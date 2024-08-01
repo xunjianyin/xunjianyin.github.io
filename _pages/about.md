@@ -24,7 +24,7 @@ Preprints
 ======
 
 - ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions   
-Xu Zhang\*,** Xunjian Yin**\*, Xiaojun Wan   
+Xu Zhang\*, **Xunjian Yin**\*, Xiaojun Wan   
 *arXiv*:2406.08842  [[paper](https://arxiv.org/abs/2406.08842)]   
 
 - Human-like Summarization Evaluation with ChatGPT  
