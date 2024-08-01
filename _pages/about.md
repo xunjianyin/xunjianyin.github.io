@@ -28,7 +28,7 @@ Xu Zhang\*, **Xunjian Yin**\*, Xiaojun Wan
 *arXiv*:2406.08842  [[paper](https://arxiv.org/abs/2406.08842)]   
 
 - Themis: Towards Flexible and Interpretable NLG Evaluation    
-Xinyu Hu, Li Lin, Mingqi Gao, Xunjian Yin, Xiaojun Wan   
+Xinyu Hu, Li Lin, Mingqi Gao, **Xunjian Yin**, Xiaojun Wan   
 *arXiv*:2406.18365  [[paper](https://arxiv.org/abs/2406.18365)]    
 
 - Human-like Summarization Evaluation with ChatGPT  
