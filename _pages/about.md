@@ -10,11 +10,7 @@ redirect_from:
 
 I am Xunjian Yin, a second-year Master's student in the [Wangxuan Institute of Computer Technology](https://www.icst.pku.edu.cn/english/home/index.htm) at [Peking University](https://english.pku.edu.cn/). My advisor is Prof. [Xiaojun Wan](https://wanxiaojun.github.io/). Previously, I obtained my B.S. degree in [Computer Science](https://eecs.pku.edu.cn/en/) from [Peking University](https://english.pku.edu.cn/).
 
-My research interest lies in knowledge and large language models (LLMs). Specifically, 
-1. I am committed to analyzing and researching the storage patterns of knowledge within large language models, aiming to uncover underlying structures and mechanisms (**Knowledge Storage Patterns**).
-2. I work on better extracting the knowledge within the model as well as assessing the boundaries of the model's knowledge capabilities. (**Knowledge Extraction and Evaluation**)
-3. I aspire to design methods that allow us to effectively manipulate and update the knowledge within these models, providing them with more flexible learning and adaptability (**Knowledge Manipulation and Updating**).
-4. My goal is to design methods that can better leverage the knowledge within the model for reasoning and practical problem-solving, enhancing the model's applicability (**Knowledge Utilization for Reasoning and Problem Solving**).
+My research focuses on advancing Large Language Models (LLMs), particularly in integrating new information. This includes benchmarking the knowledge boundaries of LLMs to define the extent of their existing expertise ([PGDC](https://arxiv.org/abs/2402.11493)), and evaluating how LLMs generalize and perform when encountering new knowledge ([Alcuna](https://arxiv.org/abs/2310.14820)). Additionally, I develop knowledge editing techniques to seamlessly integrate new knowledge while preserving valuable existing information ([AToKe](https://arxiv.org/abs/2312.05497)). Furthermore, I design unsupervised methods for self-alignment, enabling LLMs to resolve internal contradictions and improve their performance based solely on their current knowledge ([ContraSolver](https://arxiv.org/abs/2406.08842)). Through these efforts, I strive to push the frontiers of LLM capabilities, ensuring they remain robust and adaptable in an ever-evolving information landscape.
 
 
 Recent News
@@ -27,6 +23,9 @@ Recent News
 Preprints
 ======
 
+- ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions   
+Xu Zhang\*,** Xunjian Yin**\*, Xiaojun Wan
+*arXiv*:2406.08842  [[paper](https://arxiv.org/abs/2406.08842)]   
 
 - Human-like Summarization Evaluation with ChatGPT  
 Mingqi Gao, Jie Ruan, Renliang Sun, **Xunjian Yin**, Shiping Yang, Xiaojun Wan  
@@ -37,12 +36,12 @@ Mingqi Gao, Jie Ruan, Renliang Sun, **Xunjian Yin**, Shiping Yang, Xiaojun Wan
 *arXiv*:2211.07843  [[paper](https://arxiv.org/abs/2211.07843)]
 
 
-Publications
+Selected Publications
 ======
 
 - Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation  
 **Xunjian Yin**\*, Xu Zhang\*, Jie Ruan, Xiaojun Wan  
-*ACL 2024*  [[paper](https://arxiv.org/abs/2402.11493)]   
+*ACL 2024*  [[paper](https://arxiv.org/abs/2402.11493)]   [[code](https://github.com/pkulcwmzx/knowledge-boundary)]      
 
 - History Matters: Temporal Knowledge Editing in Large Language Model      
 **Xunjian Yin**, Jin Jiang, Liming Yang, Xiaojun Wan       
@@ -69,7 +68,8 @@ Xinyu Hu, **Xunjian Yin**, Xiaojun Wan
 Academic Services
 ======
 
-- Reviewer: ACL 2023, ACL ARR 2023, ACL ARR 2024
-- NLPCC Shared Task 8 track chair
-- AAAI 2024 Volunteer
+- Reviewer: ACL 2023, ACL ARR 2023, ACL ARR 2024, NeurIPS 2024 
+- NLPCC Shared Task 8 track chair 
+- AAAI 2024 Volunteer 
+- ACL 2024 Volunteer 
 
