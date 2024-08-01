@@ -27,6 +27,10 @@ Preprints
 Xu Zhang\*, **Xunjian Yin**\*, Xiaojun Wan   
 *arXiv*:2406.08842  [[paper](https://arxiv.org/abs/2406.08842)]   
 
+- Themis: Towards Flexible and Interpretable NLG Evaluation  
+Xinyu Hu, Li Lin, Mingqi Gao, Xunjian Yin, Xiaojun Wan
+*arXiv*:2406.18365  [[paper](https://arxiv.org/abs/2406.18365)]
+
 - Human-like Summarization Evaluation with ChatGPT  
 Mingqi Gao, Jie Ruan, Renliang Sun, **Xunjian Yin**, Shiping Yang, Xiaojun Wan  
 *arXiv*:2304.02554  [[paper](https://arxiv.org/abs/2304.02554)]  
@@ -70,6 +74,5 @@ Academic Services
 
 - Reviewer: ACL 2023, ACL ARR 2023, ACL ARR 2024, NeurIPS 2024 
 - NLPCC Shared Task 8 track chair 
-- AAAI 2024 Volunteer 
-- ACL 2024 Volunteer 
+- Volunteer: AAAI 2024, ACL 2024
 
