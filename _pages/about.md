@@ -12,6 +12,7 @@ I am Xunjian Yin, a second-year Master's student at the [Wangxuan Institute of C
 
 My research focuses on advancing Large Language Models (LLMs), particularly in integrating new information. This includes benchmarking the knowledge boundaries of LLMs to define the extent of their existing expertise ([PGDC](https://arxiv.org/abs/2402.11493)), and evaluating how LLMs generalize and perform when encountering new knowledge ([Alcuna](https://arxiv.org/abs/2310.14820)). Additionally, I develop knowledge editing techniques to seamlessly integrate new knowledge while preserving valuable existing information ([AToKe](https://arxiv.org/abs/2312.05497)). Furthermore, I design unsupervised methods for self-alignment, enabling LLMs to resolve internal contradictions and improve their performance based solely on their current knowledge ([ContraSolver](https://arxiv.org/abs/2406.08842)). Through these efforts, I strive to push the frontiers of LLM capabilities, ensuring they remain robust and adaptable in an ever-evolving information landscape.
 
+I’m seeking 25 Fall Ph.D. opportunities! Feel free to reach out to me if you’re interested in my research!
 
 Recent News
 ======
