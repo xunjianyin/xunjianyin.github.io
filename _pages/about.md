@@ -7,7 +7,7 @@ redirect_from:
   - /about.html
 ---
 
-I am Xunjian Yin, a second-year Master’s student at the [Wangxuan Institute of Computer Technology](https://www.icst.pku.edu.cn/english/home/index.htm) at [Peking University](https://english.pku.edu.cn/). My advisor is Prof. [Xiaojun Wan](https://wanxiaojun.github.io/). Previously, I obtained my B.S. degree in [Computer Science](https://eecs.pku.edu.cn/en/) from [Peking University](https://english.pku.edu.cn/). I worked as an intern at [Microsoft](https://www.microsoft.com/en-us/research/). Currently, I am a visiting student at [UCSB NLP Group](http://nlp.cs.ucsb.edu/), advised by Professor [William Wang](https://sites.cs.ucsb.edu/~william/index.html).
+I am Xunjian Yin, a third-year Master’s student at the [Wangxuan Institute of Computer Technology](https://www.icst.pku.edu.cn/english/home/index.htm) at [Peking University](https://english.pku.edu.cn/). My advisor is Prof. [Xiaojun Wan](https://wanxiaojun.github.io/). Previously, I obtained my B.S. degree in [Computer Science](https://eecs.pku.edu.cn/en/) from [Peking University](https://english.pku.edu.cn/). I worked as an intern at [Microsoft](https://www.microsoft.com/en-us/research/). Currently, I am a visiting student at [UCSB NLP Group](http://nlp.cs.ucsb.edu/), advised by Professor [William Wang](https://sites.cs.ucsb.edu/~william/index.html).
 
 My research focuses on advancing Large Language Models (LLMs), particularly in integrating new information. This includes:
 1. Benchmarking the knowledge boundaries of LLMs to define the extent of their existing expertise ([PGDC](https://arxiv.org/abs/2402.11493)).
@@ -29,8 +29,7 @@ Through these efforts, I strive to push the frontiers of LLM capabilities, ensur
 # Preprints
 - Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement  
   **Xunjian Yin**, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang  
-  *arXiv*:2410.04444 [[paper](https://arxiv.org/abs/2410.04444)] [[code](https://github.com/Arvid-pku/Godel_Agent)]
-
+  *arXiv*:2410.04444 [[paper](https://arxiv.org/abs/2410.04444)] [[code](https://github.com/Arvid-pku/Godel_Agent)] 
 - ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions  
   Xu Zhang\*, **Xunjian Yin**\*, Xiaojun Wan  
   *arXiv*:2406.08842 [[paper](https://arxiv.org/abs/2406.08842)]
@@ -39,27 +38,21 @@ Through these efforts, I strive to push the frontiers of LLM capabilities, ensur
 - Themis: Towards Flexible and Interpretable NLG Evaluation  
   Xinyu Hu, Li Lin, Mingqi Gao, **Xunjian Yin**, Xiaojun Wan  
   *EMNLP 2024* [[paper](https://arxiv.org/abs/2406.18365)] [[code](https://github.com/PKU-ONELab/Themis)]
-
 - Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation  
   **Xunjian Yin***, Xu Zhang*, Jie Ruan, Xiaojun Wan  
   *ACL 2024* [[paper](https://arxiv.org/abs/2402.11493)] [[code](https://github.com/pkulcwmzx/knowledge-boundary)]
-
 - History Matters: Temporal Knowledge Editing in Large Language Model  
   **Xunjian Yin**, Jin Jiang, Liming Yang, Xiaojun Wan  
   *AAAI 2024* [[pdf](https://arxiv.org/pdf/2312.05497.pdf)] [[code](https://github.com/Arvid-pku/ATOKE)]
-
 - ALCUNA: Large Language Models Meet New Knowledge  
   **Xunjian Yin***, Baizhou Huang*, Xiaojun Wan  
   *EMNLP 2023* [[pdf](https://arxiv.org/pdf/2310.14820.pdf)] [[code](https://github.com/arvid-pku/alcuna)]
-
 - Exploring Context-Aware Evaluation Metrics for Machine Translation  
   Xinyu Hu, **Xunjian Yin**, Xiaojun Wan  
-  *EMNLP 2023 findings* [[pdf](TODO)] [[code](TODO)]
-
+  *EMNLP 2023 findings* [[pdf](TODO)] [[code](TODO)] 
 - Overview of the NLPCC 2023 Shared Task: Chinese Spelling Check  
   **Xunjian Yin**, Xiaojun Wan, Dan Zhang, Linlin Yu, Long Yu  
-  *NLPCC 2023* [[pdf](https://link.springer.com/chapter/10.1007/978-3-031-44699-3_30)] [[code](https://github.com/Arvid-pku/NLPCC2023_Shared_Task8)]
-
+  *NLPCC 2023* [[pdf](https://link.springer.com/chapter/10.1007/978-3-031-44699-3_30)] [[code](https://github.com/Arvid-pku/NLPCC2023_Shared_Task8)] 
 - How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?  
   **Xunjian Yin**, Xiaojun Wan  
   *ACL 2022* [[pdf](https://aclanthology.org/2022.acl-long.531.pdf)] [[code](https://github.com/xunjianyin/Seq2SeqOnData2Text)]
