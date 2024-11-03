@@ -31,7 +31,7 @@ Through these efforts, I strive to push the frontiers of LLM capabilities, ensur
   **Xunjian Yin**, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang  
   *arXiv*:2410.04444 [[paper](https://arxiv.org/abs/2410.04444)] [[code](https://github.com/Arvid-pku/Godel_Agent)] 
 - ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions  
-  Xu Zhang\*, **Xunjian Yin**\*, Xiaojun Wan  
+  Xu Zhang&#42;, **Xunjian Yin**&#42;, Xiaojun Wan  
   *arXiv*:2406.08842 [[paper](https://arxiv.org/abs/2406.08842)]
 
 # Selected Publications
@@ -39,13 +39,13 @@ Through these efforts, I strive to push the frontiers of LLM capabilities, ensur
   Xinyu Hu, Li Lin, Mingqi Gao, **Xunjian Yin**, Xiaojun Wan  
   *EMNLP 2024* [[paper](https://arxiv.org/abs/2406.18365)] [[code](https://github.com/PKU-ONELab/Themis)]
 - Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation  
-  **Xunjian Yin***, Xu Zhang*, Jie Ruan, Xiaojun Wan  
+  **Xunjian Yin**&#42;, Xu Zhang&#42;, Jie Ruan, Xiaojun Wan  
   *ACL 2024* [[paper](https://arxiv.org/abs/2402.11493)] [[code](https://github.com/pkulcwmzx/knowledge-boundary)]
 - History Matters: Temporal Knowledge Editing in Large Language Model  
   **Xunjian Yin**, Jin Jiang, Liming Yang, Xiaojun Wan  
   *AAAI 2024* [[pdf](https://arxiv.org/pdf/2312.05497.pdf)] [[code](https://github.com/Arvid-pku/ATOKE)]
 - ALCUNA: Large Language Models Meet New Knowledge  
-  **Xunjian Yin***, Baizhou Huang*, Xiaojun Wan  
+  **Xunjian Yin**&#42;, Baizhou Huang&#42;, Xiaojun Wan  
   *EMNLP 2023* [[pdf](https://arxiv.org/pdf/2310.14820.pdf)] [[code](https://github.com/arvid-pku/alcuna)]
 - Exploring Context-Aware Evaluation Metrics for Machine Translation  
   Xinyu Hu, **Xunjian Yin**, Xiaojun Wan  
