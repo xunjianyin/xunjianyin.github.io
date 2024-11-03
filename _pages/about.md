@@ -1,49 +1,71 @@
 ---
 permalink: /
-title: "Academic Pages is a ready-to-fork GitHub Pages template for academic personal websites"
+title: "Xunjian Yin"
 author_profile: true
 redirect_from: 
   - /about/
   - /about.html
 ---
 
-This is the front page of a website that is powered by the [Academic Pages template](https://github.com/academicpages/academicpages.github.io) and hosted on GitHub pages. [GitHub pages](https://pages.github.com) is a free service in which websites are built and hosted from code and data stored in a GitHub repository, automatically updating when a new commit is made to the repository. This template was forked from the [Minimal Mistakes Jekyll Theme](https://mmistakes.github.io/minimal-mistakes/) created by Michael Rose, and then extended to support the kinds of content that academics have: publications, talks, teaching, a portfolio, blog posts, and a dynamically-generated CV. You can fork [this template](https://github.com/academicpages/academicpages.github.io) right now, modify the configuration and markdown files, add your own PDFs and other content, and have your own site for free, with no ads!
+I am Xunjian Yin, a second-year Master’s student at the [Wangxuan Institute of Computer Technology](https://www.icst.pku.edu.cn/english/home/index.htm) at [Peking University](https://english.pku.edu.cn/). My advisor is Prof. [Xiaojun Wan](https://wanxiaojun.github.io/). Previously, I obtained my B.S. degree in [Computer Science](https://eecs.pku.edu.cn/en/) from [Peking University](https://english.pku.edu.cn/). I worked as an intern at [Microsoft](https://www.microsoft.com/en-us/research/). Currently, I am a visiting student at [UCSB NLP Group](http://nlp.cs.ucsb.edu/), advised by Professor [William Wang](https://sites.cs.ucsb.edu/~william/index.html).
 
-A data-driven personal website
-======
-Like many other Jekyll-based GitHub Pages templates, Academic Pages makes you separate the website's content from its form. The content & metadata of your website are in structured markdown files, while various other files constitute the theme, specifying how to transform that content & metadata into HTML pages. You keep these various markdown (.md), YAML (.yml), HTML, and CSS files in a public GitHub repository. Each time you commit and push an update to the repository, the [GitHub pages](https://pages.github.com/) service creates static HTML pages based on these files, which are hosted on GitHub's servers free of charge.
+My research focuses on advancing Large Language Models (LLMs), particularly in integrating new information. This includes:
+1. Benchmarking the knowledge boundaries of LLMs to define the extent of their existing expertise ([PGDC](https://arxiv.org/abs/2402.11493)).
+2. Evaluating how LLMs generalize and perform when encountering new knowledge ([Alcuna](https://arxiv.org/abs/2310.14820)).
+3. Developing knowledge editing techniques to seamlessly integrate new knowledge while preserving valuable existing information ([AToKe](https://arxiv.org/abs/2312.05497)).
+4. Designing unsupervised methods for self-alignment, enabling LLMs to resolve internal contradictions and improve their performance based solely on their current knowledge ([ContraSolver](https://arxiv.org/abs/2406.08842)).
+5. Introducing the [Gödel Agent](https://arxiv.org/abs/2410.04444), a self-referential framework designed for recursive self-improvement, allowing the agent to autonomously optimize and modify itself.
 
-Many of the features of dynamic content management systems (like Wordpress) can be achieved in this fashion, using a fraction of the computational resources and with far less vulnerability to hacking and DDoSing. You can also modify the theme to your heart's content without touching the content of your site. If you get to a point where you've broken something in Jekyll/HTML/CSS beyond repair, your markdown files describing your talks, publications, etc. are safe. You can rollback the changes or even delete the repository and start over - just be sure to save the markdown files! Finally, you can also write scripts that process the structured data on the site, such as [this one](https://github.com/academicpages/academicpages.github.io/blob/master/talkmap.ipynb) that analyzes metadata in pages about talks to display [a map of every location you've given a talk](https://academicpages.github.io/talkmap.html).
+Through these efforts, I strive to push the frontiers of LLM capabilities, ensuring they remain robust and adaptable in an ever-evolving information landscape.
 
-Getting started
-======
-1. Register a GitHub account if you don't have one and confirm your e-mail (required!)
-1. Fork [this template](https://github.com/academicpages/academicpages.github.io) by clicking the "Use this template" button in the top right. 
-1. Go to the repository's settings (rightmost item in the tabs that start with "Code", should be below "Unwatch"). Rename the repository "[your GitHub username].github.io", which will also be your website's URL.
-1. Set site-wide configuration and create content & metadata (see below -- also see [this set of diffs](http://archive.is/3TPas) showing what files were changed to set up [an example site](https://getorg-testacct.github.io) for a user with the username "getorg-testacct")
-1. Upload any files (like PDFs, .zip files, etc.) to the files/ directory. They will appear at https://[your GitHub username].github.io/files/example.pdf.  
-1. Check status by going to the repository settings, in the "GitHub pages" section
+*I’m seeking 25 Fall Ph.D. opportunities! Feel free to reach out to me if you’re interested in my research!*
 
-Site-wide configuration
-------
-The main configuration file for the site is in the base directory in [_config.yml](https://github.com/academicpages/academicpages.github.io/blob/master/_config.yml), which defines the content in the sidebars and other site-wide features. You will need to replace the default variables with ones about yourself and your site's github repository. The configuration file for the top menu is in [_data/navigation.yml](https://github.com/academicpages/academicpages.github.io/blob/master/_data/navigation.yml). For example, if you don't have a portfolio or blog posts, you can remove those items from that navigation.yml file to remove them from the header. 
+# Recent News
+- 2024-10: One paper accepted to EMNLP 2023
+- 2024-05: One paper accepted to ACL 2024
+- 2023-12: One paper accepted to AAAI 2024
+- 2023-10: Two papers accepted to EMNLP 2023
 
-Create content & metadata
-------
-For site content, there is one markdown file for each type of content, which are stored in directories like _publications, _talks, _posts, _teaching, or _pages. For example, each talk is a markdown file in the [_talks directory](https://github.com/academicpages/academicpages.github.io/tree/master/_talks). At the top of each markdown file is structured data in YAML about the talk, which the theme will parse to do lots of cool stuff. The same structured data about a talk is used to generate the list of talks on the [Talks page](https://academicpages.github.io/talks), each [individual page](https://academicpages.github.io/talks/2012-03-01-talk-1) for specific talks, the talks section for the [CV page](https://academicpages.github.io/cv), and the [map of places you've given a talk](https://academicpages.github.io/talkmap.html) (if you run this [python file](https://github.com/academicpages/academicpages.github.io/blob/master/talkmap.py) or [Jupyter notebook](https://github.com/academicpages/academicpages.github.io/blob/master/talkmap.ipynb), which creates the HTML for the map based on the contents of the _talks directory).
+# Preprints
+- **Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement**  
+  **Xunjian Yin**, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang  
+  *arXiv*:2410.04444 [[paper](https://arxiv.org/abs/2410.04444)] [[code](https://github.com/Arvid-pku/Godel_Agent)]
 
-**Markdown generator**
+- **ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions**  
+  Xu Zhang*, **Xunjian Yin***, Xiaojun Wan  
+  *arXiv*:2406.08842 [[paper](https://arxiv.org/abs/2406.08842)]
 
-The repository includes [a set of Jupyter notebooks](https://github.com/academicpages/academicpages.github.io/tree/master/markdown_generator
-) that converts a CSV containing structured data about talks or presentations into individual markdown files that will be properly formatted for the Academic Pages template. The sample CSVs in that directory are the ones I used to create my own personal website at stuartgeiger.com. My usual workflow is that I keep a spreadsheet of my publications and talks, then run the code in these notebooks to generate the markdown files, then commit and push them to the GitHub repository.
+# Selected Publications
+- **Themis: Towards Flexible and Interpretable NLG Evaluation**  
+  Xinyu Hu, Li Lin, Mingqi Gao, **Xunjian Yin**, Xiaojun Wan  
+  *EMNLP 2024* [[paper](https://arxiv.org/abs/2406.18365)] [[code](https://github.com/PKU-ONELab/Themis)]
 
-How to edit your site's GitHub repository
-------
-Many people use a git client to create files on their local computer and then push them to GitHub's servers. If you are not familiar with git, you can directly edit these configuration and markdown files directly in the github.com interface. Navigate to a file (like [this one](https://github.com/academicpages/academicpages.github.io/blob/master/_talks/2012-03-01-talk-1.md) and click the pencil icon in the top right of the content preview (to the right of the "Raw | Blame | History" buttons). You can delete a file by clicking the trashcan icon to the right of the pencil icon. You can also create new files or upload files by navigating to a directory and clicking the "Create new file" or "Upload files" buttons. 
+- **Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation**  
+  **Xunjian Yin***, Xu Zhang*, Jie Ruan, Xiaojun Wan  
+  *ACL 2024* [[paper](https://arxiv.org/abs/2402.11493)] [[code](https://github.com/pkulcwmzx/knowledge-boundary)]
 
-Example: editing a markdown file for a talk
-![Editing a markdown file for a talk](/images/editing-talk.png)
+- **History Matters: Temporal Knowledge Editing in Large Language Model**  
+  **Xunjian Yin**, Jin Jiang, Liming Yang, Xiaojun Wan  
+  *AAAI 2024* [[pdf](https://arxiv.org/pdf/2312.05497.pdf)] [[code](https://github.com/Arvid-pku/ATOKE)]
 
-For more info
-------
-More info about configuring Academic Pages can be found in [the guide](https://academicpages.github.io/markdown/), the [growing wiki](https://github.com/academicpages/academicpages.github.io/wiki), and you can always [ask a question on GitHub](https://github.com/academicpages/academicpages.github.io/discussions). The [guides for the Minimal Mistakes theme](https://mmistakes.github.io/minimal-mistakes/docs/configuration/) (which this theme was forked from) might also be helpful.
+- **ALCUNA: Large Language Models Meet New Knowledge**  
+  **Xunjian Yin***, Baizhou Huang*, Xiaojun Wan  
+  *EMNLP 2023* [[pdf](https://arxiv.org/pdf/2310.14820.pdf)] [[code](https://github.com/arvid-pku/alcuna)]
+
+- **Exploring Context-Aware Evaluation Metrics for Machine Translation**  
+  Xinyu Hu, **Xunjian Yin**, Xiaojun Wan  
+  *EMNLP 2023 findings* [[pdf](TODO)] [[code](TODO)]
+
+- **Overview of the NLPCC 2023 Shared Task: Chinese Spelling Check**  
+  **Xunjian Yin**, Xiaojun Wan, Dan Zhang, Linlin Yu, Long Yu  
+  *NLPCC 2023* [[pdf](https://link.springer.com/chapter/10.1007/978-3-031-44699-3_30)] [[code](https://github.com/Arvid-pku/NLPCC2023_Shared_Task8)]
+
+- **How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?**  
+  **Xunjian Yin**, Xiaojun Wan  
+  *ACL 2022* [[pdf](https://aclanthology.org/2022.acl-long.531.pdf)] [[code](https://github.com/xunjianyin/Seq2SeqOnData2Text)]
+
+# Academic Services
+- Reviewer: ACL 2023, ACL ARR 2023, ACL ARR 2024, NeurIPS 2024
+- NLPCC Shared Task 8 track chair
+- Volunteer: AAAI 2024, ACL 2024
+
