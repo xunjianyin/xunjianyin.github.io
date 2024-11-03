@@ -75,15 +75,15 @@ author:
   # zhihu            : # Username
 
 # Publication Category - The following the list of publication categories and their headings
-# publication_category:
-#   books:
-#     title: 'Books'
-#   manuscripts:
-#     title: 'Journal Articles'    
-#   conferences:
-#     title: 'Conference Papers'
+publication_category:
+  books:
+    title: 'Books'
+  manuscripts:
+    title: 'Journal Articles'    
+  conferences:
+    title: 'Conference Papers'
 
-Site Settings
+# Site Settings
 teaser                   :  # filename of teaser fallback teaser image placed in /images/, .e.g. "500x300.png"
 breadcrumbs              : false # true, false (default)
 words_per_minute         : 160
@@ -121,9 +121,14 @@ atom_feed:
   path                   : # blank (default) uses feed.xml
 
 
-SEO Related
+# SEO Related
+google_site_verification :
+bing_site_verification   :
+alexa_site_verification  :
+yandex_site_verification :
 
-Social Sharing
+
+# Social Sharing
 twitter:
   username               : &twitter
 facebook:
