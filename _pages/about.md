@@ -27,45 +27,45 @@ Through these efforts, I strive to push the frontiers of LLM capabilities, ensur
 - 2023-10: Two papers accepted to EMNLP 2023
 
 # Preprints
-- **Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement**  
+- Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement  
   **Xunjian Yin**, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang  
   *arXiv*:2410.04444 [[paper](https://arxiv.org/abs/2410.04444)] [[code](https://github.com/Arvid-pku/Godel_Agent)]
 
-- **ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions**  
-  Xu Zhang*, **Xunjian Yin***, Xiaojun Wan  
+- ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions  
+  Xu Zhang\*, **Xunjian Yin**\*, Xiaojun Wan  
   *arXiv*:2406.08842 [[paper](https://arxiv.org/abs/2406.08842)]
 
 # Selected Publications
-- **Themis: Towards Flexible and Interpretable NLG Evaluation**  
+- Themis: Towards Flexible and Interpretable NLG Evaluation  
   Xinyu Hu, Li Lin, Mingqi Gao, **Xunjian Yin**, Xiaojun Wan  
   *EMNLP 2024* [[paper](https://arxiv.org/abs/2406.18365)] [[code](https://github.com/PKU-ONELab/Themis)]
 
-- **Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation**  
+- Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation  
   **Xunjian Yin***, Xu Zhang*, Jie Ruan, Xiaojun Wan  
   *ACL 2024* [[paper](https://arxiv.org/abs/2402.11493)] [[code](https://github.com/pkulcwmzx/knowledge-boundary)]
 
-- **History Matters: Temporal Knowledge Editing in Large Language Model**  
+- History Matters: Temporal Knowledge Editing in Large Language Model  
   **Xunjian Yin**, Jin Jiang, Liming Yang, Xiaojun Wan  
   *AAAI 2024* [[pdf](https://arxiv.org/pdf/2312.05497.pdf)] [[code](https://github.com/Arvid-pku/ATOKE)]
 
-- **ALCUNA: Large Language Models Meet New Knowledge**  
+- ALCUNA: Large Language Models Meet New Knowledge  
   **Xunjian Yin***, Baizhou Huang*, Xiaojun Wan  
   *EMNLP 2023* [[pdf](https://arxiv.org/pdf/2310.14820.pdf)] [[code](https://github.com/arvid-pku/alcuna)]
 
-- **Exploring Context-Aware Evaluation Metrics for Machine Translation**  
+- Exploring Context-Aware Evaluation Metrics for Machine Translation  
   Xinyu Hu, **Xunjian Yin**, Xiaojun Wan  
   *EMNLP 2023 findings* [[pdf](TODO)] [[code](TODO)]
 
-- **Overview of the NLPCC 2023 Shared Task: Chinese Spelling Check**  
+- Overview of the NLPCC 2023 Shared Task: Chinese Spelling Check  
   **Xunjian Yin**, Xiaojun Wan, Dan Zhang, Linlin Yu, Long Yu  
   *NLPCC 2023* [[pdf](https://link.springer.com/chapter/10.1007/978-3-031-44699-3_30)] [[code](https://github.com/Arvid-pku/NLPCC2023_Shared_Task8)]
 
-- **How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?**  
+- How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?  
   **Xunjian Yin**, Xiaojun Wan  
   *ACL 2022* [[pdf](https://aclanthology.org/2022.acl-long.531.pdf)] [[code](https://github.com/xunjianyin/Seq2SeqOnData2Text)]
 
 # Academic Services
-- Reviewer: ACL 2023, ACL ARR 2023, ACL ARR 2024, NeurIPS 2024
+- Reviewer: ACL 2023, ACL ARR 2023, ACL ARR 2024, NeurIPS 2024, ICLR 2025
 - NLPCC Shared Task 8 track chair
 - Volunteer: AAAI 2024, ACL 2024
 
