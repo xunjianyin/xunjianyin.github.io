@@ -9,12 +9,8 @@ redirect_from:
 
 I am Xunjian Yin, a third-year Master’s student at the [Wangxuan Institute of Computer Technology](https://www.icst.pku.edu.cn/english/home/index.htm) at [Peking University](https://english.pku.edu.cn/). My advisor is Prof. [Xiaojun Wan](https://wanxiaojun.github.io/). Previously, I obtained my B.S. degree in [Computer Science](https://eecs.pku.edu.cn/en/) from [Peking University](https://english.pku.edu.cn/). I worked as an intern at [Microsoft](https://www.microsoft.com/en-us/research/). Currently, I am a visiting student at [UCSB NLP Group](http://nlp.cs.ucsb.edu/), advised by Professor [William Wang](https://sites.cs.ucsb.edu/~william/index.html).
 
-My research focuses on advancing Large Language Models (LLMs), particularly in integrating new information. This includes:
-1. Benchmarking the knowledge boundaries of LLMs to define the extent of their existing expertise ([PGDC](https://arxiv.org/abs/2402.11493)).
-2. Evaluating how LLMs generalize and perform when encountering new knowledge ([Alcuna](https://arxiv.org/abs/2310.14820)).
-3. Developing knowledge editing techniques to seamlessly integrate new knowledge while preserving valuable existing information ([AToKe](https://arxiv.org/abs/2312.05497)).
-4. Designing unsupervised methods for self-alignment, enabling LLMs to resolve internal contradictions and improve their performance based solely on their current knowledge ([ContraSolver](https://arxiv.org/abs/2406.08842)).
-5. Introducing the [Gödel Agent](https://arxiv.org/abs/2410.04444), a self-referential framework designed for recursive self-improvement, allowing the agent to autonomously optimize and modify itself.
+My research focuses on advancing Large Language Models, particularly in integrating new information. This includes:
+(1) benchmarking internal knowledge boundaries of LLMs ([PGDC](https://arxiv.org/abs/2402.11493)), (2) evaluating LLM generalization with new knowledge ([Alcuna](https://arxiv.org/abs/2310.14820)), (3) proposing the task and the solution on temporal knowledge editing ([AToKe](https://arxiv.org/abs/2312.05497)), (4) unsupervised methods for LLM self-alignment by resolve their internal contradictions ([ContraSolver](https://arxiv.org/abs/2406.08842)), (5) [Gödel Agent](https://arxiv.org/abs/2410.04444), a self-referential framework designed for recursive self-improvement. (6) [Reverse Model](https://huggingface.co/Corning/Reverse-Model-7B-348B), pretrained with last token prediction.
 
 Through these efforts, I strive to push the frontiers of LLM capabilities, ensuring they remain robust and adaptable in an ever-evolving information landscape.
 
