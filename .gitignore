@@ -1,0 +1,6 @@
+.DS_Store
+.vscode/
+store/
+*.log
+*.zip
+test.html
