@@ -12,7 +12,11 @@
   <link rel="stylesheet" type="text/css" href="stylesheet.css">
   <link rel="icon" type="image/png" href="figures/logo.png">
 
+
+  
   <!-- <script src="live2dw/lib/L2Dwidget.min.js"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":200,"height":400},"mobile":{"show":true},"log":false});</script> -->
+
+  <!-- <script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=FtefwNT63Wx_0gBCBN3XnQmRNAp1TN3HO-j7pLKNwo4"></script> -->
 
 </head>
 
@@ -416,78 +420,86 @@
 
 
 
-          <!-------------------------- Awards----------------->
-          <table
-            style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-            <tbody>
-              <tr>
-                <td style="padding:20px;width:100%;vertical-align:middle">
-                  <heading>Honors and Awards</heading>
-                  <ul>
-                    <li>
-                      <p>
-                        Merit Student, PKU, Sep. 2024
-                      </p>
-                    </li>
-                    <li>
-                      <p>
-                        Guotai Junan Scholarship, PKU, Sep. 2024
-                      </p>
-                    </li>
-                    <li>
-                      <p>
-                        Wang Xuan Scholarship, PKU, Sep. 2022
-                      </p>
-                    </li>
-                    <li>
-                      <p>
-                        Award for Research Excellence, PKU, Sep. 2023, 2022, 2021
-                      </p>
-                    </li>
-                    <li>
-                      <p>
-                        Award for Academic Excellence, PKU, Sep. 2020, 2019
-                      </p>
-                    </li>
-                    <li>
-                      <p>
-                        Outstanding Student, Shandong Province, Apr. 2018
-                      </p>
-                    </li>
-                  </ul>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-
-          <!-------------------------- Stats-----------------
-          <table style="width:50%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
-            <tr>
-		    <script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=xVc6OEJjlJZcG-OaRwA8jfYlt4FPGL82bzwCxC-MbyI"></script>
-          </tr>
-        </tbody></table>
--------->
-
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>mymap</title>
+            <title>Layout</title>
             <style>
+              /* 设置父容器为 flex 布局 */
+              .container {
+                display: flex;
+                justify-content: space-between; /* 在水平方向上分布子元素 */
+                align-items: flex-end; /* 子元素在垂直方向底部对齐 */
+                gap: 20px; /* 子元素之间的间距 */
+              }
+          
+              /* Awards 样式 */
+              .awards {
+                flex: 1; /* 让 Awards 占用剩余的空间 */
+              }
+          
+              .awards table {
+                width: 100%;
+                border: 0px;
+                border-spacing: 0px;
+                border-collapse: separate;
+              }
+          
+              .awards td {
+                padding: 20px;
+                vertical-align: middle;
+              }
+          
+              /* Map 样式 */
               #map-container {
-                width: 100px;
-                height: 100px;
+                width: 150px; /* 设置映射容器的宽度 */
+                height: 150px; /* 设置映射容器的高度 */
+                background-color: #ffffff; /* 添加背景色以便更清晰地看到地图区域 */
               }
             </style>
           </head>
-
-          <body>
-            <div id="map-container">
-              <script type="text/javascript" id="clstr_globe"
-                src="//clustrmaps.com/globe.js?d=FtefwNT63Wx_0gBCBN3XnQmRNAp1TN3HO-j7pLKNwo4"></script>
+  
+            <!-- Flex容器 -->
+            <div class="container">
+              <!-- Awards 部分 -->
+              <div class="awards">
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <heading>Honors and Awards</heading>
+                        <ul>
+                          <li>
+                            <p>Merit Student, PKU, Sep. 2024</p>
+                          </li>
+                          <li>
+                            <p>Guotai Junan Scholarship, PKU, Sep. 2024</p>
+                          </li>
+                          <li>
+                            <p>Wang Xuan Scholarship, PKU, Sep. 2022</p>
+                          </li>
+                          <li>
+                            <p>Award for Research Excellence, PKU, Sep. 2023, 2022, 2021</p>
+                          </li>
+                          <li>
+                            <p>Award for Academic Excellence, PKU, Sep. 2020, 2019</p>
+                          </li>
+                          <li>
+                            <p>Outstanding Student, Shandong Province, Apr. 2018</p>
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+          
+              <!-- Map 部分 -->
+              <div id="map-container">
+                <script type="text/javascript" id="clstr_globe"
+                  src="//clustrmaps.com/globe.js?d=FtefwNT63Wx_0gBCBN3XnQmRNAp1TN3HO-j7pLKNwo4"></script>
+              </div>
             </div>
-          </body>
-
 
 
           <!-------------------------- Acknowledge----------------->
