@@ -149,3 +149,63 @@ name {
 span.highlight {
   background-color: #ffffd0;
 }
+
+/* Existing styles (omitted for brevity) */
+
+/* Floating Outline Sidebar */
+#outline-sidebar {
+  position: fixed;
+  top: 200px;
+  left: 10px;
+  width: 200px;
+  background-color: #ffffff;
+  border: 1px solid #ffffff;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 0px 0px rgba(0,0,0,0);
+  z-index: 1000;
+}
+
+#outline-sidebar .sidebar-heading {
+  font-family: 'Lato', Verdana, Helvetica, sans-serif;
+  font-size: 18px;
+  color: #0065C0;
+  margin-bottom: 10px;
+}
+
+#outline-sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#outline-sidebar ul li {
+  margin-bottom: 8px;
+}
+
+#outline-sidebar ul li a {
+  font-family: 'Lato', Verdana, Helvetica, sans-serif;
+  font-size: 14px;
+  color: #1772d0;
+  text-decoration: none;
+}
+
+#outline-sidebar ul li a:hover,
+#outline-sidebar ul li a:focus {
+  color: #f09228;
+}
+
+/* Main Content Padding to Avoid Overlap */
+#main-content {
+  padding-left: 240px; /* Width of sidebar (200px) + extra space (40px) */
+}
+
+/* Responsive Design: Hide sidebar on small screens */
+@media screen and (max-width: 768px) {
+  #outline-sidebar {
+    display: none;
+  }
+  #main-content {
+    padding-left: 0;
+  }
+}
