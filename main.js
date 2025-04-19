@@ -5,6 +5,43 @@
 
 // Wait for DOM to be ready before manipulating
 document.addEventListener('DOMContentLoaded', function() {
+  // Add publication table styles to ensure consistent indentation
+  const tableStyles = `
+    .publication-table {
+      width: 100%;
+      border: 0px;
+      border-spacing: 0px;
+      border-collapse: separate;
+      margin: 0 auto 20px;
+    }
+    .publication-table tr {
+      vertical-align: top;
+    }
+    .publication-table td {
+      padding: 10px 20px;
+      vertical-align: top;
+    }
+    .papertitle {
+      margin-bottom: 6px;
+    }
+    .paper_rest {
+      margin-bottom: 6px;
+    }
+  `;
+  
+  // Apply the styles
+  const styleEl = document.createElement('style');
+  styleEl.textContent = tableStyles;
+  document.head.appendChild(styleEl);
+  
+  // Convert existing tables to use publication-table class
+  document.querySelectorAll('table').forEach(table => {
+    if (table.querySelector('#preprints-tbody') || 
+        table.querySelector('#selected-publications-tbody')) {
+      table.className = 'publication-table';
+    }
+  });
+  
   // Populate publications and other sections
   populatePublications(preprints, 'preprints-tbody');
   populatePublications(selectedPublications, 'selected-publications-tbody');
@@ -48,6 +85,7 @@ function populatePublications(publications, tbodyId) {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
     td.setAttribute('valign', 'top');
+    td.style.padding = '10px 20px'; // Consistent padding
 
     // Paper title with "New" badge if applicable
     const titleDiv = document.createElement('div');

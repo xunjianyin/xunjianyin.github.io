@@ -21,8 +21,8 @@ const preprints = [
   }
 ];
 
-// Selected Publications Data
-const selectedPublications = [
+// Full Publications list (for dedicated publications page)
+const fullPublications = [
   {
     title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with LLMs",
     authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
@@ -49,6 +49,91 @@ const selectedPublications = [
       { text: "Paper", url: "https://arxiv.org/abs/" },
       { text: "Code", url: "https://github.com/PKU-ONELab/" }
     ]
+  },
+  {
+    title: "Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability",
+    authors: "Xinyu Hu, Li Lin, Mingqi Gao, <b>Xunjian Yin</b>, Xiaojun Wan",
+    venue: "EMNLP 2024",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2406.18365" },
+      { text: "Code", url: "https://github.com/PKU-ONELab/Themis" }
+    ]
+  },
+  {
+    title: "Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation",
+    authors: "<b>Xunjian Yin</b>, Xu Zhang*, Jie Ruan, Xiaojun Wan",
+    venue: "ACL 2024",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2402.11493" },
+      { text: "Code", url: "https://github.com/pkulcwmzx/knowledge-boundary" }
+    ]
+  },
+  {
+    title: "History Matters: Temporal Knowledge Editing in Large Language Model",
+    authors: "<b>Xunjian Yin</b>, Jin Jiang, Liming Yang, Xiaojun Wan",
+    venue: "AAAI 2024",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/pdf/2312.05497.pdf" },
+      { text: "Code", url: "https://github.com/Arvid-pku/ATOKE" }
+    ]
+  },
+  {
+    title: "Error-Robust Retrieval for Chinese Spelling Check",
+    authors: "<b>Xunjian Yin</b>, Xinyu Hu, Jin Jiang, Xiaojun Wan",
+    venue: "COLING 2024",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2312.05497" },
+      { text: "Code", url: "https://github.com/PKU-ONELab/" }
+    ]
+  },
+  {
+    title: "ALCUNA: Large Language Models Meet New Knowledge",
+    authors: "<b>Xunjian Yin</b>, Baizhou Huang*, Xiaojun Wan",
+    venue: "EMNLP 2023",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/pdf/2310.14820.pdf" },
+      { text: "Code", url: "https://github.com/arvid-pku/alcuna" }
+    ]
+  },
+  {
+    title: "Exploring Context-Aware Evaluation Metrics for Machine Translation",
+    authors: "Xinyu Hu, <b>Xunjian Yin</b>, Xiaojun Wan",
+    venue: "EMNLP 2023 Findings",
+    links: [
+      { text: "Paper", url: "TODO" },
+      { text: "Code", url: "TODO" }
+    ]
+  },
+  {
+    title: "How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?",
+    authors: "<b>Xunjian Yin</b>, Xiaojun Wan",
+    venue: "ACL 2022",
+    links: [
+      { text: "Paper", url: "https://aclanthology.org/2022.acl-long.531.pdf" },
+      { text: "Code", url: "https://github.com/xunjianyin/Seq2SeqOnData2Text" }
+    ]
+  }
+];
+
+// Selected Publications Data - Removed DSGram paper
+const selectedPublications = [
+  {
+    title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with LLMs",
+    authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
+    venue: "NAACL findings 2025",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2410.13192" }
+    ],
+    isNew: true
+  },
+  {
+    title: "ChemAgent: Self-updating Memories in LLMs Improves Chemical Reasoning",
+    authors: "Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, <b>Xunjian Yin</b>, Siru Ouyang, Wangchunshu Zhou, Pan Lu, <br>Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein",
+    venue: "ICLR 2025",
+    links: [
+      { text: "Paper", url: "https://openreview.net/forum?id=kuhIqeVg0e" }
+    ],
+    isNew: true
   },
   {
     title: "Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability",

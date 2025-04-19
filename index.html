@@ -16,10 +16,55 @@
     body {
       font-display: swap;
     }
+    
+    /* Navigation buttons styles */
+    .nav-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      padding: 15px 30px;
+      flex-wrap: wrap;
+    }
+    
+    .nav-button {
+      display: inline-block;
+      padding: 5px 10px;
+      background-color: transparent;
+      color: var(--primary-color);
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      text-align: center;
+      border: none;
+    }
+    
+    .nav-button:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+    
+    @media screen and (max-width: 600px) {
+      .nav-buttons {
+        justify-content: center;
+        gap: 12px;
+      }
+      
+      .nav-button {
+        font-size: 13px;
+      }
+    }
   </style>
 </head>
 
 <body bgcolor="#FFFFFF">
+  <!-- Navigation Buttons -->
+  <div class="nav-buttons">
+    <a href="index.html" class="nav-button">Home</a>
+    <a href="publications.html" class="nav-button">Publications</a>
+    <a href="blog.html" class="nav-button">Blog</a>
+    <a href="photography.html" class="nav-button">Photography</a>
+  </div>
+
   <!-- Floating Outline Sidebar -->
   <div id="outline-sidebar">
     <h2 class="sidebar-heading">Outline</h2>

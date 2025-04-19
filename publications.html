@@ -1,0 +1,222 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Publications - Xunjian Yin</title>
+  <meta name="author" content="Xunjian Yin">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Publications of Xunjian Yin - PhD student at Duke University specializing in AI, NLP and model generalization research">
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  <link rel="icon" type="image/png" href="figures/logo.png">
+  <!-- Use system font stack for improved performance -->
+  <style>
+    body {
+      font-display: swap;
+    }
+    
+    /* Navigation buttons styles */
+    .nav-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      padding: 15px 30px;
+      flex-wrap: wrap;
+    }
+    
+    .nav-button {
+      display: inline-block;
+      padding: 5px 10px;
+      background-color: transparent;
+      color: var(--primary-color);
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      text-align: center;
+      border: none;
+    }
+    
+    .nav-button:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+    
+    .publications-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .page-title {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: var(--primary-color);
+    }
+    
+    /* Fix for paper indentation */
+    .publication-table {
+      width: 100%;
+      border: 0px;
+      border-spacing: 0px;
+      border-collapse: separate;
+      margin: 0 auto 20px;
+    }
+    
+    .publication-table tr {
+      vertical-align: top;
+    }
+    
+    .publication-table td {
+      padding: 10px 20px;
+      vertical-align: top;
+    }
+    
+    .papertitle {
+      margin-bottom: 6px;
+    }
+    
+    .paper_rest {
+      margin-bottom: 6px;
+    }
+    
+    .paper_bottom_space {
+      margin-bottom: 20px;
+    }
+    
+    @media screen and (max-width: 600px) {
+      .nav-buttons {
+        justify-content: center;
+        gap: 12px;
+      }
+      
+      .nav-button {
+        font-size: 13px;
+      }
+      
+      .publication-table td {
+        padding: 8px 15px;
+      }
+    }
+  </style>
+</head>
+
+<body bgcolor="#FFFFFF">
+  <!-- Navigation Buttons -->
+  <div class="nav-buttons">
+    <a href="index.html" class="nav-button">Home</a>
+    <a href="publications.html" class="nav-button">Publications</a>
+    <a href="blog.html" class="nav-button">Blog</a>
+    <a href="photography.html" class="nav-button">Photography</a>
+  </div>
+
+  <!-- Publications Content -->
+  <div class="publications-container">
+    <h1 class="page-title">Publications</h1>
+    
+    <!-- Preprints -->
+    <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+      <tbody>
+        <tr>
+          <td style="padding:20px;width:100%;vertical-align:middle">
+            <heading id="preprints">Preprints</heading>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="publication-table">
+      <tbody id="preprints-tbody">
+        <!-- Preprints will be inserted here -->
+      </tbody>
+    </table>
+
+    <!-- Full Publications -->
+    <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+      <tbody>
+        <tr>
+          <td style="padding:20px;width:100%;vertical-align:middle">
+            <heading id="publications">Publications</heading>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="publication-table">
+      <tbody id="publications-tbody">
+        <!-- Publications will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <table style="width:100%;max-width:1000px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+    <tbody>
+      <tr>
+        <td style="padding:20px; text-align: center;">
+          <br>
+          <p style="font-size:small;">
+            © 2024 Xunjian Yin. All rights reserved.
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Load JavaScript files -->
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  
+  <!-- Load data first, then main.js which depends on the data -->
+  <script src="data.js"></script>
+  <script>
+    // Publications page specific script
+    document.addEventListener('DOMContentLoaded', function() {
+      // Populate preprints
+      populatePublications(preprints, 'preprints-tbody');
+      
+      // Populate full publications
+      populatePublications(fullPublications, 'publications-tbody');
+    });
+    
+    /**
+     * Function to populate publications in the specified tbody element
+     * @param {Array} publications - Array of publication objects
+     * @param {string} tbodyId - ID of the tbody element to populate
+     */
+    function populatePublications(publications, tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      
+      publications.forEach(pub => {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.setAttribute('valign', 'top');
+        td.style.padding = '10px 20px'; // Consistent padding
+
+        // Paper title with "New" badge if applicable
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'papertitle';
+        titleDiv.innerHTML = (pub.isNew ? '<span style="color:red">New!</span>   ' : '') + pub.title;
+        
+        // Paper details (authors, venue, links)
+        const restDiv = document.createElement('div');
+        restDiv.className = 'paper_rest';
+        restDiv.innerHTML = pub.authors + '<br />' +
+          '<span style="color:#CC0000"><i>' + pub.venue + '</i></span>   [ ' +
+          pub.links.map(link => `<a href="${link.url}">${link.text}</a>`).join(' | ') +
+          ' ]';
+        
+        // Bottom spacing
+        const bottomSpaceDiv = document.createElement('div');
+        bottomSpaceDiv.className = 'paper_bottom_space';
+        
+        // Append elements
+        td.appendChild(titleDiv);
+        td.appendChild(restDiv);
+        td.appendChild(bottomSpaceDiv);
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+
+</html> 
