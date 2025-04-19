@@ -5,21 +5,15 @@
 
 // Wait for DOM to be ready before manipulating
 document.addEventListener('DOMContentLoaded', function() {
-  // Add publication table styles to ensure consistent indentation
-  const tableStyles = `
-    .publication-table {
-      width: 100%;
-      border: 0px;
-      border-spacing: 0px;
-      border-collapse: separate;
+  // Add publication styles to ensure consistent indentation
+  const publicationStyles = `
+    .publication-list {
+      list-style-type: disc;
+      padding-left: 30px;
       margin: 0 auto 20px;
     }
-    .publication-table tr {
-      vertical-align: top;
-    }
-    .publication-table td {
-      padding: 10px 20px;
-      vertical-align: top;
+    .publication-list li {
+      margin-bottom: 16px;
     }
     .papertitle {
       margin-bottom: 6px;
@@ -31,20 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Apply the styles
   const styleEl = document.createElement('style');
-  styleEl.textContent = tableStyles;
+  styleEl.textContent = publicationStyles;
   document.head.appendChild(styleEl);
   
-  // Convert existing tables to use publication-table class
-  document.querySelectorAll('table').forEach(table => {
-    if (table.querySelector('#preprints-tbody') || 
-        table.querySelector('#selected-publications-tbody')) {
-      table.className = 'publication-table';
-    }
-  });
-  
   // Populate publications and other sections
-  populatePublications(preprints, 'preprints-tbody');
-  populatePublications(selectedPublications, 'selected-publications-tbody');
+  populatePublications(preprints, 'preprints-list');
+  populatePublications(selectedPublications, 'selected-publications-list');
   populateProjects();
   populateResearchExperience();
   populateTeaching();
@@ -57,10 +43,20 @@ document.addEventListener('DOMContentLoaded', function() {
       const targetId = this.getAttribute('href');
       const targetElement = document.querySelector(targetId);
       if (targetElement) {
-        window.scrollTo({
-          top: targetElement.offsetTop - 50,
-          behavior: 'smooth'
-        });
+        // Get the offsetTop of the table that contains the section heading
+        const tableContainer = targetElement.closest('table');
+        if (tableContainer) {
+          window.scrollTo({
+            top: tableContainer.offsetTop - 50,
+            behavior: 'smooth'
+          });
+        } else {
+          // Fallback if table not found
+          window.scrollTo({
+            top: targetElement.offsetTop - 50,
+            behavior: 'smooth'
+          });
+        }
       }
     });
   });
@@ -69,24 +65,24 @@ document.addEventListener('DOMContentLoaded', function() {
   const lastModified = new Date(document.lastModified);
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   const formattedDate = lastModified.toLocaleDateString('en-US', options);
-  document.getElementById('last-modified-time').textContent = `Last Modified: ${formattedDate}`;
+  const lastModifiedElement = document.getElementById('last-modified-time');
+  if (lastModifiedElement) {
+    lastModifiedElement.textContent = `Last Modified: ${formattedDate}`;
+  }
 });
 
 /**
- * Function to populate publications in the specified tbody element
+ * Function to populate publications in the specified list element
  * @param {Array} publications - Array of publication objects
- * @param {string} tbodyId - ID of the tbody element to populate
+ * @param {string} listId - ID of the ul element to populate
  */
-function populatePublications(publications, tbodyId) {
-  const tbody = document.getElementById(tbodyId);
-  if (!tbody) return;
+function populatePublications(publications, listId) {
+  const list = document.getElementById(listId);
+  if (!list) return;
   
   publications.forEach(pub => {
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
-    td.setAttribute('valign', 'top');
-    td.style.padding = '10px 20px'; // Consistent padding
-
+    const li = document.createElement('li');
+    
     // Paper title with "New" badge if applicable
     const titleDiv = document.createElement('div');
     titleDiv.className = 'papertitle';
@@ -105,11 +101,10 @@ function populatePublications(publications, tbodyId) {
     bottomSpaceDiv.className = 'paper_bottom_space';
     
     // Append elements
-    td.appendChild(titleDiv);
-    td.appendChild(restDiv);
-    td.appendChild(bottomSpaceDiv);
-    tr.appendChild(td);
-    tbody.appendChild(tr);
+    li.appendChild(titleDiv);
+    li.appendChild(restDiv);
+    li.appendChild(bottomSpaceDiv);
+    list.appendChild(li);
   });
 }
 

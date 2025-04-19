@@ -118,15 +118,6 @@ const fullPublications = [
 // Selected Publications Data - Removed DSGram paper
 const selectedPublications = [
   {
-    title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with LLMs",
-    authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
-    venue: "NAACL findings 2025",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2410.13192" }
-    ],
-    isNew: true
-  },
-  {
     title: "ChemAgent: Self-updating Memories in LLMs Improves Chemical Reasoning",
     authors: "Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, <b>Xunjian Yin</b>, Siru Ouyang, Wangchunshu Zhou, Pan Lu, <br>Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein",
     venue: "ICLR 2025",
@@ -163,30 +154,12 @@ const selectedPublications = [
     ]
   },
   {
-    title: "Error-Robust Retrieval for Chinese Spelling Check",
-    authors: "<b>Xunjian Yin</b>, Xinyu Hu, Jin Jiang, Xiaojun Wan",
-    venue: "COLING 2024",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2312.05497" },
-      { text: "Code", url: "https://github.com/PKU-ONELab/" }
-    ]
-  },
-  {
     title: "ALCUNA: Large Language Models Meet New Knowledge",
     authors: "<b>Xunjian Yin</b>, Baizhou Huang*, Xiaojun Wan",
     venue: "EMNLP 2023",
     links: [
       { text: "Paper", url: "https://arxiv.org/pdf/2310.14820.pdf" },
       { text: "Code", url: "https://github.com/arvid-pku/alcuna" }
-    ]
-  },
-  {
-    title: "Exploring Context-Aware Evaluation Metrics for Machine Translation",
-    authors: "Xinyu Hu, <b>Xunjian Yin</b>, Xiaojun Wan",
-    venue: "EMNLP 2023 Findings",
-    links: [
-      { text: "Paper", url: "TODO" },
-      { text: "Code", url: "TODO" }
     ]
   },
   {
