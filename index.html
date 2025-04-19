@@ -6,8 +6,17 @@
   <title>Xunjian Yin</title>
   <meta name="author" content="Xunjian Yin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Xunjian Yin's personal academic website - PhD student at Duke University specializing in AI, NLP and model generalization research">
   <link rel="stylesheet" type="text/css" href="stylesheet.css">
   <link rel="icon" type="image/png" href="figures/logo.png">
+  <!-- Preload critical assets -->
+  <link rel="preload" href="figures/me.jpg" as="image">
+  <!-- Use system font stack for improved performance -->
+  <style>
+    body {
+      font-display: swap;
+    }
+  </style>
 </head>
 
 <body bgcolor="#FFFFFF">
@@ -62,20 +71,20 @@
                       <b>self-referential agents</b> to improve model versatility and performance.
                     </p>
                     <p> I believe in using methods that are simple, generalizable, and graceful.</p>
-                    <p>Feel free to reach out to me if you’d like to discuss research or explore potential collaboration!
+                    <p>Feel free to reach out to me if you'd like to discuss research or explore potential collaboration!
                     </p>
                     <p style="text-align:center">
-                      <a href="/cdn-cgi/l/email-protection#2b53415242456b5b405e054e4f5e054845">Email</a>  / 
-                      <a href="https://github.com/Arvid-pku">Github</a>  / 
-                      <a href="https://www.linkedin.com/in/xunjian-yin-5b40252a5">Linkedin</a>  / 
-                      <a href="https://twitter.com/ard25974550">Twitter</a>  / 
-                      <a href="files/CV.pdf">CV</a>  / 
+                      <a href="/cdn-cgi/l/email-protection#2b53415242456b5b405e054e4f5e054845">Email</a>  / 
+                      <a href="https://github.com/Arvid-pku">Github</a>  / 
+                      <a href="https://www.linkedin.com/in/xunjian-yin-5b40252a5">Linkedin</a>  / 
+                      <a href="https://twitter.com/ard25974550">Twitter</a>  / 
+                      <a href="files/CV.pdf">CV</a>  / 
                       <a href="https://scholar.google.com/citations?user=PociQ5EAAAAJ">Google Scholar</a>
                     </p>
                   </td>
                   <td style="padding:2.5%;width:25%;max-width:25%">
-                    <img style="width:100%;max-width:100%;border-radius:50%;border:1px solid #bbb" alt="profile photo"
-                      src="figures/me.jpg">
+                    <img style="width:100%;max-width:100%;border-radius:50%;border:1px solid #bbb" alt="profile photo of Xunjian Yin"
+                      src="figures/me.jpg" width="200" height="200">
                   </td>
                 </tr>
               </tbody>
@@ -105,7 +114,7 @@
               <tbody>
                 <tr>
                   <td style="padding:20px;width:100%;vertical-align:middle">
-                    <heading id="selected-publications">Selected Publications</heading>   (Full publications: <a
+                    <heading id="selected-publications">Selected Publications</heading>   (Full publications: <a
                       href="https://scholar.google.com/citations?user=PociQ5EAAAAJ">here</a>)
                   </td>
                 </tr>
@@ -114,7 +123,7 @@
             <table
               style="width:90%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
               <tbody id="selected-publications-tbody">
-                <!-- SelectedastonishingSelected Publications will be inserted here -->
+                <!-- Publications will be inserted here -->
               </tbody>
             </table>
 
@@ -148,7 +157,7 @@
               </tbody>
             </table>
 
-            <!-- Academic Services (Static) -->
+            <!-- Academic Services -->
             <table
               style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
               <tbody>
@@ -159,7 +168,7 @@
                       <li>
                         <p>
                           Reviewer: ACL 2023, EMNLP 2023, ICLR 2024, Coling 2024, ACL 2024, NeurIPS 2024, EMNLP 2024,
-                          ICLR 2024,<br> ICLR 2025, ICML 2025
+                          ICLR 2024, ICLR 2025, ICML 2025
                         </p>
                       </li>
                       <li>
@@ -200,7 +209,8 @@
                 </td>
                 <td style="padding:20px; vertical-align:middle; width:20%; text-align:right;">
                   <div id="map-container" style="width:160px; height:160px; background-color:#ffffff;">
-                    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript" id="clstr_globe"
+                    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+                    <script type="text/javascript" id="clstr_globe" async
                       src="//clustrmaps.com/globe.js?d=FtefwNT63Wx_0gBCBN3XnQmRNAp1TN3HO-j7pLKNwo4"></script>
                   </div>
                 </td>
@@ -228,15 +238,8 @@
                 </tr>
               </tbody>
             </table>
-            <script>
-              // Last modified time
-              const lastModified = new Date(document.lastModified);
-              const options = { year: 'numeric', month: 'long', day: 'numeric' };
-              const formattedDate = lastModified.toLocaleDateString('en-US', options);
-              document.getElementById('last-modified-time').textContent = `Last Modified: ${formattedDate}`;
-            </script>
-
-            <!-- JavaScript Data and Functions -->
+            
+            <!-- JavaScript Data -->
             <script>
               // Preprints Data
               const preprints = [
@@ -424,20 +427,54 @@
                 "Outstanding Student, Shandong Province, Apr. 2018"
               ];
 
+              // Wait for DOM to be ready before manipulating
+              document.addEventListener('DOMContentLoaded', function() {
+                // Populate publications and other sections
+                populatePublications(preprints, 'preprints-tbody');
+                populatePublications(selectedPublications, 'selected-publications-tbody');
+                populateProjects();
+                populateResearchExperience();
+                populateTeaching();
+                populateHonors();
+                
+                // Add smooth scrolling to outline links
+                document.querySelectorAll('#outline-list a').forEach(anchor => {
+                  anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                      window.scrollTo({
+                        top: targetElement.offsetTop - 50,
+                        behavior: 'smooth'
+                      });
+                    }
+                  });
+                });
+                
+                // Update last modified time
+                const lastModified = new Date(document.lastModified);
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                const formattedDate = lastModified.toLocaleDateString('en-US', options);
+                document.getElementById('last-modified-time').textContent = `Last Modified: ${formattedDate}`;
+              });
+
               // Function to populate publications
               function populatePublications(publications, tbodyId) {
                 const tbody = document.getElementById(tbodyId);
+                if (!tbody) return;
+                
                 publications.forEach(pub => {
                   const tr = document.createElement('tr');
                   const td = document.createElement('td');
                   td.setAttribute('valign', 'top');
                   const titleDiv = document.createElement('div');
                   titleDiv.className = 'papertitle';
-                  titleDiv.innerHTML = (pub.isNew ? '<span style="color:red">New!</span>   ' : '') + pub.title;
+                  titleDiv.innerHTML = (pub.isNew ? '<span style="color:red">New!</span>   ' : '') + pub.title;
                   const restDiv = document.createElement('div');
                   restDiv.className = 'paper_rest';
                   restDiv.innerHTML = pub.authors + '<br />' +
-                    '<span style="color:#CC0000"><i>' + pub.venue + '</i></span>   [ ' +
+                    '<span style="color:#CC0000"><i>' + pub.venue + '</i></span>   [ ' +
                     pub.links.map(link => `<a href="${link.url}">${link.text}</a>`).join(' | ') +
                     ' ]';
                   const bottomSpaceDiv = document.createElement('div');
@@ -453,9 +490,11 @@
               // Function to populate projects
               function populateProjects() {
                 const list = document.getElementById('projects-list');
+                if (!list) return;
+                
                 projects.forEach(project => {
                   const li = document.createElement('li');
-                  li.innerHTML = `<p><strong>${project.title}</strong><br>${project.description}</p><p>${project.badges.map(badge => `<a href="${badge.url}"><img alt="${badge.img.split('-').slice(1).join(' ')}" src="${badge.img}" /></a>`).join(' ')}</p>`;
+                  li.innerHTML = `<p><strong>${project.title}</strong><br>${project.description}</p><p>${project.badges.map(badge => `<a href="${badge.url}"><img alt="${badge.img.split('-').slice(1).join(' ')}" src="${badge.img}" loading="lazy" /></a>`).join(' ')}</p>`;
                   list.appendChild(li);
                 });
               }
@@ -463,9 +502,11 @@
               // Function to populate research experience
               function populateResearchExperience() {
                 const list = document.getElementById('research-experience-list');
+                if (!list) return;
+                
                 researchExperience.forEach(exp => {
                   const li = document.createElement('li');
-                  li.innerHTML = `<p><strong>${exp.period},   ${exp.institution}</strong><br>Mentor: ${exp.mentor}<br>${exp.description}</p>`;
+                  li.innerHTML = `<p><strong>${exp.period},   ${exp.institution}</strong><br>Mentor: ${exp.mentor}<br>${exp.description}</p>`;
                   list.appendChild(li);
                 });
               }
@@ -473,6 +514,8 @@
               // Function to populate teaching
               function populateTeaching() {
                 const list = document.getElementById('teaching-list');
+                if (!list) return;
+                
                 teaching.forEach(teachingItem => {
                   const li = document.createElement('li');
                   li.innerHTML = `<p>${teachingItem}</p>`;
@@ -483,28 +526,23 @@
               // Function to populate honors
               function populateHonors() {
                 const list = document.getElementById('honors-list');
+                if (!list) return;
+                
                 honors.forEach(honor => {
                   const li = document.createElement('li');
                   li.innerHTML = `<p>${honor}</p>`;
                   list.appendChild(li);
                 });
               }
-
-              // Populate all sections on DOMContentLoaded
-              document.addEventListener('DOMContentLoaded', function() {
-                populatePublications(preprints, 'preprints-tbody');
-                populatePublications(selectedPublications, 'selected-publications-tbody');
-                populateProjects();
-                populateResearchExperience();
-                populateTeaching();
-                populateHonors();
-              });
             </script>
+            
+            <!-- Load the map script at the end -->
+            <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93222929fd4444fc',t:'MTc0NDk1ODMyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 
 </html>
