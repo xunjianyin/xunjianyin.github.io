@@ -268,6 +268,9 @@ const teaching = [
 
 // Honors Data
 const honors = [
+  "Outstanding Graduate of Beijing, Jun. 2025",
+  "Outstanding Graduate of Peking University, Jun. 2025",
+  "Outstanding Master's Thesis Award of WICT, Peking University, Jun. 2025",
   "Merit Student, PKU, Sep. 2024",
   "Guotai Junan Scholarship, PKU, Sep. 2024",
   "Wang Xuan Scholarship, PKU, Sep. 2022",
