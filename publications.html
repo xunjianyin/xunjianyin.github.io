@@ -150,7 +150,7 @@
         <td style="padding:20px; text-align: center;">
           <br>
           <p style="font-size:small;">
-            © 2024 Xunjian Yin. All rights reserved.
+            © 2025 Xunjian Yin. All rights reserved.
           </p>
         </td>
       </tr>
@@ -165,11 +165,11 @@
   <script>
     // Publications page specific script
     document.addEventListener('DOMContentLoaded', function() {
-      // Populate preprints
-      populatePublications(preprints, 'preprints-list');
+      // Populate all preprints (both selected and non-selected)
+      populatePublications(getPreprints(), 'preprints-list');
       
-      // Populate full publications
-      populatePublications(fullPublications, 'publications-list');
+      // Populate all publications (both selected and non-selected)
+      populatePublications(getPublications(), 'publications-list');
     });
     
     /**

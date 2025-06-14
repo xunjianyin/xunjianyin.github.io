@@ -1,5 +1,6 @@
-// Preprints Data
-const preprints = [
+// Unified Publications Data
+const publications = [
+  // Preprints
   {
     title: "ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions",
     authors: "Xu Zhang*, <b>Xunjian Yin</b>*, Xiaojun Wan",
@@ -7,12 +8,12 @@ const preprints = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2406.08842" },
       { text: "Code", url: "https://github.com/Arvid-pku/ContraSolver" }
-    ]
-  }
-];
-
-// Full Publications list (for dedicated publications page)
-const fullPublications = [
+    ],
+    isPreprint: true,
+    isSelected: true
+  },
+  
+  // Publications
   {
     title: "Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement",
     authors: "<b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang",
@@ -21,7 +22,9 @@ const fullPublications = [
       { text: "Paper", url: "https://arxiv.org/abs/2410.04444" },
       { text: "Code", url: "https://github.com/Arvid-pku/Godel_Agent" }
     ],
-    isNew: true
+    isNew: true,
+    isPreprint: false,
+    isSelected: true
   },
   {
     title: "MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",
@@ -30,7 +33,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2406.13219" },
     ],
-    isNew: true
+    isNew: true,
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "LLM-based NLG Evaluation: Current Status and Challenges",
@@ -39,7 +44,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2402.01383" },
     ],
-    isNew: true
+    isNew: true,
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with LLMs",
@@ -48,6 +55,8 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2410.13192" }
     ],
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "ChemAgent: Self-updating Memories in LLMs Improves Chemical Reasoning",
@@ -56,6 +65,8 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://openreview.net/forum?id=kuhIqeVg0e" }
     ],
+    isPreprint: false,
+    isSelected: true
   },
   {
     title: "DSGram: Dynamic Weighting Sub-Metrics for Grammatical Error Correction in the Era of Large Language Models",
@@ -64,7 +75,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/" },
       { text: "Code", url: "https://github.com/PKU-ONELab/" }
-    ]
+    ],
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability",
@@ -73,7 +86,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2406.18365" },
       { text: "Code", url: "https://github.com/PKU-ONELab/Themis" }
-    ]
+    ],
+    isPreprint: false,
+    isSelected: true
   },
   {
     title: "Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation",
@@ -82,7 +97,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2402.11493" },
       { text: "Code", url: "https://github.com/pkulcwmzx/knowledge-boundary" }
-    ]
+    ],
+    isPreprint: false,
+    isSelected: true
   },
   {
     title: "History Matters: Temporal Knowledge Editing in Large Language Model",
@@ -91,7 +108,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/pdf/2312.05497.pdf" },
       { text: "Code", url: "https://github.com/Arvid-pku/ATOKE" }
-    ]
+    ],
+    isPreprint: false,
+    isSelected: true
   },
   {
     title: "Error-Robust Retrieval for Chinese Spelling Check",
@@ -100,7 +119,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2312.05497" },
       { text: "Code", url: "https://github.com/PKU-ONELab/" }
-    ]
+    ],
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "Contextual Modeling for Document-level ASR Error Correction",
@@ -109,7 +130,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://aclanthology.org/2024.lrec-main.341/" },
       { text: "Code", url: "https://github.com/jiangjin1999/context_ASR" }
-    ]
+    ],
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "ALCUNA: Large Language Models Meet New Knowledge",
@@ -118,7 +141,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/pdf/2310.14820.pdf" },
       { text: "Code", url: "https://github.com/arvid-pku/alcuna" }
-    ]
+    ],
+    isPreprint: false,
+    isSelected: true
   },
   {
     title: "Exploring Context-Aware Evaluation Metrics for Machine Translation",
@@ -127,7 +152,9 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "TODO" },
       { text: "Code", url: "TODO" }
-    ]
+    ],
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?",
@@ -136,82 +163,29 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://aclanthology.org/2022.acl-long.531.pdf" },
       { text: "Code", url: "https://github.com/xunjianyin/Seq2SeqOnData2Text" }
-    ]
+    ],
+    isPreprint: false,
+    isSelected: true
   }
 ];
 
-// Selected Publications Data
-const selectedPublications = [
-  {
-    title: "Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement",
-    authors: "<b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang",
-    venue: "ACL 2025",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2410.04444" },
-      { text: "Code", url: "https://github.com/Arvid-pku/Godel_Agent" }
-    ],
-    isNew: true
-  },
-  {
-    title: "ChemAgent: Self-updating Memories in LLMs Improves Chemical Reasoning",
-    authors: "Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, <b>Xunjian Yin</b>, Siru Ouyang, Wangchunshu Zhou, Pan Lu, <br>Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein",
-    venue: "ICLR 2025",
-    links: [
-      { text: "Paper", url: "https://openreview.net/forum?id=kuhIqeVg0e" }
-    ],
-  },
-  {
-    title: "Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability",
-    authors: "Xinyu Hu, Li Lin, Mingqi Gao, <b>Xunjian Yin</b>, Xiaojun Wan",
-    venue: "EMNLP 2024",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2406.18365" },
-      { text: "Code", url: "https://github.com/PKU-ONELab/Themis" }
-    ]
-  },
-  {
-    title: "Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation",
-    authors: "<b>Xunjian Yin</b>, Xu Zhang*, Jie Ruan, Xiaojun Wan",
-    venue: "ACL 2024",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2402.11493" },
-      { text: "Code", url: "https://github.com/pkulcwmzx/knowledge-boundary" }
-    ]
-  },
-  {
-    title: "History Matters: Temporal Knowledge Editing in Large Language Model",
-    authors: "<b>Xunjian Yin</b>, Jin Jiang, Liming Yang, Xiaojun Wan",
-    venue: "AAAI 2024",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/pdf/2312.05497.pdf" },
-      { text: "Code", url: "https://github.com/Arvid-pku/ATOKE" }
-    ]
-  },
-  {
-    title: "ALCUNA: Large Language Models Meet New Knowledge",
-    authors: "<b>Xunjian Yin</b>, Baizhou Huang*, Xiaojun Wan",
-    venue: "EMNLP 2023",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/pdf/2310.14820.pdf" },
-      { text: "Code", url: "https://github.com/arvid-pku/alcuna" }
-    ]
-  },
-  {
-    title: "How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?",
-    authors: "<b>Xunjian Yin</b>, Xiaojun Wan",
-    venue: "ACL 2022",
-    links: [
-      { text: "Paper", url: "https://aclanthology.org/2022.acl-long.531.pdf" },
-      { text: "Code", url: "https://github.com/xunjianyin/Seq2SeqOnData2Text" }
-    ]
-  }
-];
+// Helper functions to filter publications
+const getPreprints = () => publications.filter(pub => pub.isPreprint);
+const getSelectedPreprints = () => publications.filter(pub => pub.isPreprint && pub.isSelected);
+const getPublications = () => publications.filter(pub => !pub.isPreprint);
+const getSelectedPublications = () => publications.filter(pub => !pub.isPreprint && pub.isSelected);
+const getAllPublications = () => publications.filter(pub => !pub.isPreprint);
+
+// Legacy variables for backward compatibility (will be removed after updating main.js)
+const preprints = getSelectedPreprints();
+const selectedPublications = getSelectedPublications();
+const fullPublications = getAllPublications();
 
 // Projects Data
 const projects = [
   {
     title: "Overleaf-Bib-Helper",
-    description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval from DBLP and Google Scholar <br>directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\">Repo</a>)",
+    description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval from DBLP and Google Scholar <br>directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\">Project Homepage</a>)",
     badges: [
       { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" },
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },

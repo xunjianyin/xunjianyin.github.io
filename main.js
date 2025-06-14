@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.head.appendChild(styleEl);
   
   // Populate publications and other sections
-  populatePublications(preprints, 'preprints-list');
-  populatePublications(selectedPublications, 'selected-publications-list');
+  populatePublications(getSelectedPreprints(), 'preprints-list');
+  populatePublications(getSelectedPublications(), 'selected-publications-list');
   populateProjects();
   populateResearchExperience();
   populateTeaching();
