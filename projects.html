@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Projects - Xunjian Yin</title>
+  <meta name="author" content="Xunjian Yin">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+    
+    :root {
+      --primary-color: #0065C0;
+      --secondary-color: #B31B1B;
+    }
+    
+    /* Navigation buttons styles */
+    .nav-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      padding: 15px 30px;
+      flex-wrap: wrap;
+    }
+    
+    .nav-button {
+      display: inline-block;
+      padding: 5px 10px;
+      background-color: transparent;
+      color: var(--primary-color);
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      text-align: center;
+      border: none;
+    }
+    
+    .nav-button:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+    
+    .projects-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .page-title {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: var(--primary-color);
+    }
+    
+    .project-item {
+      margin-bottom: 30px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      background: white;
+      border: 1px solid #f0f0f0;
+    }
+    
+    .project-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .project-description {
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    
+    .project-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .project-badges img {
+      height: 20px;
+      transition: transform 0.2s ease;
+    }
+    
+    .project-badges a:hover img {
+      transform: scale(1.05);
+    }
+    
+    @media screen and (max-width: 600px) {
+      .nav-buttons {
+        justify-content: center;
+        gap: 12px;
+      }
+      
+      .nav-button {
+        font-size: 13px;
+      }
+      
+      .project-item {
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+      
+      .project-badges {
+        gap: 5px;
+      }
+      
+      .project-badges img {
+        height: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body bgcolor="#FFFFFF">
+  <!-- Navigation Buttons -->
+  <div class="nav-buttons">
+    <a href="index.html" class="nav-button">Home</a>
+    <a href="publications.html" class="nav-button">Publications</a>
+    <a href="projects.html" class="nav-button">Projects</a>
+    <a href="blogs.html" class="nav-button">Blogs</a>
+    <a href="photography.html" class="nav-button">Photography</a>
+  </div>
+
+  <!-- Projects Content -->
+  <div class="projects-container">
+    <h1 class="page-title">Projects</h1>
+    
+    <div id="projects-list">
+      <!-- Projects will be inserted here -->
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <table style="width:100%;max-width:1000px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+    <tbody>
+      <tr>
+        <td style="padding:20px; text-align: center;">
+          <br>
+          <p style="font-size:small;">
+            © 2025 Xunjian Yin. All rights reserved.
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Load JavaScript files -->
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  
+  <!-- Load data first, then populate projects -->
+  <script src="data.js"></script>
+  <script>
+    // Projects page specific script
+    document.addEventListener('DOMContentLoaded', function() {
+      // Populate all projects (both selected and non-selected)
+      populateProjects(getAllProjects(), 'projects-list');
+    });
+    
+    /**
+     * Function to populate projects in the specified container element
+     * @param {Array} projects - Array of project objects
+     * @param {string} containerId - ID of the container element to populate
+     */
+    function populateProjects(projects, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      
+      projects.forEach(project => {
+        const projectDiv = document.createElement('div');
+        projectDiv.className = 'project-item';
+        
+        // Project title
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'project-title';
+        titleDiv.textContent = project.title;
+        
+        // Project description
+        const descDiv = document.createElement('div');
+        descDiv.className = 'project-description';
+        descDiv.innerHTML = project.description;
+        
+        // Project badges
+        const badgesDiv = document.createElement('div');
+        badgesDiv.className = 'project-badges';
+        project.badges.forEach(badge => {
+          const badgeLink = document.createElement('a');
+          badgeLink.href = badge.url;
+          badgeLink.target = '_blank';
+          
+          const badgeImg = document.createElement('img');
+          badgeImg.src = badge.img;
+          badgeImg.alt = badge.img.split('/').pop();
+          
+          badgeLink.appendChild(badgeImg);
+          badgesDiv.appendChild(badgeLink);
+        });
+        
+        // Append elements
+        projectDiv.appendChild(titleDiv);
+        projectDiv.appendChild(descDiv);
+        projectDiv.appendChild(badgesDiv);
+        container.appendChild(projectDiv);
+      });
+    }
+  </script>
+</body>
+
+</html> 

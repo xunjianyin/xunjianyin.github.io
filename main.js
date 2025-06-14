@@ -109,13 +109,13 @@ function populatePublications(publications, listId) {
 }
 
 /**
- * Function to populate projects
+ * Function to populate projects (only selected ones for homepage)
  */
 function populateProjects() {
   const list = document.getElementById('projects-list');
   if (!list) return;
   
-  projects.forEach(project => {
+  getSelectedProjects().forEach(project => {
     const li = document.createElement('li');
     li.innerHTML = `
       <p><strong>${project.title}</strong><br>${project.description}</p>

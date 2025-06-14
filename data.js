@@ -187,16 +187,90 @@ const projects = [
     title: "Overleaf-Bib-Helper",
     description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval from DBLP and Google Scholar <br>directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\">Project Homepage</a>)",
     badges: [
-      { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" },
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/stargazers", img: "https://img.shields.io/github/stars/MLNLP-World/Overleaf-Bib-Helper" },
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/network/members", img: "https://img.shields.io/github/forks/MLNLP-World/Overleaf-Bib-Helper" },
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/issues", img: "https://img.shields.io/github/issues/MLNLP-World/Overleaf-Bib-Helper" },
-      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
-    ]
+      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+      { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" }
+    ],
+    isSelected: true
+  },
+  {
+    title: "Gödel Agent",
+    description: "A self-referential agent framework for recursive self-improvement implemented with Monkey Patching. (<a href=\"https://github.com/Arvid-pku/Godel_Agent\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/Arvid-pku/Godel_Agent/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/Arvid-pku/Godel_Agent/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/Arvid-pku/Godel_Agent/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Godel_Agent" },
+      { url: "https://github.com/Arvid-pku/Godel_Agent/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/Godel_Agent" },
+      { url: "https://github.com/Arvid-pku/Godel_Agent/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Godel_Agent" },
+      { url: "https://github.com/Arvid-pku/Godel_Agent/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+      { url: "https://arxiv.org/abs/2410.04444", img: "https://img.shields.io/badge/Doc-Paper-red" }
+    ],
+    isSelected: true
+  },
+  {
+    title: "Overleaf-Bib-Helper-Dev",
+    description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval from DBLP and Google Scholar <br>directly within the Overleaf editor. (<a href=\"https://github.com/Arvid-pku/Overleaf-Bib-Helper\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
+      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Overleaf-Bib-Helper" },
+      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/Overleaf-Bib-Helper" },
+      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Overleaf-Bib-Helper" },
+      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+      { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" }
+    ],
+    isSelected: false
+  },
+  {
+    title: "Bouncing Ball",
+    description: "A website to play with a ball (developing). (<a href=\"https://xunjianyin.github.io/bouncing-ball-animation/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/xunjianyin/bouncing-ball-animation/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/xunjianyin/bouncing-ball-animation/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/xunjianyin/bouncing-ball-animation/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/bouncing-ball-animation" },
+      { url: "https://github.com/xunjianyin/bouncing-ball-animation/network/members", img: "https://img.shields.io/github/forks/xunjianyin/bouncing-ball-animation" },
+      { url: "https://github.com/xunjianyin/bouncing-ball-animation/issues", img: "https://img.shields.io/github/issues/xunjianyin/bouncing-ball-animation" },
+      { url: "https://github.com/xunjianyin/bouncing-ball-animation/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+      { url: "https://xunjianyin.github.io/bouncing-ball-animation/", img: "https://img.shields.io/badge/Website-Bouncing_Ball-blue" }
+    ],
+  },
+  {
+    title: "Rank-Anything",
+    description: "A website to rank anything (developing). (<a href=\"https://xunjianyin.github.io/rank-anything/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/xunjianyin/rank-anything/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/xunjianyin/rank-anything/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/xunjianyin/rank-anything/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/rank-anything" },
+      { url: "https://github.com/xunjianyin/rank-anything/network/members", img: "https://img.shields.io/github/forks/xunjianyin/rank-anything" },
+      { url: "https://github.com/xunjianyin/rank-anything/issues", img: "https://img.shields.io/github/issues/xunjianyin/rank-anything" },
+      { url: "https://github.com/xunjianyin/rank-anything/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+      { url: "https://xunjianyin.github.io/rank-anything/", img: "https://img.shields.io/badge/Website-Rank_Anything-blue" }
+    ],
+    isSelected: false
+  },
+  {
+    title: "Star-Maker",
+    description: "A website to create and explore planetary systems (developing). (<a href=\"https://xunjianyin.github.io/star-maker/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/xunjianyin/star-maker/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/xunjianyin/star-maker/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/xunjianyin/star-maker/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/star-maker" },
+      { url: "https://github.com/xunjianyin/star-maker/network/members", img: "https://img.shields.io/github/forks/xunjianyin/star-maker" },
+      { url: "https://github.com/xunjianyin/star-maker/issues", img: "https://img.shields.io/github/issues/xunjianyin/star-maker" },
+      { url: "https://github.com/xunjianyin/star-maker/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+      { url: "https://xunjianyin.github.io/star-maker/", img: "https://img.shields.io/badge/Website-Star_Maker-blue" }
+    ],
+    isSelected: false
   }
 ];
+
+// Helper functions to filter projects
+const getSelectedProjects = () => projects.filter(project => project.isSelected);
+const getAllProjects = () => projects;
 
 // Research Experience Data
 const researchExperience = [
