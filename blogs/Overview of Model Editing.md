@@ -3,7 +3,7 @@ title: "Overview of Model Editing"
 date: "2023-02-25"
 author: "Xunjian Yin"
 excerpt: "A brief overview of model editing techniques in Chinese."
-tags: ["AI", "LLM", "Model Editing"]
+tags: ["LLM", "Model Editing", "Survey"]
 readTime: 5
 ---
 

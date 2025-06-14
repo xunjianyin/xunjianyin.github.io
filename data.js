@@ -29,7 +29,7 @@ const publications = [
   {
     title: "MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",
     authors: "Junzhe Zhang, Huixuan Zhang, <b>Xunjian Yin</b>, Baizhou Huang, Xu Zhang, Xinyu Hu, Xiaojun Wan",
-    venue: "ACL 2025 findings",
+    venue: "ACL Findings 2025",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2406.13219" },
     ],
@@ -40,7 +40,7 @@ const publications = [
   {
     title: "LLM-based NLG Evaluation: Current Status and Challenges",
     authors: "Mingqi Gao, Xinyu Hu, <b>Xunjian Yin</b>, Jie Ruan, Xiao Pu, Xiaojun Wan",
-    venue: "CL 2025",
+    venue: "Computational Linguistics 2025",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2402.01383" },
     ],
@@ -53,7 +53,8 @@ const publications = [
     authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
     venue: "NAACL findings 2025",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2410.13192" }
+      { text: "Paper", url: "https://arxiv.org/abs/2410.13192" },
+      { text: "Code", url: "https://github.com/leejamesss/Eval_Self_Docs_RAG" }
     ],
     isPreprint: false,
     isSelected: false
@@ -63,7 +64,8 @@ const publications = [
     authors: "Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, <b>Xunjian Yin</b>, Siru Ouyang, Wangchunshu Zhou, Pan Lu, <br>Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein",
     venue: "ICLR 2025",
     links: [
-      { text: "Paper", url: "https://openreview.net/forum?id=kuhIqeVg0e" }
+      { text: "Paper", url: "https://openreview.net/forum?id=kuhIqeVg0e" },
+      { text: "Code", url: "https://github.com/gersteinlab/chemagent" }
     ],
     isPreprint: false,
     isSelected: true
@@ -73,7 +75,7 @@ const publications = [
     authors: "Jinxiang Xie, Yilin Li, <b>Xunjian Yin</b> (as Mentor), Xiaojun Wan",
     venue: "AAAI 2025",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/" },
+      { text: "Paper", url: "https://ojs.aaai.org/index.php/AAAI/article/view/34746/36901" },
       { text: "Code", url: "https://github.com/PKU-ONELab/" }
     ],
     isPreprint: false,
@@ -275,16 +277,22 @@ const getAllProjects = () => projects;
 // Research Experience Data
 const researchExperience = [
   {
+    period: "June 2025 - Current",
+    institution: "Shanghai AI Lab",
+    mentor: "Dr. Jie Fu",
+    description: "Reinforcement Learning."
+  },
+  {
     period: "June 2024 - February 2025",
     institution: "University of California, Santa Barbara (NLP Group)",
-    mentor: "Prof. William Wang",
+    mentor: "Prof. William Yang Wang",
     description: "<a href=\"https://arxiv.org/abs/2410.04444\">One paper</a> about Self-Referential Agent Framework; Ongoing work on reverse language model pre-training."
   },
   {
-    period: "Feb. 2022 - Aug. 2022",
+    period: "Feb. 2022 ~ Aug. 2022",
     institution: "Microsoft Research Asia (NLC Group)",
-    mentor: "Dr. Shuming Ma",
-    description: "Pre-training with Curriculum Learning"
+    mentor: "Dr. Kai Chen and Dr. Shuming Ma",
+    description: "Pre-training with Curriculum Learning and OCR"
   },
   {
     period: "Oct. 2020 - June 2022",
