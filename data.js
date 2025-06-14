@@ -24,13 +24,30 @@ const fullPublications = [
     isNew: true
   },
   {
+    title: "MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",
+    authors: "Junzhe Zhang, Huixuan Zhang, <b>Xunjian Yin</b>, Baizhou Huang, Xu Zhang, Xinyu Hu, Xiaojun Wan",
+    venue: "ACL 2025 findings",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2406.13219" },
+    ],
+    isNew: true
+  },
+  {
+    title: "LLM-based NLG Evaluation: Current Status and Challenges",
+    authors: "Mingqi Gao, Xinyu Hu, <b>Xunjian Yin</b>, Jie Ruan, Xiao Pu, Xiaojun Wan",
+    venue: "CL 2025",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2402.01383" },
+    ],
+    isNew: true
+  },
+  {
     title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with LLMs",
     authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
     venue: "NAACL findings 2025",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2410.13192" }
     ],
-    isNew: true
   },
   {
     title: "ChemAgent: Self-updating Memories in LLMs Improves Chemical Reasoning",
@@ -39,7 +56,6 @@ const fullPublications = [
     links: [
       { text: "Paper", url: "https://openreview.net/forum?id=kuhIqeVg0e" }
     ],
-    isNew: true
   },
   {
     title: "DSGram: Dynamic Weighting Sub-Metrics for Grammatical Error Correction in the Era of Large Language Models",
@@ -87,6 +103,15 @@ const fullPublications = [
     ]
   },
   {
+    title: "Contextual Modeling for Document-level ASR Error Correction",
+    authors: "Jin Jiang, <b>Xunjian Yin</b>, Xiaojun Wan, Wei Peng, Rongjun Li, Jingyuan Yang, and Yanquan Zhou",
+    venue: "COLING 2024",
+    links: [
+      { text: "Paper", url: "https://aclanthology.org/2024.lrec-main.341/" },
+      { text: "Code", url: "https://github.com/jiangjin1999/context_ASR" }
+    ]
+  },
+  {
     title: "ALCUNA: Large Language Models Meet New Knowledge",
     authors: "<b>Xunjian Yin</b>, Baizhou Huang*, Xiaojun Wan",
     venue: "EMNLP 2023",
@@ -115,8 +140,18 @@ const fullPublications = [
   }
 ];
 
-// Selected Publications Data - Removed DSGram paper
+// Selected Publications Data
 const selectedPublications = [
+  {
+    title: "Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement",
+    authors: "<b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang",
+    venue: "ACL 2025",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2410.04444" },
+      { text: "Code", url: "https://github.com/Arvid-pku/Godel_Agent" }
+    ],
+    isNew: true
+  },
   {
     title: "ChemAgent: Self-updating Memories in LLMs Improves Chemical Reasoning",
     authors: "Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, <b>Xunjian Yin</b>, Siru Ouyang, Wangchunshu Zhou, Pan Lu, <br>Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein",
@@ -124,7 +159,6 @@ const selectedPublications = [
     links: [
       { text: "Paper", url: "https://openreview.net/forum?id=kuhIqeVg0e" }
     ],
-    isNew: true
   },
   {
     title: "Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability",
