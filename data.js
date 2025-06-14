@@ -1,16 +1,6 @@
 // Preprints Data
 const preprints = [
   {
-    title: "Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement",
-    authors: "<b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang",
-    venue: "ArXiv:2410",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2410.04444" },
-      { text: "Code", url: "https://github.com/Arvid-pku/Godel_Agent" }
-    ],
-    isNew: true
-  },
-  {
     title: "ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions",
     authors: "Xu Zhang*, <b>Xunjian Yin</b>*, Xiaojun Wan",
     venue: "ArXiv:2406",
@@ -23,6 +13,16 @@ const preprints = [
 
 // Full Publications list (for dedicated publications page)
 const fullPublications = [
+  {
+    title: "Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement",
+    authors: "<b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang",
+    venue: "ACL 2025",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2410.04444" },
+      { text: "Code", url: "https://github.com/Arvid-pku/Godel_Agent" }
+    ],
+    isNew: true
+  },
   {
     title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with LLMs",
     authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
