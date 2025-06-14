@@ -11,46 +11,142 @@
   <link rel="icon" type="image/png" href="figures/logo.png">
   <!-- Preload critical assets -->
   <link rel="preload" href="figures/me.jpg" as="image">
-  <!-- Use system font stack for improved performance -->
+  <!-- Simple elegance improvements -->
   <style>
     body {
       font-display: swap;
+      line-height: 1.7;
     }
     
-    /* Navigation buttons styles */
+    /* Subtle improvements to navigation */
     .nav-buttons {
       display: flex;
       justify-content: flex-end;
-      gap: 15px;
-      padding: 15px 30px;
+      gap: 18px;
+      padding: 20px 35px;
       flex-wrap: wrap;
     }
     
     .nav-button {
       display: inline-block;
-      padding: 5px 10px;
+      padding: 6px 12px;
       background-color: transparent;
       color: var(--primary-color);
       font-weight: 500;
       font-size: 14px;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       text-align: center;
       border: none;
+      border-radius: 4px;
     }
     
     .nav-button:hover {
       color: var(--secondary-color);
-      text-decoration: underline;
+      background-color: rgba(240, 146, 40, 0.08);
     }
+    
+    /* Subtle section spacing improvements */
+    .main-content-wrapper {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .section-spacing {
+      margin-bottom: 1px !important;
+    }
+    
+    /* Reduce internal section padding consistently */
+    .section-spacing td,
+    .section-spacing table td {
+      padding: 10px 20px !important;
+    }
+    
+    /* Ensure footer section also has consistent spacing */
+    .footer-section {
+      margin-top: 1px !important;
+      padding-top: 10px !important;
+    }
+    
+    /* Consistent heading spacing for all sections */
+    heading {
+      margin-bottom: 15px !important;
+      margin-top: 0px !important;
+      display: block;
+    }
+    
+    /* Consistent spacing for all sections - target all ul elements */
+    .section-spacing ul,
+    .section-spacing ul.publication-list,
+    heading + ul,
+    heading + ul.publication-list,
+    td ul {
+      margin-top: 0px !important;
+      margin-bottom: 0px !important;
+    }
+    
+    /* Ensure consistent spacing for all list items */
+    .section-spacing li,
+    .section-spacing ul li,
+    td li,
+    td ul li,
+    li {
+      margin-bottom: 8px !important;
+      margin-top: 0px !important;
+      padding-bottom: 0px !important;
+      padding-top: 0px !important;
+    }
+    
+    /* Special handling for publication lists */
+    .publication-list li,
+    ul.publication-list li {
+      margin-bottom: 12px !important;
+      margin-top: 0px !important;
+      padding-bottom: 0px !important;
+      padding-top: 0px !important;
+    }
+    
+    /* Remove spacing from paragraphs within list items */
+    li p {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+    
+    /* Subtle profile photo enhancement */
+    .profile-photo {
+      border: 2px solid #f5f5f5;
+      transition: border-color 0.3s ease;
+    }
+    
+    .profile-photo:hover {
+      border-color: #e0e0e0;
+    }
+    
+    /* Better list spacing */
+    .publication-list li {
+      margin-bottom: 12px;
+    }
+    
+    ul li {
+      margin-bottom: 8px;
+    }
+    
+
     
     @media screen and (max-width: 600px) {
       .nav-buttons {
         justify-content: center;
-        gap: 12px;
+        gap: 15px;
+        padding: 15px 20px;
       }
       
       .nav-button {
         font-size: 13px;
+        padding: 5px 10px;
+      }
+      
+      .main-content-wrapper {
+        padding: 0 15px;
       }
     }
   </style>
@@ -82,11 +178,12 @@
 
   <!-- Main Content with Padding -->
   <div id="main-content">
-    <table
-      style="width:100%;background:#FFFFFF;max-width:1000px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-      <tbody>
-        <tr style="padding:0px">
-          <td style="padding:0px">
+    <div class="main-content-wrapper">
+      <table
+        style="width:100%;background:#FFFFFF;border:0px;border-spacing:0px;border-collapse:separate;">
+        <tbody>
+          <tr style="padding:0px">
+            <td style="padding:0px">
             <!-- Introduction (Static) -->
             <table
               style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
@@ -129,7 +226,7 @@
                     </p>
                   </td>
                   <td style="padding:2.5%;width:25%;max-width:25%">
-                    <img style="width:100%;max-width:100%;border-radius:50%;border:1px solid #bbb" alt="profile photo of Xunjian Yin"
+                    <img class="profile-photo" style="width:100%;max-width:100%;border-radius:50%;" alt="profile photo of Xunjian Yin"
                       src="figures/me.jpg" width="200" height="200">
                   </td>
                 </tr>
@@ -137,150 +234,156 @@
             </table>
 
             <!-- Preprints -->
-            <table
-              style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-              <tbody>
-                <tr>
-                  <td style="padding:20px;width:100%;vertical-align:middle">
-                    <heading id="preprints">Preprints</heading>
-                    <ul id="preprints-list" class="publication-list">
-                      <!-- Preprints will be inserted here -->
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="section-spacing">
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px;width:100%;vertical-align:middle">
+                      <heading id="preprints">Preprints</heading>
+                      <ul id="preprints-list" class="publication-list">
+                        <!-- Preprints will be inserted here -->
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <!-- Selected Publications -->
-            <table
-              style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-              <tbody>
-                <tr>
-                  <td style="padding:20px;width:100%;vertical-align:middle">
-                    <heading id="selected-publications">Selected Publications</heading>   
-                    <!-- (Full publications: <a
-                      href="https://scholar.google.com/citations?user=PociQ5EAAAAJ">here</a>) -->
-                    <ul id="selected-publications-list" class="publication-list">
-                      <!-- Publications will be inserted here -->
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="section-spacing">
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px;width:100%;vertical-align:middle">
+                      <heading id="selected-publications">Selected Publications</heading>   
+                      <ul id="selected-publications-list" class="publication-list">
+                        <!-- Publications will be inserted here -->
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <!-- Projects -->
-            <table
-              style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-              <tbody>
-                <tr>
-                  <td style="padding:20px;width:100%;vertical-align:middle">
-                    <heading id="projects">Selected Projects</heading>
-                    <ul id="projects-list">
-                      <!-- Projects will be inserted here -->
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="section-spacing">
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px;width:100%;vertical-align:middle">
+                      <heading id="projects">Selected Projects</heading>
+                      <ul id="projects-list">
+                        <!-- Projects will be inserted here -->
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <!-- Research Experience -->
-            <table
-              style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-              <tbody>
-                <tr>
-                  <td style="padding:20px;width:100%;vertical-align:middle">
-                    <heading id="research-experience">Research Experience</heading>
-                    <ul id="research-experience-list">
-                      <!-- Research Experience will be inserted here -->
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="section-spacing">
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px;width:100%;vertical-align:middle">
+                      <heading id="research-experience">Research Experience</heading>
+                      <ul id="research-experience-list">
+                        <!-- Research Experience will be inserted here -->
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <!-- Academic Services -->
-            <table
-              style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-              <tbody>
-                <tr>
-                  <td style="padding:20px;width:100%;vertical-align:middle">
-                    <heading id="academic-services">Academic Services</heading>
-                    <ul>
-                      <li>
-                        <p>
-                          Reviewer: ACL 2023, EMNLP 2023, ICLR 2024, Coling 2024, ACL 2024, NeurIPS 2024, EMNLP 2024,
-                          ICLR 2024, ICLR 2025, ICML 2025, JCST 2025, COLM 2025, NeurIPS 2025, EMNLP 2025
-                        </p>
-                      </li>
-                      <li>
-                        <p>
-                          Volunteer: NLPCC 2023 Shared Task 8 track chair, AAAI 2024 volunteer, ACL 2024 volunteer
-                        </p>
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="section-spacing">
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px;width:100%;vertical-align:middle">
+                      <heading id="academic-services">Academic Services</heading>
+                      <ul>
+                        <li>
+                          <p>
+                            Reviewer: ACL 2023, EMNLP 2023, ICLR 2024, Coling 2024, ACL 2024, NeurIPS 2024, EMNLP 2024,
+                            ICLR 2024, ICLR 2025, ICML 2025, JCST 2025, COLM 2025, NeurIPS 2025, EMNLP 2025
+                          </p>
+                        </li>
+                        <li>
+                          <p>
+                            Volunteer: NLPCC 2023 Shared Task 8 track chair, AAAI 2024 volunteer, ACL 2024 volunteer
+                          </p>
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <!-- Teaching -->
-            <table
-              style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-              <tbody>
-                <tr>
-                  <td style="padding:20px;width:100%;vertical-align:middle">
-                    <heading id="teaching">Teaching</heading>
-                    <ul id="teaching-list">
-                      <!-- Teaching will be inserted here -->
-                    </ul>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="section-spacing">
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px;width:100%;vertical-align:middle">
+                      <heading id="teaching">Teaching</heading>
+                      <ul id="teaching-list">
+                        <!-- Teaching will be inserted here -->
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <!-- Honors and Awards with Map -->
-            <table
-              style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-              <tr>
-                <td style="padding:20px; vertical-align:middle; width:80%;">
-                  <heading id="honors-and-awards">Selected Honors and Awards</heading>
-                  <ul id="honors-list">
-                    <!-- Honors will be inserted here -->
-                  </ul>
-                </td>
-                <td style="padding:20px; vertical-align:middle; width:20%; text-align:right;">
-                  <div id="map-container" style="width:160px; height:160px; background-color:#ffffff;">
-                    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-                    <script type="text/javascript" id="clstr_globe" async
-                      src="//clustrmaps.com/globe.js?d=FtefwNT63Wx_0gBCBN3XnQmRNAp1TN3HO-j7pLKNwo4"></script>
-                  </div>
-                </td>
-              </tr>
-            </table>
-
-            <!-- Footer -->
-            <table
-              style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-              <tbody>
+            <div class="section-spacing">
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
                 <tr>
-                  <td style="padding:20px; text-align: left; width:33%; vertical-align:middle;">
-                    <div id="footer" style="font-size: small;">
-                      <div id="last-modified-time"></div>
+                  <td style="padding:20px; vertical-align:middle; width:80%;">
+                    <heading id="honors-and-awards">Selected Honors and Awards</heading>
+                    <ul id="honors-list">
+                      <!-- Honors will be inserted here -->
+                    </ul>
+                  </td>
+                  <td style="padding:20px; vertical-align:middle; width:20%; text-align:right;">
+                    <div id="map-container" style="width:160px; height:160px; background-color:#ffffff;">
+                      <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+                      <script type="text/javascript" id="clstr_globe" async
+                        src="//clustrmaps.com/globe.js?d=FtefwNT63Wx_0gBCBN3XnQmRNAp1TN3HO-j7pLKNwo4"></script>
                     </div>
                   </td>
-                  <td style="padding:20px; text-align: center; width:34%; vertical-align:middle;">
-                    <p style="font-size:small; margin:0;">
-                      © 2025 Xunjian Yin. All rights reserved.
-                    </p>
-                  </td>
-                  <td style="padding:20px; text-align: right; width:33%; vertical-align:middle;">
-                    <p style="font-size:small; margin:0;"> Thanks <a style="font-size:small;" href="https://jonbarron.info/">Jon
-                        Barron</a> for this amazing work.
-                    </p>
-                  </td>
                 </tr>
-              </tbody>
-            </table>
+              </table>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-section">
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px; text-align: left; width:33%; vertical-align:middle;">
+                      <div id="footer" style="font-size: small;">
+                        <div id="last-modified-time"></div>
+                      </div>
+                    </td>
+                    <td style="padding:20px; text-align: center; width:34%; vertical-align:middle;">
+                      <p style="font-size:small; margin:0;">
+                        © 2025 Xunjian Yin. All rights reserved.
+                      </p>
+                    </td>
+                    <td style="padding:20px; text-align: right; width:33%; vertical-align:middle;">
+                      <p style="font-size:small; margin:0;"> Thanks <a style="font-size:small;" href="https://jonbarron.info/">Jon
+                          Barron</a> for this amazing work.
+                      </p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             
             <!-- Load JavaScript files -->
             <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
@@ -288,10 +391,11 @@
             <!-- Load data first, then main.js which depends on the data -->
             <script src="data.js"></script>
             <script src="main.js"></script>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </body>
 
