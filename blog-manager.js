@@ -106,43 +106,18 @@ class BlogManager {
   }
 
   /**
-   * Load blog posts from markdown files
+   * Load blog posts from embedded data (GitHub Pages compatible)
    */
   async loadPosts() {
-    // In a real implementation, you would fetch the list of markdown files
-    // For now, we'll use a predefined list
-    const postFiles = [
-      'Overview of Model Editing.md'
-    ];
-
-    this.posts = [];
-    
-    for (const file of postFiles) {
-      try {
-        const response = await fetch(`blogs/${file}`);
-        if (response.ok) {
-          const content = await response.text();
-          const { metadata, content: markdownContent } = this.parseMarkdown(content);
-          
-          const post = {
-            id: file.replace('.md', ''),
-            filename: file,
-            ...metadata,
-            content: markdownContent,
-            htmlContent: this.markdownToHtml(markdownContent)
-          };
-          
-          this.posts.push(post);
-        }
-      } catch (error) {
-        console.error(`Error loading ${file}:`, error);
-      }
+    try {
+      // Use embedded blog data instead of fetching files
+      this.posts = getAllBlogPosts();
+      return this.posts;
+    } catch (error) {
+      console.error('Error loading blog posts:', error);
+      this.posts = [];
+      return this.posts;
     }
-    
-    // Sort posts by date (newest first)
-    this.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    return this.posts;
   }
 
   /**
