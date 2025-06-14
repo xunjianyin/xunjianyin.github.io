@@ -19,32 +19,61 @@
     .nav-buttons {
       display: flex;
       justify-content: flex-end;
-      gap: 15px;
-      padding: 15px 30px;
+      gap: 18px;
+      padding: 20px 35px;
       flex-wrap: wrap;
     }
     
     .nav-button {
       display: inline-block;
-      padding: 5px 10px;
+      padding: 6px 12px;
       background-color: transparent;
       color: var(--primary-color);
       font-weight: 500;
       font-size: 14px;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       text-align: center;
       border: none;
+      border-radius: 4px;
     }
     
     .nav-button:hover {
       color: var(--secondary-color);
-      text-decoration: underline;
+      background-color: rgba(240, 146, 40, 0.08);
+    }
+    
+    /* Main content wrapper to match index page */
+    .main-content-wrapper {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 0 20px;
     }
     
     .publications-container {
-      max-width: 1000px;
+      max-width: 1050px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 0;
+    }
+    
+    /* Consistent heading spacing */
+    heading {
+      margin-bottom: 15px !important;
+      margin-top: 0px !important;
+      display: block;
+    }
+    
+    /* Consistent list spacing */
+    .publication-list li {
+      margin-bottom: 12px !important;
+      margin-top: 0px !important;
+      padding-bottom: 0px !important;
+      padding-top: 0px !important;
+    }
+    
+    /* Remove spacing from paragraphs within list items */
+    li p {
+      margin: 0px !important;
+      padding: 0px !important;
     }
     
     .page-title {
@@ -87,15 +116,21 @@
     @media screen and (max-width: 600px) {
       .nav-buttons {
         justify-content: center;
-        gap: 12px;
+        gap: 15px;
+        padding: 15px 20px;
       }
       
       .nav-button {
         font-size: 13px;
+        padding: 5px 10px;
       }
       
       .publication-table td {
         padding: 8px 15px;
+      }
+      
+      .main-content-wrapper {
+        padding: 0 15px;
       }
     }
   </style>
@@ -111,41 +146,62 @@
     <a href="photography.html" class="nav-button">Photography</a>
   </div>
 
-  <!-- Publications Content -->
-  <div class="publications-container">
-    <h1 class="page-title">Publications</h1>
-    
-    <!-- Preprints -->
-    <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-      <tbody>
-        <tr>
-          <td style="padding:20px;width:100%;vertical-align:middle">
-            <heading id="preprints">Preprints</heading>
-            <ul id="preprints-list" class="publication-list">
-              <!-- Preprints will be inserted here -->
-            </ul>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Main Content with Padding -->
+  <div id="main-content">
+    <div class="main-content-wrapper">
+      <table style="width:100%;background:#FFFFFF;border:0px;border-spacing:0px;border-collapse:separate;">
+        <tbody>
+          <tr style="padding:0px">
+            <td style="padding:0px">
+              
+              <!-- Page Title -->
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px;width:100%;vertical-align:middle;text-align:center">
+                      <h1 class="page-title">Publications</h1>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <!-- Preprints -->
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px;width:100%;vertical-align:middle">
+                      <heading id="preprints">Preprints</heading>
+                      <ul id="preprints-list" class="publication-list">
+                        <!-- Preprints will be inserted here -->
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
-    <!-- Full Publications -->
-    <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-      <tbody>
-        <tr>
-          <td style="padding:20px;width:100%;vertical-align:middle">
-            <heading id="publications">Publications</heading>
-            <ul id="publications-list" class="publication-list">
-              <!-- Publications will be inserted here -->
-            </ul>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              <!-- Full Publications -->
+              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+                <tbody>
+                  <tr>
+                    <td style="padding:20px;width:100%;vertical-align:middle">
+                      <heading id="publications">Publications</heading>
+                      <ul id="publications-list" class="publication-list">
+                        <!-- Publications will be inserted here -->
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Footer -->
-  <table style="width:100%;max-width:1000px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+  <table style="width:100%;max-width:1050px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
     <tbody>
       <tr>
         <td style="padding:20px; text-align: center;">
