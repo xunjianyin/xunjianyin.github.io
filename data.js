@@ -82,7 +82,7 @@ const publications = [
   },
   {
     title: "ChemAgent: Self-updating Memories in LLMs Improves Chemical Reasoning",
-    authors: "Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, <b>Xunjian Yin</b>, Siru Ouyang, Wangchunshu Zhou, Pan Lu, <br>Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein",
+    authors: "Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, <b>Xunjian Yin</b>, Siru Ouyang, Wangchunshu Zhou, Pan Lu, Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein",
     venue: "ICLR 2025",
     links: [
       { text: "Paper", url: "https://openreview.net/forum?id=kuhIqeVg0e" },

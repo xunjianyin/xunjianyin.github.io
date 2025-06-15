@@ -173,7 +173,7 @@ span.highlight {
   background-color: #ffffd0;
 }
 
-/* Floating Outline Sidebar */
+/* Floating Outline Sidebar - ensure it doesn't affect content */
 #outline-sidebar {
   position: fixed;
   top: 200px;
@@ -186,6 +186,8 @@ span.highlight {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   z-index: 1000;
   transition: all 0.3s ease;
+  /* Ensure it doesn't affect document flow */
+  pointer-events: auto;
 }
 
 #outline-sidebar .sidebar-heading {
@@ -222,11 +224,12 @@ span.highlight {
   transform: translateX(3px);
 }
 
-/* Main Content Padding to Avoid Overlap */
+/* Main Content - Properly centered layout (sidebar floats over content) */
 #main-content {
-  padding-left: 240px; /* Width of sidebar (200px) + extra space (40px) */
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
+  padding: 0 80px;
+  box-sizing: border-box;
 }
 
 /* Responsive Design */
@@ -236,7 +239,7 @@ span.highlight {
   }
   
   #main-content {
-    padding-left: 200px;
+    padding: 0 60px;
   }
 }
 
@@ -246,8 +249,7 @@ span.highlight {
   }
   
   #main-content {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 0 40px;
   }
   
   name {

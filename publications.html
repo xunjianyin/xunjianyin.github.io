@@ -16,8 +16,16 @@
       font-display: swap; 
     }
     
+    /* Page-specific layout - consistent margins for non-index pages */
+    .main-content-wrapper {
+      max-width: 1000px !important;
+      margin: 0 auto !important;
+      padding: 0 80px !important;
+      box-sizing: border-box !important;
+    }
+    
     .publications-container {
-      max-width: 1050px;
+      max-width: 800px;
       margin: 0 auto;
       padding: 0;
     }
@@ -65,72 +73,44 @@
   </div>
 
   <!-- Main Content with Padding -->
-  <div id="main-content">
-    <div class="main-content-wrapper">
-      <table style="width:100%;background:#FFFFFF;border:0px;border-spacing:0px;border-collapse:separate;">
-        <tbody>
-          <tr style="padding:0px">
-            <td style="padding:0px">
-              
-              <!-- Page Title -->
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle;text-align:center">
-                      <h1 class="page-title">Publications</h1>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <!-- Preprints -->
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <heading id="preprints">Preprints</heading>
-                      <ul id="preprints-list" class="publication-list">
-                        <!-- Preprints will be inserted here -->
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+  <div class="main-content-wrapper">
+    <!-- Page Title -->
+    <div style="text-align:center;margin-bottom:40px;">
+      <h1 class="page-title">Publications</h1>
+    </div>
+    
+    <!-- Preprints -->
+    <div style="margin-bottom:40px;">
+      <heading id="preprints">Preprints</heading>
+      <ul id="preprints-list" class="publication-list">
+        <!-- Preprints will be inserted here -->
+      </ul>
+    </div>
 
-              <!-- Full Publications -->
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <heading id="publications">Publications</heading>
-                      <ul id="publications-list" class="publication-list">
-                        <!-- Publications will be inserted here -->
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Full Publications -->
+    <div style="margin-bottom:40px;">
+      <heading id="publications">Publications</heading>
+      <ul id="publications-list" class="publication-list">
+        <!-- Publications will be inserted here -->
+      </ul>
     </div>
   </div>
 
   <!-- Footer -->
-  <table style="width:100%;max-width:1050px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-    <tbody>
-      <tr>
-        <td style="padding:20px; text-align: center;">
-          <br>
-          <p style="font-size:small;">
-            © 2025 Xunjian Yin. All rights reserved.
-          </p>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="main-content-wrapper">
+    <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+      <tbody>
+        <tr>
+          <td style="padding:20px; text-align: center;">
+            <br>
+            <p style="font-size:small;">
+              © 2025 Xunjian Yin. All rights reserved.
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <!-- Load JavaScript files -->
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>

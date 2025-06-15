@@ -44,15 +44,16 @@
       background-color: rgba(240, 146, 40, 0.08);
     }
     
-    /* Main content wrapper to match index page */
+    /* Page-specific layout - consistent margins for non-index pages */
     .main-content-wrapper {
-      max-width: 1050px;
-      margin: 0 auto;
-      padding: 0 20px;
+      max-width: 1000px !important;
+      margin: 0 auto !important;
+      padding: 0 80px !important;
+      box-sizing: border-box !important;
     }
     
     .blog-container {
-      max-width: 1050px;
+      max-width: 800px;
       margin: 0 auto;
       padding: 0;
     }
@@ -241,60 +242,36 @@
   </div>
 
   <!-- Main Content with Padding -->
-  <div id="main-content">
-    <div class="main-content-wrapper">
-      <table style="width:100%;background:#FFFFFF;border:0px;border-spacing:0px;border-collapse:separate;">
-        <tbody>
-          <tr style="padding:0px">
-            <td style="padding:0px">
-              
-              <!-- Page Title -->
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle;text-align:center">
-                      <h1 class="page-title">Blogs</h1>
-                      <div class="blog-intro">
-                        <p>Welcome to my blogs! Here I share thoughts and anything else that I find interesting.</p>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <!-- Blog Posts -->
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <div id="blog-posts-container">
-                        <div class="loading">Loading blog posts...</div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <div class="main-content-wrapper">
+    <!-- Page Title -->
+    <div style="text-align:center;margin-bottom:40px;">
+      <h1 class="page-title">Blogs</h1>
+      <div class="blog-intro">
+        <p>Welcome to my blogs! Here I share thoughts and anything else that I find interesting.</p>
+      </div>
+    </div>
+    
+    <!-- Blog Posts -->
+    <div id="blog-posts-container">
+      <div class="loading">Loading blog posts...</div>
     </div>
   </div>
 
   <!-- Footer -->
-  <table style="width:100%;max-width:1050px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-    <tbody>
-      <tr>
-        <td style="padding:20px; text-align: center;">
-          <br>
-          <p style="font-size:small;">
-            © 2025 Xunjian Yin. All rights reserved.
-          </p>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="main-content-wrapper">
+    <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+      <tbody>
+        <tr>
+          <td style="padding:20px; text-align: center;">
+            <br>
+            <p style="font-size:small;">
+              © 2025 Xunjian Yin. All rights reserved.
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <!-- Load JavaScript files -->
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
