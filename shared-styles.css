@@ -73,12 +73,24 @@ li p {
   padding: 0px !important;
 }
 
-/* Publication Styles - Fixed list formatting */
+/* Publication Styles - Consistent indentation */
 .publication-list {
   list-style-type: disc !important;
-  padding-left: 25px !important;
+  padding-left: 20px !important;
   margin: 0 0 20px 0 !important;
   list-style-position: outside !important;
+}
+
+/* Ensure all lists have consistent indentation */
+ul, ol {
+  padding-left: 20px !important;
+  margin: 0 0 20px 0 !important;
+}
+
+/* Override any specific list variations */
+#projects-list, #research-experience-list, #academic-services-list, #teaching-list, #honors-list {
+  padding-left: 20px !important;
+  margin: 0 0 20px 0 !important;
 }
 
 /* Ensure all content inside main-content-wrapper is properly aligned */
