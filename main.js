@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
   populatePublications(getSelectedPublications(), 'selected-publications-list');
   populateProjects();
   populateResearchExperience();
+  populateAcademicServices();
   populateTeaching();
   populateHonors();
   
@@ -143,6 +144,20 @@ function populateResearchExperience() {
         ${exp.description}
       </p>
     `;
+    list.appendChild(li);
+  });
+}
+
+/**
+ * Function to populate academic services
+ */
+function populateAcademicServices() {
+  const list = document.getElementById('academic-services-list');
+  if (!list) return;
+  
+  academicServices.forEach(service => {
+    const li = document.createElement('li');
+    li.innerHTML = `<p>${service}</p>`;
     list.appendChild(li);
   });
 }
