@@ -1,0 +1,124 @@
+/**
+ * Shared Styles for All Pages
+ * Contains navigation, layout, and common component styles
+ */
+
+/* Navigation Styles */
+.nav-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  padding: 20px 35px;
+  flex-wrap: wrap;
+}
+
+.nav-button {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: transparent;
+  color: var(--primary-color);
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.25s ease;
+  text-align: center;
+  border: none;
+  border-radius: 4px;
+}
+
+.nav-button:hover {
+  color: var(--secondary-color);
+  background-color: rgba(240, 146, 40, 0.08);
+}
+
+/* Main Content Layout */
+.main-content-wrapper {
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Consistent Heading Styles */
+heading {
+  margin-bottom: 15px !important;
+  margin-top: 0px !important;
+  display: block;
+}
+
+/* List Spacing */
+.section-spacing ul,
+.section-spacing ul.publication-list,
+heading + ul,
+heading + ul.publication-list,
+td ul {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+.section-spacing li,
+.section-spacing ul li,
+td li,
+td ul li,
+li {
+  margin-bottom: 8px !important;
+  margin-top: 0px !important;
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+
+.publication-list li,
+ul.publication-list li {
+  margin-bottom: 12px !important;
+  margin-top: 0px !important;
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+
+li p {
+  margin: 0px !important;
+  padding: 0px !important;
+}
+
+/* Publication Styles */
+.publication-list {
+  list-style-type: disc;
+  padding-left: 30px;
+  margin: 0 auto 20px;
+}
+
+.publication-list li {
+  margin-bottom: 16px;
+}
+
+.papertitle {
+  margin-bottom: 6px;
+}
+
+.paper_rest {
+  margin-bottom: 6px;
+}
+
+/* Page Title Styles */
+.page-title {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+  .nav-buttons {
+    justify-content: center;
+    gap: 15px;
+    padding: 15px 20px;
+  }
+  
+  .nav-button {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+  
+  .main-content-wrapper {
+    padding: 0 15px;
+  }
+} 

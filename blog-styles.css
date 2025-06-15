@@ -1,0 +1,154 @@
+/**
+ * Blog-Specific Styles
+ * Contains all styling for blog posts and blog pages
+ */
+
+/* Blog Post Container */
+.post-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  line-height: 1.6;
+}
+
+/* Blog Post Header */
+.post-header {
+  text-align: center;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.post-title {
+  font-size: 32px;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.post-meta {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.post-tags {
+  margin-top: 10px;
+}
+
+.tag {
+  display: inline-block;
+  background: var(--primary-color);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin: 0 4px;
+}
+
+/* Blog Post Content */
+.post-content {
+  font-size: 16px;
+}
+
+.post-content h1, 
+.post-content h2, 
+.post-content h3 {
+  color: var(--primary-color);
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.post-content p {
+  margin-bottom: 15px;
+}
+
+.post-content ul, 
+.post-content ol {
+  margin-bottom: 15px;
+  padding-left: 30px;
+}
+
+.post-content li {
+  margin-bottom: 5px;
+}
+
+.post-content code {
+  background: #f5f5f5;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+}
+
+.post-content pre {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin: 15px 0;
+}
+
+/* Blog Navigation */
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--secondary-color);
+}
+
+/* Blog List Styles */
+.blog-post {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.blog-title {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.blog-meta {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.blog-meta span {
+  margin-right: 15px;
+}
+
+.blog-tags {
+  margin-bottom: 15px;
+  color: #888;
+  font-size: 14px;
+}
+
+.blog-excerpt {
+  margin-bottom: 15px;
+}
+
+.read-more {
+  color: var(--primary-color);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.read-more:hover {
+  color: var(--secondary-color);
+}
+
+/* Coming Soon Message */
+.coming-soon {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.coming-soon h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+} 

@@ -8,48 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Xunjian Yin's personal academic website">
   <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="shared-styles.css">
   <link rel="icon" type="image/png" href="figures/logo.png">
   <!-- Preload critical assets -->
   <link rel="preload" href="figures/me.jpg" as="image">
-  <!-- Simple elegance improvements -->
+  <!-- Page-specific styles -->
   <style>
     body {
       font-display: swap;
       line-height: 1.7;
-    }
-    
-    /* Subtle improvements to navigation */
-    .nav-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 18px;
-      padding: 20px 35px;
-      flex-wrap: wrap;
-    }
-    
-    .nav-button {
-      display: inline-block;
-      padding: 6px 12px;
-      background-color: transparent;
-      color: var(--primary-color);
-      font-weight: 500;
-      font-size: 14px;
-      transition: all 0.25s ease;
-      text-align: center;
-      border: none;
-      border-radius: 4px;
-    }
-    
-    .nav-button:hover {
-      color: var(--secondary-color);
-      background-color: rgba(240, 146, 40, 0.08);
-    }
-    
-    /* Subtle section spacing improvements */
-    .main-content-wrapper {
-      max-width: 1050px;
-      margin: 0 auto;
-      padding: 0 20px;
     }
     
     .section-spacing {
@@ -68,49 +35,7 @@
       padding-top: 10px !important;
     }
     
-    /* Consistent heading spacing for all sections */
-    heading {
-      margin-bottom: 15px !important;
-      margin-top: 0px !important;
-      display: block;
-    }
-    
-    /* Consistent spacing for all sections - target all ul elements */
-    .section-spacing ul,
-    .section-spacing ul.publication-list,
-    heading + ul,
-    heading + ul.publication-list,
-    td ul {
-      margin-top: 0px !important;
-      margin-bottom: 0px !important;
-    }
-    
-    /* Ensure consistent spacing for all list items */
-    .section-spacing li,
-    .section-spacing ul li,
-    td li,
-    td ul li,
-    li {
-      margin-bottom: 8px !important;
-      margin-top: 0px !important;
-      padding-bottom: 0px !important;
-      padding-top: 0px !important;
-    }
-    
-    /* Special handling for publication lists */
-    .publication-list li,
-    ul.publication-list li {
-      margin-bottom: 12px !important;
-      margin-top: 0px !important;
-      padding-bottom: 0px !important;
-      padding-top: 0px !important;
-    }
-    
-    /* Remove spacing from paragraphs within list items */
-    li p {
-      margin: 0px !important;
-      padding: 0px !important;
-    }
+
     
     /* Subtle profile photo enhancement */
     .profile-photo {
@@ -122,33 +47,7 @@
       border-color: #e0e0e0;
     }
     
-    /* Better list spacing */
-    .publication-list li {
-      margin-bottom: 12px;
-    }
-    
-    ul li {
-      margin-bottom: 8px;
-    }
-    
 
-    
-    @media screen and (max-width: 600px) {
-      .nav-buttons {
-        justify-content: center;
-        gap: 15px;
-        padding: 15px 20px;
-      }
-      
-      .nav-button {
-        font-size: 13px;
-        padding: 5px 10px;
-      }
-      
-      .main-content-wrapper {
-        padding: 0 15px;
-      }
-    }
   </style>
 </head>
 

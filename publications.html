@@ -8,45 +8,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Publications of Xunjian Yin">
   <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="shared-styles.css">
   <link rel="icon" type="image/png" href="figures/logo.png">
-  <!-- Use system font stack for improved performance -->
+  <!-- Page-specific styles -->
   <style>
     body {
       font-display: swap; 
-    }
-    
-    /* Navigation buttons styles */
-    .nav-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 18px;
-      padding: 20px 35px;
-      flex-wrap: wrap;
-    }
-    
-    .nav-button {
-      display: inline-block;
-      padding: 6px 12px;
-      background-color: transparent;
-      color: var(--primary-color);
-      font-weight: 500;
-      font-size: 14px;
-      transition: all 0.25s ease;
-      text-align: center;
-      border: none;
-      border-radius: 4px;
-    }
-    
-    .nav-button:hover {
-      color: var(--secondary-color);
-      background-color: rgba(240, 146, 40, 0.08);
-    }
-    
-    /* Main content wrapper to match index page */
-    .main-content-wrapper {
-      max-width: 1050px;
-      margin: 0 auto;
-      padding: 0 20px;
     }
     
     .publications-container {
@@ -55,33 +22,7 @@
       padding: 0;
     }
     
-    /* Consistent heading spacing */
-    heading {
-      margin-bottom: 15px !important;
-      margin-top: 0px !important;
-      display: block;
-    }
-    
-    /* Consistent list spacing */
-    .publication-list li {
-      margin-bottom: 12px !important;
-      margin-top: 0px !important;
-      padding-bottom: 0px !important;
-      padding-top: 0px !important;
-    }
-    
-    /* Remove spacing from paragraphs within list items */
-    li p {
-      margin: 0px !important;
-      padding: 0px !important;
-    }
-    
-    .page-title {
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 30px;
-      color: var(--primary-color);
-    }
+
     
     /* Fix for paper indentation */
     .publication-table {
@@ -101,36 +42,13 @@
       vertical-align: top;
     }
     
-    .papertitle {
-      margin-bottom: 6px;
-    }
-    
-    .paper_rest {
-      margin-bottom: 6px;
-    }
-    
     .paper_bottom_space {
       margin-bottom: 20px;
     }
     
     @media screen and (max-width: 600px) {
-      .nav-buttons {
-        justify-content: center;
-        gap: 15px;
-        padding: 15px 20px;
-      }
-      
-      .nav-button {
-        font-size: 13px;
-        padding: 5px 10px;
-      }
-      
       .publication-table td {
         padding: 8px 15px;
-      }
-      
-      .main-content-wrapper {
-        padding: 0 15px;
       }
     }
   </style>

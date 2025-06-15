@@ -5,29 +5,6 @@
 
 // Wait for DOM to be ready before manipulating
 document.addEventListener('DOMContentLoaded', function() {
-  // Add publication styles to ensure consistent indentation
-  const publicationStyles = `
-    .publication-list {
-      list-style-type: disc;
-      padding-left: 30px;
-      margin: 0 auto 20px;
-    }
-    .publication-list li {
-      margin-bottom: 16px;
-    }
-    .papertitle {
-      margin-bottom: 6px;
-    }
-    .paper_rest {
-      margin-bottom: 6px;
-    }
-  `;
-  
-  // Apply the styles
-  const styleEl = document.createElement('style');
-  styleEl.textContent = publicationStyles;
-  document.head.appendChild(styleEl);
-  
   // Populate publications and other sections
   populatePublications(getSelectedPreprints(), 'preprints-list');
   populatePublications(getSelectedPublications(), 'selected-publications-list');

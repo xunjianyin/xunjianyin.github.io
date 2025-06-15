@@ -209,83 +209,8 @@ class BlogManager {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${post.title} - Xunjian Yin</title>
         <link rel="stylesheet" type="text/css" href="stylesheet.css">
+        <link rel="stylesheet" type="text/css" href="blog-styles.css">
         <link rel="icon" type="image/png" href="figures/logo.png">
-        <style>
-          .post-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            line-height: 1.6;
-          }
-          .post-header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
-          }
-          .post-title {
-            font-size: 32px;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-          }
-          .post-meta {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-          }
-          .post-tags {
-            margin-top: 10px;
-          }
-          .tag {
-            display: inline-block;
-            background: var(--primary-color);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin: 0 4px;
-          }
-          .post-content {
-            font-size: 16px;
-          }
-          .post-content h1, .post-content h2, .post-content h3 {
-            color: var(--primary-color);
-            margin-top: 30px;
-            margin-bottom: 15px;
-          }
-          .post-content p {
-            margin-bottom: 15px;
-          }
-          .post-content ul, .post-content ol {
-            margin-bottom: 15px;
-            padding-left: 30px;
-          }
-          .post-content li {
-            margin-bottom: 5px;
-          }
-          .post-content code {
-            background: #f5f5f5;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-          }
-          .post-content pre {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            margin: 15px 0;
-          }
-          .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-            text-decoration: none;
-          }
-          .back-link:hover {
-            color: var(--secondary-color);
-          }
-        </style>
       </head>
       <body>
         <div class="post-container">
