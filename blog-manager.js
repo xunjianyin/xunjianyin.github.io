@@ -141,7 +141,9 @@ class BlogManager {
     
     return `
       <article class="blog-post" data-post-id="${post.id}">
-        <h2 class="blog-title">${post.title}</h2>
+        <h2 class="blog-title">
+          <a href="#" onclick="blogManager.openPost('${post.id}')" style="color: inherit; text-decoration: none;">${post.title}</a>
+        </h2>
         <div class="blog-meta">
           <span class="blog-date">${formattedDate}</span>
           <span class="blog-author">by ${post.author}</span>
