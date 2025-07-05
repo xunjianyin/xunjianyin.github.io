@@ -2,6 +2,17 @@
 const publications = [
   // Preprints
   {
+    title: "LEDOM: An Open and Fundamental Reverse Language Model",
+    authors: "Xunjian Yin, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
+    venue: "ArXiv:2507",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2507.01335" },
+      { text: "Code", url: "https://github.com/Arvid-pku/ContraSolver" }
+    ],
+    isPreprint: true,
+    isSelected: true
+  },
+  {
     title: "COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement",
     authors: "Yuxi Xie, Anirudh Goyal, Xiaobao Wu, <b>Xunjian Yin</b>, Xiao Xu, Min-Yen Kan, Liangming Pan, William Yang Wang",
     venue: "ArXiv:2410",
