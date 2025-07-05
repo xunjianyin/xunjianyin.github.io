@@ -7,7 +7,7 @@ const publications = [
     venue: "ArXiv:2507",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2507.01335" },
-      { text: "Code", url: "https://github.com/Arvid-pku/ContraSolver" }
+      { text: "Model", url: "https://huggingface.co/Corning/Reverse-Model-7B-348B" }
     ],
     isPreprint: true,
     isSelected: true
