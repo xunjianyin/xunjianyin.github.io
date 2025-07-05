@@ -360,6 +360,38 @@ const academicServices = [
   "Volunteer: NLPCC 2023 Shared Task 8 track chair, AAAI 2024 volunteer, ACL 2024 volunteer"
 ];
 
+// Talks Data
+const talks = [
+  {
+    title: "Speech at the Graduation Ceremony",
+    venue: "Peking University",
+    date: "Jun 26, 2025",
+    attachments: [
+      { text: "News", url: "https://mp.weixin.qq.com/s/fzxzfwheU-5rATVypjenwg", type: "link" },
+      { text: "Slides", url: "files/Speech at the Graduation Ceremony/slides.pdf", type: "pdf" },
+      { text: "Speech Draft", url: "files/Speech at the Graduation Ceremony/speech draft.pdf", type: "pdf" }
+    ]
+  },
+  {
+    title: "Talk at NICE",
+    venue: "NICE Community",
+    date: "Jun 14, 2025",
+    attachments: [
+      { text: "Slides", url: "files/Speech at NICE/slides.pdf", type: "pdf" },
+      { text: "Video", url: "https://www.bilibili.com/video/BV16GNvzfE92", type: "video" }
+    ]
+  },
+  {
+    title: "Talk at the Founder Product Launch Event",
+    venue: "Founder",
+    date: "Jan 25, 2024",
+    attachments: [
+      { text: "News", url: "https://mp.weixin.qq.com/s/1LBHCS1GypM62GQWZ2VX9w", type: "link" }
+    ]
+  }
+
+];
+
 // Honors Data
 const honors = [
   "Outstanding Graduate of Beijing, Jun. 2025",

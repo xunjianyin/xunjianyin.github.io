@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
   populateResearchExperience();
   populateAcademicServices();
   populateTeaching();
+  populateTalks();
   populateHonors();
   
   // Add smooth scrolling to outline links
@@ -149,6 +150,24 @@ function populateTeaching() {
   teaching.forEach(teachingItem => {
     const li = document.createElement('li');
     li.innerHTML = `<p>${teachingItem}</p>`;
+    list.appendChild(li);
+  });
+}
+
+/**
+ * Function to populate talks
+ */
+function populateTalks() {
+  const list = document.getElementById('talks-list');
+  if (!list) return;
+  
+  talks.forEach(talk => {
+    const li = document.createElement('li');
+    const attachmentLinks = talk.attachments.map(attachment => 
+      `<a href="${attachment.url}" target="_blank">${attachment.text}</a>`
+    ).join(' | ');
+    
+    li.innerHTML = `<p>${talk.title}, ${talk.venue}, ${talk.date} [ ${attachmentLinks} ]</p>`;
     list.appendChild(li);
   });
 }
