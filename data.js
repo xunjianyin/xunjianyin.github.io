@@ -3,7 +3,7 @@ const publications = [
   // Preprints
   {
     title: "LEDOM: An Open and Fundamental Reverse Language Model",
-    authors: "Xunjian Yin, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
+    authors: "<b>Xunjian Yin</b>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
     venue: "ArXiv:2507",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2507.01335" },
