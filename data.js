@@ -24,17 +24,6 @@ const publications = [
     isSelected: false
   },
   {
-    title: "Understanding the interplay between parametric and contextual knowledge for large language models",
-    authors: "Sitao Cheng, Liangming Pan, <b>Xunjian Yin</b>, Xinyi Wang, William Yang Wang",
-    venue: "ArXiv:2410",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2410.08414" },
-      { text: "Code", url: "https://github.com/sitaocheng/Knowledge_Interplay" }
-    ],
-    isPreprint: true,
-    isSelected: false
-  },
-  {
     title: "ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions",
     authors: "Xu Zhang*, <b>Xunjian Yin</b>*, Xiaojun Wan",
     venue: "ArXiv:2406",
@@ -66,6 +55,17 @@ const publications = [
       { text: "Paper", url: "https://arxiv.org/abs/2406.13219" },
     ],
     isNew: true,
+    isPreprint: false,
+    isSelected: false
+  },
+  {
+    title: "Understanding the interplay between parametric and contextual knowledge for large language models",
+    authors: "Sitao Cheng, Liangming Pan, <b>Xunjian Yin</b>, Xinyi Wang, William Yang Wang",
+    venue: "KnowLM Workshop, ACL 2025",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2410.08414" },
+      { text: "Code", url: "https://github.com/sitaocheng/Knowledge_Interplay" }
+    ],
     isPreprint: false,
     isSelected: false
   },
