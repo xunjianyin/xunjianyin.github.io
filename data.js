@@ -50,7 +50,7 @@ const publications = [
   {
     title: "MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",
     authors: "Junzhe Zhang, Huixuan Zhang, <b>Xunjian Yin</b>, Baizhou Huang, Xu Zhang, Xinyu Hu, Xiaojun Wan",
-    venue: "ACL Findings 2025",
+    venue: "ACL 2025 Findings ",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2406.13219" },
     ],
@@ -83,7 +83,7 @@ const publications = [
   {
     title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with LLMs",
     authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
-    venue: "NAACL findings 2025",
+    venue: "NAACL 2025 Findings",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2410.13192" },
       { text: "Code", url: "https://github.com/leejamesss/Eval_Self_Docs_RAG" }
