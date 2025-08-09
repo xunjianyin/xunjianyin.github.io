@@ -246,6 +246,20 @@ const projects = [
     isSelected: true
   },
   {
+    title: "Music Letter",
+    description: "Turn your letter into a song and let your heart be heard. (<a href=\"https://xunjianyin.github.io/MusicLetter\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/xunjianyin/MusicLetter/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/xunjianyin/MusicLetter/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/xunjianyin/MusicLetter/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/MusicLetter" },
+      { url: "https://github.com/xunjianyin/MusicLetter/network/members", img: "https://img.shields.io/github/forks/xunjianyin/MusicLetter" },
+      { url: "https://github.com/xunjianyin/MusicLetter/issues", img: "https://img.shields.io/github/issues/xunjianyin/MusicLetter" },
+      { url: "https://github.com/xunjianyin/MusicLetter/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+      { url: "https://xunjianyin.github.io/MusicLetter/", img: "https://img.shields.io/badge/Website-Music_Letter-blue" }
+    ],
+    isSelected: true
+  },
+  {
     title: "Overleaf-Bib-Helper-Dev",
     description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/Arvid-pku/Overleaf-Bib-Helper\">Project Homepage</a>)",
     badges: [
