@@ -362,10 +362,10 @@ const researchExperience = [
 
 // Teaching Data
 const teaching = [
-  "Teaching Assistant, PKU CS, Web Data Mining, Fall 2023, with Prof. Xiaojun Wan",
-  "Teaching Assistant, PKU CS, Introduction to Computing, Fall 2023, with Prof. Xifeng Deng",
-  "Teaching Assistant, PKU CS, Data Structures and Algorithms, Spring 2022, with Prof. Zhao Wang",
-  "Teaching Assistant, PKU CS, Introduction to Computing, Fall 2021, with Prof. Yibo Lin"
+  "Teaching Assistant, PKU EECS, Web Data Mining, Fall 2023, with Prof. Xiaojun Wan",
+  "Teaching Assistant, PKU EECS, Introduction to Computing, Fall 2023, with Prof. Xifeng Deng",
+  "Teaching Assistant, PKU EECS, Data Structures and Algorithms, Spring 2022, with Prof. Zhao Wang",
+  "Teaching Assistant, PKU EECS, Introduction to Computing, Fall 2021, with Prof. Yibo Lin"
 ];
 
 // Academic Services Data
