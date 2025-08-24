@@ -262,8 +262,24 @@ ul, ol {
   
   #outline-sidebar.mobile-active {
     left: 0 !important; /* Show when active */
-    background-color: var(--sidebar-bg) !important;
+    background-color: red !important; /* DEBUG: Make it obvious */
+    border: 5px solid yellow !important; /* DEBUG: Bright border */
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3) !important; /* Add shadow for visibility */
+  }
+  
+  /* DEBUG: Make sidebar content obvious */
+  #outline-sidebar.mobile-active .sidebar-heading {
+    color: white !important;
+    background-color: blue !important;
+    padding: 10px !important;
+  }
+  
+  #outline-sidebar.mobile-active ul li a {
+    color: white !important;
+    background-color: green !important;
+    padding: 5px !important;
+    margin: 2px 0 !important;
+    display: block !important;
   }
   
   .main-content-wrapper {
