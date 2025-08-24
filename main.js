@@ -405,6 +405,9 @@ function initializeOutlineNavigation() {
         // Update URL hash without triggering default scroll
         history.pushState(null, null, targetId);
         
+        // Remove focus from the clicked link to clear highlight/shadow
+        this.blur();
+        
         // Close mobile menu if it's open
         const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
         if (mobileMenuToggle && mobileMenuToggle.classList.contains('active')) {
