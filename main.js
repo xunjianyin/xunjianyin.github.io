@@ -216,18 +216,18 @@ function initializeLazyVisitorMap() {
     // Replace placeholder with actual map
     placeholder.innerHTML = '';
     
-    // Create script elements for the visitor map
-    const emailScript = document.createElement('script');
-    emailScript.setAttribute('data-cfasync', 'false');
-    emailScript.src = '/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js';
-    
+    // Create script element for the visitor map (no need for email decode script)
     const mapScript = document.createElement('script');
     mapScript.type = 'text/javascript';
     mapScript.id = 'clstr_globe';
     mapScript.async = true;
     mapScript.src = '//clustrmaps.com/globe.js?d=FtefwNT63Wx_0gBCBN3XnQmRNAp1TN3HO-j7pLKNwo4';
     
-    placeholder.appendChild(emailScript);
+    // Add error handling
+    mapScript.onerror = function() {
+      placeholder.innerHTML = '<span style="font-size:12px; color:var(--placeholder-text);">Map unavailable</span>';
+    };
+    
     placeholder.appendChild(mapScript);
   }
   
@@ -342,16 +342,12 @@ function initializeMobileMenu() {
   const overlay = document.getElementById('mobile-sidebar-overlay');
   
   if (!menuToggle || !sidebar || !overlay) {
-    console.error('Mobile menu elements not found:', { menuToggle, sidebar, overlay });
     return;
   }
-  
-  console.log('Mobile menu initialized successfully');
   
   // Toggle menu function
   function toggleMobileMenu() {
     const isActive = menuToggle.classList.contains('active');
-    console.log('Toggle mobile menu:', isActive ? 'closing' : 'opening');
     
     if (isActive) {
       // Close menu
@@ -359,14 +355,12 @@ function initializeMobileMenu() {
       sidebar.classList.remove('mobile-active');
       overlay.classList.remove('active');
       document.body.style.overflow = '';
-      console.log('Menu closed');
     } else {
       // Open menu
       menuToggle.classList.add('active');
       sidebar.classList.add('mobile-active');
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden'; // Prevent background scrolling
-      console.log('Menu opened');
     }
   }
   
