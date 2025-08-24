@@ -129,15 +129,19 @@
   </style>
 </head>
 
-<body bgcolor="#FFFFFF">
+<body>
   <!-- Navigation Buttons -->
-  <div class="nav-buttons">
+  <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="index.html" class="nav-button">Home</a>
     <a href="publications.html" class="nav-button">Publications</a>
-    <a href="projects.html" class="nav-button">Projects</a>
+    <a href="projects.html" class="nav-button" aria-current="page">Projects</a>
     <a href="blogs.html" class="nav-button">Blogs</a>
     <a href="photography.html" class="nav-button">Photography</a>
-  </div>
+    
+    <!-- Dark mode toggle -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+    </button>
+  </nav>
 
   <!-- Main Content with Padding -->
   <div class="main-content-wrapper">
@@ -178,6 +182,9 @@
     document.addEventListener('DOMContentLoaded', function() {
       // Populate all projects (both selected and non-selected)
       populateProjects(getAllProjects(), 'projects-list');
+      
+      // Initialize dark mode toggle
+      initializeDarkMode();
     });
     
     /**
@@ -225,6 +232,51 @@
         projectDiv.appendChild(badgesDiv);
         container.appendChild(projectDiv);
       });
+    }
+    
+    /**
+     * Initialize dark mode functionality
+     */
+    function initializeDarkMode() {
+      const themeToggle = document.getElementById('theme-toggle');
+      
+      if (!themeToggle) return;
+      
+      // Check for saved theme preference or default to 'light'
+      const currentTheme = localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      
+      // Apply the saved theme
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      updateThemeLabel(currentTheme, themeToggle);
+      
+      // Add click event listener
+      themeToggle.addEventListener('click', () => {
+        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeLabel(newTheme, themeToggle);
+      });
+      
+      // Listen for system theme changes
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+          const newTheme = e.matches ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          updateThemeLabel(newTheme, themeToggle);
+        }
+      });
+    }
+
+    /**
+     * Update theme button label based on current theme
+     */
+    function updateThemeLabel(theme, toggleElement) {
+      toggleElement.setAttribute('aria-label', 
+        theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+      toggleElement.setAttribute('title', 
+        theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
     }
   </script>
 </body>
