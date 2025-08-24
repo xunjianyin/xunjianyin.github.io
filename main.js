@@ -29,30 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize mobile hamburger menu
   initializeMobileMenu();
   
-  // Add smooth scrolling to outline links
-  document.querySelectorAll('#outline-list a').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = this.getAttribute('href');
-      const targetElement = document.querySelector(targetId);
-      if (targetElement) {
-        // Get the offsetTop of the table that contains the section heading
-        const tableContainer = targetElement.closest('table');
-        if (tableContainer) {
-          window.scrollTo({
-            top: tableContainer.offsetTop - 50,
-            behavior: 'smooth'
-          });
-        } else {
-          // Fallback if table not found
-          window.scrollTo({
-            top: targetElement.offsetTop - 50,
-            behavior: 'smooth'
-          });
-        }
-      }
-    });
-  });
+  // Initialize outline navigation
+  initializeOutlineNavigation();
   
   // Update last modified time
   const lastModified = new Date(document.lastModified);
@@ -387,5 +365,58 @@ function initializeMobileMenu() {
     if (window.innerWidth > 768 && menuToggle.classList.contains('active')) {
       toggleMobileMenu();
     }
+  });
+}
+
+/**
+ * Initialize outline navigation with smooth scrolling
+ */
+function initializeOutlineNavigation() {
+  document.querySelectorAll('#outline-list a').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      
+      if (targetElement) {
+        // Find the section container (div with section-spacing class)
+        const sectionContainer = targetElement.closest('.section-spacing');
+        let scrollTarget = targetElement;
+        
+        if (sectionContainer) {
+          scrollTarget = sectionContainer;
+        } else {
+          // Try to find the table container
+          const tableContainer = targetElement.closest('table');
+          if (tableContainer) {
+            scrollTarget = tableContainer;
+          }
+        }
+        
+        // Calculate the scroll position with offset for navigation and sidebar
+        const rect = scrollTarget.getBoundingClientRect();
+        const scrollTop = window.pageYOffset + rect.top - 100;
+        
+        window.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        });
+        
+        // Update URL hash without triggering default scroll
+        history.pushState(null, null, targetId);
+        
+        // Close mobile menu if it's open
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        if (mobileMenuToggle && mobileMenuToggle.classList.contains('active')) {
+          const sidebar = document.getElementById('outline-sidebar');
+          const overlay = document.getElementById('mobile-sidebar-overlay');
+          
+          mobileMenuToggle.classList.remove('active');
+          sidebar.classList.remove('mobile-active');
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+    });
   });
 }
