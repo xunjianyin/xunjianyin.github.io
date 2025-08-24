@@ -6,12 +6,74 @@
   <title>Xunjian Yin</title>
   <meta name="author" content="Xunjian Yin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Xunjian Yin's personal academic website">
+  <meta name="description" content="Xunjian Yin - CS PhD student at Duke University. Research in model generalizability, knowledge editing, and self-referential agents.">
+  <meta name="keywords" content="Xunjian Yin, Duke University, NLP, Machine Learning, Knowledge Editing, Self-Referential Agents">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph tags for social media -->
+  <meta property="og:title" content="Xunjian Yin - CS PhD Student">
+  <meta property="og:description" content="CS PhD student at Duke University researching model generalizability and self-referential agents">
+  <meta property="og:image" content="https://xunjianyin.github.io/figures/me.jpg">
+  <meta property="og:url" content="https://xunjianyin.github.io/">
+  <meta property="og:type" content="profile">
+  
+  <!-- Twitter Card tags -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Xunjian Yin - CS PhD Student">
+  <meta name="twitter:description" content="CS PhD student at Duke University researching model generalizability and self-referential agents">
+  <meta name="twitter:image" content="https://xunjianyin.github.io/figures/me.jpg">
+  
   <link rel="stylesheet" type="text/css" href="stylesheet.css">
   <link rel="stylesheet" type="text/css" href="shared-styles.css">
   <link rel="icon" type="image/png" href="figures/logo.png">
+  
   <!-- Preload critical assets -->
   <link rel="preload" href="figures/me.jpg" as="image">
+  <link rel="preload" href="https://fonts.gstatic.com/s/lato/v15/S6uyw4BMUTPHjx4wXiWtFCc.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <!-- DNS prefetch for external domains -->
+  <link rel="dns-prefetch" href="//clustrmaps.com">
+  <link rel="dns-prefetch" href="//fonts.gstatic.com">
+  
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Xunjian Yin",
+    "alternateName": "Shoon-Jen",
+    "description": "CS PhD student at Duke University researching model generalizability, knowledge editing, and self-referential agents",
+    "url": "https://xunjianyin.github.io/",
+    "image": "https://xunjianyin.github.io/figures/me.jpg",
+    "email": "xunjian.yin@duke.edu",
+    "affiliation": {
+      "@type": "Organization",
+      "name": "Duke University",
+      "url": "https://www.duke.edu/"
+    },
+    "alumniOf": [
+      {
+        "@type": "Organization",
+        "name": "Peking University",
+        "url": "https://english.pku.edu.cn/"
+      }
+    ],
+    "sameAs": [
+      "https://github.com/Arvid-pku",
+      "https://www.linkedin.com/in/xunjian-yin-5b40252a5",
+      "https://x.com/xunjian_yin",
+      "https://scholar.google.com/citations?user=PociQ5EAAAAJ"
+    ],
+    "knowsAbout": [
+      "Machine Learning",
+      "Natural Language Processing",
+      "Knowledge Editing",
+      "Self-Referential Agents",
+      "Model Generalizability"
+    ]
+  }
+  </script>
+  
   <!-- Page-specific styles -->
   <style>
     body {
@@ -53,32 +115,40 @@
 </head>
 
 <body bgcolor="#FFFFFF">
+  <!-- Scroll progress indicator -->
+  <div class="scroll-progress" id="scroll-progress"></div>
+  
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
   <!-- Navigation Buttons -->
-  <div class="nav-buttons">
-    <a href="index.html" class="nav-button">Home</a>
+  <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-button" aria-current="page">Home</a>
     <a href="publications.html" class="nav-button">Publications</a>
     <a href="projects.html" class="nav-button">Projects</a>
     <a href="blogs.html" class="nav-button">Blogs</a>
     <a href="photography.html" class="nav-button">Photography</a>
-  </div>
+  </nav>
 
   <!-- Floating Outline Sidebar -->
-  <div id="outline-sidebar">
+  <aside id="outline-sidebar" role="complementary" aria-label="Page outline">
     <h2 class="sidebar-heading">Outline</h2>
-    <ul id="outline-list">
-      <li><a href="#preprints">Preprints</a></li>
-      <li><a href="#selected-publications">Publications</a></li>
-      <li><a href="#projects">Selected Projects</a></li>
-      <li><a href="#research-experience">Research Experience</a></li>
-      <li><a href="#academic-services">Academic Services</a></li>
-      <li><a href="#teaching">Teaching</a></li>
-      <li><a href="#talks">Talks</a></li>
-      <li><a href="#honors-and-awards">Honors and Awards</a></li>
-    </ul>
-  </div>
+    <nav role="navigation" aria-label="Page sections">
+      <ul id="outline-list">
+        <li><a href="#preprints" aria-label="Jump to Preprints section">Preprints</a></li>
+        <li><a href="#selected-publications" aria-label="Jump to Publications section">Publications</a></li>
+        <li><a href="#projects" aria-label="Jump to Selected Projects section">Selected Projects</a></li>
+        <li><a href="#research-experience" aria-label="Jump to Research Experience section">Research Experience</a></li>
+        <li><a href="#academic-services" aria-label="Jump to Academic Services section">Academic Services</a></li>
+        <li><a href="#teaching" aria-label="Jump to Teaching section">Teaching</a></li>
+        <li><a href="#talks" aria-label="Jump to Talks section">Talks</a></li>
+        <li><a href="#honors-and-awards" aria-label="Jump to Honors and Awards section">Honors and Awards</a></li>
+      </ul>
+    </nav>
+  </aside>
 
   <!-- Main Content with Padding -->
-  <div id="main-content">
+  <main id="main-content" role="main">
     <div class="main-content-wrapper">
       <table
         style="width:100%;background:#FFFFFF;border:0px;border-spacing:0px;border-collapse:separate;">
@@ -88,8 +158,13 @@
             <!-- Introduction with Photo Floating Right -->
             <div style="margin-bottom:40px;overflow:hidden;">
               <!-- Photo floated to the right -->
-              <img class="profile-photo" style="float:right;width:200px;height:200px;border-radius:50%;margin-left:5px;margin-top:160px;" alt="profile photo of Xunjian Yin"
-                src="figures/me.jpg">
+              <img class="profile-photo" 
+                   style="float:right;width:200px;height:200px;border-radius:50%;margin-left:5px;margin-top:160px;" 
+                   alt="Profile photo of Xunjian Yin, CS PhD student at Duke University"
+                   src="figures/me.jpg"
+                   loading="eager"
+                   width="200"
+                   height="200">
               
               <!-- Text content maintains full width centering -->
               <div>
@@ -243,7 +318,7 @@
 
             <!-- Honors and Awards with Map -->
             <div class="section-spacing">
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+              <table class="honors-map-container" style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
                 <tr>
                   <td style="padding:20px; vertical-align:middle; width:80%;">
                     <heading id="honors-and-awards">Selected Honors and Awards</heading>
@@ -252,10 +327,11 @@
                     </ul>
                   </td>
                   <td style="padding:20px; vertical-align:middle; width:20%; text-align:right;">
-                    <div id="map-container" style="width:160px; height:160px; background-color:#ffffff;">
-                      <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-                      <script type="text/javascript" id="clstr_globe" async
-                        src="//clustrmaps.com/globe.js?d=FtefwNT63Wx_0gBCBN3XnQmRNAp1TN3HO-j7pLKNwo4"></script>
+                    <div id="map-container" style="width:160px; height:160px; border-radius:8px;">
+                      <!-- Visitor map will be loaded lazily -->
+                      <div id="visitor-map-placeholder" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer;">
+                        <span style="font-size:12px; color:#666;">📍 Click to load visitor map</span>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -298,7 +374,7 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </main>
 </body>
 
 </html>

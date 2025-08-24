@@ -15,6 +15,14 @@ document.addEventListener('DOMContentLoaded', function() {
   populateTalks();
   populateHonors();
   
+  // Initialize lazy loading for visitor map
+  initializeLazyVisitorMap();
+  
+  // Copy citation functionality removed per user request
+  
+  // Initialize scroll progress indicator
+  initializeScrollProgress();
+  
   // Add smooth scrolling to outline links
   document.querySelectorAll('#outline-list a').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
@@ -184,4 +192,92 @@ function populateHonors() {
     li.innerHTML = `<p>${honor}</p>`;
     list.appendChild(li);
   });
-} 
+}
+
+/**
+ * Initialize lazy loading for visitor map
+ */
+function initializeLazyVisitorMap() {
+  const placeholder = document.getElementById('visitor-map-placeholder');
+  if (!placeholder) return;
+  
+  let mapLoaded = false;
+  
+  function loadVisitorMap() {
+    if (mapLoaded) return;
+    mapLoaded = true;
+    
+    // Replace placeholder with actual map
+    placeholder.innerHTML = '';
+    
+    // Create script elements for the visitor map
+    const emailScript = document.createElement('script');
+    emailScript.setAttribute('data-cfasync', 'false');
+    emailScript.src = '/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js';
+    
+    const mapScript = document.createElement('script');
+    mapScript.type = 'text/javascript';
+    mapScript.id = 'clstr_globe';
+    mapScript.async = true;
+    mapScript.src = '//clustrmaps.com/globe.js?d=FtefwNT63Wx_0gBCBN3XnQmRNAp1TN3HO-j7pLKNwo4';
+    
+    placeholder.appendChild(emailScript);
+    placeholder.appendChild(mapScript);
+  }
+  
+  // Load map on click
+  placeholder.addEventListener('click', loadVisitorMap);
+  
+  // Load map when it comes into viewport (intersection observer)
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          loadVisitorMap();
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    observer.observe(placeholder);
+  } else {
+    // Fallback for older browsers - load after 2 seconds
+    setTimeout(loadVisitorMap, 2000);
+  }
+}
+
+
+
+/**
+ * Initialize scroll progress indicator
+ */
+function initializeScrollProgress() {
+  const progressBar = document.getElementById('scroll-progress');
+  if (!progressBar) return;
+  
+  function updateScrollProgress() {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = (scrollTop / scrollHeight) * 100;
+    
+    progressBar.style.width = Math.min(scrollPercent, 100) + '%';
+  }
+  
+  // Update on scroll with throttling
+  let ticking = false;
+  function handleScroll() {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        updateScrollProgress();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+  
+  window.addEventListener('scroll', handleScroll);
+  window.addEventListener('resize', updateScrollProgress);
+  
+  // Initial update
+  updateScrollProgress();
+}

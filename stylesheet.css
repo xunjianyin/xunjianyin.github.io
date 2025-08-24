@@ -232,6 +232,108 @@ span.highlight {
   box-sizing: border-box;
 }
 
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced hover effects for links */
+a {
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+a:hover {
+  text-shadow: 0 1px 2px rgba(0, 101, 192, 0.1);
+}
+
+/* Subtle animations for sections */
+.section-spacing {
+  transition: transform 0.2s ease;
+}
+
+.section-spacing:hover {
+  transform: translateY(-1px);
+}
+
+/* Profile photo enhancements */
+.profile-photo {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-photo:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+
+
+/* Focus styles for accessibility */
+a:focus, button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Skip to main content link (hidden by default) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--primary-color);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+  border-radius: 4px;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Scroll progress indicator */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+  z-index: 1000;
+  transition: width 0.1s ease;
+}
+
+/* Loading animation for lazy content */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Improved section transitions */
+.section-spacing {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.section-spacing:nth-child(1) { animation-delay: 0.1s; }
+.section-spacing:nth-child(2) { animation-delay: 0.2s; }
+.section-spacing:nth-child(3) { animation-delay: 0.3s; }
+.section-spacing:nth-child(4) { animation-delay: 0.4s; }
+.section-spacing:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive Design */
 @media screen and (max-width: 992px) {
   #outline-sidebar {
@@ -259,6 +361,28 @@ span.highlight {
   heading {
     font-size: 20px;
   }
+  
+  /* Improve mobile layout for profile section */
+  .profile-photo {
+    float: none !important;
+    display: block;
+    margin: 20px auto !important;
+    width: 150px !important;
+    height: 150px !important;
+  }
+  
+  /* Adjust text centering for mobile */
+  .profile-photo + div p[style*="text-align:center"] {
+    text-align: center !important;
+    margin-left: 0 !important;
+  }
+  
+  /* Make map container responsive */
+  #map-container {
+    width: 120px !important;
+    height: 120px !important;
+    margin: 0 auto;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -284,6 +408,32 @@ span.highlight {
   
   .paper_rest {
     font-size: 14px;
+  }
+  
+  /* Further mobile optimizations */
+  #main-content {
+    padding: 0 20px;
+  }
+  
+  .profile-photo {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  
+  /* Stack honors and map vertically on very small screens */
+  .honors-map-container {
+    display: block !important;
+  }
+  
+  .honors-map-container td {
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+  }
+  
+  #map-container {
+    margin: 20px auto 0 !important;
+    text-align: center;
   }
 }
 

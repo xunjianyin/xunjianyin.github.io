@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://xunjianyin.github.io/sitemap.xml
+
+# Disallow certain directories if they exist
+Disallow: /store/
+Disallow: /*.log$
+Disallow: /*.tmp$
