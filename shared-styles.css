@@ -126,10 +126,12 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
+  transition: opacity 0.3s ease;
 }
 
 .mobile-sidebar-overlay.active {
-  display: block;
+  display: block !important;
+  opacity: 1;
 }
 
 /* Main Content Layout - Only applies to pages without specific overrides */
@@ -242,21 +244,26 @@ ul, ol {
   
   /* Mobile sidebar modifications */
   #outline-sidebar {
-    position: fixed;
-    top: 0;
-    left: -280px; /* Hide off-screen */
-    width: 250px;
-    height: 100vh;
-    padding: 80px 20px 20px;
-    border-radius: 0;
-    border: none;
-    transition: left 0.3s ease;
-    overflow-y: auto;
-    z-index: 1000;
+    position: fixed !important;
+    top: 0 !important;
+    left: -280px !important; /* Hide off-screen */
+    width: 250px !important;
+    height: 100vh !important;
+    padding: 80px 20px 20px !important;
+    border-radius: 0 !important;
+    border: none !important;
+    transition: left 0.3s ease !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    transform: none !important; /* Reset any transforms */
+    opacity: 1 !important; /* Override section animations */
+    animation: none !important; /* Disable section animations */
   }
   
   #outline-sidebar.mobile-active {
-    left: 0; /* Show when active */
+    left: 0 !important; /* Show when active */
+    background-color: var(--sidebar-bg) !important;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3) !important; /* Add shadow for visibility */
   }
   
   .main-content-wrapper {

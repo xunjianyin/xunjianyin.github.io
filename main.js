@@ -361,6 +361,11 @@ function initializeMobileMenu() {
       sidebar.classList.add('mobile-active');
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden'; // Prevent background scrolling
+      
+      // Debug: log the sidebar's computed style
+      console.log('Sidebar classes:', sidebar.className);
+      console.log('Sidebar left position:', window.getComputedStyle(sidebar).left);
+      console.log('Sidebar z-index:', window.getComputedStyle(sidebar).zIndex);
     }
   }
   
