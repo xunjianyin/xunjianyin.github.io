@@ -80,6 +80,7 @@
     .project-description {
       margin-bottom: 15px;
       line-height: 1.6;
+      color: var(--text-color, #333);
     }
     
     .project-badges {
@@ -125,6 +126,18 @@
       .main-content-wrapper {
         padding: 0 15px;
       }
+    }
+    
+    /* Dark mode styles */
+    [data-theme="dark"] .project-item {
+      background: var(--bg-color, #1a1a1a) !important;
+      color: var(--text-color, #e0e0e0);
+      border: 1px solid var(--border-color, #404040);
+      box-shadow: 0 2px 10px rgba(255,255,255,0.05);
+    }
+    
+    [data-theme="dark"] .project-description {
+      color: var(--text-color, #e0e0e0);
     }
   </style>
 </head>
