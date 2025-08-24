@@ -78,6 +78,7 @@
   cursor: pointer;
   padding: 0;
   z-index: 1001;
+  position: relative;
 }
 
 .hamburger-line {
@@ -88,8 +89,18 @@
   transform-origin: center;
 }
 
-.mobile-menu-toggle:hover .hamburger-line {
+.mobile-menu-toggle:hover .hamburger-line,
+.mobile-menu-toggle:active .hamburger-line {
   background-color: var(--primary-color);
+}
+
+/* Touch-friendly mobile button */
+@media (hover: none) and (pointer: coarse) {
+  .mobile-menu-toggle {
+    width: 44px;
+    height: 44px;
+    padding: 7px;
+  }
 }
 
 /* Hamburger animation when active */
@@ -241,6 +252,7 @@ ul, ol {
     border: none;
     transition: left 0.3s ease;
     overflow-y: auto;
+    z-index: 1000;
   }
   
   #outline-sidebar.mobile-active {
