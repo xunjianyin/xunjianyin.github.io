@@ -23,6 +23,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize scroll progress indicator
   initializeScrollProgress();
   
+  // Initialize dark mode toggle
+  initializeDarkMode();
+  
+  // Initialize mobile hamburger menu
+  initializeMobileMenu();
+  
   // Add smooth scrolling to outline links
   document.querySelectorAll('#outline-list a').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
@@ -280,4 +286,104 @@ function initializeScrollProgress() {
   
   // Initial update
   updateScrollProgress();
+}
+
+/**
+ * Initialize dark mode functionality
+ */
+function initializeDarkMode() {
+  const themeToggle = document.getElementById('theme-toggle');
+  
+  if (!themeToggle) return;
+  
+  // Check for saved theme preference or default to 'light'
+  const currentTheme = localStorage.getItem('theme') || 
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  
+  // Apply the saved theme
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  updateThemeLabel(currentTheme, themeToggle);
+  
+  // Add click event listener
+  themeToggle.addEventListener('click', () => {
+    const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeLabel(newTheme, themeToggle);
+  });
+  
+  // Listen for system theme changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      const newTheme = e.matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      updateThemeLabel(newTheme, themeToggle);
+    }
+  });
+}
+
+/**
+ * Update theme button label based on current theme
+ */
+function updateThemeLabel(theme, toggleElement) {
+  toggleElement.setAttribute('aria-label', 
+    theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  toggleElement.setAttribute('title', 
+    theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+
+/**
+ * Initialize mobile hamburger menu
+ */
+function initializeMobileMenu() {
+  const menuToggle = document.getElementById('mobile-menu-toggle');
+  const sidebar = document.getElementById('outline-sidebar');
+  const overlay = document.getElementById('mobile-sidebar-overlay');
+  
+  if (!menuToggle || !sidebar || !overlay) return;
+  
+  // Toggle menu function
+  function toggleMobileMenu() {
+    const isActive = menuToggle.classList.contains('active');
+    
+    if (isActive) {
+      // Close menu
+      menuToggle.classList.remove('active');
+      sidebar.classList.remove('mobile-active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    } else {
+      // Open menu
+      menuToggle.classList.add('active');
+      sidebar.classList.add('mobile-active');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+  }
+  
+  // Add event listeners
+  menuToggle.addEventListener('click', toggleMobileMenu);
+  overlay.addEventListener('click', toggleMobileMenu);
+  
+  // Close menu when clicking on sidebar links
+  sidebar.addEventListener('click', (e) => {
+    if (e.target.tagName === 'A') {
+      toggleMobileMenu();
+    }
+  });
+  
+  // Close menu on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuToggle.classList.contains('active')) {
+      toggleMobileMenu();
+    }
+  });
+  
+  // Close menu on window resize if it gets too wide
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768 && menuToggle.classList.contains('active')) {
+      toggleMobileMenu();
+    }
+  });
 }

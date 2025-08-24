@@ -77,6 +77,66 @@
   --text-color: #000000;
   --bg-color: #FFFFFF;
   --border-color: #bbb;
+  --sidebar-bg: #FFFFFF;
+  --section-bg: #FFFFFF;
+  --hover-bg: rgba(240, 146, 40, 0.08);
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --placeholder-bg: #f5f5f5;
+  --placeholder-text: #666;
+}
+
+/* Dark mode colors */
+[data-theme="dark"] {
+  --primary-color: #4A90E2;
+  --secondary-color: #FFA500;
+  --text-color: #E0E0E0;
+  --bg-color: #121212;
+  --border-color: #404040;
+  --sidebar-bg: #1E1E1E;
+  --section-bg: #1A1A1A;
+  --hover-bg: rgba(255, 165, 0, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --placeholder-bg: #2A2A2A;
+  --placeholder-text: #AAA;
+}
+
+/* Ensure body background changes in dark mode */
+[data-theme="dark"] body {
+  background-color: var(--bg-color) !important;
+}
+
+/* Fix profile photo background in dark mode */
+[data-theme="dark"] .profile-photo {
+  background-color: transparent !important;
+  border-color: var(--border-color);
+}
+
+/* Ensure main content has proper background in dark mode */
+[data-theme="dark"] #main-content {
+  background-color: var(--bg-color);
+}
+
+/* Fix table backgrounds in dark mode */
+[data-theme="dark"] table {
+  background-color: var(--bg-color) !important;
+}
+
+/* Remove section background styling for cleaner look */
+
+/* Fix highlight color in dark mode */
+[data-theme="dark"] span.highlight {
+  background-color: #3a3a00;
+  color: #ffff80;
+}
+
+/* Fix venue colors in dark mode */
+[data-theme="dark"] .venue {
+  color: var(--primary-color);
+}
+
+/* Fix paper rest color in dark mode */
+[data-theme="dark"] .paper_rest {
+  color: var(--text-color);
 }
 
 /* Global styles */
@@ -179,11 +239,10 @@ span.highlight {
   top: 200px;
   left: 10px;
   width: 200px;
-  background-color: var(--bg-color);
-  border: 1px solid var(--bg-color);
+  background-color: var(--sidebar-bg);
+  border: none;
   padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-radius: 8px;
   z-index: 1000;
   transition: all 0.3s ease;
   /* Ensure it doesn't affect document flow */

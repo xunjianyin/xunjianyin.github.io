@@ -114,7 +114,7 @@
   </style>
 </head>
 
-<body bgcolor="#FFFFFF">
+<body>
   <!-- Scroll progress indicator -->
   <div class="scroll-progress" id="scroll-progress"></div>
   
@@ -128,8 +128,22 @@
     <a href="projects.html" class="nav-button">Projects</a>
     <a href="blogs.html" class="nav-button">Blogs</a>
     <a href="photography.html" class="nav-button">Photography</a>
+    
+    <!-- Dark mode toggle -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+    </button>
+    
+    <!-- Mobile hamburger menu -->
+    <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Toggle mobile menu" title="Toggle navigation menu">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
   </nav>
 
+  <!-- Mobile sidebar overlay -->
+  <div id="mobile-sidebar-overlay" class="mobile-sidebar-overlay"></div>
+  
   <!-- Floating Outline Sidebar -->
   <aside id="outline-sidebar" role="complementary" aria-label="Page outline">
     <h2 class="sidebar-heading">Outline</h2>
@@ -151,7 +165,7 @@
   <main id="main-content" role="main">
     <div class="main-content-wrapper">
       <table
-        style="width:100%;background:#FFFFFF;border:0px;border-spacing:0px;border-collapse:separate;">
+        style="width:100%;background:var(--bg-color);border:0px;border-spacing:0px;border-collapse:separate;">
         <tbody>
           <tr style="padding:0px">
             <td style="padding:0px">
@@ -330,7 +344,7 @@
                     <div id="map-container" style="width:160px; height:160px; border-radius:8px;">
                       <!-- Visitor map will be loaded lazily -->
                       <div id="visitor-map-placeholder" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer;">
-                        <span style="font-size:12px; color:#666;">📍 Click to load visitor map</span>
+                        <span style="font-size:12px; color:var(--placeholder-text);">📍 Click to load visitor map</span>
                       </div>
                     </div>
                   </td>
