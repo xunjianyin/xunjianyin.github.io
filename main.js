@@ -361,44 +361,6 @@ function initializeMobileMenu() {
       sidebar.classList.add('mobile-active');
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden'; // Prevent background scrolling
-      
-      // Debug: log the sidebar's computed style
-      console.log('Sidebar classes:', sidebar.className);
-      console.log('Sidebar left position:', window.getComputedStyle(sidebar).left);
-      console.log('Sidebar z-index:', window.getComputedStyle(sidebar).zIndex);
-      console.log('Sidebar dimensions:', {
-        width: window.getComputedStyle(sidebar).width,
-        height: window.getComputedStyle(sidebar).height,
-        display: window.getComputedStyle(sidebar).display,
-        visibility: window.getComputedStyle(sidebar).visibility,
-        opacity: window.getComputedStyle(sidebar).opacity
-      });
-      console.log('Sidebar content:', sidebar.innerHTML.length, 'characters');
-      console.log('Sidebar bounding rect:', sidebar.getBoundingClientRect());
-      
-      // DEBUG: Add a temporary visual indicator
-      const debugDiv = document.createElement('div');
-      debugDiv.id = 'debug-indicator';
-      debugDiv.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: red;
-        color: white;
-        padding: 20px;
-        z-index: 9999;
-        font-size: 20px;
-        border: 3px solid yellow;
-      `;
-      debugDiv.textContent = 'MENU OPENED - DEBUGGING';
-      document.body.appendChild(debugDiv);
-      
-      // Remove debug indicator after 3 seconds
-      setTimeout(() => {
-        const indicator = document.getElementById('debug-indicator');
-        if (indicator) indicator.remove();
-      }, 3000);
     }
   }
   
