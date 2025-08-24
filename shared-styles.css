@@ -262,6 +262,7 @@ ul, ol {
   
   #outline-sidebar.mobile-active {
     left: 0 !important; /* Show when active */
+    display: block !important; /* Force display when active */
     background-color: red !important; /* DEBUG: Make it obvious */
     border: 5px solid yellow !important; /* DEBUG: Bright border */
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3) !important; /* Add shadow for visibility */

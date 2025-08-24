@@ -406,7 +406,7 @@ a:focus, button:focus {
 
 @media screen and (max-width: 768px) {
   #outline-sidebar {
-    display: none;
+    display: block; /* Changed from none to block to allow mobile menu */
   }
   
   #main-content {
