@@ -62,41 +62,27 @@
     }
     
     .project-item {
-      margin-bottom: 30px;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      background: white;
-      border: 1px solid #f0f0f0;
+      margin-bottom: 20px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
     }
     
     .project-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
-      margin-bottom: 10px;
-      color: var(--primary-color);
+      margin-bottom: 5px;
+      color: var(--text-color, #333);
     }
     
     .project-description {
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       line-height: 1.6;
       color: var(--text-color, #333);
     }
     
-    .project-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    
-    .project-badges img {
-      height: 20px;
-      transition: transform 0.2s ease;
-    }
-    
-    .project-badges a:hover img {
-      transform: scale(1.05);
-    }
+
     
     @media screen and (max-width: 600px) {
       .nav-buttons {
@@ -110,18 +96,7 @@
         padding: 5px 10px;
       }
       
-      .project-item {
-        padding: 15px;
-        margin-bottom: 20px;
-      }
-      
-      .project-badges {
-        gap: 5px;
-      }
-      
-      .project-badges img {
-        height: 18px;
-      }
+
       
       .main-content-wrapper {
         padding: 0 15px;
@@ -129,13 +104,6 @@
     }
     
     /* Dark mode styles */
-    [data-theme="dark"] .project-item {
-      background: var(--section-bg, #252525) !important;
-      color: var(--text-color, #d4d4d4);
-      border: 1px solid var(--border-color, #4a4a4a);
-      box-shadow: 0 2px 10px rgba(255,255,255,0.03);
-    }
-    
     [data-theme="dark"] .project-description {
       color: var(--text-color, #d4d4d4);
     }
@@ -164,8 +132,11 @@
     </div>
     
     <!-- Projects List -->
-    <div id="projects-list">
-      <!-- Projects will be inserted here -->
+    <div style="margin-bottom:40px;">
+      <heading id="projects">Projects</heading>
+      <ul id="projects-list">
+        <!-- Projects will be inserted here -->
+      </ul>
     </div>
   </div>
 
@@ -210,40 +181,35 @@
       if (!container) return;
       
       projects.forEach(project => {
-        const projectDiv = document.createElement('div');
-        projectDiv.className = 'project-item';
+        const li = document.createElement('li');
         
-        // Project title
+        // Project title with homepage link
         const titleDiv = document.createElement('div');
         titleDiv.className = 'project-title';
-        titleDiv.textContent = project.title;
         
-        // Project description
+        // Check if project has a homepage link in the description
+        const homepageMatch = project.description.match(/<a href="([^"]+)">Project Homepage<\/a>/);
+        if (homepageMatch) {
+          const homepageUrl = homepageMatch[1];
+          const titleText = project.title;
+          titleDiv.innerHTML = `<strong>${titleText}</strong> (<a href="${homepageUrl}" target="_blank">homepage</a>)`;
+        } else {
+          titleDiv.textContent = project.title;
+        }
+        
+        // Project description (remove homepage link from description since it's now in title)
         const descDiv = document.createElement('div');
         descDiv.className = 'project-description';
-        descDiv.innerHTML = project.description;
-        
-        // Project badges
-        const badgesDiv = document.createElement('div');
-        badgesDiv.className = 'project-badges';
-        project.badges.forEach(badge => {
-          const badgeLink = document.createElement('a');
-          badgeLink.href = badge.url;
-          badgeLink.target = '_blank';
-          
-          const badgeImg = document.createElement('img');
-          badgeImg.src = badge.img;
-          badgeImg.alt = badge.img.split('/').pop();
-          
-          badgeLink.appendChild(badgeImg);
-          badgesDiv.appendChild(badgeLink);
-        });
+        // Remove the homepage link from description since it's now in the title
+        const cleanDescription = project.description.replace(/<a href="[^"]+">Project Homepage<\/a>/, '');
+        // Clean up any extra spaces or punctuation that might be left
+        const finalDescription = cleanDescription.replace(/\s*\(\s*\)\s*/, '').trim();
+        descDiv.innerHTML = finalDescription;
         
         // Append elements
-        projectDiv.appendChild(titleDiv);
-        projectDiv.appendChild(descDiv);
-        projectDiv.appendChild(badgesDiv);
-        container.appendChild(projectDiv);
+        li.appendChild(titleDiv);
+        li.appendChild(descDiv);
+        container.appendChild(li);
       });
     }
     

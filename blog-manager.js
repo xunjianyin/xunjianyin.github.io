@@ -140,10 +140,10 @@ class BlogManager {
     const tags = Array.isArray(post.tags) ? post.tags.join(', ') : '';
     
     return `
-      <article class="blog-post" data-post-id="${post.id}">
-        <h2 class="blog-title">
-          <a href="#" onclick="blogManager.openPost('${post.id}')" style="color: inherit; text-decoration: none;">${post.title}</a>
-        </h2>
+      <li class="blog-post" data-post-id="${post.id}">
+        <div class="blog-title">
+          <a href="#" onclick="blogManager.openPost('${post.id}')">${post.title}</a>
+        </div>
         <div class="blog-meta">
           <span class="blog-date">${formattedDate}</span>
           <span class="blog-author">by ${post.author}</span>
@@ -154,7 +154,7 @@ class BlogManager {
           <p>${post.excerpt}</p>
         </div>
         <a href="#" class="read-more" onclick="blogManager.openPost('${post.id}')">Read More</a>
-      </article>
+      </li>
     `;
   }
 
@@ -167,11 +167,11 @@ class BlogManager {
 
     if (this.posts.length === 0) {
       container.innerHTML = `
-        <div class="coming-soon">
+        <li class="coming-soon">
           <h2>Coming Soon!</h2>
           <p>I'm working on some interesting blog posts about my research and experiences in AI and NLP.</p>
           <p>Check back soon for updates!</p>
-        </div>
+        </li>
       `;
       return;
     }
