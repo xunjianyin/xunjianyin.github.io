@@ -260,6 +260,39 @@ const projects = [
     isSelected: true
   },
   {
+    title: "Game-of-Life",
+    description: "A website to play with Conway's Game of Life. (<a href=\"https://xunjianyin.github.io/Game-of-Life/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/xunjianyin/Game-of-Life/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/xunjianyin/Game-of-Life/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/xunjianyin/Game-of-Life/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Game-of-Life" },
+      { url: "https://github.com/xunjianyin/Game-of-Life/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Game-of-Life" },
+    ],
+    isSelected: false
+  },
+  {
+    title: "Audio-Visualizer",
+    description: "A website to visualize audio. (<a href=\"https://xunjianyin.github.io/Audio-Visualizer/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/xunjianyin/Audio-Visualizer/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/xunjianyin/Audio-Visualizer/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/xunjianyin/Audio-Visualizer/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Audio-Visualizer" },
+      { url: "https://github.com/xunjianyin/Audio-Visualizer/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Audio-Visualizer" },
+    ],
+    isSelected: false
+  },
+  {
+    title: "Maze-Generator-And-Solver",
+    description: "A website to generate and solve mazes. (<a href=\"https://xunjianyin.github.io/Maze-Generator-And-Solver/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Maze-Generator-And-Solver" },
+      { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Maze-Generator-And-Solver" },
+    ],
+    isSelected: false
+  },
+  {
     title: "Overleaf-Bib-Helper-Dev",
     description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/Arvid-pku/Overleaf-Bib-Helper\">Project Homepage</a>)",
     badges: [
