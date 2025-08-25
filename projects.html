@@ -192,7 +192,7 @@
         if (homepageMatch) {
           const homepageUrl = homepageMatch[1];
           const titleText = project.title;
-          titleDiv.innerHTML = `<strong>${titleText}</strong> (<a href="${homepageUrl}" target="_blank">homepage</a>)`;
+          titleDiv.innerHTML = `<strong><a href="${homepageUrl}" target="_blank">${titleText}</a></strong>`;
         } else {
           titleDiv.textContent = project.title;
         }
