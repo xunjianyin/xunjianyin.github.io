@@ -219,7 +219,7 @@ const fullPublications = getAllPublications();
 const projects = [
   {
     title: "Overleaf-Bib-Helper",
-    description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\">Project Homepage</a>)",
+    description: "A <a href=\"https://greasyfork.org/scripts/532304-overleaf-bib-helper\">Userscript</a> to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -229,7 +229,8 @@ const projects = [
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
       { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" }
     ],
-    isSelected: true
+    isSelected: true,
+    demoPath: "photos/project-demo/Overleaf-Bib-Helper.jpg"
   },
   {
     title: "Gödel Agent",
@@ -243,7 +244,8 @@ const projects = [
       { url: "https://github.com/Arvid-pku/Godel_Agent/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
       { url: "https://arxiv.org/abs/2410.04444", img: "https://img.shields.io/badge/Doc-Paper-red" }
     ],
-    isSelected: true
+    isSelected: true,
+    demoPath: "photos/project-demo/Gödel Agent.png"
   },
   {
     title: "Music Letter",
@@ -257,7 +259,8 @@ const projects = [
       { url: "https://github.com/xunjianyin/MusicLetter/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
       { url: "https://xunjianyin.github.io/MusicLetter/", img: "https://img.shields.io/badge/Website-Music_Letter-blue" }
     ],
-    isSelected: true
+    isSelected: true,
+    demoPath: "photos/project-demo/Music Letter.png"
   },
   {
     title: "Game-of-Life",
@@ -268,7 +271,8 @@ const projects = [
       { url: "https://github.com/xunjianyin/Game-of-Life/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Game-of-Life" },
       { url: "https://github.com/xunjianyin/Game-of-Life/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Game-of-Life" },
     ],
-    isSelected: false
+    isSelected: false,
+    demoPath: "photos/project-demo/Game-of-Life.png"
   },
   {
     title: "Audio-Visualizer",
@@ -279,7 +283,8 @@ const projects = [
       { url: "https://github.com/xunjianyin/Audio-Visualizer/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Audio-Visualizer" },
       { url: "https://github.com/xunjianyin/Audio-Visualizer/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Audio-Visualizer" },
     ],
-    isSelected: false
+    isSelected: false,
+    demoPath: "photos/project-demo/Audio-Visualizer.png"
   },
   {
     title: "Maze-Generator-And-Solver",
@@ -290,7 +295,8 @@ const projects = [
       { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Maze-Generator-And-Solver" },
       { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Maze-Generator-And-Solver" },
     ],
-    isSelected: false
+    isSelected: false,
+    demoPath: "photos/project-demo/Maze-Generator-And-Solver.png"
   },
   {
     title: "Overleaf-Bib-Helper-Dev",
@@ -304,11 +310,12 @@ const projects = [
       { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
       { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" }
     ],
-    isSelected: false
+    isSelected: false,
+    demoPath: "photos/project-demo/Overleaf-Bib-Helper.jpg"
   },
   {
     title: "Bouncing Ball",
-    description: "A website to play with a ball (developing). (<a href=\"https://xunjianyin.github.io/bouncing-ball-animation/\">Project Homepage</a>)",
+    description: "A website to play with a ball. (<a href=\"https://xunjianyin.github.io/bouncing-ball-animation/\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/bouncing-ball-animation/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/bouncing-ball-animation/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -318,24 +325,12 @@ const projects = [
       { url: "https://github.com/xunjianyin/bouncing-ball-animation/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
       { url: "https://xunjianyin.github.io/bouncing-ball-animation/", img: "https://img.shields.io/badge/Website-Bouncing_Ball-blue" }
     ],
-  },
-  {
-    title: "Rank-Anything",
-    description: "A website to rank anything (developing). (<a href=\"https://xunjianyin.github.io/rank-anything/\">Project Homepage</a>)",
-    badges: [
-      { url: "https://github.com/xunjianyin/rank-anything/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
-      { url: "https://github.com/xunjianyin/rank-anything/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
-      { url: "https://github.com/xunjianyin/rank-anything/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/rank-anything" },
-      { url: "https://github.com/xunjianyin/rank-anything/network/members", img: "https://img.shields.io/github/forks/xunjianyin/rank-anything" },
-      { url: "https://github.com/xunjianyin/rank-anything/issues", img: "https://img.shields.io/github/issues/xunjianyin/rank-anything" },
-      { url: "https://github.com/xunjianyin/rank-anything/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
-      { url: "https://xunjianyin.github.io/rank-anything/", img: "https://img.shields.io/badge/Website-Rank_Anything-blue" }
-    ],
-    isSelected: false
+    isSelected: false,
+    demoPath: "photos/project-demo/Bouncing Ball.png"
   },
   {
     title: "Star-Maker",
-    description: "A website to create and explore planetary systems (developing). (<a href=\"https://xunjianyin.github.io/star-maker/\">Project Homepage</a>)",
+    description: "A website to create and explore planetary systems. (<a href=\"https://xunjianyin.github.io/star-maker/\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/star-maker/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/star-maker/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -345,8 +340,49 @@ const projects = [
       { url: "https://github.com/xunjianyin/star-maker/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
       { url: "https://xunjianyin.github.io/star-maker/", img: "https://img.shields.io/badge/Website-Star_Maker-blue" }
     ],
-    isSelected: false
-  }
+    isSelected: false,
+    demoPath: "photos/project-demo/Star-Maker.png"
+  },
+  {
+    title: "HF-Downloader",
+    description: "A <a href=\"https://greasyfork.org/zh-CN/scripts/543283-hugging-face-batch-downloader\">Tampermonkey userscript</a> that enhances Hugging Face model pages with batch download functionality. (<a href=\"https://github.com/Arvid-pku/HF-Downloader\">Project Homepage</a>)",
+    badges: [
+      { url: "https://greasyfork.org/zh-CN/scripts/543283-hugging-face-batch-downloader", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/Arvid-pku/HF-Downloader/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/Arvid-pku/HF-Downloader/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/HF-Downloader" },
+      { url: "https://github.com/Arvid-pku/HF-Downloader/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/HF-Downloader" },
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/HF-Downloader.png"
+  },
+  {
+    title: "ID-Photo-Helper",
+    description: "Help everyone deal with the complicated issues of ID photo format and layout. (<a href=\"https://github.com/Arvid-pku/ID-Photo-Helper\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/ID-Photo-Helper" },
+      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/ID-Photo-Helper" },
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/ID-Photo-Helper.png"
+  },
+  {
+    title: "Rank-Anything",
+    description: "A website to rank anything (developing). (<a href=\"https://xunjianyin.github.io/rank-anything/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/releases", img: "https://img.shields.io/badge/Version-0.1-blue" },
+      { url: "https://github.com/xunjianyin/rank-anything/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/xunjianyin/rank-anything/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/rank-anything" },
+      { url: "https://github.com/xunjianyin/rank-anything/network/members", img: "https://img.shields.io/github/forks/xunjianyin/rank-anything" },
+      { url: "https://github.com/xunjianyin/rank-anything/issues", img: "https://img.shields.io/github/issues/xunjianyin/rank-anything" },
+      { url: "https://github.com/xunjianyin/rank-anything/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+      { url: "https://xunjianyin.github.io/rank-anything/", img: "https://img.shields.io/badge/Website-Rank_Anything-blue" }
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/Rank-Anything.png"
+  },
+  
 ];
 
 // Helper functions to filter projects

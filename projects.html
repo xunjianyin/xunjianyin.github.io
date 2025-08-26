@@ -23,12 +23,12 @@
     .main-content-wrapper {
       max-width: 1000px !important;
       margin: 0 auto !important;
-      padding: 0 80px !important;
+      padding: 0 40px !important;
       box-sizing: border-box !important;
     }
     
     .projects-container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 0;
     }
@@ -67,6 +67,28 @@
       border: none;
       background: transparent;
       box-shadow: none;
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .project-demo-image {
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .project-demo-image:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .project-content {
+      flex: 1;
     }
     
     .project-title {
@@ -96,10 +118,19 @@
         padding: 5px 10px;
       }
       
-
+      .project-item {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .project-demo-image {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+      }
       
       .main-content-wrapper {
-        padding: 0 15px;
+        padding: 0 20px;
       }
     }
     
@@ -133,7 +164,6 @@
     
     <!-- Projects List -->
     <div style="margin-bottom:40px;">
-      <heading id="projects">Projects</heading>
       <ul id="projects-list">
         <!-- Projects will be inserted here -->
       </ul>
@@ -182,6 +212,37 @@
       
       projects.forEach(project => {
         const li = document.createElement('li');
+        li.className = 'project-item';
+        
+        // Project demo image
+        if (project.demoPath) {
+          const imgDiv = document.createElement('div');
+          const img = document.createElement('img');
+          img.src = project.demoPath;
+          img.alt = `${project.title} demo`;
+          img.className = 'project-demo-image';
+          img.loading = 'lazy';
+          
+          // Check if project has a homepage link to make image clickable
+          const homepageMatch = project.description.match(/<a href="([^"]+)">Project Homepage<\/a>/);
+          if (homepageMatch) {
+            const homepageUrl = homepageMatch[1];
+            const imgLink = document.createElement('a');
+            imgLink.href = homepageUrl;
+            imgLink.target = '_blank';
+            imgLink.style.textDecoration = 'none';
+            imgLink.appendChild(img);
+            imgDiv.appendChild(imgLink);
+          } else {
+            imgDiv.appendChild(img);
+          }
+          
+          li.appendChild(imgDiv);
+        }
+        
+        // Project content container
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'project-content';
         
         // Project title with homepage link
         const titleDiv = document.createElement('div');
@@ -207,8 +268,9 @@
         descDiv.innerHTML = finalDescription;
         
         // Append elements
-        li.appendChild(titleDiv);
-        li.appendChild(descDiv);
+        contentDiv.appendChild(titleDiv);
+        contentDiv.appendChild(descDiv);
+        li.appendChild(contentDiv);
         container.appendChild(li);
       });
     }
