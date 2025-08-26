@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Update last modified time
   const lastModified = new Date(document.lastModified);
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const options = { year: 'numeric', month: 'long' };
   const formattedDate = lastModified.toLocaleDateString('en-US', options);
   const lastModifiedElement = document.getElementById('last-modified-time');
   if (lastModifiedElement) {
