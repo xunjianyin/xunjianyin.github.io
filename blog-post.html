@@ -1,0 +1,422 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Blog Post - Xunjian Yin</title>
+  <meta name="author" content="Xunjian Yin">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Blog post by Xunjian Yin">
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="shared-styles.css">
+  <link rel="stylesheet" type="text/css" href="blog-styles.css">
+  <link rel="icon" type="image/png" href="figures/logo.png">
+  
+  <style>
+    body {
+      font-display: swap;
+    }
+    
+    /* Navigation buttons styles */
+    .nav-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 18px;
+      padding: 20px 35px;
+      flex-wrap: wrap;
+    }
+    
+    .nav-button {
+      display: inline-block;
+      padding: 6px 12px;
+      background-color: transparent;
+      color: var(--primary-color);
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.25s ease;
+      text-align: center;
+      border: none;
+      border-radius: 4px;
+    }
+    
+    .nav-button:hover {
+      color: var(--secondary-color);
+      background-color: rgba(240, 146, 40, 0.08);
+    }
+    
+    /* Main content wrapper */
+    .main-content-wrapper {
+      max-width: 1000px !important;
+      margin: 0 auto !important;
+      padding: 0 80px !important;
+      box-sizing: border-box !important;
+    }
+    
+    .post-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-bottom: 30px;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .back-link:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+    
+    .post-header {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    
+    .post-title {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: var(--text-color, #333);
+      line-height: 1.3;
+    }
+    
+    .post-meta {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #666;
+      flex-wrap: wrap;
+    }
+    
+    .post-tags {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .tag {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .post-content {
+      line-height: 1.8;
+      color: var(--text-color, #333);
+    }
+    
+    .post-content h1,
+    .post-content h2,
+    .post-content h3 {
+      margin-top: 40px;
+      margin-bottom: 20px;
+      color: var(--text-color, #333);
+    }
+    
+    .post-content h1 {
+      font-size: 28px;
+    }
+    
+    .post-content h2 {
+      font-size: 24px;
+    }
+    
+    .post-content h3 {
+      font-size: 20px;
+    }
+    
+    .post-content p {
+      margin-bottom: 20px;
+    }
+    
+    .post-content ul,
+    .post-content ol {
+      margin-bottom: 20px;
+      padding-left: 30px;
+    }
+    
+    .post-content li {
+      margin-bottom: 8px;
+    }
+    
+    .post-content a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    
+    .post-content a:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+    
+    .post-content strong {
+      font-weight: bold;
+    }
+    
+    .post-content em {
+      font-style: italic;
+    }
+    
+    .post-content code {
+      background-color: #f5f5f5;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 0.9em;
+    }
+    
+    .post-content pre {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+    
+    .post-content pre code {
+      background: none;
+      padding: 0;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+    
+    .error {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+    
+    .error h2 {
+      color: var(--text-color, #333);
+      margin-bottom: 15px;
+    }
+    
+    @media screen and (max-width: 600px) {
+      .nav-buttons {
+        justify-content: center;
+        gap: 15px;
+        padding: 15px 20px;
+      }
+      
+      .nav-button {
+        font-size: 13px;
+        padding: 5px 10px;
+      }
+      
+      .main-content-wrapper {
+        padding: 0 15px;
+      }
+      
+      .post-title {
+        font-size: 24px;
+      }
+      
+      .post-meta {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+    
+    /* Dark mode styles */
+    [data-theme="dark"] .post-meta {
+      color: var(--text-color, #b8b8b8);
+    }
+    
+    [data-theme="dark"] .post-content code {
+      background-color: #2d2d2d;
+      color: #e6e6e6;
+    }
+    
+    [data-theme="dark"] .post-content pre {
+      background-color: #2d2d2d;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation Buttons -->
+  <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-button">Home</a>
+    <a href="publications.html" class="nav-button">Publications</a>
+    <a href="projects.html" class="nav-button">Projects</a>
+    <a href="blogs.html" class="nav-button">Blogs</a>
+    <a href="photography.html" class="nav-button">Photography</a>
+    
+    <!-- Dark mode toggle -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content-wrapper">
+    <div class="post-container">
+      <div id="post-content">
+        <div class="loading">Loading blog post...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="main-content-wrapper">
+    <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
+      <tbody>
+        <tr>
+          <td style="padding:20px; text-align: center;">
+            <br>
+            <p style="font-size:small;">
+              © 2025 Xunjian Yin. All rights reserved.
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Load JavaScript files -->
+  <script src="blog-data.js"></script>
+  <script src="blog-manager.js"></script>
+  <script>
+    // Initialize blog post page when it loads
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        // Get post ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+        
+        if (!postId) {
+          showError('No blog post specified', 'Please select a blog post from the <a href="blogs.html">blogs page</a>.');
+          return;
+        }
+        
+        // Load blog posts and find the requested post
+        await blogManager.loadPosts();
+        const post = blogManager.posts.find(p => p.id === postId);
+        
+        if (!post) {
+          showError('Blog post not found', `The blog post "${postId}" could not be found. <a href="blogs.html">Return to blogs</a>.`);
+          return;
+        }
+        
+        // Render the post
+        renderBlogPost(post);
+        
+        // Update page title
+        document.title = `${post.title} - Xunjian Yin`;
+        
+        // Update meta description
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.content = post.excerpt;
+        }
+        
+      } catch (error) {
+        console.error('Error loading blog post:', error);
+        showError('Error loading blog post', 'There was an error loading the blog post. <a href="blogs.html">Return to blogs</a>.');
+      }
+      
+      // Initialize dark mode toggle
+      initializeDarkMode();
+    });
+    
+    /**
+     * Render a blog post
+     */
+    function renderBlogPost(post) {
+      const formattedDate = blogManager.formatDate(post.date);
+      const tags = Array.isArray(post.tags) ? 
+        post.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : '';
+      
+      const postHtml = `
+        <a href="blogs.html" class="back-link">← Back to Blogs</a>
+        <header class="post-header">
+          <h1 class="post-title">${post.title}</h1>
+          <div class="post-meta">
+            <span>${formattedDate}</span>
+            <span>by ${post.author}</span>
+            <span>${post.readTime} min read</span>
+          </div>
+          ${tags ? `<div class="post-tags">${tags}</div>` : ''}
+        </header>
+        <div class="post-content">
+          ${post.htmlContent || '<p>Content not available.</p>'}
+        </div>
+      `;
+      
+      document.getElementById('post-content').innerHTML = postHtml;
+    }
+    
+    /**
+     * Show error message
+     */
+    function showError(title, message) {
+      const errorHtml = `
+        <div class="error">
+          <h2>${title}</h2>
+          <p>${message}</p>
+        </div>
+      `;
+      document.getElementById('post-content').innerHTML = errorHtml;
+    }
+    
+    /**
+     * Initialize dark mode functionality
+     */
+    function initializeDarkMode() {
+      const themeToggle = document.getElementById('theme-toggle');
+      
+      if (!themeToggle) return;
+      
+      // Check for saved theme preference or default to 'light'
+      const currentTheme = localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      
+      // Apply the saved theme
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      updateThemeLabel(currentTheme, themeToggle);
+      
+      // Add click event listener
+      themeToggle.addEventListener('click', () => {
+        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeLabel(newTheme, themeToggle);
+      });
+      
+      // Listen for system theme changes
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+          const newTheme = e.matches ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          updateThemeLabel(newTheme, themeToggle);
+        }
+      });
+    }
+
+    /**
+     * Update theme button label based on current theme
+     */
+    function updateThemeLabel(theme, toggleElement) {
+      toggleElement.setAttribute('aria-label', 
+        theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+      toggleElement.setAttribute('title', 
+        theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+  </script>
+</body>
+
+</html>

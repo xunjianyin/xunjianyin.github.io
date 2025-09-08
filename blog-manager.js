@@ -207,60 +207,16 @@ class BlogManager {
   }
 
   /**
-   * Open individual blog post
+   * Open individual blog post using proper URL
    */
   openPost(postId) {
     const post = this.posts.find(p => p.id === postId);
     if (!post) return;
 
-    this.currentPost = post;
-    
-    // Create a new page or modal for the full post
-    const postWindow = window.open('', '_blank');
-    const postHtml = this.generateFullPostHtml(post);
-    postWindow.document.write(postHtml);
-    postWindow.document.close();
+    // Navigate to the blog post page with the post ID as a parameter
+    window.location.href = `blog-post.html?id=${postId}`;
   }
 
-  /**
-   * Generate full post HTML
-   */
-  generateFullPostHtml(post) {
-    const formattedDate = this.formatDate(post.date);
-    const tags = Array.isArray(post.tags) ? 
-      post.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : '';
-
-    return `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${post.title} - Xunjian Yin</title>
-        <link rel="stylesheet" type="text/css" href="stylesheet.css">
-        <link rel="stylesheet" type="text/css" href="blog-styles.css">
-        <link rel="icon" type="image/png" href="figures/logo.png">
-      </head>
-      <body>
-        <div class="post-container">
-          <a href="javascript:window.close()" class="back-link">← Back to Blog</a>
-          <header class="post-header">
-            <h1 class="post-title">${post.title}</h1>
-            <div class="post-meta">
-              <span>${formattedDate}</span> • 
-              <span>by ${post.author}</span> • 
-              <span>${post.readTime} min read</span>
-            </div>
-            ${tags ? `<div class="post-tags">${tags}</div>` : ''}
-          </header>
-          <div class="post-content">
-            ${post.htmlContent}
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
 }
 
 // Global instance
