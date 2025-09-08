@@ -36,6 +36,18 @@ const publications = [
   },
   // Publications
   {
+    title: "DAMON: A Dialogue-Aware MCTS Framework for Jailbreaking Large Language Models",
+    authors: "Xu Zhang, <b>Xunjian Yin</b>, Dinghao Jing, Huixuan Zhang, Xinyu Hu, Xiaojun Wan",
+    venue: "EMNLP 2025",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/coming" },
+      { text: "Code", url: "coming" }
+    ],
+    isNew: true,
+    isPreprint: false,
+    isSelected: true
+  },
+  {
     title: "Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement",
     authors: "<b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang",
     venue: "ACL 2025",
@@ -43,7 +55,7 @@ const publications = [
       { text: "Paper", url: "https://arxiv.org/abs/2410.04444" },
       { text: "Code", url: "https://github.com/Arvid-pku/Godel_Agent" }
     ],
-    isNew: true,
+    isNew: false,
     isPreprint: false,
     isSelected: true
   },
@@ -54,7 +66,7 @@ const publications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2406.13219" },
     ],
-    isNew: true,
+    isNew: false,
     isPreprint: false,
     isSelected: false
   },
@@ -76,7 +88,7 @@ const publications = [
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2402.01383" },
     ],
-    isNew: true,
+    isNew: false,
     isPreprint: false,
     isSelected: false
   },
@@ -100,7 +112,7 @@ const publications = [
       { text: "Code", url: "https://github.com/gersteinlab/chemagent" }
     ],
     isPreprint: false,
-    isSelected: true
+    isSelected: false
   },
   {
     title: "DSGram: Dynamic Weighting Sub-Metrics for Grammatical Error Correction in the Era of Large Language Models",
@@ -392,7 +404,7 @@ const getAllProjects = () => projects;
 // Research Experience Data
 const researchExperience = [
   {
-    period: "June 2025 - Current",
+    period: "June 2025 - Aug. 2025",
     institution: "Shanghai AI Lab",
     mentor: "Dr. Jie Fu",
     description: "Reinforcement Learning."
@@ -445,6 +457,14 @@ const academicServices = [
 
 // Talks Data
 const talks = [
+  {
+    title: "Talk at JetBrains Seminar",
+    venue: "JetBrains",
+    date: "Sep 8, 2025",
+    attachments: [
+      { text: "Slides", url: "files/Talk at JetBrains/slides.pdf", type: "pdf" }
+    ]
+  },
   {
     title: "Speech at the Graduation Ceremony",
     venue: "Peking University",

@@ -106,12 +106,39 @@ class BlogManager {
   }
 
   /**
-   * Load blog posts from embedded data (GitHub Pages compatible)
+   * Load blog posts from embedded data and fetch markdown content
    */
   async loadPosts() {
     try {
-      // Use embedded blog data instead of fetching files
-      this.posts = getAllBlogPosts();
+      // Get blog post metadata from embedded data
+      const postsData = getAllBlogPosts();
+      
+      // Load markdown content for posts that have markdownFile property
+      this.posts = await Promise.all(postsData.map(async (post) => {
+        if (post.markdownFile) {
+          try {
+            const response = await fetch(post.markdownFile);
+            if (response.ok) {
+              const markdownContent = await response.text();
+              const parsedContent = this.parseMarkdown(markdownContent);
+              
+              return {
+                ...post,
+                content: markdownContent,
+                htmlContent: this.markdownToHtml(parsedContent.content)
+              };
+            } else {
+              console.warn(`Failed to load markdown file: ${post.markdownFile}`);
+              return post;
+            }
+          } catch (error) {
+            console.warn(`Error loading markdown file ${post.markdownFile}:`, error);
+            return post;
+          }
+        }
+        return post;
+      }));
+      
       return this.posts;
     } catch (error) {
       console.error('Error loading blog posts:', error);
