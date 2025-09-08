@@ -50,12 +50,35 @@
   font-size: 16px;
 }
 
-.post-content h1, 
-.post-content h2, 
+.post-content h1 {
+  font-size: 48px !important;
+  color: var(--text-color, #333) !important;
+  margin-top: 0 !important;
+  margin-bottom: 30px !important;
+  border-bottom: 3px solid var(--primary-color) !important;
+  padding-bottom: 15px !important;
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  text-transform: uppercase !important;
+}
+
+.post-content h2 {
+  font-size: 38px !important;
+  color: var(--primary-color) !important;
+  margin-top: 45px !important;
+  margin-bottom: 25px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-decoration: underline !important;
+}
+
 .post-content h3 {
-  color: var(--primary-color);
-  margin-top: 30px;
-  margin-bottom: 15px;
+  font-size: 30px !important;
+  color: var(--primary-color) !important;
+  margin-top: 35px !important;
+  margin-bottom: 25px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
 }
 
 .post-content p {
@@ -151,4 +174,19 @@
 .coming-soon h2 {
   color: var(--primary-color);
   margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+  .post-content h1 {
+    font-size: 36px !important;
+  }
+  
+  .post-content h2 {
+    font-size: 30px !important;
+  }
+  
+  .post-content h3 {
+    font-size: 24px !important;
+  }
 } 
