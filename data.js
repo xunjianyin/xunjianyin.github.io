@@ -472,7 +472,8 @@ const talks = [
     venue: "JetBrains",
     date: "Sep 8, 2025",
     attachments: [
-      { text: "Slides", url: "files/Talk at Jetbrains/slides.pdf", type: "pdf" }
+      { text: "Slides", url: "files/Talk at Jetbrains/slides.pdf", type: "pdf" },
+      { text: "Blog", url: "https://xunjianyin.github.io/blog-post.html?id=self-referential-agent", type: "link" }
     ]
   },
   {
