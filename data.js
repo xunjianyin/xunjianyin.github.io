@@ -275,6 +275,16 @@ const projects = [
     demoPath: "photos/project-demo/Music Letter.png"
   },
   {
+    title: "Academic-Homepage-Template",
+    description: "A template for academic homepages. (<a href=\"https://github.com/Arvid-pku/Academic-Homepage-Template\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/Academic-Homepage-Template.png"
+  },
+  {
     title: "Game-of-Life",
     description: "A website to play with Conway's Game of Life. (<a href=\"https://xunjianyin.github.io/Game-of-Life/\">Project Homepage</a>)",
     badges: [
