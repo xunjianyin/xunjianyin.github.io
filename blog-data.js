@@ -7,7 +7,7 @@ const blogPosts = [
   {
     id: "self-referential-agent",
     title: "Beyond the Optimizer's Dilemma: Why the Future of AI Must Be Self-Referential",
-    date: "2025-09-08",
+    date: "2025-08-10",
     author: "Xunjian Yin",
     excerpt: "A brief motivation of self-referential agents.",
     tags: ["LLM", "Self-Referential Agent", "Opinion"],
