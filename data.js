@@ -2,6 +2,17 @@
 const publications = [
   // Preprints
   {
+    title: "The Geometry of Reasoning: Flowing Logics in Representation Space",
+    authors: "Yufa Zhou*, Yixiao Wang*, <b>Xunjian Yin</b>, Shuyan Zhou, Anru R. Zhang",
+    venue: "ArXiv:2510",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2510.09782" },
+      { text: "Code", url: "https://github.com/MasterZhou1/Reasoning-Flow" }
+    ],
+    isPreprint: true,
+    isSelected: true
+  },
+  {
     title: "LEDOM: An Open and Fundamental Reverse Language Model",
     authors: "<b>Xunjian Yin</b>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
     venue: "ArXiv:2507",
@@ -461,7 +472,7 @@ const teaching = [
 
 // Academic Services Data
 const academicServices = [
-  "Reviewer: ACL 2023, EMNLP 2023, ICLR 2024, Coling 2024, ACL 2024, NeurIPS 2024, EMNLP 2024, ICLR 2024, ICLR 2025, ICML 2025, JCST 2025, COLM 2025, NeurIPS 2025, EMNLP 2025, AAAI 2025",
+  "Reviewer: ACL-ARR (2023 - Now), ICLR (2024 - 2026), NeurIPS (2024 - 2025), ICML (2025), AAAI (2024 - 2025),  COLM (2025), COLING (2024), JCST (2025)",
   "Volunteer: NLPCC 2023 Shared Task 8 track chair, AAAI 2024 volunteer, ACL 2024 volunteer"
 ];
 
