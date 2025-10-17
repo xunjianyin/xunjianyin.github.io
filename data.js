@@ -3,7 +3,7 @@ const publications = [
   // Preprints
   {
     title: "The Geometry of Reasoning: Flowing Logics in Representation Space",
-    authors: "Yufa Zhou*, Yixiao Wang*, <b>Xunjian Yin</b>, Shuyan Zhou, Anru R. Zhang",
+    authors: "Yufa Zhou*, Yixiao Wang*, <b>Xunjian Yin*</b>, Shuyan Zhou, Anru R. Zhang",
     venue: "ArXiv:2510",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2510.09782" },
