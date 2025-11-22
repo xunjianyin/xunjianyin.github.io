@@ -3,6 +3,19 @@
  * This file contains all formatting and rendering functions
  */
 
+let detailIdCounter = 0;
+const detailToggleRegistry = [];
+
+function closeOtherDetails(activeToggle) {
+  detailToggleRegistry.forEach(({ toggle, content, label }) => {
+    if (toggle !== activeToggle && toggle.getAttribute('aria-expanded') === 'true') {
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = label;
+      content.hidden = true;
+    }
+  });
+}
+
 // Wait for DOM to be ready before manipulating
 document.addEventListener('DOMContentLoaded', function() {
   // Populate publications and other sections
@@ -62,10 +75,90 @@ function populatePublications(publications, listId) {
     // Paper details (authors, venue, links)
     const restDiv = document.createElement('div');
     restDiv.className = 'paper_rest';
-    restDiv.innerHTML = pub.authors + '<br />' +
-      '<span style="color:#CC0000"><i>' + pub.venue + '</i></span>   [ ' +
-      pub.links.map(link => `<a href="${link.url}">${link.text}</a>`).join(' | ') +
-      ' ]';
+    restDiv.innerHTML = `${pub.authors}<br />`;
+    
+    const venueSpan = document.createElement('span');
+    venueSpan.className = 'paper-venue';
+    venueSpan.innerHTML = `<i>${pub.venue}</i>`;
+    restDiv.appendChild(venueSpan);
+    
+    const linksWrapper = document.createElement('span');
+    linksWrapper.className = 'paper-links';
+    linksWrapper.appendChild(document.createTextNode('[ '));
+    
+    const linkElements = pub.links.map(link => {
+      const anchor = document.createElement('a');
+      anchor.href = link.url;
+      anchor.textContent = link.text;
+      return anchor;
+    });
+    
+    const createDetailToggle = (label, contentValue, fallbackText, baseClass) => {
+      const container = document.createElement('div');
+      container.className = `${baseClass}-container detail-container`;
+      
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = `${baseClass}-toggle detail-toggle`;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = label;
+      
+      const content = document.createElement('div');
+      content.className = `${baseClass}-content detail-content`;
+      const hasContent = typeof contentValue === 'string' && contentValue.trim().length > 0;
+      content.innerHTML = hasContent ? contentValue : fallbackText;
+      content.hidden = true;
+      const contentId = `detail-content-${detailIdCounter++}`;
+      content.id = contentId;
+      content.setAttribute('role', 'region');
+      content.setAttribute('aria-label', `${pub.title} ${label.toLowerCase()}`);
+      toggle.setAttribute('aria-controls', contentId);
+      
+      toggle.addEventListener('click', () => {
+        const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+        if (!isExpanded) {
+          closeOtherDetails(toggle);
+        }
+        const nextState = !isExpanded;
+        toggle.setAttribute('aria-expanded', String(nextState));
+        content.hidden = !nextState;
+        toggle.textContent = nextState ? `Hide ${label}` : label;
+      });
+      
+      container.appendChild(content);
+      
+      detailToggleRegistry.push({ toggle, content, label });
+      
+      return { container, toggle };
+    };
+    
+    const { container: abstractContainer, toggle: abstractToggle } =
+      createDetailToggle('Abstract', pub.abstract, 'Abstract coming soon.', 'abstract');
+    const { container: citationContainer, toggle: citationToggle } =
+      createDetailToggle('Citation', pub.citation, 'Citation coming soon.', 'citation');
+    
+    const interactiveItems = [];
+    if (linkElements.length > 0) {
+      interactiveItems.push(linkElements[0]);
+    }
+    interactiveItems.push(abstractToggle);
+    if (linkElements.length > 1) {
+      linkElements.slice(1).forEach(linkElement => {
+        interactiveItems.push(linkElement);
+      });
+    }
+    interactiveItems.push(citationToggle);
+    
+    interactiveItems.forEach((item, index) => {
+      if (index > 0) {
+        linksWrapper.appendChild(document.createTextNode(' | '));
+      }
+      linksWrapper.appendChild(item);
+    });
+    linksWrapper.appendChild(document.createTextNode(' ]'));
+    
+    restDiv.appendChild(document.createTextNode(' '));
+    restDiv.appendChild(linksWrapper);
     
     // Bottom spacing
     const bottomSpaceDiv = document.createElement('div');
@@ -74,6 +167,8 @@ function populatePublications(publications, listId) {
     // Append elements
     li.appendChild(titleDiv);
     li.appendChild(restDiv);
+    li.appendChild(abstractContainer);
+    li.appendChild(citationContainer);
     li.appendChild(bottomSpaceDiv);
     list.appendChild(li);
   });
@@ -378,47 +473,53 @@ function initializeOutlineNavigation() {
       const targetId = this.getAttribute('href');
       const targetElement = document.querySelector(targetId);
       
-      if (targetElement) {
-        // Find the section container (div with section-spacing class)
-        const sectionContainer = targetElement.closest('.section-spacing');
-        let scrollTarget = targetElement;
-        
-        if (sectionContainer) {
-          scrollTarget = sectionContainer;
-        } else {
-          // Try to find the table container
-          const tableContainer = targetElement.closest('table');
-          if (tableContainer) {
-            scrollTarget = tableContainer;
-          }
+      if (!targetElement) {
+        return;
+      }
+
+      const sectionContainer = targetElement.closest('.section-spacing');
+      let scrollTarget = targetElement;
+
+      if (sectionContainer) {
+        scrollTarget = sectionContainer;
+      } else {
+        const tableContainer = targetElement.closest('table');
+        if (tableContainer) {
+          scrollTarget = tableContainer;
         }
-        
-        // Calculate the scroll position with offset for navigation and sidebar
+      }
+
+      const link = this;
+      const scrollToTarget = () => {
         const rect = scrollTarget.getBoundingClientRect();
         const scrollTop = window.pageYOffset + rect.top - 100;
-        
+
         window.scrollTo({
           top: scrollTop,
           behavior: 'smooth'
         });
-        
-        // Update URL hash without triggering default scroll
-        history.pushState(null, null, targetId);
-        
-        // Remove focus from the clicked link to clear highlight/shadow
-        this.blur();
-        
-        // Close mobile menu if it's open
-        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-        if (mobileMenuToggle && mobileMenuToggle.classList.contains('active')) {
-          const sidebar = document.getElementById('outline-sidebar');
-          const overlay = document.getElementById('mobile-sidebar-overlay');
-          
-          mobileMenuToggle.classList.remove('active');
+
+        history.pushState(null, '', targetId);
+        link.blur();
+      };
+
+      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+      if (mobileMenuToggle && mobileMenuToggle.classList.contains('active')) {
+        const sidebar = document.getElementById('outline-sidebar');
+        const overlay = document.getElementById('mobile-sidebar-overlay');
+
+        mobileMenuToggle.classList.remove('active');
+        if (sidebar) {
           sidebar.classList.remove('mobile-active');
-          overlay.classList.remove('active');
-          document.body.style.overflow = '';
         }
+        if (overlay) {
+          overlay.classList.remove('active');
+        }
+        document.body.style.overflow = '';
+
+        setTimeout(scrollToTarget, 50);
+      } else {
+        scrollToTarget();
       }
     });
   });
