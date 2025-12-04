@@ -616,12 +616,12 @@ const getAllProjects = () => projects;
 
 // Research Experience Data
 const researchExperience = [
-  {
-    period: "June 2025 - Aug. 2025",
-    institution: "Shanghai AI Lab",
-    mentor: "Dr. Jie Fu",
-    description: "Reinforcement Learning."
-  },
+  // {
+  //   period: "June 2025 - Aug. 2025",
+  //   institution: "Shanghai AI Lab",
+  //   mentor: "Dr. Jie Fu",
+  //   description: "Reinforcement Learning."
+  // },
   {
     period: "June 2024 - February 2025",
     institution: "University of California, Santa Barbara (NLP Group)",
