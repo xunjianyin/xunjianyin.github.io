@@ -2,6 +2,27 @@
 const publications = [
   // Preprints
   {
+    title: "From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning",
+    authors: "Yufa Zhou*, <b>Xunjian Yin*</b>, Yixiao Wang*, Shuyan Zhou, Anru R. Zhang",
+    venue: "ArXiv:2510",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2512.01970" },
+      { text: "Code", url: "" }
+    ],
+    abstract: "The mechanism by which RL contributes to reasoning capabilities-whether it incentivizes the synthesis of new skills or merely amplifies existing behaviors-remains a subject of intense debate. In this work, we investigate this question through the lens of Complementary Reasoning, a complex task that requires integrating internal parametric knowledge with external contextual information. Using a controlled synthetic dataset of human biographies, we strictly decouple this ability into two atomic skills: Parametric Reasoning (relying on internal knowledge) and Contextual Reasoning (depending on external information). To rigorously assess capability boundaries, we evaluate generalization across three distinct levels of difficulty: I.I.D., Composition, and Zero-shot settings. We find that while SFT is sufficient for in-distribution performance, it struggles with O.O.D. generalization, particularly in Zero-shot settings where relational combinations are novel. Crucially, we identify the SFT Generalization Paradox: Models supervised solely on the composite task achieve near-perfect in-distribution accuracy but collapse on out-of-distribution generalization, indicating their reliance on rote memorization of path shortcuts. In contrast, we find that RL acts as a reasoning synthesizer rather than a probability amplifier. However, we uncover a strict atomic prerequisite: RL can only synthesize these complex strategies if the base model has first mastered the independent atomic skills (Parametric and Contextual) via SFT. These findings challenge the view of RL as a mere amplifier, suggesting that given sufficient atomic foundations, RL can actively synthesize complex reasoning strategies from learned primitives without explicit supervision on such complex strategies. This indicates that decoupled atomic training followed by RL offers a scalable path to generalization for complex reasoning tasks.",
+    citation: `<pre><code>@misc{cheng2025atomiccompositereinforcementlearning,
+      title={From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning}, 
+      author={Sitao Cheng and Xunjian Yin and Ruiwen Zhou and Yuxuan Li and Xinyi Wang and Liangming Pan and William Yang Wang and Victor Zhong},
+      year={2025},
+      eprint={2512.01970},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2512.01970}, 
+}</code></pre>`,
+    isPreprint: true,
+    isSelected: true
+  },
+  {
     title: "The Geometry of Reasoning: Flowing Logics in Representation Space",
     authors: "Yufa Zhou*, Yixiao Wang*, <b>Xunjian Yin*</b>, Shuyan Zhou, Anru R. Zhang",
     venue: "ArXiv:2510",
@@ -10,11 +31,14 @@ const publications = [
       { text: "Code", url: "https://github.com/MasterZhou1/Reasoning-Flow" }
     ],
     abstract: "We study how large language models (LLMs) ``think'' through their representation space. We propose a novel geometric framework that models an LLM's reasoning as flows -- embedding trajectories evolving where logic goes. We disentangle logical structure from semantics by employing the same natural deduction propositions with varied semantic carriers, allowing us to test whether LLMs internalize logic beyond surface form. This perspective connects reasoning with geometric quantities such as position, velocity, and curvature, enabling formal analysis in representation and concept spaces. Our theory establishes: (1) LLM reasoning corresponds to smooth flows in representation space, and (2) logical statements act as local controllers of these flows' velocities. Using learned representation proxies, we design controlled experiments to visualize and quantify reasoning flows, providing empirical validation of our theoretical framework. Our work serves as both a conceptual foundation and practical tools for studying reasoning phenomenon, offering a new lens for interpretability and formal analysis of LLMs' behavior.",
-    citation: `<pre><code>@article{zhou2025geometry,
-  title={ The Geometry of Reasoning: Flowing Logics in Representation Space },
-  author={ Yufa Zhou and Yixiao Wang and Xunjian Yin and Shuyan Zhou and Anru R. Zhang },
-  journal={arXiv preprint arXiv:2510.09782},
-  year={ 2025 }
+    citation: `<pre><code>@misc{zhou2025geometryreasoningflowinglogics,
+      title={The Geometry of Reasoning: Flowing Logics in Representation Space}, 
+      author={Yufa Zhou and Yixiao Wang and Xunjian Yin and Shuyan Zhou and Anru R. Zhang},
+      year={2025},
+      eprint={2510.09782},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2510.09782}, 
 }</code></pre>`,
     isPreprint: true,
     isSelected: true
@@ -28,11 +52,14 @@ const publications = [
       { text: "Model", url: "https://huggingface.co/Corning/Reverse-Model-7B-348B" }
     ],
     abstract: "We introduce LEDOM, the first purely reverse language model, trained autoregressively on 435B tokens with 2B and 7B parameter variants, which processes sequences in reverse temporal order through previous token prediction. For the first time, we present the reverse language model as a potential foundational model across general tasks, accompanied by a set of intriguing examples and insights. Based on LEDOM, we further introduce a novel application: Reverse Reward, where LEDOM-guided reranking of forward language model outputs leads to substantial performance improvements on mathematical reasoning tasks. This approach leverages LEDOM's unique backward reasoning capability to refine generation quality through posterior evaluation. Our findings suggest that LEDOM exhibits unique characteristics with broad application potential. We will release all models, training code, and pre-training data to facilitate future research.",
-    citation: `<pre><code>@article{yin2025ledom,
-  title={ LEDOM: An Open and Fundamental Reverse Language Model },
-  author={ Xunjian Yin and Sitao Cheng and Yuxi Xie and Xinyu Hu and Li Lin and Xinyi Wang and Liangming Pan and William Yang Wang and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2507.01335},
-  year={ 2025 }
+    citation: `<pre><code>@misc{yin2025ledomopenfundamentalreverse,
+      title={LEDOM: An Open and Fundamental Reverse Language Model}, 
+      author={Xunjian Yin and Sitao Cheng and Yuxi Xie and Xinyu Hu and Li Lin and Xinyi Wang and Liangming Pan and William Yang Wang and Xiaojun Wan},
+      year={2025},
+      eprint={2507.01335},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2507.01335}, 
 }</code></pre>`,
     isPreprint: true,
     isSelected: true
@@ -46,11 +73,14 @@ const publications = [
       { text: "Code", url: "https://github.com/YuxiXie/COrAL" }
     ],
     abstract: "Iterative refinement has emerged as an effective paradigm for enhancing the capabilities of large language models (LLMs) on complex tasks. However, existing approaches typically implement iterative refinement at the application or prompting level, relying on autoregressive (AR) modeling. The sequential token generation in AR models can lead to high inference latency. To overcome these challenges, we propose Context-Wise Order-Agnostic Language Modeling (COrAL), which incorporates iterative refinement directly into the LLM architecture while maintaining computational efficiency. Our approach models multiple token dependencies within manageable context windows, enabling the model to perform iterative refinement internally during the generation process. Leveraging the order-agnostic nature of COrAL, we introduce sliding blockwise order-agnostic decoding, which performs multi-token forward prediction and backward reconstruction within context windows. This allows the model to iteratively refine its outputs in parallel in the sliding block, effectively capturing diverse dependencies without the high inference cost of sequential generation. Empirical evaluations on reasoning tasks demonstrate that COrAL improves performance and inference speed, respectively, achieving absolute accuracy gains of $4.6\\%$ on GSM8K and $4.0\\%$ on LogiQA, along with inference speedups of up to $3.9\\times$ over next-token baselines. Preliminary results on code generation indicate a drop in pass rates due to inconsistencies in order-agnostic outputs, highlighting the inherent quality--speed trade-off. Our code is publicly available at https://github.com/YuxiXie/COrAL.",
-    citation: `<pre><code>@article{xie2024coral,
-  title={ COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement },
-  author={ Yuxi Xie and Anirudh Goyal and Xiaobao Wu and Xunjian Yin and Xiao Xu and Min-Yen Kan and Liangming Pan and William Yang Wang },
-  journal={arXiv preprint arXiv:2410.09675},
-  year={ 2024 }
+    citation: `<pre><code>@misc{xie2024coralorderagnosticlanguagemodeling,
+      title={COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement}, 
+      author={Yuxi Xie and Anirudh Goyal and Xiaobao Wu and Xunjian Yin and Xiao Xu and Min-Yen Kan and Liangming Pan and William Yang Wang},
+      year={2024},
+      eprint={2410.09675},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2410.09675}, 
 }</code></pre>`,
     isPreprint: true,
     isSelected: false
@@ -64,11 +94,14 @@ const publications = [
       { text: "Code", url: "https://github.com/Arvid-pku/ContraSolver" }
     ],
     abstract: "While substantial advancements have been made in developing large language models (LLMs), achieving control over their behavior can be difficult. Direct preference optimization (DPO) assumes the existence of a latent reward function to evaluate the responses of LLMs. This assumption indicates a strict preference ordering of different responses to the same input. However, there always exist contradictions of preference in LLMs according to our experimental observations. In this paper, we construct a graph structure of the preference relationship among different responses with self-annotation to find contradictions in the preference order. We propose ContraSolver, an algorithm that traverses all edges on the preference graph to identify those that might cause contradictions. ContraSolver initializes the graph with a maximum spanning tree and identifies contradictory edges, prioritizing the resolution of low-confidence preferences while preserving high-confidence ones. Experimental results on four different generation tasks show that the performance of different LLMs can be largely improved through our completely unsupervised self-alignment. Furthermore, by analyzing the preference graphs of LLMs with and without self-alignment by ContraSolver, we quantify the reduction in contradictions, suggesting that resolving preference contradictions is crucial for achieving better alignment performance.",
-    citation: `<pre><code>@article{zhang2024contrasolver,
-  title={ ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions },
-  author={ Xu Zhang and Xunjian Yin and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2406.08842},
-  year={ 2024 }
+    citation: `<pre><code>@misc{zhang2024contrasolverselfalignmentlanguagemodels,
+      title={ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions}, 
+      author={Xu Zhang and Xunjian Yin and Xiaojun Wan},
+      year={2024},
+      eprint={2406.08842},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2406.08842}, 
 }</code></pre>`,
     isPreprint: true,
     isSelected: true
@@ -103,7 +136,8 @@ const publications = [
     url = "https://aclanthology.org/2025.emnlp-main.323/",
     doi = "10.18653/v1/2025.emnlp-main.323",
     pages = "6361--6377",
-    ISBN = "979-8-89176-332-6"
+    ISBN = "979-8-89176-332-6",
+    abstract = "While large language models (LLMs) demonstrate remarkable capabilities across a wide range of tasks, they remain vulnerable to generating outputs that are potentially harmful. Red teaming, which involves crafting adversarial inputs to expose vulnerabilities, is a widely adopted approach for evaluating the robustness of these models. Prior studies have indicated that LLMs are susceptible to vulnerabilities exposed through multi-turn interactions as opposed to single-turn scenarios. Nevertheless, existing methods for multi-turn attacks mainly utilize a predefined dialogue pattern, limiting their effectiveness in realistic situations. Effective attacks require adaptive dialogue strategies that respond dynamically to the initial user prompt and the evolving context of the conversation. To address these limitations, we propose DAMON, a novel multi-turn jailbreak attack method. DAMON leverages Monte Carlo Tree Search (MCTS) to systematically explore multi-turn conversational spaces, efficiently identifying sub-instruction sequences that induce harmful responses. We evaluate DAMON{'}s efficacy across five LLMs and three datasets. Our experimental results show that DAMON can effectively induce undesired behaviors."
 }</code></pre>`,
     isNew: true,
     isPreprint: false,
@@ -114,15 +148,32 @@ const publications = [
     authors: "<b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang",
     venue: "ACL 2025",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2410.04444" },
+      { text: "Paper", url: "https://aclanthology.org/2025.acl-long.1354/" },
       { text: "Code", url: "https://github.com/Arvid-pku/Godel_Agent" }
     ],
     abstract: "The rapid advancement of large language models (LLMs) has significantly enhanced the capabilities of AI-driven agents across various tasks. However, existing agentic systems, whether based on fixed pipeline algorithms or pre-defined meta-learning frameworks, cannot search the whole agent design space due to the restriction of human-designed components, and thus might miss the globally optimal agent design. In this paper, we introduce Gödel Agent, a self-evolving framework inspired by the Gödel machine, enabling agents to recursively improve themselves without relying on predefined routines or fixed optimization algorithms. Gödel Agent leverages LLMs to dynamically modify its own logic and behavior, guided solely by high-level objectives through prompting. Experimental results on mathematical reasoning and complex agent tasks demonstrate that implementation of Gödel Agent can achieve continuous self-improvement, surpassing manually crafted agents in performance, efficiency, and generalizability.",
-    citation: `<pre><code>@article{yin2024gdel,
-  title={ Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement },
-  author={ Xunjian Yin and Xinyi Wang and Liangming Pan and Li Lin and Xiaojun Wan and William Yang Wang },
-  journal={arXiv preprint arXiv:2410.04444},
-  year={ 2024 }
+    citation: `<pre><code>@inproceedings{yin-etal-2025-godel,
+    title = {G{\"o}del Agent: A Self-Referential Agent Framework for Recursively Self-Improvement},
+    author = "Yin, Xunjian  and
+      Wang, Xinyi  and
+      Pan, Liangming  and
+      Lin, Li  and
+      Wan, Xiaojun  and
+      Wang, William Yang",
+    editor = "Che, Wanxiang  and
+      Nabende, Joyce  and
+      Shutova, Ekaterina  and
+      Pilehvar, Mohammad Taher",
+    booktitle = "Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = jul,
+    year = "2025",
+    address = "Vienna, Austria",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.acl-long.1354/",
+    doi = "10.18653/v1/2025.acl-long.1354",
+    pages = "27890--27913",
+    ISBN = "979-8-89176-251-0",
+    abstract = {The rapid advancement of large language models (LLMs) has significantly enhanced the capabilities of agents across various tasks. However, existing agentic systems, whether based on fixed pipeline algorithms or pre-defined meta-learning frameworks, cannot search the whole agent design space due to the restriction of human-designed components, and thus might miss the more optimal agent design. In this paper, we introduce G{\"o}del Agent, a self-evolving framework inspired by the G{\"o}del Machine, enabling agents to recursively improve themselves without relying on predefined routines or fixed optimization algorithms. G{\"o}del Agent leverages LLMs to dynamically modify its own logic and behavior, guided solely by high-level objectives through prompting. Experimental results on multiple domains demonstrate that the implementation of G{\"o}del Agent can achieve continuous self-improvement, surpassing manually crafted agents in performance, efficiency, and generalizability.}
 }</code></pre>`,
     isNew: false,
     isPreprint: false,
@@ -133,14 +184,33 @@ const publications = [
     authors: "Junzhe Zhang, Huixuan Zhang, <b>Xunjian Yin</b>, Baizhou Huang, Xu Zhang, Xinyu Hu, Xiaojun Wan",
     venue: "ACL 2025 Findings ",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2406.13219" },
+      { text: "Paper", url: "https://aclanthology.org/2025.findings-acl.896/" },
+      { text: "Code", url: "https://github.com/reroze/MC-MKE" }
     ],
     abstract: "Multimodal large language models (MLLMs) are prone to non-factual or outdated knowledge issues, which can manifest as misreading and misrecognition errors due to the complexity of multimodal knowledge. Previous benchmarks have not systematically analyzed the performance of editing methods in correcting these two error types. To better represent and correct these errors, we decompose multimodal knowledge into its visual and textual components. Different error types correspond to different editing formats, which edit distinct parts of the multimodal knowledge. We present MC-MKE, a fine-grained Multimodal Knowledge Editing benchmark emphasizing Modality Consistency. Our benchmark facilitates independent correction of misreading and misrecognition errors by editing the corresponding knowledge component. We evaluate four multimodal knowledge editing methods on MC-MKE, revealing their limitations, particularly in terms of modality consistency. Our work highlights the challenges posed by multimodal knowledge editing and motivates further research in developing effective techniques for this task.",
-    citation: `<pre><code>@article{zhang2024mc,
-  title={ MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency },
-  author={ Junzhe Zhang and Huixuan Zhang and Xunjian Yin and Baizhou Huang and Xu Zhang and Xinyu Hu and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2406.13219},
-  year={ 2024 }
+    citation: `<pre><code>@inproceedings{zhang-etal-2025-mc,
+    title = "{MC}-{MKE}: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",
+    author = "Zhang, Junzhe  and
+      Zhang, Huixuan  and
+      Yin, Xunjian  and
+      Huang, Baizhou  and
+      Zhang, Xu  and
+      Hu, Xinyu  and
+      Wan, Xiaojun",
+    editor = "Che, Wanxiang  and
+      Nabende, Joyce  and
+      Shutova, Ekaterina  and
+      Pilehvar, Mohammad Taher",
+    booktitle = "Findings of the Association for Computational Linguistics: ACL 2025",
+    month = jul,
+    year = "2025",
+    address = "Vienna, Austria",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.findings-acl.896/",
+    doi = "10.18653/v1/2025.findings-acl.896",
+    pages = "17430--17445",
+    ISBN = "979-8-89176-256-5",
+    abstract = "Multimodal large language models (MLLMs) are prone to non-factual or outdated knowledge issues, highlighting the importance of knowledge editing. Many benchmark has been proposed for researching multimodal knowledge editing. However, previous benchmarks focus on limited scenarios due to the lack of rigorous definition of multimodal knowledge. To better evaluate multimodal knowledge editing, we propose a decomposed definition of multimodal knowledge. Following the decomposed definition of multimodal knowledge, we introduce three scenarios and a novel requirement modality consistency. We construct MC-MKE, a fine-grained **M**ultimodal **K**nowledge **E**diting benchmark emphasizing **M**odality **C**onsistency through strict data selection. We evaluate four multimodal knowledge editing methods on MC-MKE, revealing their limitations, particularly in terms of modality consistency. Our work highlights the challenges posed by multimodal knowledge editing and motivates further research in developing effective techniques for this task."
 }</code></pre>`,
     isNew: false,
     isPreprint: false,
@@ -155,11 +225,13 @@ const publications = [
       { text: "Code", url: "https://github.com/sitaocheng/Knowledge_Interplay" }
     ],
     abstract: "Large language models (LLMs) encode vast amounts of knowledge during pre-training (parametric knowledge, or PK) and can further be enhanced by incorporating contextual knowledge (CK). Can LLMs effectively integrate their internal PK with external CK to solve complex problems? In this paper, we investigate the dynamic interaction between PK and CK, categorizing their relationships into four types: Supportive, Complementary, Conflicting, and Irrelevant. To support this investigation, we introduce ECHOQA, a benchmark spanning scientific, factual, and commonsense knowledge. Our results show that LLMs tend to suppress their PK when contextual information is available, even when it is complementary or irrelevant. While tailored instructions can encourage LLMs to rely more on their PK, they still struggle to fully leverage it. These findings reveal a key vulnerability in LLMs, raising concerns about their reliability in knowledge-intensive tasks. Resources are available at https://github.com/sitaocheng/Knowledge_Interplay",
-    citation: `<pre><code>@article{cheng2024understanding,
-  title={ Understanding the Interplay between Parametric and Contextual Knowledge for Large Language Models },
-  author={ Sitao Cheng and Liangming Pan and Xunjian Yin and Xinyi Wang and William Yang Wang },
-  journal={arXiv preprint arXiv:2410.08414},
-  year={ 2024 }
+    citation: `<pre><code>@inproceedings{
+cheng2025understanding,
+title={Understanding the Interplay between Parametric and Contextual Knowledge for Large Language Models},
+author={Sitao Cheng and Liangming Pan and Xunjian Yin and Xinyi Wang and William Yang Wang},
+booktitle={Knowledgeable Foundation Models at ACL 2025},
+year={2025},
+url={https://openreview.net/forum?id=4uisAcagzw}
 }</code></pre>`,
     isPreprint: false,
     isSelected: false
@@ -169,14 +241,27 @@ const publications = [
     authors: "Mingqi Gao, Xinyu Hu, <b>Xunjian Yin</b>, Jie Ruan, Xiao Pu, Xiaojun Wan",
     venue: "Computational Linguistics 2025",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2402.01383" },
+      { text: "Paper", url: "https://aclanthology.org/2025.cl-2.9/" },
     ],
     abstract: "Evaluating natural language generation (NLG) is a vital but challenging problem in natural language processing. Traditional evaluation metrics mainly capturing content (e.g. n-gram) overlap between system outputs and references are far from satisfactory, and large language models (LLMs) such as ChatGPT have demonstrated great potential in NLG evaluation in recent years. Various automatic evaluation methods based on LLMs have been proposed, including metrics derived from LLMs, prompting LLMs, fine-tuning LLMs, and human-LLM collaborative evaluation. In this survey, we first give a taxonomy of LLM-based NLG evaluation methods, and discuss their pros and cons, respectively. Lastly, we discuss several open problems in this area and point out future research directions.",
-    citation: `<pre><code>@article{gao2024llm,
-  title={ LLM-based NLG Evaluation: Current Status and Challenges },
-  author={ Mingqi Gao and Xinyu Hu and Jie Ruan and Xiao Pu and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2402.01383},
-  year={ 2024 }
+    citation: `<pre><code>@article{gao-etal-2025-llm,
+    title = "{LLM}-based {NLG} Evaluation: Current Status and Challenges",
+    author = "Gao, Mingqi  and
+      Hu, Xinyu  and
+      Yin, Xunjian  and
+      Ruan, Jie  and
+      Pu, Xiao  and
+      Wan, Xiaojun",
+    journal = "Computational Linguistics",
+    volume = "51",
+    month = jun,
+    year = "2025",
+    address = "Cambridge, MA",
+    publisher = "MIT Press",
+    url = "https://aclanthology.org/2025.cl-2.9/",
+    doi = "10.1162/coli_a_00561",
+    pages = "661--687",
+    abstract = "Evaluating natural language generation (NLG) is a vital but challenging problem in natural language processing. Traditional evaluation metrics mainly capturing content (e.g., n-gram) overlap between system outputs and references are far from satisfactory, and large language models (LLMs) such as ChatGPT have demonstrated great potential in NLG evaluation in recent years. Various automatic evaluation methods based on LLMs have been proposed, including metrics derived from LLMs, prompting LLMs, fine-tuning LLMs, and human{--}LLM collaborative evaluation. In this survey, we first give a taxonomy of LLM-based NLG evaluation methods, and discuss their pros and cons, respectively. Lastly, we discuss several open problems in this area and point out future research directions."
 }</code></pre>`,
     isNew: false,
     isPreprint: false,
@@ -187,15 +272,29 @@ const publications = [
     authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
     venue: "NAACL 2025 Findings",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2410.13192" },
+      { text: "Paper", url: "https://aclanthology.org/2025.findings-naacl.149/" },
       { text: "Code", url: "https://github.com/leejamesss/Eval_Self_Docs_RAG" }
     ],
     abstract: "The integration of documents generated by LLMs themselves (Self-Docs) alongside retrieved documents has emerged as a promising strategy for retrieval-augmented generation systems. However, previous research primarily focuses on optimizing the use of Self-Docs, with their inherent properties remaining underexplored. To bridge this gap, we first investigate the overall effectiveness of Self-Docs, identifying key factors that shape their contribution to RAG performance (RQ1). Building on these insights, we develop a taxonomy grounded in Systemic Functional Linguistics to compare the influence of various Self-Docs categories (RQ2) and explore strategies for combining them with external sources (RQ3). Our findings reveal which types of Self-Docs are most beneficial and offer practical guidelines for leveraging them to achieve significant improvements in knowledge-intensive question answering tasks.",
-    citation: `<pre><code>@article{li2024evaluating,
-  title={ Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models },
-  author={ Jiatao Li and Xinyu Hu and Xunjian Yin and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2410.13192},
-  year={ 2024 }
+    citation: `<pre><code>@inproceedings{li-etal-2025-evaluating,
+    title = "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models",
+    author = "Li, Jiatao  and
+      Hu, Xinyu  and
+      Yin, Xunjian  and
+      Wan, Xiaojun",
+    editor = "Chiruzzo, Luis  and
+      Ritter, Alan  and
+      Wang, Lu",
+    booktitle = "Findings of the Association for Computational Linguistics: NAACL 2025",
+    month = apr,
+    year = "2025",
+    address = "Albuquerque, New Mexico",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.findings-naacl.149/",
+    doi = "10.18653/v1/2025.findings-naacl.149",
+    pages = "2741--2775",
+    ISBN = "979-8-89176-195-7",
+    abstract = "The integration of documents generated by LLMs themselves (Self-Docs) alongside retrieved documents has emerged as a promising strategy for retrieval-augmented generation systems. However, previous research primarily focuses on optimizing the use of Self-Docs, with their inherent properties remaining underexplored. To bridge this gap, we first investigate the overall effectiveness of Self-Docs, identifying key factors that shape their contribution to RAG performance (RQ1). Building on these insights, we develop a taxonomy grounded in Systemic Functional Linguistics to compare the influence of various Self-Docs categories (RQ2) and explore strategies for combining them with external sources (RQ3). Our findings reveal which types of Self-Docs are most beneficial and offer practical guidelines for leveraging them to achieve significant improvements in knowledge-intensive question answering tasks."
 }</code></pre>`,
     isPreprint: false,
     isSelected: false
@@ -209,11 +308,13 @@ const publications = [
       { text: "Code", url: "https://github.com/gersteinlab/chemagent" }
     ],
     abstract: "Chemical reasoning usually involves complex, multi-step processes that demand precise calculations, where even minor errors can lead to cascading failures. Furthermore, large language models (LLMs) encounter difficulties handling domain-specific formulas, executing reasoning steps accurately, and integrating code effectively when tackling chemical reasoning tasks. To address these challenges, we present ChemAgent, a novel framework designed to improve the performance of LLMs through a dynamic, self-updating library. This library is developed by decomposing chemical tasks into sub-tasks and compiling these sub-tasks into a structured collection that can be referenced for future queries. Then, when presented with a new problem, ChemAgent retrieves and refines pertinent information from the library, which we call memory, facilitating effective task decomposition and the generation of solutions. Our method designs three types of memory and a library-enhanced reasoning component, enabling LLMs to improve over time through experience. Experimental results on four chemical reasoning datasets from SciBench demonstrate that ChemAgent achieves performance gains of up to 46% (GPT-4), significantly outperforming existing methods. Our findings suggest substantial potential for future applications, including tasks such as drug discovery and materials science. Our code can be found at https://github.com/gersteinlab/chemagent",
-    citation: `<pre><code>@article{tang2025chemagent,
-  title={ ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning },
-  author={ Xiangru Tang and Tianyu Hu and Muyang Ye and Yanjun Shao and Xunjian Yin and Siru Ouyang and Wangchunshu Zhou and Pan Lu and Zhuosheng Zhang and Yilun Zhao and Arman Cohan and Mark Gerstein },
-  journal={arXiv preprint arXiv:2501.06590},
-  year={ 2025 }
+    citation: `<pre><code>@inproceedings{
+tang2025chemagent,
+title={ChemAgent: Self-updating Memories in Large Language Models Improves Chemical Reasoning},
+author={Xiangru Tang and Tianyu Hu and Muyang Ye and Yanjun Shao and Xunjian Yin and Siru Ouyang and Wangchunshu Zhou and Pan Lu and Zhuosheng Zhang and Yilun Zhao and Arman Cohan and Mark Gerstein},
+booktitle={The Thirteenth International Conference on Learning Representations},
+year={2025},
+url={https://openreview.net/forum?id=kuhIqeVg0e}
 }</code></pre>`,
     isPreprint: false,
     isSelected: false
@@ -234,8 +335,7 @@ const publications = [
   volume={39},
   number={24},
   pages={25561--25569},
-  year={2025},
-  doi={10.1609/aaai.v39i24.34746}
+  year={2025}
 }</code></pre>`,
     isPreprint: false,
     isSelected: false
@@ -245,15 +345,29 @@ const publications = [
     authors: "Xinyu Hu, Li Lin, Mingqi Gao, <b>Xunjian Yin</b>, Xiaojun Wan",
     venue: "EMNLP 2024",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2406.18365" },
+      { text: "Paper", url: "https://aclanthology.org/2024.emnlp-main.891/" },
       { text: "Code", url: "https://github.com/PKU-ONELab/Themis" }
     ],
     abstract: "The evaluation of natural language generation (NLG) tasks is a significant and longstanding research area. With the recent emergence of powerful large language models (LLMs), some studies have turned to LLM-based automatic evaluation methods, which demonstrate great potential to become a new evaluation paradigm following traditional string-based and model-based metrics. However, despite the improved performance of existing methods, they still possess some deficiencies, such as dependency on references and limited evaluation flexibility. Therefore, in this paper, we meticulously construct a large-scale NLG evaluation corpus NLG-Eval with annotations from both human and GPT-4 to alleviate the lack of relevant data in this field. Furthermore, we propose Themis, an LLM dedicated to NLG evaluation, which has been trained with our designed multi-perspective consistency verification and rating-oriented preference alignment methods. Themis can conduct flexible and interpretable evaluations without references, and it exhibits superior evaluation performance on various NLG tasks, simultaneously generalizing well to unseen tasks and surpassing other evaluation models, including GPT-4.",
-    citation: `<pre><code>@article{hu2024themis,
-  title={ Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability },
-  author={ Xinyu Hu and Li Lin and Mingqi Gao and Xunjian Yin and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2406.18365},
-  year={ 2024 }
+    citation: `<pre><code>@inproceedings{hu-etal-2024-themis,
+    title = "Themis: A Reference-free {NLG} Evaluation Language Model with Flexibility and Interpretability",
+    author = "Hu, Xinyu  and
+      Lin, Li  and
+      Gao, Mingqi  and
+      Yin, Xunjian  and
+      Wan, Xiaojun",
+    editor = "Al-Onaizan, Yaser  and
+      Bansal, Mohit  and
+      Chen, Yun-Nung",
+    booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2024",
+    address = "Miami, Florida, USA",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.emnlp-main.891/",
+    doi = "10.18653/v1/2024.emnlp-main.891",
+    pages = "15924--15951",
+    abstract = "The evaluation of natural language generation (NLG) tasks is a significant and longstanding research area. With the recent emergence of powerful large language models (LLMs), some studies have turned to LLM-based automatic evaluation methods, which demonstrate great potential to become a new evaluation paradigm following traditional string-based and model-based metrics. However, despite the improved performance of existing methods, they still possess some deficiencies, such as dependency on references and limited evaluation flexibility. Therefore, in this paper, we meticulously construct a large-scale NLG evaluation corpus **NLG-Eval** with annotations from both human and GPT-4 to alleviate the lack of relevant data in this field. Furthermore, we propose **Themis**, an LLM dedicated to NLG evaluation, which has been trained with our designed multi-perspective consistency verification and rating-oriented preference alignment methods. Themis can conduct flexible and interpretable evaluations without references, and it exhibits superior evaluation performance on various NLG tasks, simultaneously generalizing well to unseen tasks and surpassing other evaluation models, including GPT-4."
 }</code></pre>`,
     isPreprint: false,
     isSelected: true
@@ -263,15 +377,28 @@ const publications = [
     authors: "<b>Xunjian Yin*</b>, Xu Zhang*, Jie Ruan, Xiaojun Wan",
     venue: "ACL 2024",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2402.11493" },
+      { text: "Paper", url: "https://aclanthology.org/2024.acl-long.124/" },
       { text: "Code", url: "https://github.com/pkulcwmzx/knowledge-boundary" }
     ],
     abstract: "In recent years, substantial advancements have been made in the development of large language models, achieving remarkable performance across diverse tasks. To evaluate the knowledge ability of language models, previous studies have proposed lots of benchmarks based on question-answering pairs. We argue that it is not reliable and comprehensive to evaluate language models with a fixed question or limited paraphrases as the query, since language models are sensitive to prompt. Therefore, we introduce a novel concept named knowledge boundary to encompass both prompt-agnostic and prompt-sensitive knowledge within language models. Knowledge boundary avoids prompt sensitivity in language model evaluations, rendering them more dependable and robust. To explore the knowledge boundary for a given model, we propose projected gradient descent method with semantic constraints, a new algorithm designed to identify the optimal prompt for each piece of knowledge. Experiments demonstrate a superior performance of our algorithm in computing the knowledge boundary compared to existing methods. Furthermore, we evaluate the ability of multiple language models in several domains with knowledge boundary.",
-    citation: `<pre><code>@article{yin2024benchmarking,
-  title={ Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation },
-  author={ Xunjian Yin and Xu Zhang and Jie Ruan and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2402.11493},
-  year={ 2024 }
+    citation: `<pre><code>@inproceedings{yin-etal-2024-benchmarking,
+    title = "Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation",
+    author = "Yin, Xunjian  and
+      Zhang, Xu  and
+      Ruan, Jie  and
+      Wan, Xiaojun",
+    editor = "Ku, Lun-Wei  and
+      Martins, Andre  and
+      Srikumar, Vivek",
+    booktitle = "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = aug,
+    year = "2024",
+    address = "Bangkok, Thailand",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.acl-long.124/",
+    doi = "10.18653/v1/2024.acl-long.124",
+    pages = "2270--2286",
+    abstract = "In recent years, substantial advancements have been made in the development of large language models, achieving remarkable performance across diverse tasks.To evaluate the knowledge ability of language models, previous studies have proposed lots of benchmarks based on question-answering pairs.We argue that it is not reliable and comprehensive to evaluate language models with a fixed question or limited paraphrases as the query, since language models are sensitive to prompt.Therefore, we introduce a novel concept named knowledge boundary to encompass both prompt-agnostic and prompt-sensitive knowledge within language models.Knowledge boundary avoids prompt sensitivity in language model evaluations, rendering them more dependable and robust.To explore the knowledge boundary for a given model, we propose projected gradient descent method with semantic constraints, a new algorithm designed to identify the optimal prompt for each piece of knowledge.Experiments demonstrate a superior performance of our algorithm in computing the knowledge boundary compared to existing methods.Furthermore, we evaluate the ability of multiple language models in several domains with knowledge boundary."
 }</code></pre>`,
     isPreprint: false,
     isSelected: true
@@ -281,15 +408,18 @@ const publications = [
     authors: "<b>Xunjian Yin</b>, Jin Jiang, Liming Yang, Xiaojun Wan",
     venue: "AAAI 2024",
     links: [
-      { text: "Paper", url: "https://arxiv.org/pdf/2312.05497.pdf" },
+      { text: "Paper", url: "https://ojs.aaai.org/index.php/AAAI/article/view/29912/31594" },
       { text: "Code", url: "https://github.com/Arvid-pku/ATOKE" }
     ],
     abstract: "The imperative task of revising or updating the knowledge stored within large language models arises from two distinct sources: intrinsic errors inherent in the model which should be corrected and outdated knowledge due to external shifts in the real world which should be updated. Prevailing efforts in model editing conflate these two distinct categories of edits arising from distinct reasons and directly modify the original knowledge in models into new knowledge. However, we argue that preserving the model's original knowledge remains pertinent. Specifically, if a model's knowledge becomes outdated due to evolving worldly dynamics, it should retain recollection of the historical knowledge while integrating the newfound knowledge. In this work, we introduce the task of Temporal Knowledge Editing (TKE) and establish a benchmark AToKe (Assessment of TempOral Knowledge Editing) to evaluate current model editing methods. We find that while existing model editing methods are effective at making models remember new knowledge, the edited model catastrophically forgets historical knowledge. To address this gap, we propose a simple and general framework termed Multi-Editing with Time Objective (METO) for enhancing existing editing models, which edits both historical and new knowledge concurrently and optimizes the model's prediction for the time of each fact. Our assessments demonstrate that while AToKe is still difficult, METO maintains the effectiveness of learning new knowledge and meanwhile substantially improves the performance of edited models on utilizing historical knowledge.",
-    citation: `<pre><code>@article{yin2023history,
-  title={ History Matters: Temporal Knowledge Editing in Large Language Model },
-  author={ Xunjian Yin and Jin Jiang and Liming Yang and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2312.05497},
-  year={ 2023 }
+    citation: `<pre><code>@inproceedings{yin2024history,
+  title={History matters: Temporal knowledge editing in large language model},
+  author={Yin, Xunjian and Jiang, Jin and Yang, Liming and Wan, Xiaojun},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={38},
+  number={17},
+  pages={19413--19421},
+  year={2024}
 }</code></pre>`,
     isPreprint: false,
     isSelected: true
@@ -299,15 +429,30 @@ const publications = [
     authors: "<b>Xunjian Yin</b>, Xinyu Hu, Jin Jiang, Xiaojun Wan",
     venue: "COLING 2024",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2211.07843" },
+      { text: "Paper", url: "https://aclanthology.org/2024.lrec-main.553/" },
       { text: "Code", url: "https://github.com/PKU-ONELab/" }
     ],
     abstract: "Chinese Spelling Check (CSC) aims to detect and correct error tokens in Chinese contexts, which has a wide range of applications. However, it is confronted with the challenges of insufficient annotated data and the issue that previous methods may actually not fully leverage the existing datasets. In this paper, we introduce our plug-and-play retrieval method with error-robust information for Chinese Spelling Check (RERIC), which can be directly applied to existing CSC models. The datastore for retrieval is built completely based on the training data, with elaborate designs according to the characteristics of CSC. Specifically, we employ multimodal representations that fuse phonetic, morphologic, and contextual information in the calculation of query and key during retrieval to enhance robustness against potential errors. Furthermore, in order to better judge the retrieved candidates, the n-gram surrounding the token to be checked is regarded as the value and utilized for specific reranking. The experiment results on the SIGHAN benchmarks demonstrate that our proposed method achieves substantial improvements over existing work.",
-    citation: `<pre><code>@article{yin2022error,
-  title={ Error-Robust Retrieval for Chinese Spelling Check },
-  author={ Xunjian Yin and Xinyu Hu and Jin Jiang and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2211.07843},
-  year={ 2022 }
+    citation: `<pre><code>@inproceedings{yin-etal-2024-error,
+    title = "Error-Robust Retrieval for {C}hinese Spelling Check",
+    author = "Yin, Xunjian  and
+      Hu, Xinyu  and
+      Jiang, Jin  and
+      Wan, Xiaojun",
+    editor = "Calzolari, Nicoletta  and
+      Kan, Min-Yen  and
+      Hoste, Veronique  and
+      Lenci, Alessandro  and
+      Sakti, Sakriani  and
+      Xue, Nianwen",
+    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
+    month = may,
+    year = "2024",
+    address = "Torino, Italia",
+    publisher = "ELRA and ICCL",
+    url = "https://aclanthology.org/2024.lrec-main.553/",
+    pages = "6257--6267",
+    abstract = "Chinese Spelling Check (CSC) aims to detect and correct error tokens in Chinese contexts, which has a wide range of applications. However, it is confronted with the challenges of insufficient annotated data and the issue that previous methods may actually not fully leverage the existing datasets. In this paper, we introduce our plug-and-play retrieval method with error-robust information for Chinese Spelling Check (RERIC), which can be directly applied to existing CSC models. The datastore for retrieval is built completely based on the training data, with elaborate designs according to the characteristics of CSC. Specifically, we employ multimodal representations that fuse phonetic, morphologic, and contextual information in the calculation of query and key during retrieval to enhance robustness against potential errors. Furthermore, in order to better judge the retrieved candidates, the n-gram surrounding the token to be checked is regarded as the value and utilized for specific reranking. The experiment results on the SIGHAN benchmarks demonstrate that our proposed method achieves substantial improvements over existing work."
 }</code></pre>`,
     isPreprint: false,
     isSelected: false
@@ -352,15 +497,27 @@ const publications = [
     authors: "<b>Xunjian Yin*</b>, Baizhou Huang*, Xiaojun Wan",
     venue: "EMNLP 2023",
     links: [
-      { text: "Paper", url: "https://arxiv.org/pdf/2310.14820.pdf" },
+      { text: "Paper", url: "https://aclanthology.org/2023.emnlp-main.87/" },
       { text: "Code", url: "https://github.com/arvid-pku/alcuna" }
     ],
     abstract: "With the rapid development of NLP, large-scale language models (LLMs) excel in various tasks across multiple domains now. However, existing benchmarks may not adequately measure these models' capabilities, especially when faced with new knowledge. In this paper, we address the lack of benchmarks to evaluate LLMs' ability to handle new knowledge, an important and challenging aspect in the rapidly evolving world. We propose an approach called KnowGen that generates new knowledge by altering existing entity attributes and relationships, resulting in artificial entities that are distinct from real-world entities. With KnowGen, we introduce a benchmark named ALCUNA to assess LLMs' abilities in knowledge understanding, differentiation, and association. We benchmark several LLMs, reveals that their performance in face of new knowledge is not satisfactory, particularly in reasoning between new and internal knowledge. We also explore the impact of entity similarity on the model's understanding of entity knowledge and the influence of contextual entities. We appeal to the need for caution when using LLMs in new scenarios or with new knowledge, and hope that our benchmarks can help drive the development of LLMs in face of new knowledge.",
-    citation: `<pre><code>@article{yin2023alcuna,
-  title={ ALCUNA: Large Language Models Meet New Knowledge },
-  author={ Xunjian Yin and Baizhou Huang and Xiaojun Wan },
-  journal={arXiv preprint arXiv:2310.14820},
-  year={ 2023 }
+    citation: `<pre><code>@inproceedings{yin-etal-2023-alcuna,
+    title = "{ALCUNA}: Large Language Models Meet New Knowledge",
+    author = "Yin, Xunjian  and
+      Huang, Baizhou  and
+      Wan, Xiaojun",
+    editor = "Bouamor, Houda  and
+      Pino, Juan  and
+      Bali, Kalika",
+    booktitle = "Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing",
+    month = dec,
+    year = "2023",
+    address = "Singapore",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2023.emnlp-main.87/",
+    doi = "10.18653/v1/2023.emnlp-main.87",
+    pages = "1397--1414",
+    abstract = "With the rapid development of NLP, large-scale language models (LLMs) excel in various tasks across multiple domains now. However, existing benchmarks may not adequately measure these models' capabilities, especially when faced with new knowledge. In this paper, we address the lack of benchmarks to evaluate LLMs' ability to handle new knowledge, an important and challenging aspect in the rapidly evolving world. We propose an approach called KnowGen that generates new knowledge by altering existing entity attributes and relationships, resulting in artificial entities that are distinct from real-world entities. With KnowGen, we introduce a benchmark named ALCUNA to assess LLMs' abilities in knowledge understanding, differentiation, and association. We benchmark several LLMs, reveals that their performance in face of new knowledge is not satisfactory, particularly in reasoning between new and internal knowledge. We also explore the impact of entity similarity on the model{'}s understanding of entity knowledge and the influence of contextual entities. We appeal to the need for caution when using LLMs in new scenarios or with new knowledge, and hope that our benchmarks can help drive the development of LLMs in face of new knowledge."
 }</code></pre>`,
     isPreprint: false,
     isSelected: true
@@ -370,9 +527,28 @@ const publications = [
     authors: "Xinyu Hu, <b>Xunjian Yin</b>, Xiaojun Wan",
     venue: "EMNLP 2023 Findings",
     links: [
-      { text: "Paper", url: "TODO" },
-      { text: "Code", url: "TODO" }
+      { text: "Paper", url: "https://aclanthology.org/2023.findings-emnlp.1021/" },
+      { text: "Code", url: "https://github.com/herrxy/Cont-COMET" }
     ],
+    abstract: "Previous studies on machine translation evaluation mostly focused on the quality of individual sentences, while overlooking the important role of contextual information. Although WMT Metrics Shared Tasks have introduced context content into the human annotations of translation evaluation since 2019, the relevant metrics and methods still did not take advantage of the corresponding context. In this paper, we propose a context-aware machine translation evaluation metric called Cont-COMET, built upon the effective COMET framework. Our approach simultaneously considers the preceding and subsequent contexts of the sentence to be evaluated and trains our metric to be aligned with the setting during human annotation. We also introduce a content selection method to extract and utilize the most relevant information. The experiments and evaluation of Cont-COMET on the official test framework from WMT show improvements in both system-level and segment-level assessments.",
+    citation: `<pre><code>@inproceedings{hu-etal-2023-exploring,
+    title = "Exploring Context-Aware Evaluation Metrics for Machine Translation",
+    author = "Hu, Xinyu  and
+      Yin, Xunjian  and
+      Wan, Xiaojun",
+    editor = "Bouamor, Houda  and
+      Pino, Juan  and
+      Bali, Kalika",
+    booktitle = "Findings of the Association for Computational Linguistics: EMNLP 2023",
+    month = dec,
+    year = "2023",
+    address = "Singapore",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2023.findings-emnlp.1021/",
+    doi = "10.18653/v1/2023.findings-emnlp.1021",
+    pages = "15291--15298",
+    abstract = "Previous studies on machine translation evaluation mostly focused on the quality of individual sentences, while overlooking the important role of contextual information. Although WMT Metrics Shared Tasks have introduced context content into the human annotations of translation evaluation since 2019, the relevant metrics and methods still did not take advantage of the corresponding context. In this paper, we propose a context-aware machine translation evaluation metric called Cont-COMET, built upon the effective COMET framework. Our approach simultaneously considers the preceding and subsequent contexts of the sentence to be evaluated and trains our metric to be aligned with the setting during human annotation. We also introduce a content selection method to extract and utilize the most relevant information. The experiments and evaluation of Cont-COMET on the official test framework from WMT show improvements in both system-level and segment-level assessments."
+}</code></pre>`,
     isPreprint: false,
     isSelected: false
   },
@@ -476,6 +652,18 @@ const projects = [
     ],
     isSelected: false,
     demoPath: "photos/project-demo/Music Letter.png"
+  },
+  {
+    title: "Text of Sisyphus",
+    description: "An interactive simulation where Sisyphus's collapse builds a text archive. (<a href=\"https://Arvid-pku.github.io/Sisyphus/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/Arvid-pku/Sisyphus/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/Arvid-pku/Sisyphus/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/Arvid-pku/Sisyphus/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Sisyphus" },
+      { url: "https://github.com/Arvid-pku/Sisyphus/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/Sisyphus" },
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/Text of Sisyphus.png"
   },
   {
     title: "Academic-Homepage-Template",
