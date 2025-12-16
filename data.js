@@ -3,7 +3,7 @@ const publications = [
   // Preprints
   {
     title: "From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning",
-    authors: "Sitao Cheng, Xunjian Yin, Ruiwen Zhou, Yuxuan Li, Xinyi Wang, Liangming Pan, William Yang Wang, Victor Zhong",
+    authors: "Sitao Cheng, <b>Xunjian Yin</b>, Ruiwen Zhou, Yuxuan Li, Xinyi Wang, Liangming Pan, William Yang Wang, Victor Zhong",
     venue: "ArXiv:2510",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2512.01970" },
