@@ -627,6 +627,16 @@ const projects = [
     demoPath: "photos/project-demo/Gödel Agent.png"
   },
   {
+    title: "Tower of Babel",
+    description: "Play with Text in the Physical World. (<a href=\"https://arvid-pku.github.io/Babel/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://arvid-pku.github.io/Babel/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://arvid-pku.github.io/Babel/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/Tower of Babel.png"
+  },
+  {
     title: "Proactive AI Assistant",
     description: "An AI assistant extension that proactively helps users with tasks and reminders. (<a href=\"https://github.com/Arvid-pku/Proactive-AI\">Project Homepage</a>)",
     badges: [
