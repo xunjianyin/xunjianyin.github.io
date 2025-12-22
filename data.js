@@ -2,7 +2,25 @@
 const publications = [
   // Preprints
   {
-    title: 
+    title: "From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning",
+    authors: "Sitao Cheng, <b>Xunjian Yin</b>, Ruiwen Zhou, Yuxuan Li, Xinyi Wang, Liangming Pan, William Yang Wang, Victor Zhong",
+    venue: "ArXiv:2510",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2512.01970" },
+      { text: "Code", url: "https://github.com/sitaocheng/from_atomic_to_composite" }
+    ],
+    abstract: "The mechanism by which RL contributes to reasoning capabilities-whether it incentivizes the synthesis of new skills or merely amplifies existing behaviors-remains a subject of intense debate. In this work, we investigate this question through the lens of Complementary Reasoning, a complex task that requires integrating internal parametric knowledge with external contextual information. Using a controlled synthetic dataset of human biographies, we strictly decouple this ability into two atomic skills: Parametric Reasoning (relying on internal knowledge) and Contextual Reasoning (depending on external information). To rigorously assess capability boundaries, we evaluate generalization across three distinct levels of difficulty: I.I.D., Composition, and Zero-shot settings. We find that while SFT is sufficient for in-distribution performance, it struggles with O.O.D. generalization, particularly in Zero-shot settings where relational combinations are novel. Crucially, we identify the SFT Generalization Paradox: Models supervised solely on the composite task achieve near-perfect in-distribution accuracy but collapse on out-of-distribution generalization, indicating their reliance on rote memorization of path shortcuts. In contrast, we find that RL acts as a reasoning synthesizer rather than a probability amplifier. However, we uncover a strict atomic prerequisite: RL can only synthesize these complex strategies if the base model has first mastered the independent atomic skills (Parametric and Contextual) via SFT. These findings challenge the view of RL as a mere amplifier, suggesting that given sufficient atomic foundations, RL can actively synthesize complex reasoning strategies from learned primitives without explicit supervision on such complex strategies. This indicates that decoupled atomic training followed by RL offers a scalable path to generalization for complex reasoning tasks.",
+    citation: `<pre><code>@misc{cheng2025atomiccompositereinforcementlearning,
+      title={From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning}, 
+      author={Sitao Cheng and Xunjian Yin and Ruiwen Zhou and Yuxuan Li and Xinyi Wang and Liangming Pan and William Yang Wang and Victor Zhong},
+      year={2025},
+      eprint={2512.01970},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2512.01970}, 
+}</code></pre>`,
+    isPreprint: true,
+    isSelected: true
   },
   {
     title: "Differentiable Evolutionary Reinforcement Learning",
