@@ -2,25 +2,28 @@
 const publications = [
   // Preprints
   {
-    title: "From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning",
-    authors: "Sitao Cheng, <b>Xunjian Yin</b>, Ruiwen Zhou, Yuxuan Li, Xinyi Wang, Liangming Pan, William Yang Wang, Victor Zhong",
+    title: 
+  },
+  {
+    title: "Differentiable Evolutionary Reinforcement Learning",
+    authors: "Sitao Cheng*, Tianle Li*, Xuhan Huang*, <b>Xunjian Yin*</b>, Difan Zou",
     venue: "ArXiv:2510",
     links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2512.01970" },
-      { text: "Code", url: "https://github.com/sitaocheng/from_atomic_to_composite" }
+      { text: "Paper", url: "https://arxiv.org/abs/2512.13399" },
+      { text: "Code", url: "https://github.com/sitaocheng/DERL" }
     ],
-    abstract: "The mechanism by which RL contributes to reasoning capabilities-whether it incentivizes the synthesis of new skills or merely amplifies existing behaviors-remains a subject of intense debate. In this work, we investigate this question through the lens of Complementary Reasoning, a complex task that requires integrating internal parametric knowledge with external contextual information. Using a controlled synthetic dataset of human biographies, we strictly decouple this ability into two atomic skills: Parametric Reasoning (relying on internal knowledge) and Contextual Reasoning (depending on external information). To rigorously assess capability boundaries, we evaluate generalization across three distinct levels of difficulty: I.I.D., Composition, and Zero-shot settings. We find that while SFT is sufficient for in-distribution performance, it struggles with O.O.D. generalization, particularly in Zero-shot settings where relational combinations are novel. Crucially, we identify the SFT Generalization Paradox: Models supervised solely on the composite task achieve near-perfect in-distribution accuracy but collapse on out-of-distribution generalization, indicating their reliance on rote memorization of path shortcuts. In contrast, we find that RL acts as a reasoning synthesizer rather than a probability amplifier. However, we uncover a strict atomic prerequisite: RL can only synthesize these complex strategies if the base model has first mastered the independent atomic skills (Parametric and Contextual) via SFT. These findings challenge the view of RL as a mere amplifier, suggesting that given sufficient atomic foundations, RL can actively synthesize complex reasoning strategies from learned primitives without explicit supervision on such complex strategies. This indicates that decoupled atomic training followed by RL offers a scalable path to generalization for complex reasoning tasks.",
-    citation: `<pre><code>@misc{cheng2025atomiccompositereinforcementlearning,
-      title={From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning}, 
-      author={Sitao Cheng and Xunjian Yin and Ruiwen Zhou and Yuxuan Li and Xinyi Wang and Liangming Pan and William Yang Wang and Victor Zhong},
+    abstract: "The design of effective reward functions presents a central and often arduous challenge in reinforcement learning (RL), particularly when developing autonomous agents for complex reasoning tasks. While automated reward optimization approaches exist, they typically rely on derivative-free evolutionary heuristics that treat the reward function as a black box, failing to capture the causal relationship between reward structure and task performance. To bridge this gap, we propose Differentiable Evolutionary Reinforcement Learning (DERL), a bilevel framework that enables the autonomous discovery of optimal reward signals. In DERL, a Meta-Optimizer evolves a reward function (i.e., Meta-Reward) by composing structured atomic primitives, guiding the training of an inner-loop policy. Crucially, unlike previous evolution, DERL is differentiable in its metaoptimization: it treats the inner-loop validation performance as a signal to update the Meta-Optimizer via reinforcement learning. This allows DERL to approximate the meta-gradient of task success, progressively learning to generate denser and more actionable feedback. We validate DERL across three distinct domains: robotic agent (ALFWorld), scientific simulation (ScienceWorld), and mathematical reasoning (GSM8k, MATH). Experimental results show that DERL achieves state-of-the-art performance on ALFWorld and ScienceWorld, significantly outperforming methods relying on heuristic rewards, especially in out-of-distribution scenarios. Analysis of the evolutionary trajectory demonstrates that DERL successfully captures the intrinsic structure of tasks, enabling selfimproving agent alignment without human intervention.",
+    citation: `<pre><code>@misc{cheng2025differentiableevolutionaryreinforcementlearning,
+      title={Differentiable Evolutionary Reinforcement Learning}, 
+      author={Sitao Cheng and Tianle Li and Xuhan Huang and Xunjian Yin and Difan Zou},
       year={2025},
-      eprint={2512.01970},
+      eprint={2512.13399},
       archivePrefix={arXiv},
       primaryClass={cs.AI},
-      url={https://arxiv.org/abs/2512.01970}, 
+      url={https://arxiv.org/abs/2512.13399}, 
 }</code></pre>`,
     isPreprint: true,
-    isSelected: true
+    isSelected: false
   },
   {
     title: "The Geometry of Reasoning: Flowing Logics in Representation Space",
