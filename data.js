@@ -675,6 +675,16 @@ const projects = [
     isSelected: false,
     demoPath: "photos/project-demo/Text of Sisyphus.png"
   },
+    {
+    title: "Harmony Cube",
+    description: "Music Meets Geometry. (<a href=\"https://arvid-pku.github.io/harmony-cube/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://arvid-pku.github.io/harmony-cube/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://arvid-pku.github.io/harmony-cube/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/Harmony Cube.png"
+  },
   {
     title: "Academic-Homepage-Template",
     description: "A template for academic homepages. (<a href=\"https://github.com/Arvid-pku/Academic-Homepage-Template\">Project Homepage</a>)",
