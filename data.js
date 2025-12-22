@@ -24,7 +24,7 @@ const publications = [
   },
   {
     title: "Differentiable Evolutionary Reinforcement Learning",
-    authors: "Sitao Cheng*, Tianle Li*, Xuhan Huang*, <b>Xunjian Yin*</b>, Difan Zou",
+    authors: "Sitao Cheng*, Tianle Li*, Xuhan Huang*, <b>Xunjian Yin</b>, Difan Zou",
     venue: "ArXiv:2510",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2512.13399" },
