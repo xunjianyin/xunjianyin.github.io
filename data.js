@@ -657,6 +657,16 @@ const projects = [
     isSelected: false,
     demoPath: "photos/project-demo/Tower of Babel.png"
   },
+    {
+    title: "World of Physics",
+    description: "A physics simulation platform where we can play with blocks, spring, rope, electric field, magnetic field, and more. (<a href=\"https://arvid-pku.github.io/worldofphysics/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://arvid-pku.github.io/worldofphysics/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://arvid-pku.github.io/worldofphysics/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/World of Physics.png"
+  },
   {
     title: "Proactive AI Assistant",
     description: "An AI assistant extension that proactively helps users with tasks and reminders. (<a href=\"https://github.com/Arvid-pku/Proactive-AI\">Project Homepage</a>)",
