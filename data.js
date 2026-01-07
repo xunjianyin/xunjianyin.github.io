@@ -65,7 +65,7 @@ const publications = [
     isSelected: true
   },
   {
-    title: "LEDOM: An Open and Fundamental Reverse Language Model",
+    title: "Reverse Language Model",
     authors: "<b>Xunjian Yin</b>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
     venue: "ArXiv:2507",
     links: [
