@@ -648,6 +648,17 @@ const projects = [
     demoPath: "photos/project-demo/Gödel Agent.png"
   },
   {
+    title: "LLM Interpretability Workbench",
+    description: "A workbench for interpreting the internals of large language models. (<a href=\"https://github.com/Arvid-pku/Modelen\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/Arvid-pku/Modelen/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Modelen" },
+      { url: "https://github.com/Arvid-pku/Modelen/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Modelen" },
+      { url: "https://github.com/Arvid-pku/Modelen/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
+    ],
+    isSelected: true,
+    demoPath: "photos/project-demo/Model_Len.png"
+  },
+  {
     title: "Tower of Babel",
     description: "Play with Text in the Physical World. (<a href=\"https://arvid-pku.github.io/Babel/\">Project Homepage</a>)",
     badges: [
@@ -706,16 +717,16 @@ const projects = [
     isSelected: false,
     demoPath: "photos/project-demo/Text of Sisyphus.png"
   },
-    {
-    title: "Harmony Cube",
-    description: "Music Meets Geometry. (<a href=\"https://arvid-pku.github.io/harmony-cube/\">Project Homepage</a>)",
-    badges: [
-      { url: "https://arvid-pku.github.io/harmony-cube/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
-      { url: "https://arvid-pku.github.io/harmony-cube/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
-    ],
-    isSelected: false,
-    demoPath: "photos/project-demo/Harmony Cube.png"
-  },
+  //   {
+  //   title: "Harmony Cube",
+  //   description: "Music Meets Geometry. (<a href=\"https://arvid-pku.github.io/harmony-cube/\">Project Homepage</a>)",
+  //   badges: [
+  //     { url: "https://arvid-pku.github.io/harmony-cube/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+  //     { url: "https://arvid-pku.github.io/harmony-cube/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+  //   ],
+  //   isSelected: false,
+  //   demoPath: "photos/project-demo/Harmony Cube.png"
+  // },
   {
     title: "Academic-Homepage-Template",
     description: "A template for academic homepages. (<a href=\"https://github.com/Arvid-pku/Academic-Homepage-Template\">Project Homepage</a>)",
@@ -738,18 +749,18 @@ const projects = [
     isSelected: false,
     demoPath: "photos/project-demo/Game-of-Life.png"
   },
-  {
-    title: "Audio-Visualizer",
-    description: "A website to visualize audio. (<a href=\"https://xunjianyin.github.io/Audio-Visualizer/\">Project Homepage</a>)",
-    badges: [
-      { url: "https://github.com/xunjianyin/Audio-Visualizer/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
-      { url: "https://github.com/xunjianyin/Audio-Visualizer/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
-      { url: "https://github.com/xunjianyin/Audio-Visualizer/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Audio-Visualizer" },
-      { url: "https://github.com/xunjianyin/Audio-Visualizer/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Audio-Visualizer" },
-    ],
-    isSelected: false,
-    demoPath: "photos/project-demo/Audio-Visualizer.png"
-  },
+  // {
+  //   title: "Audio-Visualizer",
+  //   description: "A website to visualize audio. (<a href=\"https://xunjianyin.github.io/Audio-Visualizer/\">Project Homepage</a>)",
+  //   badges: [
+  //     { url: "https://github.com/xunjianyin/Audio-Visualizer/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+  //     { url: "https://github.com/xunjianyin/Audio-Visualizer/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+  //     { url: "https://github.com/xunjianyin/Audio-Visualizer/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Audio-Visualizer" },
+  //     { url: "https://github.com/xunjianyin/Audio-Visualizer/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Audio-Visualizer" },
+  //   ],
+  //   isSelected: false,
+  //   demoPath: "photos/project-demo/Audio-Visualizer.png"
+  // },
   {
     title: "Maze-Generator-And-Solver",
     description: "A website to generate and solve mazes. (<a href=\"https://xunjianyin.github.io/Maze-Generator-And-Solver/\">Project Homepage</a>)",
@@ -762,21 +773,21 @@ const projects = [
     isSelected: false,
     demoPath: "photos/project-demo/Maze-Generator-And-Solver.png"
   },
-  {
-    title: "Overleaf-Bib-Helper-Dev",
-    description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/Arvid-pku/Overleaf-Bib-Helper\">Project Homepage</a>)",
-    badges: [
-      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
-      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
-      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Overleaf-Bib-Helper" },
-      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/Overleaf-Bib-Helper" },
-      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Overleaf-Bib-Helper" },
-      { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
-      { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" }
-    ],
-    isSelected: false,
-    demoPath: "photos/project-demo/Overleaf-Bib-Helper.jpg"
-  },
+  // {
+  //   title: "Overleaf-Bib-Helper-Dev",
+  //   description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/Arvid-pku/Overleaf-Bib-Helper\">Project Homepage</a>)",
+  //   badges: [
+  //     { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
+  //     { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+  //     { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Overleaf-Bib-Helper" },
+  //     { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/Overleaf-Bib-Helper" },
+  //     { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Overleaf-Bib-Helper" },
+  //     { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+  //     { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" }
+  //   ],
+  //   isSelected: false,
+  //   demoPath: "photos/project-demo/Overleaf-Bib-Helper.jpg"
+  // },
   {
     title: "Bouncing Ball",
     description: "A website to play with a ball. (<a href=\"https://xunjianyin.github.io/bouncing-ball-animation/\">Project Homepage</a>)",
@@ -831,21 +842,21 @@ const projects = [
     isSelected: false,
     demoPath: "photos/project-demo/ID-Photo-Helper.png"
   },
-  {
-    title: "Rank-Anything",
-    description: "A website to rank anything (developing). (<a href=\"https://xunjianyin.github.io/rank-anything/\">Project Homepage</a>)",
-    badges: [
-      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/releases", img: "https://img.shields.io/badge/Version-0.1-blue" },
-      { url: "https://github.com/xunjianyin/rank-anything/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
-      { url: "https://github.com/xunjianyin/rank-anything/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/rank-anything" },
-      { url: "https://github.com/xunjianyin/rank-anything/network/members", img: "https://img.shields.io/github/forks/xunjianyin/rank-anything" },
-      { url: "https://github.com/xunjianyin/rank-anything/issues", img: "https://img.shields.io/github/issues/xunjianyin/rank-anything" },
-      { url: "https://github.com/xunjianyin/rank-anything/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
-      { url: "https://xunjianyin.github.io/rank-anything/", img: "https://img.shields.io/badge/Website-Rank_Anything-blue" }
-    ],
-    isSelected: false,
-    demoPath: "photos/project-demo/Rank-Anything.png"
-  },
+  // {
+  //   title: "Rank-Anything",
+  //   description: "A website to rank anything (developing). (<a href=\"https://xunjianyin.github.io/rank-anything/\">Project Homepage</a>)",
+  //   badges: [
+  //     { url: "https://github.com/Arvid-pku/ID-Photo-Helper/releases", img: "https://img.shields.io/badge/Version-0.1-blue" },
+  //     { url: "https://github.com/xunjianyin/rank-anything/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+  //     { url: "https://github.com/xunjianyin/rank-anything/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/rank-anything" },
+  //     { url: "https://github.com/xunjianyin/rank-anything/network/members", img: "https://img.shields.io/github/forks/xunjianyin/rank-anything" },
+  //     { url: "https://github.com/xunjianyin/rank-anything/issues", img: "https://img.shields.io/github/issues/xunjianyin/rank-anything" },
+  //     { url: "https://github.com/xunjianyin/rank-anything/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+  //     { url: "https://xunjianyin.github.io/rank-anything/", img: "https://img.shields.io/badge/Website-Rank_Anything-blue" }
+  //   ],
+  //   isSelected: false,
+  //   demoPath: "photos/project-demo/Rank-Anything.png"
+  // },
   
 ];
 
@@ -895,6 +906,7 @@ const researchExperience = [
 
 // Teaching Data
 const teaching = [
+  "Teaching Assistant, Duke CS, Natural Language Processing, Spring 2026, with Prof. Bhuwan Dhingra",
   "Teaching Assistant, PKU EECS, Web Data Mining, Fall 2023, with Prof. Xiaojun Wan",
   "Teaching Assistant, PKU EECS, Introduction to Computing, Fall 2023, with Prof. Xifeng Deng",
   "Teaching Assistant, PKU EECS, Data Structures and Algorithms, Spring 2022, with Prof. Zhao Wang",
