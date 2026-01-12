@@ -651,6 +651,7 @@ const projects = [
     title: "LLM Interpretability Workbench",
     description: "A workbench for interpreting the internals of large language models. (<a href=\"https://github.com/Arvid-pku/Modelen\">Project Homepage</a>)",
     badges: [
+      { url: "https://github.com/Arvid-pku/Modelen/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/Modelen/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Modelen" },
       { url: "https://github.com/Arvid-pku/Modelen/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Modelen" },
       { url: "https://github.com/Arvid-pku/Modelen/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
