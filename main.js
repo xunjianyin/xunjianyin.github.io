@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize dark mode toggle
   initializeDarkMode();
+
+  // Initialize back to top button
+  initializeBackToTop();
   
   // Initialize mobile hamburger menu
   initializeMobileMenu();
@@ -361,50 +364,8 @@ function initializeScrollProgress() {
   updateScrollProgress();
 }
 
-/**
- * Initialize dark mode functionality
- */
-function initializeDarkMode() {
-  const themeToggle = document.getElementById('theme-toggle');
-  
-  if (!themeToggle) return;
-  
-  // Check for saved theme preference or default to 'light'
-  const currentTheme = localStorage.getItem('theme') || 
-    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  
-  // Apply the saved theme
-  document.documentElement.setAttribute('data-theme', currentTheme);
-  updateThemeLabel(currentTheme, themeToggle);
-  
-  // Add click event listener
-  themeToggle.addEventListener('click', () => {
-    const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeLabel(newTheme, themeToggle);
-  });
-  
-  // Listen for system theme changes
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem('theme')) {
-      const newTheme = e.matches ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      updateThemeLabel(newTheme, themeToggle);
-    }
-  });
-}
-
-/**
- * Update theme button label based on current theme
- */
-function updateThemeLabel(theme, toggleElement) {
-  toggleElement.setAttribute('aria-label', 
-    theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-  toggleElement.setAttribute('title', 
-    theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-}
+// Dark mode functions are now in utils.js
+// The functions initializeDarkMode() and updateThemeLabel() are loaded from utils.js
 
 /**
  * Initialize mobile hamburger menu
