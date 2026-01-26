@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contextual Modeling for Chinese ASR Errors</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .concept-box { background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #4a6fa5; }
+    .concept-box h3 { margin-top: 0; color: #4a6fa5; font-size: 18px; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
+
+    <h1 class="paper-title">Improving Contextual Modeling for Omission and Coreference Resolution in Chinese ASR</h1>
+    <p class="paper-authors">Xiaoyu Liu, <b>Xunjian Yin</b>, Xiaojun Wan</p>
+    <p class="paper-venue">COLING 2024</p>
+
+    <div class="paper-links">
+      <a href="https://aclanthology.org/2024.lrec-main.1301/">Paper</a>
+    </div>
+
+    <div class="story-section">
+      <h2>When Speech Becomes Text</h2>
+      <p>Automatic speech recognition has become remarkably accurate at transcribing words. But spoken language isn't just words—it's a continuous stream of meaning where speakers drop implied subjects, use pronouns freely, and rely on context that listeners naturally fill in. When ASR produces a transcript, much of this contextual richness is lost.</p>
+      <p>Consider a conversation in Chinese: "小明去了商店。买了苹果。" The second sentence has no explicit subject—Chinese allows this naturally, with listeners inferring "he" from context. But the ASR transcript loses this connection, producing text that reads as fragmentary to downstream systems.</p>
+    </div>
+
+    <div class="concept-box">
+      <h3>Two Pervasive Error Types</h3>
+      <p>We focus on two specific error types that plague Chinese ASR. <em>Omission errors</em> occur when contextually-implied content isn't explicitly represented—subjects dropped in pro-drop constructions, ellipsis that spoken language handles naturally. <em>Coreference errors</em> arise when pronouns and references become ambiguous without the prosodic cues of speech. Both require understanding context that extends beyond the immediate utterance.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Context Beyond the Sentence</h2>
+      <p>The solution requires looking beyond individual utterances. A pronoun's referent often appears sentences earlier. An omitted subject is clear from the discourse structure. But standard ASR post-processing treats each sentence in isolation, missing these longer-range dependencies.</p>
+      <p>We developed contextual modeling approaches that maintain discourse state across utterances. The system tracks entities as they're introduced, follows coreference chains, and identifies where ellipsis has occurred based on the semantic gaps it creates.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Filling in the Gaps</h2>
+      <p>Detecting omissions is only half the challenge—we also need to recover what's missing. This requires inferring from discourse context what the speaker intended, then generating appropriate completions that restore the full meaning.</p>
+      <p>For coreference, the task is disambiguation: when a transcript says "他" (he), which "he" does it mean? The surrounding context usually makes this clear to human readers, but extracting this clarity algorithmically requires modeling the discourse structure explicitly.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Contributions</h3>
+      <ul>
+        <li><b>Error Taxonomy:</b> Systematic analysis of omission and coreference patterns in Chinese ASR</li>
+        <li><b>Contextual Methods:</b> Discourse-aware modeling for error detection and recovery</li>
+        <li><b>Omission Recovery:</b> Techniques to identify and restore missing content</li>
+        <li><b>Coreference Resolution:</b> Disambiguation of references in transcribed speech</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>Restoring Coherence</h2>
+      <p>Our experiments demonstrate that contextual modeling significantly reduces both error types. More importantly, the resulting transcripts are more useful for downstream applications—summarization, question answering, and information extraction all benefit from having coherent, complete text rather than fragmentary transcriptions.</p>
+      <p>The approach is particularly valuable for Chinese, where pro-drop and topic-comment structure make omission natural and frequent, but the principles extend to any language where spoken conventions differ from written expectations.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Results</h3>
+      <ul>
+        <li><b>Error Reduction:</b> Significant decrease in omission and coreference errors</li>
+        <li><b>Discourse Effectiveness:</b> Context proves crucial for both error types</li>
+        <li><b>Downstream Benefit:</b> Improved transcript quality enhances downstream tasks</li>
+        <li><b>Language Sensitivity:</b> Approach tailored to Chinese linguistic characteristics</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>From Speech to Understanding</h2>
+      <p>Perfect word-level transcription doesn't equal perfect understanding. The gap between acoustic accuracy and semantic completeness requires bridging—understanding not just what was said, but what was meant in context. This work takes a step toward ASR systems that produce not just transcripts, but coherent representations of spoken discourse.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@inproceedings{liu-etal-2024-improving,
+    title = "Improving Contextual Modeling for Omission and Coreference Resolution in Chinese ASR",
+    author = "Liu, Xiaoyu and Yin, Xunjian and Wan, Xiaojun",
+    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation",
+    year = "2024",
+    url = "https://aclanthology.org/2024.lrec-main.1301/",
+    pages = "14950--14959"
+}</div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .paper-figure { margin: 40px 0; text-align: center; }
+    .paper-figure.hero { margin: 45px -40px; }
+    .paper-figure.hero img { max-width: 100%; width: 750px; }
+    .paper-figure.medium img { max-width: 600px; width: 100%; }
+    .paper-figure.small img { max-width: 500px; width: 100%; }
+    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement</h1>
+    <p class="paper-authors"><b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, William Yang Wang</p>
+    <p class="paper-venue">ACL 2025 · Main Conference</p>
+
+    <div class="paper-links">
+      <a href="https://aclanthology.org/2025.acl-long.1354/">Paper</a>
+      <a href="https://arxiv.org/abs/2410.04444">arXiv</a>
+      <a href="https://github.com/Arvid-pku/Godel_Agent">Code</a>
+      <a href="https://xunjianyin.github.io/blog-post.html?id=self-referential-agent">Blog</a>
+    </div>
+
+    <figure class="paper-figure medium">
+      <img src="https://arxiv.org/html/2410.04444v4/x1.png" alt="Gödel Agent Framework Overview">
+      <figcaption>The Gödel Agent framework enables AI agents to recursively examine and modify their own logic, achieving continuous self-improvement without human intervention.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>The Vision</h2>
+      <p>What if an AI agent could look at its own code, understand its limitations, and rewrite itself to become better? This seemingly science-fiction idea is at the heart of Gödel Agent—a framework that brings the concept of recursive self-improvement from theoretical computer science into practical reality.</p>
+      <p>The name pays homage to the Gödel machine, a theoretical construct proposed by Jürgen Schmidhuber, which describes a self-referential universal problem solver capable of optimally improving itself. Our work demonstrates that with large language models, this vision is no longer just theoretical.</p>
+    </div>
+
+    <figure class="paper-figure medium">
+      <img src="https://arxiv.org/html/2410.04444v4/x2.png" alt="Evolution of Agent Paradigms">
+      <figcaption>The evolution of AI agent paradigms: from fixed human-designed pipelines, through constrained meta-learning, to truly self-referential systems that can escape human-imposed limitations.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>The Problem with Current Agents</h2>
+      <p>Today's AI agents, despite their impressive capabilities, are fundamentally limited by their human designers. Whether based on fixed pipeline algorithms like ReAct or Chain-of-Thought, or more sophisticated meta-learning frameworks, they all share a common constraint: they can only search within a space that humans have predefined.</p>
+      <p>This means that even the most advanced agents might miss globally optimal designs simply because those designs fall outside the boundaries of human imagination. We asked ourselves: what if we removed these constraints entirely?</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Insight</h3>
+      <p>By giving an agent access to its own source code and the ability to modify it at runtime, we can create systems that discover novel strategies humans never conceived—strategies that emerge from the agent's own experience and reasoning.</p>
+    </div>
+
+    <figure class="paper-figure medium">
+      <img src="https://arxiv.org/html/2410.04444v4/x3.png" alt="Monkey Patching Implementation">
+      <figcaption>The technical implementation uses Python's monkey patching mechanism, allowing the agent to dynamically modify its own methods during execution without requiring a restart.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>How It Works</h2>
+      <p>Gödel Agent operates on a beautifully simple principle: the agent can read its own code, evaluate its performance, and propose modifications—all guided by nothing more than a high-level objective like "solve more math problems correctly."</p>
+      <p>Using Python's monkey patching mechanism, these modifications are applied at runtime. The agent then tests the new version, keeps improvements that work, and continues the cycle. Over time, this process leads to emergent behaviors and strategies that no human explicitly programmed.</p>
+    </div>
+
+    <figure class="paper-figure small">
+      <img src="https://arxiv.org/html/2410.04444v4/x5.png" alt="Game of 24 Results">
+      <figcaption>On the Game of 24 benchmark, Gödel Agent improved its accuracy from 4% to 78% through successive self-modifications—discovering novel mathematical strategies along the way.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>The Results</h2>
+      <p>We tested Gödel Agent on mathematical reasoning tasks (Game of 24, MATH) and embodied agent tasks (ALFWorld). The results exceeded our expectations. On Game of 24, starting from a mere 4% accuracy, Gödel Agent iteratively improved itself to achieve 78% accuracy—a transformation that happened without any human guidance on how to solve these problems.</p>
+      <p>Perhaps more remarkably, the agent didn't just get more accurate; it became more efficient, reducing the average number of actions needed per task. It discovered optimization strategies that emerged naturally from its self-improvement process.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>What We Learned</h3>
+      <ul>
+        <li><b>Emergence is real:</b> Novel problem-solving strategies can emerge from self-referential improvement without explicit human design</li>
+        <li><b>Efficiency follows accuracy:</b> As the agent improves its logic, it naturally becomes more efficient</li>
+        <li><b>Generalization happens:</b> Improvements on one task often transfer to related tasks</li>
+        <li><b>The ceiling is high:</b> We haven't yet found the limit of how much an agent can improve itself</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>Looking Forward</h2>
+      <p>Gödel Agent represents a step toward AI systems that can genuinely improve themselves—not through human engineering of better algorithms, but through their own recursive self-reflection. While we're still far from systems that can fundamentally redesign their own architectures, this work shows that meaningful self-improvement is possible today.</p>
+      <p>The implications extend beyond academic research. As AI systems become more autonomous, the ability to self-correct and self-improve becomes increasingly valuable. Gödel Agent offers a glimpse of what that future might look like.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@inproceedings{yin-etal-2025-godel,
+    title = {Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement},
+    author = "Yin, Xunjian and Wang, Xinyi and Pan, Liangming and Lin, Li and Wan, Xiaojun and Wang, William Yang",
+    booktitle = "Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics",
+    year = "2025",
+    url = "https://aclanthology.org/2025.acl-long.1354/"
+}</div>
+  </main>
+</body>
+</html>

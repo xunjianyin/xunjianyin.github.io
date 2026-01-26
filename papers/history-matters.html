@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>History Matters: Temporal Knowledge Editing</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
+    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">History Matters: Temporal Knowledge Editing in Large Language Model</h1>
+    <p class="paper-authors"><b>Xunjian Yin</b>, Jin Jiang, Liming Yang, Xiaojun Wan</p>
+    <p class="paper-venue">AAAI 2024</p>
+
+    <div class="paper-links">
+      <a href="https://ojs.aaai.org/index.php/AAAI/article/view/29912/31594">Paper</a>
+      <a href="https://github.com/Arvid-pku/ATOKE">Code</a>
+    </div>
+
+    <div class="story-section">
+      <h2>Two Kinds of Wrong</h2>
+      <p>When a language model is wrong, it can be wrong in two very different ways. Sometimes the model has an intrinsic error—it learned something incorrectly during training and should simply be fixed. But sometimes the model's knowledge has become outdated—the world changed, and what was once true is no longer true.</p>
+      <p>The President of the United States in 2020 isn't the same as in 2024. A company's CEO changes. A country's capital can move. When we update these facts in a language model, should we erase the history or preserve it?</p>
+    </div>
+
+    <div class="warning-box">
+      <h3>The Problem with Forgetting</h3>
+      <p>Current knowledge editing methods treat all updates the same—they replace old knowledge with new. But this causes historical amnesia. Ask an edited model "Who was the CEO of Twitter in 2022?" and it might answer with the current CEO, erasing the historical record. For temporal facts, we want models to remember history while knowing what's current.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Temporal Knowledge Editing</h2>
+      <p>We introduce Temporal Knowledge Editing (TKE) as a distinct task. Unlike standard editing that overwrites, TKE requires the model to maintain temporal coherence: knowing what was true at different times, and correctly distinguishing past from present.</p>
+      <p>To evaluate this, we built AToKe (Assessment of Temporal Knowledge Editing), a benchmark that tests whether edited models can answer time-indexed questions correctly—both for current facts and historical ones.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>The Catastrophic Forgetting</h2>
+      <p>Our experiments revealed a troubling finding: existing editing methods cause catastrophic forgetting of historical knowledge. They successfully implant new facts but destroy the record of what came before. A model that once knew historical sequences of events becomes temporally confused after editing.</p>
+      <p>This isn't just an academic concern. Models deployed in domains like law, medicine, or policy need to reason about what was true when—not just what's true now.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>METO: Multi-Editing with Time Objective</h3>
+      <p>We propose METO, a framework that addresses temporal editing by jointly updating historical and current knowledge. Instead of replacing facts, it adds temporally-indexed facts and optimizes the model's ability to predict when each fact was true. This preserves the historical record while updating to current information.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Contributions</h3>
+      <ul>
+        <li><b>New Task:</b> Temporal Knowledge Editing as distinct from standard editing</li>
+        <li><b>AToKe Benchmark:</b> Evaluation suite for temporal knowledge editing</li>
+        <li><b>Problem Discovery:</b> Documenting catastrophic forgetting in existing methods</li>
+        <li><b>METO Framework:</b> A solution that preserves historical knowledge</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>History Matters</h2>
+      <p>As language models become repositories of world knowledge, how we update them matters. The past isn't just noise to be overwritten—it's context that gives meaning to the present. Temporal Knowledge Editing takes this seriously, ensuring that models can be updated while maintaining their role as keepers of historical record.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@inproceedings{yin2024history,
+  title={History matters: Temporal knowledge editing in large language model},
+  author={Yin, Xunjian and Jiang, Jin and Yang, Liming and Wan, Xiaojun},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={38},
+  number={17},
+  pages={19413--19421},
+  year={2024}
+}</div>
+  </main>
+</body>
+</html>

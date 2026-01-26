@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seq2Seq Models on Data-to-Text Generation</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
+    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
+
+    <h1 class="paper-title">How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?</h1>
+    <p class="paper-authors"><b>Xunjian Yin</b>, Xiaojun Wan</p>
+    <p class="paper-venue">ACL 2022</p>
+
+    <div class="paper-links">
+      <a href="https://aclanthology.org/2022.acl-long.531.pdf">Paper</a>
+      <a href="https://github.com/xunjianyin/Seq2SeqOnData2Text">Code</a>
+    </div>
+
+    <div class="story-section">
+      <h2>The BLEU Score Illusion</h2>
+      <p>Data-to-text generation—turning structured data like tables and graphs into natural language—has seen remarkable progress. BLEU scores keep climbing. Leaderboards show steady improvement. But anyone who reads the actual outputs knows something is wrong. The generated text often sounds fluent but says things the data doesn't support, or misses crucial information entirely.</p>
+      <p>This disconnect between automatic metrics and actual quality is a crisis hiding in plain sight. We set out to understand what Seq2Seq models actually do well, and where they systematically fail.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Beyond Aggregate Scores</h2>
+      <p>Standard evaluation gives you a number. That number might be 45 BLEU or 52 BLEU, but it doesn't tell you why text is good or bad, or what specific problems plague your model. To truly understand model behavior, we need finer-grained analysis.</p>
+      <p>We adopted the Multidimensional Quality Metric (MQM) framework, annotating outputs from five representative models across four datasets with eight specific error types. This isn't sampling—it's systematic classification of every error in hundreds of generated texts.</p>
+    </div>
+
+    <div class="warning-box">
+      <h3>The Error Landscape</h3>
+      <p>Our analysis revealed systematic patterns. Models make predictable types of mistakes: omitting information that's in the data, adding "facts" that aren't, confusing similar entities, generating grammatically-correct nonsense. These aren't random failures—they're characteristic weaknesses of the Seq2Seq paradigm applied to this task.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>What We Discovered</h3>
+      <ul>
+        <li><b>Copy Mechanisms:</b> Help with omission and extrinsic inaccuracy, but increase addition errors—trading one problem for another</li>
+        <li><b>Pre-training Power:</b> Dramatically reduces errors; strategy and model size matter more than architecture details</li>
+        <li><b>Dataset Structure:</b> The structure of training data profoundly affects which errors models make</li>
+        <li><b>Persistent Challenges:</b> Certain error types remain difficult regardless of model sophistication</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>The Trade-offs of Copy</h2>
+      <p>Copy mechanisms were supposed to solve data-to-text generation by letting models directly copy tokens from input tables. They do help—omission errors decrease because the model can faithfully reproduce input values. But the improvement comes with a cost: models start hallucinating additional content, perhaps because copying makes generation feel "easier" and the model becomes overconfident.</p>
+      <p>This trade-off illustrates a broader pattern: architectural choices have complex effects that aggregate metrics hide.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>The Pre-training Revolution</h2>
+      <p>Perhaps our most striking finding concerns pre-training. Pre-trained models don't just score better—they make fundamentally fewer errors across all categories. The linguistic knowledge encoded during pre-training transfers effectively to the structured data domain, even though pre-training corpora contain little structured data.</p>
+      <p>Model size matters too, but not as simply as "bigger is better." The relationship between capacity and error reduction varies by error type, suggesting that scale and capability aren't synonymous.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Error Types That Persist</h2>
+      <p>Some errors stubbornly resist improvement. Confusing similar entities remains hard because models struggle with fine-grained distinctions in structured data. Certain logical errors persist because Seq2Seq models don't truly reason about data relationships. These persistent challenges point toward fundamental limitations of the paradigm itself.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Practical Implications</h3>
+      <ul>
+        <li><b>For Practitioners:</b> Choose models based on which errors matter most for your application</li>
+        <li><b>For Researchers:</b> Target specific error types rather than optimizing aggregate metrics</li>
+        <li><b>For Evaluation:</b> Fine-grained error analysis reveals what leaderboards hide</li>
+        <li><b>For the Field:</b> Current approaches have systematic limitations that new paradigms may need to address</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>Seeing Past the Scores</h2>
+      <p>This work advocates for a different way of evaluating generation systems. Not "how good is this model?" but "what does this model do well, and what does it do poorly?" The answers are specific, actionable, and often surprising. High-scoring models can have serious blind spots; lower-scoring models might excel at specific subtasks.</p>
+      <p>Progress in data-to-text generation requires understanding failure, not just celebrating success. By mapping the error landscape, we chart a course toward models that don't just score well, but actually work.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@inproceedings{yin-wan-2022-seq2seq,
+    title = "How Do {S}eq2{S}eq Models Perform on End-to-End Data-to-Text Generation?",
+    author = "Yin, Xunjian and Wan, Xiaojun",
+    booktitle = "Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics",
+    year = "2022",
+    url = "https://aclanthology.org/2022.acl-long.531/",
+    pages = "7701--7710"
+}</div>
+  </main>
+</body>
+</html>

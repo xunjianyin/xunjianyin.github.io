@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DERL: Differentiable Evolutionary Reinforcement Learning</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .paper-figure { margin: 40px 0; text-align: center; }
+    .paper-figure.hero img { max-width: 100%; width: 700px; }
+    .paper-figure.medium img { max-width: 550px; width: 100%; }
+    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">Differentiable Evolutionary Reinforcement Learning</h1>
+    <p class="paper-authors">Sitao Cheng*, Tianle Li*, Xuhan Huang*, <b>Xunjian Yin</b>, Difan Zou</p>
+    <p class="paper-venue">ArXiv Preprint 2025</p>
+
+    <div class="paper-links">
+      <a href="https://arxiv.org/abs/2512.13399">Paper</a>
+      <a href="https://github.com/sitaocheng/DERL">Code</a>
+    </div>
+
+    <div class="story-section">
+      <h2>The Reward Design Problem</h2>
+      <p>Reinforcement learning has a dirty secret: the hardest part isn't the algorithm—it's the reward function. Getting the reward right often requires extensive trial and error, domain expertise, and sometimes luck. A poorly designed reward leads to agents that technically optimize what you asked for but not what you actually wanted.</p>
+      <p>Existing approaches to automatic reward design treat the reward function as a black box, using evolutionary heuristics to search for better rewards. But evolution is slow and inefficient—it can't see the causal relationship between reward structure and task performance.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Making Evolution Differentiable</h2>
+      <p>DERL bridges this gap with a key insight: what if we could make the evolutionary process differentiable? Instead of blind mutation and selection, what if we could compute gradients that tell us exactly how to improve the reward function?</p>
+      <p>The framework operates as a bilevel optimization: a Meta-Optimizer evolves reward functions by composing structured atomic primitives, and an inner-loop policy is trained using these rewards. Crucially, the validation performance of the inner policy flows back as a learning signal to update the Meta-Optimizer through reinforcement learning.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>The Technical Innovation</h3>
+      <p>DERL approximates the meta-gradient of task success with respect to reward structure. This allows it to progressively learn to generate denser, more actionable feedback. Unlike black-box evolution, DERL understands <em>why</em> certain reward functions work better and can generalize this understanding to design better rewards.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>From Robots to Math</h2>
+      <p>We validated DERL across three distinct domains that test different aspects of reward design. In ALFWorld, robotic agents must navigate and manipulate objects in household environments. In ScienceWorld, agents conduct scientific experiments in simulation. In GSM8K and MATH, agents solve mathematical reasoning problems.</p>
+      <p>Across all domains, DERL discovers reward functions that outperform hand-designed baselines—without any domain-specific engineering of the rewards themselves.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Results</h3>
+      <ul>
+        <li><b>ALFWorld:</b> Improved robotic task completion through learned reward shaping</li>
+        <li><b>ScienceWorld:</b> Better scientific reasoning via evolved reward signals</li>
+        <li><b>GSM8K & MATH:</b> Enhanced mathematical reasoning through meta-learned rewards</li>
+        <li><b>Generalization:</b> Learned reward principles transfer across related tasks</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>Toward Autonomous Reward Design</h2>
+      <p>DERL represents a step toward truly autonomous reinforcement learning—systems that can design their own training signals without human intervention. By making the reward design process differentiable, we open the door to more efficient and effective automatic curriculum design, where agents learn not just to solve tasks but to teach themselves how to learn.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@misc{cheng2025differentiableevolutionaryreinforcementlearning,
+    title={Differentiable Evolutionary Reinforcement Learning},
+    author={Sitao Cheng and Tianle Li and Xuhan Huang and Xunjian Yin and Difan Zou},
+    year={2025},
+    eprint={2512.13399},
+    archivePrefix={arXiv},
+    primaryClass={cs.AI},
+    url={https://arxiv.org/abs/2512.13399}
+}</div>
+  </main>
+</body>
+</html>

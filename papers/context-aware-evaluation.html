@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Context-Aware MT Evaluation</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">Exploring Context-Aware Evaluation Metrics for Machine Translation</h1>
+    <p class="paper-authors">Xinyu Hu, <b>Xunjian Yin</b>, Xiaojun Wan</p>
+    <p class="paper-venue">EMNLP 2024 Findings</p>
+
+    <div class="paper-links">
+      <a href="https://aclanthology.org/2024.findings-emnlp.696/">Paper</a>
+    </div>
+
+    <div class="story-section">
+      <h2>The Sentence in Isolation</h2>
+      <p>Machine translation evaluation has traditionally focused on individual sentences. Take a sentence, translate it, compare to a reference, compute a score. This works for simple cases, but real translation happens in context—documents where sentences connect, where pronouns refer back, where terminology must stay consistent.</p>
+      <p>A translation that's perfect in isolation might be terrible in context. "She went to the bank" could be correct or wrong depending on whether the previous sentence talked about rivers or money. Sentence-level metrics can't capture this.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Discourse Matters</h2>
+      <p>We investigated how to incorporate document context into MT evaluation. The challenge is knowing what context helps and how to use it. Do we simply concatenate surrounding sentences? Weight them by proximity? Build more sophisticated representations of document structure?</p>
+      <p>Different strategies suit different purposes. Catching coreference errors requires attention to pronouns and their antecedents. Measuring lexical consistency needs document-wide vocabulary tracking. Evaluating coherence requires understanding discourse relations.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Context Integration Strategies</h3>
+      <p>We systematically compared different ways of incorporating context: fixed windows of surrounding sentences, weighted attention to relevant context, and learned representations that capture discourse structure. Each approach has trade-offs between effectiveness and computational cost.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>What Context Reveals</h2>
+      <p>Our experiments showed that context-aware metrics catch errors that sentence-level metrics miss. Pronoun translation errors, inconsistent terminology, and coherence breaks all become visible when evaluation considers the broader document. Human ratings on document-level quality correlate better with context-aware automatic metrics.</p>
+      <p>But context isn't free—it adds computational overhead and can sometimes introduce noise if the context itself is poorly translated. The key is knowing when context helps and how much to use.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Findings</h3>
+      <ul>
+        <li><b>Discourse Sensitivity:</b> Context-aware metrics better capture coreference and coherence</li>
+        <li><b>Human Correlation:</b> Improved alignment with human document-level judgments</li>
+        <li><b>Strategy Trade-offs:</b> Different context incorporation approaches suit different needs</li>
+        <li><b>Practical Guidelines:</b> Recommendations for developing context-aware MT evaluation</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>Toward Document-Level Quality</h2>
+      <p>As machine translation matures, document-level quality becomes increasingly important. This work provides a foundation for evaluation metrics that see beyond the sentence—measuring not just whether individual sentences are translated correctly, but whether they work together as coherent documents.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@inproceedings{hu-etal-2024-exploring,
+    title = "Exploring Context-Aware Evaluation Metrics for Machine Translation",
+    author = "Hu, Xinyu and Yin, Xunjian and Wan, Xiaojun",
+    booktitle = "Findings of the Association for Computational Linguistics: EMNLP 2024",
+    year = "2024",
+    url = "https://aclanthology.org/2024.findings-emnlp.696/",
+    pages = "11890--11906"
+}</div>
+  </main>
+</body>
+</html>

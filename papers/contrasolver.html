@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContraSolver: Self-Alignment of Language Models</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .paper-figure { margin: 40px 0; text-align: center; }
+    .paper-figure.hero img { max-width: 100%; width: 700px; }
+    .paper-figure.medium img { max-width: 580px; width: 100%; }
+    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions</h1>
+    <p class="paper-authors">Xu Zhang*, <b>Xunjian Yin</b>*, Xiaojun Wan</p>
+    <p class="paper-venue">ArXiv Preprint 2024</p>
+
+    <div class="paper-links">
+      <a href="https://arxiv.org/abs/2406.08842">Paper</a>
+      <a href="https://github.com/Arvid-pku/ContraSolver">Code</a>
+    </div>
+
+    <figure class="paper-figure hero">
+      <img src="https://arxiv.org/html/2406.08842v1/x1.png" alt="ContraSolver Framework">
+      <figcaption>ContraSolver traverses a preference graph to identify and resolve contradictions—edges that violate logical consistency in the model's preferences.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>The Hidden Inconsistency</h2>
+      <p>When we ask a language model to compare two responses, it expresses a preference. Ask it enough times with different pairs, and you'd expect a consistent ordering to emerge—if A is better than B, and B is better than C, then A should be better than C. But what if the model says C is better than A?</p>
+      <p>This isn't a hypothetical. We discovered that language models harbor deep preference contradictions—logical inconsistencies in how they rank different responses. These contradictions aren't just theoretical curiosities; they fundamentally limit how well a model can be aligned with human values.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>A Graph-Theoretic Approach</h2>
+      <p>We realized that preferences form a graph structure. Each response is a node; each comparison creates an edge. In a perfectly consistent model, this graph would have no cycles—you could sort all responses from best to worst. But real models create cycles, and these cycles represent contradictions.</p>
+      <p>ContraSolver approaches alignment as a graph problem: find the contradictory edges and resolve them. But which edges are contradictory? A cycle might contain many edges, and only removing the right ones will lead to improvement.</p>
+    </div>
+
+    <figure class="paper-figure medium">
+      <img src="https://arxiv.org/html/2406.08842v1/x2.png" alt="Data Construction">
+      <figcaption>The data construction process: we build a preference graph through self-annotation, then identify edges that create contradictory cycles.</figcaption>
+    </figure>
+
+    <div class="highlight-box">
+      <h3>The Key Insight</h3>
+      <p>We initialize the graph with a maximum spanning tree—preserving high-confidence preferences—then identify edges that create contradictions. By prioritizing the resolution of low-confidence preferences while preserving high-confidence ones, we can systematically improve alignment without external supervision.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Completely Unsupervised</h2>
+      <p>What makes ContraSolver remarkable is that it requires no human labels. The model identifies its own contradictions and resolves them through self-annotation. This is true self-alignment: the model becomes more consistent with its own best judgments, without any external guidance.</p>
+      <p>We tested ContraSolver across four different generation tasks and found consistent improvements. More importantly, we could directly measure the reduction in contradictions—the preference graphs became cleaner, more acyclic, more logically coherent.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Results</h3>
+      <ul>
+        <li><b>Consistent Improvement:</b> Performance gains across four diverse generation tasks</li>
+        <li><b>Measurable Consistency:</b> Quantifiable reduction in preference graph contradictions</li>
+        <li><b>Zero Human Supervision:</b> Completely unsupervised self-alignment</li>
+        <li><b>Model Agnostic:</b> Works across different LLM architectures</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>What This Means</h2>
+      <p>ContraSolver reveals that alignment isn't just about matching human preferences—it's about internal consistency. A model that contradicts itself cannot be reliably aligned, no matter how much human feedback you provide. By resolving these internal contradictions first, we create a more solid foundation for alignment.</p>
+      <p>This work suggests a new paradigm: before aligning models to external standards, help them align with themselves.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@misc{zhang2024contrasolverselfalignmentlanguagemodels,
+    title={ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions},
+    author={Xu Zhang and Xunjian Yin and Xiaojun Wan},
+    year={2024},
+    eprint={2406.08842},
+    archivePrefix={arXiv},
+    primaryClass={cs.CL},
+    url={https://arxiv.org/abs/2406.08842}
+}</div>
+  </main>
+</body>
+</html>

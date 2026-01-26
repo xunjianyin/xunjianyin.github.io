@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Knowledge Boundary for LLMs</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .paper-figure { margin: 40px 0; text-align: center; }
+    .paper-figure.hero img { max-width: 100%; width: 700px; }
+    .paper-figure.medium img { max-width: 550px; width: 100%; }
+    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .concept-box { background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #4a5a8d; }
+    .concept-box h3 { margin-top: 0; color: #4a5a8d; font-size: 18px; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation</h1>
+    <p class="paper-authors"><b>Xunjian Yin*</b>, Xu Zhang*, Jie Ruan, Xiaojun Wan</p>
+    <p class="paper-venue">ACL 2024</p>
+
+    <div class="paper-links">
+      <a href="https://aclanthology.org/2024.acl-long.124/">Paper</a>
+      <a href="https://github.com/pkulcwmzx/knowledge-boundary">Code</a>
+    </div>
+
+    <div class="story-section">
+      <h2>The Prompt Sensitivity Problem</h2>
+      <p>Ask a language model a question, and it might get it right. Rephrase the same question, and suddenly it fails. This prompt sensitivity is one of the most frustrating aspects of working with LLMs—a model's apparent knowledge depends not just on what you ask, but on how you phrase it.</p>
+      <p>This creates a fundamental problem for evaluation. When we test a model's knowledge with a fixed set of questions, are we measuring what the model knows, or just how well the prompts happen to match what it learned? The distinction matters enormously.</p>
+    </div>
+
+    <div class="concept-box">
+      <h3>Introducing Knowledge Boundary</h3>
+      <p>We propose a new concept: the <em>knowledge boundary</em>. Rather than asking whether a model can answer a specific prompt, we ask: what is the full range of prompts for which this knowledge is accessible? The boundary encompasses both prompt-agnostic knowledge (accessible regardless of phrasing) and prompt-sensitive knowledge (accessible only with specific wordings).</p>
+    </div>
+
+    <div class="story-section">
+      <h2>A Robuster Evaluation</h2>
+      <p>Traditional benchmarks evaluate models on fixed question sets. If the model knows the answer but the exact phrasing happens to trigger a failure, the benchmark marks it wrong. If the model gets lucky with a phrasing, it marks it right. Neither result reflects true knowledge.</p>
+      <p>Knowledge boundary evaluation searches for the optimal prompt for each piece of knowledge. This gives a more reliable measure of what the model actually knows, independent of superficial prompt variations.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Finding the Boundary</h2>
+      <p>How do you find the optimal prompt for a given piece of knowledge? We developed a projected gradient descent algorithm with semantic constraints. The algorithm searches the space of possible prompts, looking for phrasings that maximize the model's ability to retrieve the correct answer while staying semantically equivalent to the original question.</p>
+      <p>This is harder than it sounds—the search space is enormous, and we need to ensure the discovered prompts are actually asking the same question, not gaming the model with unrelated triggers.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Contributions</h3>
+      <ul>
+        <li><b>New Framework:</b> Knowledge boundary as a prompt-robust evaluation concept</li>
+        <li><b>Algorithm:</b> Projected gradient descent with semantic constraints to find optimal prompts</li>
+        <li><b>Better Evaluation:</b> More reliable assessment of model knowledge across domains</li>
+        <li><b>Insights:</b> Revealing the gap between apparent and actual model knowledge</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>What We Learned</h2>
+      <p>Our experiments revealed that knowledge boundaries vary dramatically across models and domains. Some knowledge is robustly accessible; other knowledge hangs by a thread, retrievable only with very specific prompts. Understanding these boundaries helps us build more reliable systems and design better evaluation protocols.</p>
+      <p>Knowledge boundary offers a new lens on model capabilities—one that sees past the noise of prompt sensitivity to measure genuine understanding.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@inproceedings{yin-etal-2024-benchmarking,
+    title = "Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation",
+    author = "Yin, Xunjian and Zhang, Xu and Ruan, Jie and Wan, Xiaojun",
+    booktitle = "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics",
+    year = "2024",
+    url = "https://aclanthology.org/2024.acl-long.124/",
+    pages = "2270--2286"
+}</div>
+  </main>
+</body>
+</html>

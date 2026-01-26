@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DAMON: Dialogue-Aware MCTS for LLM Safety</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .paper-figure { margin: 40px 0; text-align: center; }
+    .paper-figure.hero img { max-width: 100%; width: 700px; }
+    .paper-figure.medium img { max-width: 550px; width: 100%; }
+    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">DAMON: A Dialogue-Aware MCTS Framework for Jailbreaking Large Language Models</h1>
+    <p class="paper-authors">Xu Zhang, <b>Xunjian Yin</b>, Dinghao Jing, Huixuan Zhang, Xinyu Hu, Xiaojun Wan</p>
+    <p class="paper-venue">EMNLP 2025</p>
+
+    <div class="paper-links">
+      <a href="https://aclanthology.org/2025.emnlp-main.323/">Paper</a>
+      <a href="https://github.com/pkulcwmzx/DAMON">Code</a>
+    </div>
+
+    <div class="story-section">
+      <h2>The Art of Red Teaming</h2>
+      <p>Language models are trained to refuse harmful requests. But how robust are these refusals? Red teaming—the practice of probing systems for vulnerabilities—is essential for understanding and improving model safety. The challenge is that effective attacks require more than simple one-shot prompts; they often unfold over multiple conversation turns.</p>
+      <p>Previous research has shown that models become more vulnerable in multi-turn dialogues. But existing multi-turn attack methods use predefined patterns, limiting their effectiveness in realistic scenarios where conversations evolve dynamically.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Conversation as a Search Space</h2>
+      <p>We reconceptualized multi-turn jailbreaking as a search problem. Each possible dialogue path is a branch in an enormous tree of conversations. Some paths lead to successful attacks; most don't. The question becomes: how do we efficiently explore this space to find the paths that expose vulnerabilities?</p>
+      <p>Our answer is DAMON: a framework that applies Monte Carlo Tree Search (MCTS) to navigate conversational spaces. Just as MCTS revolutionized game-playing AI by efficiently searching game trees, DAMON efficiently searches conversation trees to identify attack sequences.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>The MCTS Approach</h3>
+      <p>DAMON treats each conversation turn as a move in a game. The search tree expands by generating possible follow-up messages, simulates conversations to estimate their potential, and gradually focuses on the most promising dialogue paths. This systematic exploration finds attack sequences that would be nearly impossible to discover through random sampling.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Adaptive Dialogue Strategies</h2>
+      <p>What makes DAMON different from previous methods is its adaptivity. The framework doesn't follow a script—it responds dynamically to the model's responses, adjusting its strategy based on how the conversation unfolds. If one approach seems to be working, it explores variations. If another hits a wall, it backtracks and tries something different.</p>
+      <p>This adaptivity mirrors how real-world social engineering attacks work: they probe, adjust, and find the path of least resistance.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Results Across Models</h3>
+      <ul>
+        <li><b>Five LLMs Tested:</b> Comprehensive evaluation across diverse model architectures</li>
+        <li><b>Three Datasets:</b> Varied attack scenarios and safety domains</li>
+        <li><b>Effective Discovery:</b> Successfully identifies sub-instruction sequences that induce harmful responses</li>
+        <li><b>Safety Implications:</b> Reveals vulnerabilities that inform better defense strategies</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>For Better Defenses</h2>
+      <p>The goal of this work isn't to enable attacks—it's to improve defenses. By understanding how multi-turn conversations can be exploited, we can build models that are more robust to these patterns. DAMON provides a systematic tool for safety researchers to probe model vulnerabilities before bad actors do.</p>
+      <p>As language models become more integrated into high-stakes applications, this kind of rigorous safety testing becomes increasingly critical.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@inproceedings{zhang-etal-2025-damon,
+    title = "{DAMON}: A Dialogue-Aware {MCTS} Framework for Jailbreaking Large Language Models",
+    author = "Zhang, Xu and Yin, Xunjian and Jing, Dinghao and Zhang, Huixuan and Hu, Xinyu and Wan, Xiaojun",
+    booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
+    year = "2025",
+    url = "https://aclanthology.org/2025.emnlp-main.323/",
+    pages = "6361--6377"
+}</div>
+  </main>
+</body>
+</html>

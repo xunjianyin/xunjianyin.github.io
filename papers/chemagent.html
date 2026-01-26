@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChemAgent: Self-updating Library for Chemistry</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .paper-figure { margin: 40px 0; text-align: center; }
+    .paper-figure.hero img { max-width: 100%; width: 700px; }
+    .paper-figure.medium img { max-width: 550px; width: 100%; }
+    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning</h1>
+    <p class="paper-authors">Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, <b>Xunjian Yin</b>, Siru Ouyang, Wangchunshu Zhou, Pan Lu, Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein</p>
+    <p class="paper-venue">ICLR 2025</p>
+
+    <div class="paper-links">
+      <a href="https://openreview.net/forum?id=VQAW04w08X">Paper</a>
+      <a href="https://github.com/gersteinlab/chemagent">Code</a>
+    </div>
+
+    <div class="story-section">
+      <h2>The Chemistry Challenge</h2>
+      <p>Chemistry presents a unique challenge for language models. It requires not just general reasoning ability, but deep domain knowledge—reaction mechanisms, molecular properties, thermodynamic principles. Most LLMs weren't trained with enough chemistry-specific data to handle these tasks reliably.</p>
+      <p>The traditional solutions—fine-tuning on chemistry datasets or using static knowledge bases—have limitations. Fine-tuning is expensive and doesn't scale across domains. Static knowledge bases can't adapt to new problems or learn from experience.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>A Library That Grows</h2>
+      <p>ChemAgent takes a different approach: equip the model with a self-updating library. As the agent solves chemistry problems, it doesn't just produce answers—it accumulates knowledge. Successful reasoning patterns, useful chemical facts, and problem-solving strategies are stored in a structured library for future use.</p>
+      <p>When the agent encounters a new problem, it retrieves relevant knowledge from this library to enhance its reasoning. The library grows and improves with each interaction, becoming more valuable over time.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>The Key Innovation</h3>
+      <p>Unlike static retrieval augmentation, ChemAgent's library is dynamic. It learns from experience without requiring parameter updates. The agent effectively builds its own chemistry textbook through problem-solving, capturing not just facts but the reasoning patterns that make those facts useful.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>No Fine-Tuning Required</h2>
+      <p>Perhaps most remarkably, ChemAgent works with off-the-shelf language models. There's no domain-specific training, no expensive fine-tuning on chemistry datasets. The model bootstraps its chemistry expertise through the self-updating library mechanism, starting from general-purpose capabilities and specializing through experience.</p>
+      <p>This makes the approach highly practical—it can be applied to any LLM and extended to other domains beyond chemistry.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Results</h3>
+      <ul>
+        <li><b>SciBench Performance:</b> Significant improvements over baseline LLMs and existing augmentation methods</li>
+        <li><b>Knowledge Accumulation:</b> Library quality improves with more problem-solving interactions</li>
+        <li><b>Transferability:</b> Knowledge learned from one set of problems transfers to related problems</li>
+        <li><b>Interpretability:</b> The library provides insights into the agent's reasoning process</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>Learning to Learn Chemistry</h2>
+      <p>ChemAgent represents a new paradigm for domain adaptation in LLMs. Instead of trying to encode all possible domain knowledge during training, we let models accumulate expertise through experience. This mirrors how human experts develop—through practice, reflection, and building personal knowledge repositories.</p>
+      <p>The implications extend beyond chemistry to any domain requiring specialized knowledge: medicine, law, engineering, and beyond.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@inproceedings{tang2025chemagent,
+  title={ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning},
+  author={Tang, Xiangru and Hu, Tianyu and Ye, Muyang and Shao, Yanjun and Yin, Xunjian and Ouyang, Siru and Zhou, Wangchunshu and Lu, Pan and Zhang, Zhuosheng and Zhao, Yilun and Cohan, Arman and Gerstein, Mark},
+  booktitle={International Conference on Learning Representations},
+  year={2025},
+  url={https://openreview.net/forum?id=VQAW04w08X}
+}</div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From Atomic to Composite: RL Enables Generalization</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .paper-figure { margin: 40px 0; text-align: center; }
+    .paper-figure.hero img { max-width: 100%; width: 700px; }
+    .paper-figure.medium img { max-width: 580px; width: 100%; }
+    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .paradox-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
+    .paradox-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning</h1>
+    <p class="paper-authors">Sitao Cheng, <b>Xunjian Yin</b>, Ruiwen Zhou, Yuxuan Li, Xinyi Wang, Liangming Pan, William Yang Wang, Victor Zhong</p>
+    <p class="paper-venue">ArXiv Preprint 2025</p>
+
+    <div class="paper-links">
+      <a href="https://arxiv.org/abs/2512.01970">Paper</a>
+      <a href="https://github.com/sitaocheng/from_atomic_to_composite">Code</a>
+    </div>
+
+    <figure class="paper-figure hero">
+      <img src="https://arxiv.org/html/2512.01970v1/x1.png" alt="SFT Generalization Paradox">
+      <figcaption>The SFT Generalization Paradox: models trained with supervised learning achieve near-perfect in-distribution accuracy but collapse completely on out-of-distribution tests—a striking failure mode we investigate in depth.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>The Question That Drives Us</h2>
+      <p>There's a heated debate in AI: does reinforcement learning actually teach models new reasoning skills, or does it merely amplify behaviors they already possess? This question has profound implications for how we should train the next generation of AI systems.</p>
+      <p>We designed a rigorous experiment to answer this question, and what we found surprised us.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>The Setup: Complementary Reasoning</h2>
+      <p>We focused on "complementary reasoning"—tasks that require integrating what a model knows internally (parametric knowledge) with information provided in context (contextual knowledge). Think of it like a detective who must combine their expertise with clues at a crime scene.</p>
+      <p>Using a carefully constructed dataset of human biographies, we decomposed this complex skill into two atomic components: <em>parametric reasoning</em> (using internal knowledge) and <em>contextual reasoning</em> (using external information). This separation allowed us to precisely measure what models learn and when they fail.</p>
+    </div>
+
+    <div class="paradox-box">
+      <h3>The SFT Generalization Paradox</h3>
+      <p>Here's the striking finding: models trained with supervised fine-tuning (SFT) on composite reasoning tasks achieve near-perfect accuracy on in-distribution tests. But when we evaluate them on novel combinations—situations they haven't seen but could logically solve—their performance collapses.</p>
+      <p>They weren't learning to reason; they were memorizing shortcuts. Perfect training scores masked a fundamental failure to generalize.</p>
+    </div>
+
+    <figure class="paper-figure medium">
+      <img src="https://arxiv.org/html/2512.01970v1/images/figure1_relative_abs.png" alt="RL vs SFT Comparison">
+      <figcaption>Reinforcement learning shows a dramatically different pattern: while SFT models fail to generalize, RL-trained models maintain strong performance even on novel combinations they've never seen during training.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>Enter Reinforcement Learning</h2>
+      <p>When we switched from supervised learning to reinforcement learning, something remarkable happened. RL-trained models showed genuine generalization—they could solve novel combinations of atomic skills even without explicit training on those combinations.</p>
+      <p>But here's the crucial caveat: RL only worked when the base model had first mastered the individual atomic skills through SFT. Without this foundation, RL couldn't synthesize what wasn't there to begin with.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>The Recipe for Generalization</h3>
+      <ul>
+        <li><b>Step 1:</b> Train atomic skills separately using SFT (parametric reasoning, contextual reasoning)</li>
+        <li><b>Step 2:</b> Apply RL to enable synthesis of complex reasoning from atomic components</li>
+        <li><b>Key insight:</b> RL acts as a "reasoning synthesizer," not just a probability amplifier</li>
+        <li><b>Requirement:</b> Atomic skills must be mastered first—RL can't synthesize from nothing</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>What This Means</h2>
+      <p>Our findings challenge the view that RL merely amplifies existing behaviors. When given the right foundation, RL can actively synthesize complex reasoning strategies from simpler learned primitives—without ever being explicitly shown those complex strategies.</p>
+      <p>This suggests a scalable path forward: instead of trying to supervise models on every complex task, we can train atomic skills and use RL to enable their combination. It's a more modular, more generalizable approach to building reasoning systems.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Looking Ahead</h2>
+      <p>The SFT Generalization Paradox serves as a cautionary tale. High training accuracy can be deceiving—true understanding requires out-of-distribution generalization. By decomposing complex skills into atomic components and using RL to enable their synthesis, we may be able to build AI systems that truly reason rather than merely recall.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@misc{cheng2025atomiccompositereinforcementlearning,
+    title={From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning},
+    author={Sitao Cheng and Xunjian Yin and Ruiwen Zhou and Yuxuan Li and Xinyi Wang and Liangming Pan and William Yang Wang and Victor Zhong},
+    year={2025},
+    eprint={2512.01970},
+    archivePrefix={arXiv},
+    primaryClass={cs.AI},
+    url={https://arxiv.org/abs/2512.01970}
+}</div>
+  </main>
+</body>
+</html>

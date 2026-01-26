@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LEDOM: Reverse Language Model</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .paper-figure { margin: 40px 0; text-align: center; }
+    .paper-figure.hero img { max-width: 100%; width: 700px; }
+    .paper-figure.medium img { max-width: 550px; width: 100%; }
+    .paper-figure.small img { max-width: 450px; width: 100%; }
+    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+    .name-box { background: #fff8e6; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #f0e0b0; }
+    .name-box code { background: #f0e0b0; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">LEDOM: An Open and Fundamental Reverse Language Model</h1>
+    <p class="paper-authors"><b>Xunjian Yin</b>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan</p>
+    <p class="paper-venue">ArXiv Preprint 2025</p>
+
+    <div class="paper-links">
+      <a href="https://arxiv.org/abs/2507.01335">Paper</a>
+      <a href="https://huggingface.co/Corning/Reverse-Model-7B-348B">Model (7B)</a>
+      <a href="https://huggingface.co/Corning/Reverse-Model-2B-348B">Model (2B)</a>
+    </div>
+
+    <div class="name-box">
+      <strong>Why "LEDOM"?</strong> Spell <code>MODEL</code> backwards. It captures the essence of what we've built—a language model that thinks in reverse.
+    </div>
+
+    <figure class="paper-figure medium">
+      <img src="https://arxiv.org/html/2507.01335v2/x1.png" alt="Reverse Language Model Pretraining">
+      <figcaption>While conventional language models predict "what comes next," LEDOM predicts "what came before"—a fundamentally different way of modeling language that unlocks unique capabilities.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>Thinking Backwards</h2>
+      <p>Every language model you've ever used—GPT, Claude, Llama—works the same way: given some text, predict the next token. It's so fundamental that we rarely question it. But what if we flipped this entirely? What if a model was trained to predict the <em>previous</em> token instead?</p>
+      <p>This isn't just a curiosity. LEDOM represents the first serious attempt to build a reverse language model at scale—trained on 435 billion tokens with both 2B and 7B parameter variants. We're releasing everything: the models, training code, and pre-training data.</p>
+    </div>
+
+    <figure class="paper-figure medium">
+      <img src="https://arxiv.org/html/2507.01335v2/x2.png" alt="Reverse Reward Mechanism">
+      <figcaption>The Reverse Reward application: LEDOM evaluates candidate solutions by computing how likely they are to have led to the given conclusion—a natural form of backward verification.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>A Different Kind of Intelligence</h2>
+      <p>When you read a sentence forward, you're predicting where it might go. When you read it backward, you're reasoning about how it got there. These are complementary forms of intelligence, and until now, we've only trained models for one of them.</p>
+      <p>LEDOM exhibits fascinating behaviors that emerge from backward processing. It naturally excels at verification—checking whether a conclusion follows from given premises. It develops unique attention patterns suited for tracking backward dependencies. It "thinks" in a way that's fundamentally different from forward models.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Reverse Reward: A Killer Application</h3>
+      <p>We discovered a powerful application: using LEDOM to improve forward model outputs. Given multiple candidate answers from a forward model, LEDOM evaluates each by asking "how likely is this reasoning chain to have produced this answer?" This backward likelihood serves as a powerful reranking signal, achieving substantial improvements on mathematical reasoning benchmarks.</p>
+    </div>
+
+    <figure class="paper-figure medium">
+      <img src="https://arxiv.org/html/2507.01335v2/x3.png" alt="Performance Results">
+      <figcaption>Reverse Reward consistently improves performance across different sampling sizes, demonstrating the complementary value of backward reasoning.</figcaption>
+    </figure>
+
+    <div class="story-section">
+      <h2>What We Found</h2>
+      <p>Training LEDOM revealed several surprising insights. First, reverse language modeling converges just as stably as forward modeling—the training curves look remarkably similar. Second, the model develops genuinely different internal representations, not just mirror images of forward models. Third, combining forward generation with backward evaluation creates a more robust reasoning system than either alone.</p>
+    </div>
+
+    <figure class="paper-figure small">
+      <img src="https://arxiv.org/html/2507.01335v2/x4.png" alt="Training Loss Curves">
+      <figcaption>Training dynamics of LEDOM compared to a forward language model—both converge smoothly, suggesting reverse modeling is equally learnable.</figcaption>
+    </figure>
+
+    <div class="highlight-box">
+      <h3>Key Results</h3>
+      <ul>
+        <li><b>GSM8K:</b> Significant accuracy improvements through Reverse Reward reranking</li>
+        <li><b>MATH:</b> Consistent gains across difficulty levels</li>
+        <li><b>Scaling:</b> Larger LEDOM models provide better reverse reward signals</li>
+        <li><b>Efficiency:</b> No additional training required—purely inference-time improvement</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>Open Science</h2>
+      <p>We believe in open research. That's why we're releasing not just the trained models, but the complete training code and pre-training data. We want others to explore reverse language modeling, to find applications we haven't imagined, and to push this direction further.</p>
+      <p>LEDOM is an invitation to think differently about language models. Forward isn't the only direction.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@misc{yin2025ledomopenfundamentalreverse,
+    title={LEDOM: An Open and Fundamental Reverse Language Model},
+    author={Xunjian Yin and Sitao Cheng and Yuxi Xie and Xinyu Hu and Li Lin and Xinyi Wang and Liangming Pan and William Yang Wang and Xiaojun Wan},
+    year={2025},
+    eprint={2507.01335},
+    archivePrefix={arXiv},
+    primaryClass={cs.CL},
+    url={https://arxiv.org/abs/2507.01335}
+}</div>
+  </main>
+</body>
+</html>

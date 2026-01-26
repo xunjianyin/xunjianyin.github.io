@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM-based NLG Evaluation Survey</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .paper-figure { margin: 40px 0; text-align: center; }
+    .paper-figure.hero img { max-width: 100%; width: 700px; }
+    .paper-figure.medium img { max-width: 550px; width: 100%; }
+    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
+    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">LLM-based NLG Evaluation: Current Status and Challenges</h1>
+    <p class="paper-authors">Mingqi Gao, Xinyu Hu, Jie Ruan, <b>Xunjian Yin</b>, Xiaojun Wan</p>
+    <p class="paper-venue">Computational Linguistics (CL) 2024</p>
+
+    <div class="paper-links">
+      <a href="https://direct.mit.edu/coli/article/doi/10.1162/coli_a_00540/124539/LLM-based-NLG-Evaluation-Current-Status-and">Paper</a>
+    </div>
+
+    <div class="story-section">
+      <h2>The Evaluation Problem</h2>
+      <p>How do you know if machine-generated text is good? This seemingly simple question has puzzled NLP researchers for decades. Traditional metrics like BLEU and ROUGE count matching n-grams—but a perfectly valid paraphrase might score terribly, while grammatical nonsense could score well.</p>
+      <p>With the rise of large language models, a new paradigm has emerged: using LLMs themselves as evaluators. Models like GPT-4 can read text and provide quality judgments that often correlate better with human assessments than any traditional metric. But this promising approach comes with its own challenges.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>A Comprehensive Survey</h2>
+      <p>This survey provides the first comprehensive review of LLM-based NLG evaluation. We analyzed methods across diverse tasks—summarization, dialogue, machine translation, creative writing—to understand what works, what doesn't, and why.</p>
+      <p>The landscape is rich and rapidly evolving. Reference-based methods compare outputs to gold standards. Reference-free methods evaluate quality directly. Comparative methods rank outputs against each other. Each approach has strengths and weaknesses that depend on the task and evaluation criteria.</p>
+    </div>
+
+    <div class="warning-box">
+      <h3>The Hidden Biases</h3>
+      <p>Our analysis revealed troubling biases in LLM evaluators. <b>Position bias</b>: models prefer options based on presentation order. <b>Verbosity bias</b>: longer outputs get higher scores regardless of quality. <b>Self-enhancement bias</b>: models favor their own outputs. These biases can silently corrupt evaluation results if not carefully addressed.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Challenges Identified</h3>
+      <ul>
+        <li><b>Position Bias:</b> LLMs show preference based on the order of presented options</li>
+        <li><b>Verbosity Bias:</b> Longer outputs often receive higher scores regardless of quality</li>
+        <li><b>Self-Enhancement Bias:</b> Models tend to favor their own outputs</li>
+        <li><b>Inconsistency:</b> Evaluations can vary across multiple runs</li>
+        <li><b>Hallucination:</b> LLM evaluators may generate plausible but incorrect assessments</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>The Path Forward</h2>
+      <p>Despite these challenges, LLM-based evaluation represents a significant advance over traditional metrics. The key is understanding the failure modes and designing systems that mitigate them. Calibration techniques, ensemble methods, and fine-tuned evaluators all show promise.</p>
+      <p>This survey serves as both a comprehensive reference for current methods and a roadmap for future research. As LLMs continue to improve, so too will their potential as evaluators—but only if we remain vigilant about their limitations.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Survey Scope</h3>
+      <ul>
+        <li><b>Evaluation Paradigms:</b> Reference-based, reference-free, and comparative evaluation approaches</li>
+        <li><b>Task Coverage:</b> Summarization, dialogue, translation, question answering, creative writing</li>
+        <li><b>LLM Types:</b> GPT-4, Claude, Llama, and specialized evaluation models</li>
+        <li><b>Evaluation Dimensions:</b> Fluency, coherence, relevance, factuality, and task-specific criteria</li>
+      </ul>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@article{gao2024llm,
+  title={LLM-based NLG Evaluation: Current Status and Challenges},
+  author={Gao, Mingqi and Hu, Xinyu and Ruan, Jie and Yin, Xunjian and Wan, Xiaojun},
+  journal={Computational Linguistics},
+  pages={1--44},
+  year={2024},
+  publisher={MIT Press},
+  doi={10.1162/coli_a_00540}
+}</div>
+  </main>
+</body>
+</html>

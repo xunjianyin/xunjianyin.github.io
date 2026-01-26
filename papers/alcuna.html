@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ALCUNA: LLMs Meet New Knowledge</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+  <style>
+    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
+    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
+    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
+    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
+    .paper-links { margin-bottom: 35px; }
+    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
+    .story-section { margin-bottom: 35px; }
+    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
+    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
+    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
+    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
+    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
+    .highlight-box li { margin-bottom: 8px; color: #444; }
+    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
+    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
+    .back-link { margin-bottom: 30px; }
+    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
+    .back-link a:hover { text-decoration: underline; }
+    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
+    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+  <nav class="nav-buttons">
+    <a href="../index.html" class="nav-button">Home</a>
+    <a href="../publications.html" class="nav-button">Publications</a>
+    <a href="../projects.html" class="nav-button">Projects</a>
+    <a href="../blogs.html" class="nav-button">Blogs</a>
+  </nav>
+
+  <main class="paper-container">
+    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+
+    <h1 class="paper-title">ALCUNA: Large Language Models Meet New Knowledge</h1>
+    <p class="paper-authors"><b>Xunjian Yin*</b>, Baizhou Huang*, Xiaojun Wan</p>
+    <p class="paper-venue">EMNLP 2023</p>
+
+    <div class="paper-links">
+      <a href="https://aclanthology.org/2023.emnlp-main.87/">Paper</a>
+      <a href="https://github.com/arvid-pku/alcuna">Code</a>
+    </div>
+
+    <div class="story-section">
+      <h2>The Benchmark Contamination Problem</h2>
+      <p>How do we know if a language model truly understands, or if it's just memorized the answers? This question becomes urgent when we realize that many benchmarks test knowledge the model has seen during training. High scores might reflect recall rather than reasoning.</p>
+      <p>The world also keeps generating new knowledge—new people, new companies, new discoveries. Models trained on past data can't have this information, yet real-world applications constantly encounter it. How do models handle knowledge they've never seen?</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Creating Artificial Entities</h2>
+      <p>We developed KnowGen, an approach that generates genuinely new knowledge by creating artificial entities. These aren't real people or places—they're fabricated with coherent attributes and relationships, but they're guaranteed to be absent from any training data.</p>
+      <p>By testing models on these artificial entities, we can cleanly separate understanding from memorization. A model that performs well on ALCUNA must be reasoning from the provided context, not pulling answers from its training data.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>The ALCUNA Benchmark</h3>
+      <p>ALCUNA tests three core capabilities when models face new knowledge: <em>understanding</em> (can the model grasp the new information?), <em>differentiation</em> (can it distinguish new entities from similar known ones?), and <em>association</em> (can it reason about relationships between new and existing knowledge?).</p>
+    </div>
+
+    <div class="warning-box">
+      <h3>The Troubling Results</h3>
+      <p>Our experiments revealed that LLMs struggle significantly with new knowledge. They conflate artificial entities with similar real ones, fail to reason about relationships involving new entities, and show brittle performance when contexts require integrating new and internal knowledge. The capabilities that shine on standard benchmarks don't transfer well to genuinely novel scenarios.</p>
+    </div>
+
+    <div class="story-section">
+      <h2>Understanding the Failures</h2>
+      <p>We dug deeper into what causes these failures. Entity similarity matters—models confuse new entities with existing ones that share surface features. Context structure matters—certain ways of presenting new information help models more than others. But fundamentally, models seem biased toward their training knowledge, even when context clearly provides different information.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Key Findings</h3>
+      <ul>
+        <li><b>Understanding Gap:</b> Models struggle to properly absorb new knowledge from context</li>
+        <li><b>Entity Confusion:</b> Similar entities cause interference with reasoning</li>
+        <li><b>Association Failure:</b> Reasoning between new and internal knowledge is particularly weak</li>
+        <li><b>Practical Implications:</b> Caution needed when deploying LLMs in novel domains</li>
+      </ul>
+    </div>
+
+    <div class="story-section">
+      <h2>A Call for Caution</h2>
+      <p>ALCUNA serves as both a benchmark and a warning. As we deploy language models in ever-expanding domains, they will constantly encounter knowledge beyond their training. Our results suggest that the impressive performance on standard benchmarks may not transfer to these real-world scenarios.</p>
+      <p>We hope this work motivates research into models that can better handle the genuinely new—not just recall what they've already learned.</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
+    <div class="paper-citation">@inproceedings{yin-etal-2023-alcuna,
+    title = "{ALCUNA}: Large Language Models Meet New Knowledge",
+    author = "Yin, Xunjian and Huang, Baizhou and Wan, Xiaojun",
+    booktitle = "Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing",
+    year = "2023",
+    url = "https://aclanthology.org/2023.emnlp-main.87/",
+    pages = "1397--1414"
+}</div>
+  </main>
+</body>
+</html>
