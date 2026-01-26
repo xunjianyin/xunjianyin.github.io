@@ -11,8 +11,25 @@ function initializeDarkMode() {
 
   if (!themeToggle) return;
 
+  // Safe localStorage access (handles private browsing, disabled storage, etc.)
+  function getStoredTheme() {
+    try {
+      return localStorage.getItem('theme');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function setStoredTheme(theme) {
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (e) {
+      // Ignore storage errors
+    }
+  }
+
   // Check for saved theme preference or default to 'light'
-  const currentTheme = localStorage.getItem('theme') ||
+  const currentTheme = getStoredTheme() ||
     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
   // Apply the saved theme
@@ -24,13 +41,13 @@ function initializeDarkMode() {
     const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
 
     document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
+    setStoredTheme(newTheme);
     updateThemeIcon(newTheme, themeToggle);
   });
 
   // Listen for system theme changes
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem('theme')) {
+    if (!getStoredTheme()) {
       const newTheme = e.matches ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', newTheme);
       updateThemeIcon(newTheme, themeToggle);
