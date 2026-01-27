@@ -682,6 +682,16 @@ const projects = [
     demoPath: "photos/project-demo/Model_Len.png"
   },
   {
+    title: "History Visualization",
+    description: "A web application that visualizes world history through an interactive timeline and map. (<a href=\"https://arvid-pku.github.io/history_vis/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://arvid-pku.github.io/history_vis/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://arvid-pku.github.io/history_vis/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/History Visualization.png"
+  },
+  {
     title: "Tower of Babel",
     description: "Play with Text in the Physical World. (<a href=\"https://arvid-pku.github.io/Babel/\">Project Homepage</a>)",
     badges: [
