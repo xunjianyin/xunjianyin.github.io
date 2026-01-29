@@ -48,7 +48,7 @@ const publications = [
   {
     title: "The Geometry of Reasoning: Flowing Logics in Representation Space",
     authors: "Yufa Zhou*, Yixiao Wang*, <b>Xunjian Yin*</b>, Shuyan Zhou, Anru R. Zhang",
-    venue: "ArXiv:2510",
+    venue: "ICLR 2026",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2510.09782" },
       { text: "Code", url: "https://github.com/MasterZhou1/Reasoning-Flow" },
@@ -62,9 +62,10 @@ const publications = [
       eprint={2510.09782},
       archivePrefix={arXiv},
       primaryClass={cs.AI},
-      url={https://arxiv.org/abs/2510.09782}, 
+      url={https://arxiv.org/abs/2510.09782},
 }</code></pre>`,
-    isPreprint: true,
+    isNew: true,
+    isPreprint: false,
     isSelected: true
   },
   {
@@ -167,7 +168,7 @@ const publications = [
     ISBN = "979-8-89176-332-6",
     abstract = "While large language models (LLMs) demonstrate remarkable capabilities across a wide range of tasks, they remain vulnerable to generating outputs that are potentially harmful. Red teaming, which involves crafting adversarial inputs to expose vulnerabilities, is a widely adopted approach for evaluating the robustness of these models. Prior studies have indicated that LLMs are susceptible to vulnerabilities exposed through multi-turn interactions as opposed to single-turn scenarios. Nevertheless, existing methods for multi-turn attacks mainly utilize a predefined dialogue pattern, limiting their effectiveness in realistic situations. Effective attacks require adaptive dialogue strategies that respond dynamically to the initial user prompt and the evolving context of the conversation. To address these limitations, we propose DAMON, a novel multi-turn jailbreak attack method. DAMON leverages Monte Carlo Tree Search (MCTS) to systematically explore multi-turn conversational spaces, efficiently identifying sub-instruction sequences that induce harmful responses. We evaluate DAMON{'}s efficacy across five LLMs and three datasets. Our experimental results show that DAMON can effectively induce undesired behaviors."
 }</code></pre>`,
-    isNew: true,
+    isNew: false,
     isPreprint: false,
     isSelected: true
   },
@@ -914,7 +915,7 @@ const researchExperience = [
   {
     period: "Feb. 2022 ~ Aug. 2022",
     institution: "Microsoft Research Asia (NLC Group)",
-    mentor: "Dr. Kai Chen and Dr. Shuming Ma",
+    mentor: "Dr. Shuming Ma and Dr. Kai Chen",
     description: "Pre-training with Curriculum Learning and OCR"
   },
   {
