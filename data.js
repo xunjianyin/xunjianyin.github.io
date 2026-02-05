@@ -674,8 +674,12 @@ const projects = [
     title: "Vision2Text",
     description: "Convert images and videos to ASCII art in real-time. (<a href=\"https://arvid-pku.github.io/image2text/\">Project Homepage</a>)",
     badges: [
-      { url: "https://arvid-pku.github.io/image2text/", img: "https://img.shields.io/badge/Version-1.0-blue" },
-      { url: "https://arvid-pku.github.io/image2text/", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/Arvid-pku/image2text/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://github.com/Arvid-pku/image2text/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/Arvid-pku/image2text/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/image2text" },
+      { url: "https://github.com/Arvid-pku/image2text/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/image2text" },
+      { url: "https://github.com/Arvid-pku/image2text/issues", img: "https://img.shields.io/github/issues/Arvid-pku/image2text" },
+      { url: "https://github.com/Arvid-pku/image2text/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
     ],
     isSelected: true,
     demoPath: "photos/project-demo/Vison2Text.jpg"
