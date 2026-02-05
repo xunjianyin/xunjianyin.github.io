@@ -671,6 +671,16 @@ const projects = [
     demoPath: "photos/project-demo/Gödel Agent.png"
   },
   {
+    title: "Vision2Text",
+    description: "Convert images and videos to ASCII art in real-time. (<a href=\"https://arvid-pku.github.io/image2text/\">Project Homepage</a>)",
+    badges: [
+      { url: "https://arvid-pku.github.io/image2text/", img: "https://img.shields.io/badge/Version-1.0-blue" },
+      { url: "https://arvid-pku.github.io/image2text/", img: "https://img.shields.io/badge/License-MIT-blue" },
+    ],
+    isSelected: true,
+    demoPath: "photos/project-demo/Vison2Text.jpg"
+  },
+  {
     title: "LLM Interpretability Workbench",
     description: "A workbench for interpreting the internals of large language models. (<a href=\"https://github.com/Arvid-pku/Modelen\">Project Homepage</a>)",
     badges: [
@@ -679,7 +689,7 @@ const projects = [
       { url: "https://github.com/Arvid-pku/Modelen/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Modelen" },
       { url: "https://github.com/Arvid-pku/Modelen/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
     ],
-    isSelected: true,
+    isSelected: false,
     demoPath: "photos/project-demo/Model_Len.png"
   },
   {
@@ -721,7 +731,7 @@ const projects = [
       { url: "https://github.com/Arvid-pku/Proactive-AI/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Proactive-AI" },
       { url: "https://github.com/Arvid-pku/Proactive-AI/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
     ],
-    isSelected: true,
+    isSelected: false,
     demoPath: "photos/project-demo/Proactive AI Assistant.png"
   },
   {
