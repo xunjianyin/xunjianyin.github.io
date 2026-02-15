@@ -377,6 +377,27 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     isSelected: false
   },
   {
+    title: "EAMA: Entity-Aware Multimodal Alignment Based Approach for News Image Captioning",
+    authors: "Junzhe Zhang, Huixuan Zhang, <b>Xunjian Yin</b>, Xiaojun Wan",
+    venue: "TOMM 2025",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2402.19404" },
+      { text: "Page", url: "papers/eama.html" }
+    ],
+    abstract: "Multimodal large language models (MLLMs) have shown great success across various tasks. However, their performance in handling entity information for news image captioning remains suboptimal. In this work, we propose EAMA, an Entity-Aware Multimodal Alignment based approach. We align the MLLM through two auxiliary tasks: Entity-Aware Sentence Selection and Entity Selection, together with the News Image Captioning task. The aligned model is then leveraged to self-extract entity-related information to supplement textual input during caption generation. Our approach achieves superior results on the GoodNews and NYTimes800k datasets compared to all previous methods.",
+    citation: `<pre><code>@misc{zhang2024eamaentityawaremultimodal,
+      title={EAMA : Entity-Aware Multimodal Alignment Based Approach for News Image Captioning},
+      author={Junzhe Zhang and Huixuan Zhang and Xunjian Yin and Xiaojun Wan},
+      year={2024},
+      eprint={2402.19404},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2402.19404},
+}</code></pre>`,
+    isPreprint: false,
+    isSelected: false
+  },
+  {
     title: "Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability",
     authors: "Xinyu Hu, Li Lin, Mingqi Gao, <b>Xunjian Yin</b>, Xiaojun Wan",
     venue: "EMNLP 2024",
