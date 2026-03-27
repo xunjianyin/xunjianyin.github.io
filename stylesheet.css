@@ -368,19 +368,11 @@ a:focus, button:focus {
   #outline-sidebar {
     width: 180px;
   }
-  
-  #main-content {
-    padding: 0 60px;
-  }
 }
 
 @media screen and (max-width: 768px) {
   #outline-sidebar {
     display: block; /* Changed from none to block to allow mobile menu */
-  }
-  
-  #main-content {
-    padding: 0 40px;
   }
   
   name {
@@ -439,11 +431,6 @@ a:focus, button:focus {
     font-size: 14px;
   }
   
-  /* Further mobile optimizations */
-  #main-content {
-    padding: 0 20px;
-  }
-  
   .profile-photo {
     width: 120px !important;
     height: 120px !important;
@@ -470,10 +457,6 @@ a:focus, button:focus {
 @media print {
   #outline-sidebar {
     display: none;
-  }
-  
-  #main-content {
-    padding-left: 0;
   }
   
   a {

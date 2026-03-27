@@ -57,52 +57,15 @@ class BlogManager {
   }
 
   /**
-   * Simple markdown to HTML converter
+   * Convert markdown to HTML using the vendored marked parser.
    */
   markdownToHtml(markdown) {
-    let html = markdown;
-    
-    // Headers
-    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-    
-    // Bold
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    
-    // Italic
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    
-    // Links
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-    
-    // Code blocks
-    html = html.replace(/```[\s\S]*?```/g, (match) => {
-      const code = match.replace(/```/g, '').trim();
-      return `<pre><code>${code}</code></pre>`;
-    });
-    
-    // Inline code
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    
-    // Lists
-    html = html.replace(/^\d+\.\s+(.*$)/gim, '<li>$1</li>');
-    html = html.replace(/^-\s+(.*$)/gim, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-    html = html.replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>');
-    
-    // Paragraphs
-    html = html.replace(/\n\n/g, '</p><p>');
-    html = '<p>' + html + '</p>';
-    
-    // Clean up empty paragraphs
-    html = html.replace(/<p><\/p>/g, '');
-    html = html.replace(/<p>(<h[1-6]>)/g, '$1');
-    html = html.replace(/(<\/h[1-6]>)<\/p>/g, '$1');
-    html = html.replace(/<p>(<ul>|<ol>|<pre>)/g, '$1');
-    html = html.replace(/(<\/ul>|<\/ol>|<\/pre>)<\/p>/g, '$1');
-    
-    return html;
+    if (typeof marked === 'undefined' || typeof marked.parse !== 'function') {
+      console.warn('Marked is not available. Falling back to plain text rendering.');
+      return `<p>${markdown}</p>`;
+    }
+
+    return marked.parse(markdown);
   }
 
   /**
@@ -119,12 +82,13 @@ class BlogManager {
           try {
             const response = await fetch(encodeURI(post.markdownFile));
             if (response.ok) {
-              const markdownContent = await response.text();
-              const parsedContent = this.parseMarkdown(markdownContent);
+              const rawMarkdownContent = await response.text();
+              const parsedContent = this.parseMarkdown(rawMarkdownContent);
               
               return {
                 ...post,
-                content: markdownContent,
+                ...parsedContent.metadata,
+                content: rawMarkdownContent,
                 htmlContent: this.markdownToHtml(parsedContent.content)
               };
             } else {
@@ -165,11 +129,12 @@ class BlogManager {
   generatePostPreview(post) {
     const formattedDate = this.formatDate(post.date);
     const tags = Array.isArray(post.tags) ? post.tags.join(', ') : '';
+    const postUrl = `blog-post.html?id=${encodeURIComponent(post.id)}`;
     
     return `
       <li class="blog-post" data-post-id="${post.id}">
         <div class="blog-title">
-          <a href="#" onclick="blogManager.openPost('${post.id}')">${post.title}</a>
+          <a href="${postUrl}">${post.title}</a>
         </div>
         <div class="blog-meta">
           <span class="blog-date">${formattedDate}</span>
@@ -180,7 +145,7 @@ class BlogManager {
         <div class="blog-excerpt">
           <p>${post.excerpt}</p>
         </div>
-        <a href="#" class="read-more" onclick="blogManager.openPost('${post.id}')">Read More</a>
+        <a href="${postUrl}" class="read-more">Read More</a>
       </li>
     `;
   }
@@ -205,18 +170,6 @@ class BlogManager {
 
     container.innerHTML = this.posts.map(post => this.generatePostPreview(post)).join('');
   }
-
-  /**
-   * Open individual blog post using proper URL
-   */
-  openPost(postId) {
-    const post = this.posts.find(p => p.id === postId);
-    if (!post) return;
-
-    // Navigate to the blog post page with the post ID as a parameter
-    window.location.href = `blog-post.html?id=${postId}`;
-  }
-
 }
 
 // Global instance
