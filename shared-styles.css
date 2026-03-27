@@ -151,18 +151,9 @@
 
 /* Main Content Layout - Only applies to pages without specific overrides */
 
-/* Consistent Heading Styles */
-heading {
-  margin-bottom: 15px !important;
-  margin-top: 0px !important;
-  display: block;
-}
-
 /* List Spacing */
 .section-spacing ul,
 .section-spacing ul.publication-list,
-heading + ul,
-heading + ul.publication-list,
 td ul {
   margin-top: 0px !important;
   margin-bottom: 0px !important;
@@ -238,7 +229,7 @@ ul, ol {
 }
 
 .paper-links {
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .paper-links a {
@@ -268,7 +259,7 @@ ul, ol {
   display: inline;
   padding: 0;
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   font-family: inherit;
   font-weight: 400;
   color: var(--primary-color);
@@ -303,7 +294,7 @@ ul, ol {
   background: transparent;
   box-shadow: none;
   line-height: 1.6;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .detail-content p {
@@ -346,7 +337,7 @@ ul, ol {
     align-items: center;
     justify-content: center;
     padding: 8px 14px;
-    font-size: 15px;
+    font-size: 16px;
   }
   
   .theme-toggle {

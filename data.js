@@ -984,7 +984,7 @@ const teaching = [
 
 // Academic Services Data
 const academicServices = [
-  "Reviewer: ACL-ARR (2023 - Now), ICLR (2024 - 2026), NeurIPS (2024 - 2025), ICML (2025), AAAI (2024 - 2025),  COLM (2025), COLING (2024), JCST (2025)",
+  "Reviewer: ACL-ARR (2023 - Now), ICLR (2024 - 2026), NeurIPS (2024 - 2026), ICML (2025 - 2026), AAAI (2024 - 2025),  COLM (2025), COLING (2024), JCST (2025)",
   "Volunteer: NLPCC 2023 Shared Task 8 track chair, AAAI 2024 volunteer, ACL 2024 volunteer"
 ];
 

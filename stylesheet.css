@@ -142,7 +142,7 @@
 /* Global styles */
 body {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.6;
   color: var(--text-color);
   background-color: var(--bg-color);
@@ -169,23 +169,6 @@ a:focus, a:hover {
   text-decoration: none;
 }
 
-heading {
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 16px;
-  color: #1a1a1a;
-  display: block;
-  margin: 0 0 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-[data-theme="dark"] heading {
-  color: var(--text-color);
-  border-bottom-color: #374151;
-}
 
 name {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
@@ -197,7 +180,7 @@ name {
 /* Publication styles */
 .papertitle {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: #1a1a1a;
   margin-bottom: 1px;
@@ -324,24 +307,11 @@ a:hover {
   text-shadow: 0 1px 2px rgba(0, 101, 192, 0.1);
 }
 
-/* Subtle animations for sections */
-.section-spacing {
-  transition: transform 0.2s ease;
-}
+/* Section spacing */
 
-.section-spacing:hover {
-  transform: translateY(-1px);
-}
-
-/* Profile photo enhancements */
+/* Profile photo */
 .profile-photo {
-  transition: all 0.3s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.profile-photo:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 
@@ -392,25 +362,6 @@ a:focus, button:focus {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* Improved section transitions */
-.section-spacing {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.6s ease forwards;
-}
-
-.section-spacing:nth-child(1) { animation-delay: 0.1s; }
-.section-spacing:nth-child(2) { animation-delay: 0.2s; }
-.section-spacing:nth-child(3) { animation-delay: 0.3s; }
-.section-spacing:nth-child(4) { animation-delay: 0.4s; }
-.section-spacing:nth-child(5) { animation-delay: 0.5s; }
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Responsive Design */
 @media screen and (max-width: 992px) {
@@ -481,7 +432,7 @@ a:focus, button:focus {
   }
   
   .papertitle {
-    font-size: 15px;
+    font-size: 16px;
   }
   
   .paper_rest {

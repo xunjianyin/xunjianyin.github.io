@@ -65,7 +65,7 @@ function populatePublications(publications, listId) {
 
     const titleDiv = document.createElement('div');
     titleDiv.className = 'papertitle';
-    titleDiv.innerHTML = (pub.isNew ? '<span style="color:red">New!</span>   ' : '') + pub.title;
+    titleDiv.innerHTML = (pub.isNew ? '<span style="color:#6b7280;font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;">New</span>   ' : '') + pub.title;
 
     const restDiv = document.createElement('div');
     restDiv.className = 'paper_rest';
