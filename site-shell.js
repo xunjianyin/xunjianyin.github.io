@@ -151,6 +151,11 @@
     if (footerMount) {
       footerMount.innerHTML = buildFooter();
     }
+
+    // Load easter egg
+    var eeScript = document.createElement('script');
+    eeScript.src = toRootHref('easter-egg.js');
+    document.body.appendChild(eeScript);
   }
 
   whenReady(injectSiteShell);
