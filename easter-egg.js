@@ -1,15 +1,16 @@
 /**
- * Konami Code Easter Egg
- * Sequence: Up Up Down Down Left Right Left Right B A
- * Effect: Zero Gravity -> Matrix Rain -> Particle Fireworks
+ * Easter Egg — type "yxjgogogo"
+ * Phase 1: Zero Gravity — page floats away
+ * Phase 2: Word Fireworks — page words explode as fireworks
+ * Phase 3: Reconstructing Rain — characters rain down and rebuild the page
  */
 (function () {
-  const KONAMI = [
+  var KONAMI = [
     'KeyY', 'KeyX', 'KeyJ', 'KeyG', 'KeyO',
     'KeyG', 'KeyO', 'KeyG', 'KeyO'
   ];
-  let pos = 0;
-  let running = false;
+  var pos = 0;
+  var running = false;
 
   document.addEventListener('keydown', function (e) {
     if (running) return;
@@ -25,13 +26,28 @@
     }
   });
 
-  function runSpectacle() {
-    return phaseZeroGravity()
-      .then(phaseMatrixRain)
-      .then(phaseFireworks);
+  // Harvest page words once (reused by fireworks)
+  function harvestWords() {
+    var text = (document.getElementById('main-content') || document.body).innerText || '';
+    var words = text.split(/\s+/).filter(function (w) { return w.length >= 2 && w.length <= 20; });
+    var unique = Array.from(new Set(words));
+    for (var i = unique.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = unique[i]; unique[i] = unique[j]; unique[j] = tmp;
+    }
+    return unique.length > 0 ? unique : ['Xunjian', 'Yin', 'Duke', 'Research', 'AI', 'Agent'];
   }
 
-  /* ── Phase 1: Zero Gravity ── */
+  function runSpectacle() {
+    var words = harvestWords();
+    return phaseZeroGravity()
+      .then(function () { return phaseFireworks(words); })
+      .then(phaseReconstructingRain);
+  }
+
+  /* ─────────────────────────────────────────────
+     Phase 1: Zero Gravity
+     ───────────────────────────────────────────── */
   function phaseZeroGravity() {
     return new Promise(function (resolve) {
       var main = document.getElementById('main-content');
@@ -41,7 +57,6 @@
       var saved = [];
 
       children.forEach(function (el) {
-        var rect = el.getBoundingClientRect();
         saved.push({
           el: el,
           origTransform: el.style.transform,
@@ -60,14 +75,10 @@
       });
 
       setTimeout(function () {
-        // Fade out
-        children.forEach(function (el) {
-          el.style.opacity = '0';
-        });
+        children.forEach(function (el) { el.style.opacity = '0'; });
       }, 2000);
 
       setTimeout(function () {
-        // Reset
         saved.forEach(function (s) {
           s.el.style.transform = s.origTransform;
           s.el.style.transition = s.origTransition;
@@ -80,83 +91,10 @@
     });
   }
 
-  /* ── Phase 2: Matrix Rain ── */
-  function phaseMatrixRain() {
-    return new Promise(function (resolve) {
-      var canvas = document.createElement('canvas');
-      canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;pointer-events:none;';
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      document.body.appendChild(canvas);
-
-      var ctx = canvas.getContext('2d');
-      var fontSize = 14;
-      var cols = Math.floor(canvas.width / fontSize);
-      var drops = [];
-      for (var i = 0; i < cols; i++) {
-        drops[i] = Math.random() * -50;
-      }
-
-      var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*(){}[]|;:<>?/~';
-      var frame;
-      var startTime = Date.now();
-      var duration = 3500;
-
-      function draw() {
-        var elapsed = Date.now() - startTime;
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.font = fontSize + 'px monospace';
-
-        for (var i = 0; i < drops.length; i++) {
-          var char = chars[Math.floor(Math.random() * chars.length)];
-
-          // Varying green shades
-          var g = Math.floor(150 + Math.random() * 105);
-          ctx.fillStyle = 'rgb(0, ' + g + ', 0)';
-
-          // Bright leading character
-          if (Math.random() > 0.95) {
-            ctx.fillStyle = '#ffffff';
-          }
-
-          ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-
-          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-            drops[i] = 0;
-          }
-          drops[i]++;
-        }
-
-        if (elapsed < duration) {
-          frame = requestAnimationFrame(draw);
-        } else {
-          // Fade out canvas
-          var fadeStart = Date.now();
-          function fadeOut() {
-            var fadeElapsed = Date.now() - fadeStart;
-            var alpha = Math.min(fadeElapsed / 500, 1);
-            canvas.style.opacity = String(1 - alpha);
-            if (alpha < 1) {
-              requestAnimationFrame(fadeOut);
-            } else {
-              cancelAnimationFrame(frame);
-              document.body.removeChild(canvas);
-              resolve();
-            }
-          }
-          fadeOut();
-        }
-      }
-
-      draw();
-    });
-  }
-
-  /* ── Phase 3: Particle Fireworks ── */
-  function phaseFireworks() {
+  /* ─────────────────────────────────────────────
+     Phase 2: Word Fireworks — ALL particles are words
+     ───────────────────────────────────────────── */
+  function phaseFireworks(words) {
     return new Promise(function (resolve) {
       var canvas = document.createElement('canvas');
       canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;pointer-events:none;';
@@ -168,27 +106,30 @@
       var particles = [];
       var rockets = [];
       var startTime = Date.now();
-      var duration = 4000;
+      var duration = 4500;
+      var wordIdx = 0;
 
       var colors = [
         [255,107,107], [78,205,196], [69,183,209], [150,230,161],
         [221,160,221], [255,217,61], [107,203,119], [255,140,148],
-        [168,216,234], [255,111,97], [136,216,176], [252,186,211],
-        [181,234,215], [199,206,234], [255,183,178], [226,240,203]
+        [168,216,234], [255,111,97], [136,216,176], [252,186,211]
       ];
 
       function Particle(x, y, rgb) {
         this.x = x;
         this.y = y;
         this.r = rgb[0]; this.g = rgb[1]; this.b = rgb[2];
+        this.word = words[wordIdx % words.length];
+        wordIdx++;
         var angle = Math.random() * Math.PI * 2;
-        var speed = Math.random() * 6 + 2;
+        var speed = Math.random() * 3 + 1.5;
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
         this.alpha = 1;
-        this.decay = Math.random() * 0.015 + 0.01;
-        this.size = Math.random() * 3 + 1;
-        this.trail = [];
+        this.decay = Math.random() * 0.008 + 0.005;
+        this.fontSize = 10 + Math.random() * 8;
+        this.rotation = (Math.random() - 0.5) * 0.6;
+        this.rotSpeed = (Math.random() - 0.5) * 0.02;
       }
 
       function Rocket(targetX, targetY) {
@@ -202,66 +143,52 @@
         var dist = Math.sqrt(dx * dx + dy * dy);
         this.vx = (dx / dist) * this.speed;
         this.vy = (dy / dist) * this.speed;
-        this.alpha = 1;
-        this.exploded = false;
         this.trail = [];
       }
 
       function explode(x, y) {
         var rgb = colors[Math.floor(Math.random() * colors.length)];
-        var count = 60 + Math.floor(Math.random() * 40);
+        var count = 25 + Math.floor(Math.random() * 15);
         for (var i = 0; i < count; i++) {
           particles.push(new Particle(x, y, rgb));
         }
-        var rgb2 = colors[Math.floor(Math.random() * colors.length)];
-        for (var j = 0; j < 20; j++) {
-          particles.push(new Particle(x, y, rgb2));
-        }
       }
 
-      // Launch rockets over time
       var lastLaunch = 0;
-      var launchInterval = 300;
+      var launchInterval = 350;
 
       function draw() {
         var elapsed = Date.now() - startTime;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Launch new rockets
-        if (elapsed - lastLaunch > launchInterval && elapsed < duration - 1000) {
+        // Launch rockets
+        if (elapsed - lastLaunch > launchInterval && elapsed < duration - 1200) {
           var tx = canvas.width * (0.15 + Math.random() * 0.7);
           var ty = canvas.height * (0.1 + Math.random() * 0.4);
           rockets.push(new Rocket(tx, ty));
           lastLaunch = elapsed;
-          // Speed up launches over time
-          launchInterval = Math.max(100, 300 - elapsed * 0.05);
+          launchInterval = Math.max(150, 350 - elapsed * 0.04);
         }
 
-        // Update and draw rockets
+        // Draw rockets
         for (var r = rockets.length - 1; r >= 0; r--) {
           var rocket = rockets[r];
           rocket.trail.push({ x: rocket.x, y: rocket.y });
           if (rocket.trail.length > 8) rocket.trail.shift();
-
           rocket.x += rocket.vx;
           rocket.y += rocket.vy;
 
-          // Draw trail
           for (var t = 0; t < rocket.trail.length; t++) {
-            var ta = (t / rocket.trail.length) * 0.5;
             ctx.beginPath();
             ctx.arc(rocket.trail[t].x, rocket.trail[t].y, 2, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 200, 100, ' + ta + ')';
+            ctx.fillStyle = 'rgba(255, 220, 120, ' + ((t / rocket.trail.length) * 0.5) + ')';
             ctx.fill();
           }
-
-          // Draw rocket
           ctx.beginPath();
           ctx.arc(rocket.x, rocket.y, 3, 0, Math.PI * 2);
           ctx.fillStyle = '#FFD700';
           ctx.fill();
 
-          // Check if reached target
           var dx = rocket.x - rocket.targetX;
           var dy = rocket.y - rocket.targetY;
           if (Math.sqrt(dx * dx + dy * dy) < 15) {
@@ -270,70 +197,224 @@
           }
         }
 
-        // Update and draw particles
+        // Draw word particles
         for (var i = particles.length - 1; i >= 0; i--) {
           var p = particles[i];
-
-          p.trail.push({ x: p.x, y: p.y, alpha: p.alpha });
-          if (p.trail.length > 5) p.trail.shift();
-
           p.x += p.vx;
           p.y += p.vy;
-          p.vy += 0.06; // gravity
-          p.vx *= 0.99; // drag
+          p.vy += 0.03;
+          p.vx *= 0.995;
           p.alpha -= p.decay;
+          p.rotation += p.rotSpeed;
 
-          // Draw trail
-          for (var j = 0; j < p.trail.length; j++) {
-            var pt = p.trail[j];
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, p.size * 0.5, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + (pt.alpha * (j / p.trail.length) * 0.3) + ')';
-            ctx.fill();
-          }
-
-          // Draw particle with glow
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.font = 'bold ' + Math.round(p.fontSize) + 'px Lato, sans-serif';
           ctx.fillStyle = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + p.alpha + ')';
-          ctx.fill();
+          ctx.shadowColor = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + (p.alpha * 0.5) + ')';
+          ctx.shadowBlur = 10;
+          ctx.textAlign = 'center';
+          ctx.fillText(p.word, 0, 0);
+          ctx.restore();
 
-          // Glow effect
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + (p.alpha * 0.2) + ')';
-          ctx.fill();
-
-          if (p.alpha <= 0) {
-            particles.splice(i, 1);
-          }
+          if (p.alpha <= 0) particles.splice(i, 1);
         }
 
         if (elapsed < duration || particles.length > 0 || rockets.length > 0) {
           requestAnimationFrame(draw);
         } else {
-          // Restore page
           document.body.removeChild(canvas);
-          restorePage();
           resolve();
         }
       }
-
       draw();
     });
   }
 
-  function restorePage() {
-    var main = document.getElementById('main-content');
-    if (!main) return;
-    Array.from(main.children).forEach(function (el) {
-      el.style.transition = 'opacity 0.8s ease';
-      el.style.opacity = '1';
-      // Clean up after transition
-      el.addEventListener('transitionend', function handler() {
-        el.style.transition = '';
-        el.removeEventListener('transitionend', handler);
+  /* ─────────────────────────────────────────────
+     Phase 3: Reconstructing Rain
+     Full sentences / titles / author lists rain down,
+     then the page rebuilds itself top-to-bottom.
+     ───────────────────────────────────────────── */
+  function phaseReconstructingRain() {
+    return new Promise(function (resolve) {
+      var main = document.getElementById('main-content');
+      if (!main) { resolve(); return; }
+
+      // ── Harvest meaningful phrases from the page ──
+      var phrases = [];
+      // Paper titles
+      main.querySelectorAll('.papertitle').forEach(function (el) {
+        var t = el.textContent.trim();
+        if (t) phrases.push(t);
       });
+      // Author lines
+      main.querySelectorAll('.paper_rest').forEach(function (el) {
+        var t = el.textContent.trim().split('\n')[0].trim();
+        if (t && t.length > 5) phrases.push(t);
+      });
+      // Section headings
+      main.querySelectorAll('h1, h2, h3').forEach(function (el) {
+        var t = el.textContent.trim();
+        if (t) phrases.push(t);
+      });
+      // News items
+      main.querySelectorAll('.news-list li').forEach(function (el) {
+        var t = el.textContent.trim();
+        if (t) phrases.push(t);
+      });
+      // Bio paragraphs / any <p>
+      main.querySelectorAll('.bio, p').forEach(function (el) {
+        var t = el.textContent.trim();
+        if (t && t.length > 10) {
+          // Split long text into sentence-ish chunks
+          var sentences = t.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [t];
+          sentences.forEach(function (s) {
+            s = s.trim();
+            if (s.length > 5) phrases.push(s);
+          });
+        }
+      });
+      // Project descriptions
+      main.querySelectorAll('#projects-list li').forEach(function (el) {
+        var t = el.textContent.trim();
+        if (t) phrases.push(t);
+      });
+      // Name
+      var nameEl = main.querySelector('.name');
+      if (nameEl) phrases.push(nameEl.textContent.trim());
+
+      // Deduplicate and shuffle
+      phrases = Array.from(new Set(phrases));
+      for (var i = phrases.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = phrases[i]; phrases[i] = phrases[j]; phrases[j] = tmp;
+      }
+      if (phrases.length === 0) phrases = ['Xunjian Yin', 'Duke University', 'Research'];
+
+      // ── Create overlay container for falling text ──
+      var overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;pointer-events:none;overflow:hidden;';
+      document.body.appendChild(overlay);
+
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+      var colors = [
+        [0, 101, 192],    // site blue
+        [107, 163, 245],  // light blue
+        [78, 205, 196],   // teal
+        [150, 230, 161],  // green
+        [240, 146, 40],   // site orange
+        [255, 183, 178],  // pink
+      ];
+
+      // ── Raindrop: a falling phrase ──
+      var drops = [];
+      var phraseIdx = 0;
+      var startTime = Date.now();
+      var spawnDuration = 3500;  // how long we keep spawning new drops
+      var totalDuration = 5000;  // total phase time
+
+      function spawnDrop() {
+        var text = phrases[phraseIdx % phrases.length];
+        phraseIdx++;
+        var rgb = colors[Math.floor(Math.random() * colors.length)];
+
+        var el = document.createElement('div');
+        var fSize = 11 + Math.floor(Math.random() * 6);
+        el.textContent = text;
+        el.style.cssText =
+          'position:absolute;white-space:nowrap;font-family:Lato,sans-serif;' +
+          'font-size:' + fSize + 'px;font-weight:600;pointer-events:none;' +
+          'color:rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.85);' +
+          'text-shadow:0 0 8px rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.3);' +
+          'left:' + (Math.random() * 90) + '%;' +
+          'top:-40px;';
+        overlay.appendChild(el);
+
+        var speed = 1.5 + Math.random() * 3;  // px per frame
+        var y = -40;
+        var maxY = window.innerHeight + 50;
+
+        drops.push({ el: el, y: y, speed: speed, maxY: maxY, done: false });
+      }
+
+      // Get children for progressive reveal
+      var children = Array.from(main.children);
+      var childData = children.map(function (el) {
+        var rect = el.getBoundingClientRect();
+        return { el: el, revealed: false };
+      });
+      var revealDelay = 800;
+      var revealDuration = 3200;
+
+      // Spawn initial batch
+      var spawnInterval = 80;
+      var lastSpawn = 0;
+
+      function animate() {
+        var elapsed = Date.now() - startTime;
+
+        // Spawn new drops
+        if (elapsed < spawnDuration && elapsed - lastSpawn > spawnInterval) {
+          // Spawn 1-3 at a time for density
+          var count = 1 + Math.floor(Math.random() * 2);
+          for (var s = 0; s < count; s++) spawnDrop();
+          lastSpawn = elapsed;
+          // Increase density over time
+          spawnInterval = Math.max(30, 80 - elapsed * 0.012);
+        }
+
+        // Move drops
+        var activeDrop = false;
+        for (var d = 0; d < drops.length; d++) {
+          var drop = drops[d];
+          if (drop.done) continue;
+          drop.y += drop.speed;
+          drop.el.style.top = drop.y + 'px';
+
+          // Fade out as it nears bottom
+          if (drop.y > drop.maxY * 0.7) {
+            var fadeAlpha = Math.max(0, 1 - (drop.y - drop.maxY * 0.7) / (drop.maxY * 0.3));
+            drop.el.style.opacity = String(fadeAlpha);
+          }
+
+          if (drop.y > drop.maxY) {
+            drop.done = true;
+            if (drop.el.parentNode) drop.el.parentNode.removeChild(drop.el);
+          } else {
+            activeDrop = true;
+          }
+        }
+
+        // Progressive page reveal
+        var revealProgress = Math.max(0, Math.min(1, (elapsed - revealDelay) / revealDuration));
+        var revealCount = Math.floor(revealProgress * childData.length);
+        for (var c = 0; c < childData.length; c++) {
+          if (c < revealCount && !childData[c].revealed) {
+            childData[c].revealed = true;
+            var el = childData[c].el;
+            el.style.transition = 'opacity 0.8s ease';
+            el.style.opacity = '1';
+          }
+        }
+
+        // End condition
+        if (elapsed > totalDuration && !activeDrop) {
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          children.forEach(function (el) {
+            el.style.opacity = '1';
+            el.style.transition = '';
+          });
+          resolve();
+          return;
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
     });
   }
 })();
