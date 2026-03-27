@@ -6,114 +6,240 @@
   <title>Knowledge Boundary for LLMs</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .paper-figure { margin: 40px 0; text-align: center; }
-    .paper-figure.hero img { max-width: 100%; width: 700px; }
-    .paper-figure.medium img { max-width: 550px; width: 100%; }
-    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .concept-box { background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #4a5a8d; }
-    .concept-box h3 { margin-top: 0; color: #4a5a8d; font-size: 18px; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation</h1>
     <p class="paper-authors"><b>Xunjian Yin*</b>, Xu Zhang*, Jie Ruan, Xiaojun Wan</p>
-    <p class="paper-venue">ACL 2024</p>
+    <p class="paper-venue">ACL 2024 &middot; Main Conference</p>
 
     <div class="paper-links">
-      <a href="https://aclanthology.org/2024.acl-long.124/">Paper</a>
-      <a href="https://github.com/pkulcwmzx/knowledge-boundary">Code</a>
+      <a href="https://aclanthology.org/2024.acl-long.124/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        Paper
+      </a>
+      <a href="https://arxiv.org/abs/2402.11493">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        arXiv
+      </a>
+      <a href="https://github.com/pkulcwmzx/knowledge-boundary">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
     </div>
 
-    <div class="story-section">
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr">
+      <div class="tldr-label">TL;DR</div>
+      <p>We introduce the concept of <em>knowledge boundary</em> to evaluate LLMs beyond fixed prompts, using projected gradient descent with semantic constraints (PGDC) to find optimal prompts for each piece of knowledge -- revealing what models truly know versus what they can only access through lucky phrasing.</p>
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract">
+      <button class="abstract-toggle-btn">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>In recent years, substantial advancements have been made in the development of large language models, achieving remarkable performance across diverse tasks. However, evaluating LLMs with fixed questions is unreliable due to prompt sensitivity. We introduce the concept of knowledge boundary to encompass both prompt-agnostic knowledge (accessible regardless of phrasing) and prompt-sensitive knowledge (accessible only with specific wordings). We propose PGDC (projected gradient descent with semantic constraints) to identify optimal prompts for each knowledge piece. Our loss function combines answer generation probability, semantic constraint via L2 distance between hidden representations, and regularization penalizing embeddings far from discrete tokens. Experiments across multiple models and datasets demonstrate that knowledge boundary evaluation provides a more reliable and robust measure of what models truly know, independent of superficial prompt variations.</p>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Hero Figure -->
+    <figure class="paper-figure hero fade-in-section">
+      <img src="https://arxiv.org/html/2402.11493v1/x1.png" alt="Knowledge Boundary: Three Classes of Knowledge">
+      <figcaption>The three classes of knowledge under our framework: Prompt-Agnostic Knowledge (answerable regardless of phrasing), Prompt-Sensitive Knowledge (accessible only with specific wordings), and Unanswerable Knowledge. Knowledge boundary captures both the first two categories.</figcaption>
+    </figure>
+
+    <div class="story-section fade-in-section">
       <h2>The Prompt Sensitivity Problem</h2>
-      <p>Ask a language model a question, and it might get it right. Rephrase the same question, and suddenly it fails. This prompt sensitivity is one of the most frustrating aspects of working with LLMs—a model's apparent knowledge depends not just on what you ask, but on how you phrase it.</p>
+      <p>Ask a language model a question, and it might get it right. Rephrase the same question, and suddenly it fails. This prompt sensitivity is one of the most frustrating aspects of working with LLMs -- a model's apparent knowledge depends not just on what you ask, but on how you phrase it.</p>
       <p>This creates a fundamental problem for evaluation. When we test a model's knowledge with a fixed set of questions, are we measuring what the model knows, or just how well the prompts happen to match what it learned? The distinction matters enormously.</p>
     </div>
 
-    <div class="concept-box">
+    <div class="concept-box fade-in-section">
       <h3>Introducing Knowledge Boundary</h3>
       <p>We propose a new concept: the <em>knowledge boundary</em>. Rather than asking whether a model can answer a specific prompt, we ask: what is the full range of prompts for which this knowledge is accessible? The boundary encompasses both prompt-agnostic knowledge (accessible regardless of phrasing) and prompt-sensitive knowledge (accessible only with specific wordings).</p>
     </div>
 
-    <div class="story-section">
-      <h2>A Robuster Evaluation</h2>
+    <div class="section-divider"></div>
+
+    <!-- PGDC Framework Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2402.11493v1/x2.png" alt="PGDC Framework Overview">
+      <figcaption>The PGDC framework: starting from labeled prompts, the algorithm performs gradient descent toward target answers while constraining the search to remain within the semantic space of the original question.</figcaption>
+    </figure>
+
+    <div class="story-section fade-in-section">
+      <h2>A More Robust Evaluation</h2>
       <p>Traditional benchmarks evaluate models on fixed question sets. If the model knows the answer but the exact phrasing happens to trigger a failure, the benchmark marks it wrong. If the model gets lucky with a phrasing, it marks it right. Neither result reflects true knowledge.</p>
       <p>Knowledge boundary evaluation searches for the optimal prompt for each piece of knowledge. This gives a more reliable measure of what the model actually knows, independent of superficial prompt variations.</p>
     </div>
 
-    <div class="story-section">
-      <h2>Finding the Boundary</h2>
-      <p>How do you find the optimal prompt for a given piece of knowledge? We developed a projected gradient descent algorithm with semantic constraints. The algorithm searches the space of possible prompts, looking for phrasings that maximize the model's ability to retrieve the correct answer while staying semantically equivalent to the original question.</p>
-      <p>This is harder than it sounds—the search space is enormous, and we need to ensure the discovered prompts are actually asking the same question, not gaming the model with unrelated triggers.</p>
+    <div class="section-divider"></div>
+
+    <!-- Method Steps -->
+    <div class="story-section fade-in-section">
+      <h2>Finding the Boundary with PGDC</h2>
+      <p>How do you find the optimal prompt for a given piece of knowledge? We developed a projected gradient descent algorithm with semantic constraints. The algorithm searches the space of possible prompts, maximizing the model's ability to retrieve the correct answer while staying semantically equivalent to the original question.</p>
     </div>
 
-    <div class="highlight-box">
+    <div class="method-steps fade-in-section">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Continuous Relaxation</h4>
+          <p>The algorithm operates in continuous embedding space rather than discrete token space, allowing gradient-based optimization over prompt representations.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Gradient Descent with Constraints</h4>
+          <p>The loss function combines answer generation probability, semantic constraint via L2 distance between hidden representations, and a regularization term penalizing embeddings far from discrete tokens.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Proximal Projection</h4>
+          <p>A conditional threshold-based projection transforms optimized embeddings back to discrete text when the distance to the nearest token falls below threshold c, yielding a valid natural-language prompt.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box fade-in-section">
+      <h3>Optimization Details</h3>
+      <p>PGDC uses the Adam optimizer with a learning rate of 1e-2 and an exponential scheduler, running for a maximum of 25 iterations per prompt. The loss function is: <b>&Phi;(X) = L(X,A) + &lambda;<sub>1</sub>R(X,Q) + &lambda;<sub>2</sub>&delta;(X)</b>, where L measures answer generation probability using a slicing window method, R enforces semantic similarity, and &delta; regularizes toward valid tokens.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Radar Chart Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2402.11493v1/x3.png" alt="Knowledge Boundaries Across Domains">
+      <figcaption>Radar chart showing knowledge boundaries across six domains (natural sciences, medical, computer science, social sciences, humanities, and others) for five models on MMLU, revealing how different models have different knowledge profiles.</figcaption>
+    </figure>
+
+    <!-- Results Table -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Knowledge Boundary Results (Accuracy %)</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Dataset</th>
+            <th>Model</th>
+            <th>Original</th>
+            <th>PGDC</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row">
+            <td>PaRaRel</td>
+            <td>LLaMA2</td>
+            <td>--</td>
+            <td class="best-value">71.36</td>
+          </tr>
+          <tr>
+            <td>KAssess</td>
+            <td>LLaMA2</td>
+            <td>--</td>
+            <td class="best-value">69.84</td>
+          </tr>
+          <tr>
+            <td>CFACT</td>
+            <td>LLaMA2</td>
+            <td>--</td>
+            <td>3.41</td>
+          </tr>
+          <tr>
+            <td>AlCuna</td>
+            <td>LLaMA2</td>
+            <td>--</td>
+            <td>0.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Human Evaluation: Semantic Preservation Rate</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Preservation Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>GPT-2</td>
+            <td>80.5%</td>
+          </tr>
+          <tr>
+            <td>GPT-J</td>
+            <td>85.1%</td>
+          </tr>
+          <tr>
+            <td>LLaMA2</td>
+            <td>83.3%</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Vicuna</td>
+            <td class="best-value">86.2%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="story-section fade-in-section">
+      <h2>What We Learned</h2>
+      <p>Our experiments revealed that knowledge boundaries vary dramatically across models and domains. Some knowledge is robustly accessible; other knowledge hangs by a thread, retrievable only with very specific prompts. Understanding these boundaries helps us build more reliable systems and design better evaluation protocols.</p>
+      <p>Knowledge boundary offers a new lens on model capabilities -- one that sees past the noise of prompt sensitivity to measure genuine understanding.</p>
+    </div>
+
+    <div class="highlight-box fade-in-section">
       <h3>Key Contributions</h3>
       <ul>
-        <li><b>New Framework:</b> Knowledge boundary as a prompt-robust evaluation concept</li>
-        <li><b>Algorithm:</b> Projected gradient descent with semantic constraints to find optimal prompts</li>
-        <li><b>Better Evaluation:</b> More reliable assessment of model knowledge across domains</li>
-        <li><b>Insights:</b> Revealing the gap between apparent and actual model knowledge</li>
+        <li><b>New Framework:</b> Knowledge boundary as a prompt-robust evaluation concept, distinguishing prompt-agnostic from prompt-sensitive knowledge</li>
+        <li><b>PGDC Algorithm:</b> Projected gradient descent with semantic constraints to find optimal prompts in continuous embedding space</li>
+        <li><b>Better Evaluation:</b> More reliable assessment of model knowledge that is independent of specific prompt phrasing</li>
+        <li><b>Cross-Domain Insights:</b> Revealing how knowledge boundaries differ across domains and models, exposing the gap between apparent and actual model knowledge</li>
       </ul>
     </div>
 
-    <div class="story-section">
-      <h2>What We Learned</h2>
-      <p>Our experiments revealed that knowledge boundaries vary dramatically across models and domains. Some knowledge is robustly accessible; other knowledge hangs by a thread, retrievable only with very specific prompts. Understanding these boundaries helps us build more reliable systems and design better evaluation protocols.</p>
-      <p>Knowledge boundary offers a new lens on model capabilities—one that sees past the noise of prompt sensitivity to measure genuine understanding.</p>
-    </div>
-
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@inproceedings{yin-etal-2024-benchmarking,
+    <!-- Citation with Copy Button -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@inproceedings{yin-etal-2024-benchmarking,
     title = "Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation",
     author = "Yin, Xunjian and Zhang, Xu and Ruan, Jie and Wan, Xiaojun",
     booktitle = "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics",
@@ -121,6 +247,7 @@
     url = "https://aclanthology.org/2024.acl-long.124/",
     pages = "2270--2286"
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -139,7 +266,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -147,6 +274,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

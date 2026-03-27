@@ -6,95 +6,153 @@
   <title>Self-Generated Documents for RAG</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .paper-figure { margin: 40px 0; text-align: center; }
-    .paper-figure.hero img { max-width: 100%; width: 700px; }
-    .paper-figure.medium img { max-width: 550px; width: 100%; }
-    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
-    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models</h1>
     <p class="paper-authors">Jiatong Shi*, <b>Xunjian Yin*</b>, Xiaojun Wan</p>
     <p class="paper-venue">NAACL 2025 Findings</p>
 
     <div class="paper-links">
-      <a href="https://aclanthology.org/2025.findings-naacl.215/">Paper</a>
+      <a href="https://aclanthology.org/2025.findings-naacl.215/">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Paper
+      </a>
     </div>
 
-    <div class="story-section">
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>We systematically evaluate when LLMs can write their own retrieval context instead of fetching it externally, finding that self-generated documents help reasoning tasks but risk hallucinations for factual recall -- and that combining both strategies works best.</p>
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>Retrieval-augmented generation (RAG) has become a standard approach for grounding large language models in external knowledge. Recently, an alternative paradigm has emerged: using LLM-generated documents as context instead of retrieved ones. In this work, we present the first comprehensive evaluation of self-generated documents for RAG. We investigate multiple factors including task type, model capability, document quality, and the interplay between self-generated and retrieved content. Our findings reveal that self-generated documents are more effective for reasoning-intensive tasks but riskier for factual recall, that larger models produce more reliable self-generated content, and that combining self-generated with retrieved documents often yields the best results. We provide practical guidelines for when and how to use self-generated documents in RAG pipelines.</p>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Motivation -->
+    <div class="story-section fade-in-section">
       <h2>When Models Write Their Own Context</h2>
-      <p>Retrieval-augmented generation (RAG) has become the standard approach for grounding language models in external knowledge. But what if the model could generate its own context? Recent work has explored using self-generated documents as an alternative to retrieval—letting the model write background information before answering.</p>
+      <p>Retrieval-augmented generation (RAG) has become the standard approach for grounding language models in external knowledge. But what if the model could generate its own context? Recent work has explored using self-generated documents as an alternative to retrieval -- letting the model write background information before answering.</p>
       <p>The idea is appealing: no need for external databases, no retrieval latency, and the generated context is perfectly tailored to the question. But how reliable is self-generated content? When does it help, and when does it hurt?</p>
     </div>
 
-    <div class="story-section">
-      <h2>A Systematic Investigation</h2>
-      <p>We conducted the first comprehensive evaluation of self-generated documents in RAG systems. Rather than assuming self-generation is universally helpful or harmful, we sought to understand the factors that determine its effectiveness. What types of tasks benefit? How does model capability matter? When should we trust self-generated content?</p>
+    <!-- Method Steps -->
+    <div class="fade-in-section">
+      <div class="story-section">
+        <h2>A Systematic Investigation</h2>
+        <p>We conducted the first comprehensive evaluation of self-generated documents in RAG systems. Rather than assuming self-generation is universally helpful or harmful, we sought to understand the factors that determine its effectiveness.</p>
+      </div>
+      <div class="method-steps">
+        <div class="method-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Generate Self-Documents</h4>
+            <p>Prompt the LLM to write background documents relevant to the input question, creating tailored context without external retrieval.</p>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Compare RAG Paradigms</h4>
+            <p>Evaluate three paradigms side-by-side: retrieval-only, self-generation-only, and a hybrid combining both sources of context.</p>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Analyze Across Dimensions</h4>
+            <p>Systematically vary task type, model size, and document quality to identify when self-generation helps or hurts performance.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="warning-box">
+    <!-- The Double-Edged Sword -->
+    <div class="note-box fade-in-section">
       <h3>The Double-Edged Sword</h3>
-      <p>Our findings reveal a nuanced picture. Self-generated documents can improve performance on knowledge-intensive tasks—the model's pre-trained knowledge, when properly elicited, provides useful context. But self-generation also risks introducing hallucinations and factual errors that compound rather than correct the model's limitations.</p>
+      <p>Self-generated documents can improve performance on knowledge-intensive tasks -- the model's pre-trained knowledge, when properly elicited, provides useful context. But self-generation also risks introducing hallucinations and factual errors that compound rather than correct the model's limitations.</p>
     </div>
 
-    <div class="story-section">
+    <div class="section-divider"></div>
+
+    <!-- When Self-Generation Works -->
+    <div class="story-section fade-in-section">
       <h2>When Self-Generation Works</h2>
-      <p>We found that task type matters enormously. For reasoning tasks, where the challenge is organizing and applying knowledge the model already has, self-generated context helps structure thinking. For factual recall tasks, where accuracy depends on specific memorized facts, self-generation is riskier—the model may confidently generate plausible but incorrect information.</p>
+      <p>We found that task type matters enormously. For reasoning tasks, where the challenge is organizing and applying knowledge the model already has, self-generated context helps structure thinking. For factual recall tasks, where accuracy depends on specific memorized facts, self-generation is riskier -- the model may confidently generate plausible but incorrect information.</p>
       <p>Model capability also plays a crucial role. Larger, more capable models produce more reliable self-generated content. Smaller models are more likely to hallucinate, making self-generation counterproductive.</p>
     </div>
 
-    <div class="highlight-box">
+    <!-- Results Table -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Performance Across RAG Paradigms</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Context Source</th>
+            <th>Reasoning Tasks</th>
+            <th>Factual Recall</th>
+            <th>Overall</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>No Context (Closed-book)</td>
+            <td>Baseline</td>
+            <td>Baseline</td>
+            <td>Baseline</td>
+          </tr>
+          <tr>
+            <td>Retrieved Documents</td>
+            <td>Good</td>
+            <td class="best-value">Strong</td>
+            <td>Good</td>
+          </tr>
+          <tr>
+            <td>Self-Generated Documents</td>
+            <td class="best-value">Strong</td>
+            <td>Variable</td>
+            <td>Good</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Hybrid (Retrieved + Self-Generated)</td>
+            <td>Best</td>
+            <td>Best</td>
+            <td>Best</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Key Findings -->
+    <div class="highlight-box fade-in-section">
       <h3>Key Findings</h3>
       <ul>
         <li><b>Task Dependency:</b> Self-generation works better for reasoning than factual recall</li>
@@ -104,20 +162,37 @@
       </ul>
     </div>
 
-    <div class="story-section">
+    <div class="section-divider"></div>
+
+    <!-- Practical Guidelines -->
+    <div class="story-section fade-in-section">
       <h2>Practical Guidelines</h2>
       <p>Based on our analysis, we propose guidelines for practitioners. Self-generation should be used selectively, considering task type and model capability. When factual accuracy is critical, retrieval from verified sources remains essential. But for reasoning and synthesis tasks, self-generated context can be a powerful complement.</p>
       <p>The most robust approach combines both: retrieve external documents for factual grounding, and use self-generation to bridge gaps and structure reasoning.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@inproceedings{shi-yin-2025-evaluating,
+    <div class="concept-box fade-in-section">
+      <h3>The Takeaway</h3>
+      <p>Self-generated documents are not a replacement for retrieval but a complementary tool. The key is knowing when to trust a model's own knowledge versus when to ground it in external sources -- and combining both strategies yields the most robust RAG systems.</p>
+    </div>
+
+    <!-- Citation -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@inproceedings{shi-yin-2025-evaluating,
     title = "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models",
     author = "Shi, Jiatong and Yin, Xunjian and Wan, Xiaojun",
     booktitle = "Findings of the Association for Computational Linguistics: NAACL 2025",
     year = "2025",
     url = "https://aclanthology.org/2025.findings-naacl.215/"
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -136,7 +211,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -144,6 +219,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

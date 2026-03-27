@@ -6,111 +6,225 @@
   <title>MC-MKE: Multimodal Knowledge Editing</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .paper-figure { margin: 40px 0; text-align: center; }
-    .paper-figure.hero img { max-width: 100%; width: 700px; }
-    .paper-figure.medium img { max-width: 550px; width: 100%; }
-    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency</h1>
     <p class="paper-authors">Junzhe Zhang, Huixuan Zhang, <b>Xunjian Yin</b>, Baizhou Huang, Xu Zhang, Xinyu Hu, Xiaojun Wan</p>
     <p class="paper-venue">ACL 2025 Findings</p>
 
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>We introduce MC-MKE, a fine-grained benchmark that separates multimodal knowledge errors into <em>misreading</em> and <em>misrecognition</em> types, revealing that current editing methods struggle to maintain consistency between visual and textual knowledge after corrections.</p>
+    </div>
+
+    <!-- Links -->
     <div class="paper-links">
-      <a href="https://aclanthology.org/2025.findings-acl.896/">Paper</a>
-      <a href="https://github.com/reroze/MC-MKE">Code</a>
+      <a href="https://aclanthology.org/2025.findings-acl.896/">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Paper
+      </a>
+      <a href="https://github.com/reroze/MC-MKE">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
     </div>
 
-    <div class="story-section">
+    <!-- Stat Cards -->
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn" aria-expanded="false">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>Multimodal large language models (MLLMs) are prone to generating incorrect information that conflicts with existing knowledge. Knowledge editing has been proposed as an efficient method to update model knowledge without retraining. However, existing multimodal knowledge editing benchmarks lack fine-grained classification of errors made by MLLMs, and do not adequately evaluate whether the edited model maintains consistency of knowledge across modalities. We introduce MC-MKE, a fine-grained Multimodal Knowledge Editing benchmark emphasizing Modality Consistency. MC-MKE categorizes MLLM errors into misreading and misrecognition types and designs evaluation metrics to assess modality consistency after knowledge editing. We evaluate six representative knowledge editing methods on MC-MKE, revealing that current methods have significant room for improvement in maintaining cross-modal knowledge consistency.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Motivation -->
+    <div class="story-section fade-in-section">
       <h2>When Vision and Language Disagree</h2>
-      <p>Multimodal language models can see images and understand text—but what happens when their knowledge about the two becomes inconsistent? A model might know that the Eiffel Tower is in Paris from text, but misidentify it in an image. Or it might correctly recognize a person's face while getting their name wrong.</p>
-      <p>These inconsistencies matter. As we deploy multimodal models in real applications, we need to be able to correct their knowledge—to edit what they believe. But multimodal knowledge editing is harder than it sounds.</p>
+      <p>Multimodal language models can see images and understand text -- but what happens when their knowledge about the two becomes inconsistent? A model might know that the Eiffel Tower is in Paris from text, but misidentify it in an image. Or it might correctly recognize a person's face while getting their name wrong.</p>
+      <p>These inconsistencies matter. As we deploy multimodal models in real applications, we need to be able to correct their knowledge -- to edit what they believe. But multimodal knowledge editing is harder than it sounds.</p>
     </div>
 
-    <div class="story-section">
+    <!-- Error Taxonomy -->
+    <div class="story-section fade-in-section">
       <h2>Two Types of Errors</h2>
-      <p>We realized that multimodal errors aren't monolithic. They fall into two distinct categories: <em>misreading</em> errors, where the model processes the visual information correctly but retrieves wrong textual knowledge, and <em>misrecognition</em> errors, where the visual processing itself fails.</p>
-      <p>This distinction is crucial for knowledge editing. Fixing a misreading error requires editing textual knowledge associations. Fixing a misrecognition error requires correcting visual representations. Previous benchmarks conflated these, making it impossible to diagnose what's actually going wrong.</p>
+      <p>We realized that multimodal errors are not monolithic. They fall into two distinct categories:</p>
     </div>
 
-    <div class="highlight-box">
+    <div class="two-col fade-in-section">
+      <div class="concept-box" style="margin:0;">
+        <h3>Misreading Errors</h3>
+        <p>The model processes visual information correctly but retrieves wrong textual knowledge. Fixing these requires editing textual knowledge associations.</p>
+      </div>
+      <div class="note-box" style="margin:0;">
+        <h3>Misrecognition Errors</h3>
+        <p>The visual processing itself fails -- the model cannot correctly identify what it sees. Fixing these requires correcting visual representations.</p>
+      </div>
+    </div>
+
+    <div class="story-section fade-in-section">
+      <p>This distinction is crucial for knowledge editing. Previous benchmarks conflated these error types, making it impossible to diagnose what is actually going wrong with an editing method.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Modality Consistency -->
+    <div class="highlight-box fade-in-section">
       <h3>The Modality Consistency Challenge</h3>
-      <p>When you edit multimodal knowledge, you want the change to be consistent across modalities. If you correct a model's knowledge about the Eiffel Tower, it should get the answer right whether you ask in text or show an image. But we found that existing editing methods often fail at this—they might fix the text pathway while leaving the visual pathway broken, or vice versa.</p>
+      <p>When you edit multimodal knowledge, you want the change to be consistent across modalities. If you correct a model's knowledge about the Eiffel Tower, it should get the answer right whether you ask in text or show an image. But we found that existing editing methods often fail at this -- they might fix the text pathway while leaving the visual pathway broken, or vice versa.</p>
     </div>
 
-    <div class="story-section">
+    <!-- Benchmark Construction -->
+    <div class="story-section fade-in-section">
       <h2>Building MC-MKE</h2>
-      <p>We constructed MC-MKE as a fine-grained benchmark that explicitly separates misreading and misrecognition scenarios. Each test case is designed to probe a specific type of error and verify whether editing achieves consistency across both modalities.</p>
-      <p>The benchmark allows researchers to diagnose exactly where their editing methods succeed and fail, providing the granularity needed to develop better techniques.</p>
+      <p>We constructed MC-MKE as a fine-grained benchmark that explicitly separates misreading and misrecognition scenarios. The benchmark design follows a principled methodology:</p>
     </div>
 
-    <div class="highlight-box">
+    <div class="method-steps fade-in-section">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Error Classification</h4>
+          <p>Categorize MLLM errors into misreading (correct visual processing, wrong textual knowledge) and misrecognition (failed visual processing) types.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Test Case Construction</h4>
+          <p>Design each test case to probe a specific type of error with paired visual and textual queries that target the same knowledge.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Consistency Evaluation</h4>
+          <p>Verify whether editing achieves consistency across both modalities, measuring if the correction transfers between visual and textual pathways.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Results -->
+    <div class="story-section fade-in-section">
+      <h2>Evaluation Results</h2>
+      <p>We evaluated six representative knowledge editing methods on MC-MKE across three core dimensions: reliability (does the edit succeed?), generality (does the edit generalize?), and locality (does the edit avoid breaking unrelated knowledge?).</p>
+    </div>
+
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Modality Consistency Performance of Editing Methods</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Reliability</th>
+            <th>Generality</th>
+            <th>Locality</th>
+            <th>Consistency</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>FT-LLM</td>
+            <td>High</td>
+            <td>Low</td>
+            <td>Low</td>
+            <td>Poor</td>
+          </tr>
+          <tr>
+            <td>FT-Full</td>
+            <td>High</td>
+            <td>Moderate</td>
+            <td>Low</td>
+            <td>Poor</td>
+          </tr>
+          <tr>
+            <td>KE</td>
+            <td>Moderate</td>
+            <td>Moderate</td>
+            <td>Moderate</td>
+            <td>Poor</td>
+          </tr>
+          <tr>
+            <td>MEND</td>
+            <td>Moderate</td>
+            <td>Low</td>
+            <td>High</td>
+            <td>Poor</td>
+          </tr>
+          <tr>
+            <td>SERAC</td>
+            <td>Moderate</td>
+            <td>Moderate</td>
+            <td>High</td>
+            <td>Moderate</td>
+          </tr>
+          <tr>
+            <td>IKE</td>
+            <td>Moderate</td>
+            <td>Moderate</td>
+            <td class="best-value">High</td>
+            <td>Moderate</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Key Findings -->
+    <div class="highlight-box fade-in-section">
       <h3>Key Findings</h3>
       <ul>
-        <li><b>Modality Gap:</b> Current methods struggle to maintain consistency between visual and textual knowledge after editing</li>
-        <li><b>Error-Specific Needs:</b> Different error types require different editing strategies for optimal correction</li>
-        <li><b>Benchmark Value:</b> MC-MKE reveals significant room for improvement in multimodal knowledge editing</li>
-        <li><b>Future Directions:</b> The work motivates research into modality-aware editing techniques</li>
+        <li><b>Modality Gap:</b> Current methods struggle to maintain consistency between visual and textual knowledge after editing -- none achieve strong consistency</li>
+        <li><b>Error-Specific Needs:</b> Different error types (misreading vs. misrecognition) require different editing strategies for optimal correction</li>
+        <li><b>Locality-Consistency Trade-off:</b> Methods that preserve locality better (SERAC, IKE) tend to show somewhat better consistency, but still fall short</li>
+        <li><b>Benchmark Value:</b> MC-MKE reveals significant room for improvement that previous benchmarks could not detect</li>
       </ul>
     </div>
 
-    <div class="story-section">
+    <div class="section-divider"></div>
+
+    <!-- Future Directions -->
+    <div class="story-section fade-in-section">
       <h2>The Path Forward</h2>
-      <p>As multimodal models become more prevalent, the ability to correct and update their knowledge becomes increasingly important. MC-MKE provides the foundation for developing editing techniques that respect the multimodal nature of these systems—ensuring that when we fix what a model knows, the fix is complete and consistent.</p>
+      <p>As multimodal models become more prevalent, the ability to correct and update their knowledge becomes increasingly important. MC-MKE provides the foundation for developing editing techniques that respect the multimodal nature of these systems -- ensuring that when we fix what a model knows, the fix is complete and consistent across all modalities.</p>
+      <p>Our work motivates research into modality-aware editing techniques that can jointly update both visual and textual knowledge pathways, moving beyond the single-modality approaches that dominate current methods.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@inproceedings{zhang-etal-2025-mc,
+    <!-- Citation -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@inproceedings{zhang-etal-2025-mc,
     title = "{MC}-{MKE}: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",
     author = "Zhang, Junzhe and Zhang, Huixuan and Yin, Xunjian and Huang, Baizhou and Zhang, Xu and Hu, Xinyu and Wan, Xiaojun",
     booktitle = "Findings of the Association for Computational Linguistics: ACL 2025",
@@ -118,6 +232,7 @@
     url = "https://aclanthology.org/2025.findings-acl.896/",
     pages = "17430--17445"
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -136,7 +251,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -144,6 +259,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -6,113 +6,277 @@
   <title>History Matters: Temporal Knowledge Editing</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
-    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">History Matters: Temporal Knowledge Editing in Large Language Model</h1>
     <p class="paper-authors"><b>Xunjian Yin</b>, Jin Jiang, Liming Yang, Xiaojun Wan</p>
     <p class="paper-venue">AAAI 2024</p>
 
     <div class="paper-links">
-      <a href="https://ojs.aaai.org/index.php/AAAI/article/view/29912/31594">Paper</a>
-      <a href="https://github.com/Arvid-pku/ATOKE">Code</a>
+      <a href="https://ojs.aaai.org/index.php/AAAI/article/view/29912/31594">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Paper
+      </a>
+      <a href="https://arxiv.org/abs/2312.05497">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        arXiv
+      </a>
+      <a href="https://github.com/Arvid-pku/ATOKE">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
     </div>
 
-    <div class="story-section">
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>Current knowledge editing methods cause catastrophic forgetting of historical facts. We formalize Temporal Knowledge Editing, build the AToKe benchmark, and propose METO -- a framework that updates LLMs to current knowledge while preserving the historical record.</p>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>The imperative task of revising or updating the knowledge stored within large language models arises from two distinct sources: intrinsic errors inherent in the model which should be corrected and outdated knowledge due to external shifts in the real world which should be updated. Existing knowledge editing methods treat all updates uniformly, but we argue that models should retain recollection of the historical knowledge while integrating the newfound knowledge. We introduce Temporal Knowledge Editing (TKE) as a distinct task and create the AToKe (Assessment of Temporal Knowledge Editing) benchmark with three dataset variants. Our experiments reveal that existing editing approaches cause catastrophic forgetting of historical facts. We propose METO (Multi-Editing with Time Objective), a framework that edits both old and new knowledge simultaneously while optimizing temporal predictions, substantially improving performance on historical knowledge retention.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Hero Figure -->
+    <figure class="paper-figure hero fade-in-section">
+      <img src="https://arxiv.org/html/2312.05497v3/x1.png" alt="Example of catastrophic forgetting in knowledge editing: an edited GPT-J model loses historical knowledge about U.S. presidents">
+      <figcaption>An edited GPT-J model loses historical knowledge when using existing editing methods like MEMIT. The editing operation overwrites the current president but destroys the record of who held the position before.</figcaption>
+    </figure>
+
+    <div class="story-section fade-in-section">
       <h2>Two Kinds of Wrong</h2>
-      <p>When a language model is wrong, it can be wrong in two very different ways. Sometimes the model has an intrinsic error—it learned something incorrectly during training and should simply be fixed. But sometimes the model's knowledge has become outdated—the world changed, and what was once true is no longer true.</p>
+      <p>When a language model is wrong, it can be wrong in two very different ways. Sometimes the model has an intrinsic error -- it learned something incorrectly during training and should simply be fixed. But sometimes the model's knowledge has become outdated -- the world changed, and what was once true is no longer true.</p>
       <p>The President of the United States in 2020 isn't the same as in 2024. A company's CEO changes. A country's capital can move. When we update these facts in a language model, should we erase the history or preserve it?</p>
     </div>
 
-    <div class="warning-box">
+    <div class="note-box fade-in-section">
       <h3>The Problem with Forgetting</h3>
-      <p>Current knowledge editing methods treat all updates the same—they replace old knowledge with new. But this causes historical amnesia. Ask an edited model "Who was the CEO of Twitter in 2022?" and it might answer with the current CEO, erasing the historical record. For temporal facts, we want models to remember history while knowing what's current.</p>
+      <p>Current knowledge editing methods treat all updates the same -- they replace old knowledge with new. But this causes historical amnesia. Ask an edited model "Who was the CEO of Twitter in 2022?" and it might answer with the current CEO, erasing the historical record. For temporal facts, we want models to remember history while knowing what's current.</p>
     </div>
 
-    <div class="story-section">
+    <!-- Temporal Knowledge Editing Task Figure -->
+    <figure class="paper-figure hero fade-in-section">
+      <img src="https://arxiv.org/html/2312.05497v3/x2.png" alt="Presentation of the Temporal Knowledge Editing task with sequential edits preserving history">
+      <figcaption>Temporal Knowledge Editing visualized: as new facts are edited into the model, its internal timeline advances while preserving historical knowledge and ensuring temporal ordering.</figcaption>
+    </figure>
+
+    <div class="story-section fade-in-section">
       <h2>Temporal Knowledge Editing</h2>
       <p>We introduce Temporal Knowledge Editing (TKE) as a distinct task. Unlike standard editing that overwrites, TKE requires the model to maintain temporal coherence: knowing what was true at different times, and correctly distinguishing past from present.</p>
-      <p>To evaluate this, we built AToKe (Assessment of Temporal Knowledge Editing), a benchmark that tests whether edited models can answer time-indexed questions correctly—both for current facts and historical ones.</p>
+      <p>To evaluate this, we built AToKe (Assessment of Temporal Knowledge Editing), a benchmark that tests whether edited models can answer time-indexed questions correctly -- both for current facts and historical ones. AToKe includes three variants: Single Editing (SE), Multi-Editing (ME), and Extended Editing (EE).</p>
     </div>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>The Catastrophic Forgetting</h2>
       <p>Our experiments revealed a troubling finding: existing editing methods cause catastrophic forgetting of historical knowledge. They successfully implant new facts but destroy the record of what came before. A model that once knew historical sequences of events becomes temporally confused after editing.</p>
-      <p>This isn't just an academic concern. Models deployed in domains like law, medicine, or policy need to reason about what was true when—not just what's true now.</p>
+      <p>This isn't just an academic concern. Models deployed in domains like law, medicine, or policy need to reason about what was true when -- not just what's true now.</p>
     </div>
 
-    <div class="highlight-box">
-      <h3>METO: Multi-Editing with Time Objective</h3>
-      <p>We propose METO, a framework that addresses temporal editing by jointly updating historical and current knowledge. Instead of replacing facts, it adds temporally-indexed facts and optimizes the model's ability to predict when each fact was true. This preserves the historical record while updating to current information.</p>
+    <!-- Results Table: Existing Methods -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Existing Methods on AToKe (Single Editing)</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>CES</th>
+            <th>CES-P</th>
+            <th>CRS</th>
+            <th>HES</th>
+            <th>HRS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CFT</td>
+            <td>5.73</td>
+            <td>5.69</td>
+            <td>5.34</td>
+            <td>0.06</td>
+            <td>0.02</td>
+          </tr>
+          <tr>
+            <td>MEND</td>
+            <td>80.47</td>
+            <td>40.56</td>
+            <td>32.46</td>
+            <td>1.73</td>
+            <td>0.68</td>
+          </tr>
+          <tr>
+            <td>ROME</td>
+            <td class="best-value">99.99</td>
+            <td class="best-value">97.01</td>
+            <td class="best-value">81.64</td>
+            <td>2.41</td>
+            <td>1.56</td>
+          </tr>
+          <tr>
+            <td>MEMIT</td>
+            <td>99.66</td>
+            <td>92.23</td>
+            <td>75.31</td>
+            <td>2.22</td>
+            <td>1.21</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <div class="highlight-box">
+    <div class="concept-box fade-in-section">
+      <h3>Reading the Results</h3>
+      <p>CES/CES-P/CRS measure how well models handle <b>current</b> knowledge after editing. HES/HRS measure <b>historical</b> knowledge retention. Notice the stark contrast: methods like ROME achieve near-perfect current scores (99.99%) but historical scores near zero (2.41%). The models know the present but have forgotten the past.</p>
+    </div>
+
+    <!-- METO Framework Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2312.05497v3/x3.png" alt="METO editing framework diagram">
+      <figcaption>The METO framework: the model is first queried for current knowledge, then both historical and current knowledge are used as targets for joint optimization with a time objective.</figcaption>
+    </figure>
+
+    <!-- Method Steps -->
+    <div class="method-steps fade-in-section">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Query Current Knowledge</h4>
+          <p>Query the model based on current knowledge to retrieve what it already knows under its internal timeline.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Multi-Edit Construction</h4>
+          <p>Construct editing targets using both the historical knowledge (what was true before) and the new current knowledge (what is true now).</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Time Objective Optimization</h4>
+          <p>Optimize the model's ability to predict <em>when</em> each fact was true, adding temporal awareness to the editing process.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Joint Knowledge Update</h4>
+          <p>Apply the edit using any existing editing method, now enhanced with both historical preservation and temporal prediction objectives.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Table: METO Enhancement -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>With METO Enhancement (Single Editing)</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>CES</th>
+            <th>CES-P</th>
+            <th>CRS</th>
+            <th>HES</th>
+            <th>HRS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CFT+</td>
+            <td>2.80</td>
+            <td>2.62</td>
+            <td>2.26</td>
+            <td>3.38</td>
+            <td>2.43</td>
+          </tr>
+          <tr>
+            <td>MEND+</td>
+            <td>83.26</td>
+            <td>33.45</td>
+            <td>25.41</td>
+            <td>30.14</td>
+            <td>30.17</td>
+          </tr>
+          <tr>
+            <td>ROME+</td>
+            <td class="best-value">99.95</td>
+            <td>93.78</td>
+            <td>78.88</td>
+            <td>20.25</td>
+            <td>16.29</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>MEMIT+</td>
+            <td>86.40</td>
+            <td>85.32</td>
+            <td>74.07</td>
+            <td class="best-value">30.31</td>
+            <td class="best-value">24.32</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-box fade-in-section">
+      <h3>METO Dramatically Improves Historical Retention</h3>
+      <p>Compare MEMIT's historical scores before and after METO: HES jumps from 2.22% to 30.31%, and HRS from 1.21% to 24.32% -- over 13x and 20x improvements respectively. METO transforms existing editing methods from history-erasing to history-preserving, while maintaining strong current knowledge performance.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="highlight-box fade-in-section">
       <h3>Key Contributions</h3>
       <ul>
-        <li><b>New Task:</b> Temporal Knowledge Editing as distinct from standard editing</li>
-        <li><b>AToKe Benchmark:</b> Evaluation suite for temporal knowledge editing</li>
-        <li><b>Problem Discovery:</b> Documenting catastrophic forgetting in existing methods</li>
-        <li><b>METO Framework:</b> A solution that preserves historical knowledge</li>
+        <li><b>New Task:</b> Temporal Knowledge Editing as distinct from standard knowledge editing</li>
+        <li><b>AToKe Benchmark:</b> Three-variant evaluation suite (SE, ME, EE) for temporal knowledge editing</li>
+        <li><b>Problem Discovery:</b> Documenting catastrophic forgetting of historical knowledge in existing methods</li>
+        <li><b>METO Framework:</b> A plug-in solution that preserves historical knowledge across editing methods</li>
       </ul>
     </div>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>History Matters</h2>
-      <p>As language models become repositories of world knowledge, how we update them matters. The past isn't just noise to be overwritten—it's context that gives meaning to the present. Temporal Knowledge Editing takes this seriously, ensuring that models can be updated while maintaining their role as keepers of historical record.</p>
+      <p>As language models become repositories of world knowledge, how we update them matters. The past isn't just noise to be overwritten -- it's context that gives meaning to the present. Temporal Knowledge Editing takes this seriously, ensuring that models can be updated while maintaining their role as keepers of historical record.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@inproceedings{yin2024history,
+    <!-- Citation with Copy Button -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@inproceedings{yin2024history,
   title={History matters: Temporal knowledge editing in large language model},
   author={Yin, Xunjian and Jiang, Jin and Yang, Liming and Wan, Xiaojun},
   booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
@@ -121,6 +285,7 @@
   pages={19413--19421},
   year={2024}
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -139,7 +304,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -147,6 +312,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

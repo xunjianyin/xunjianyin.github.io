@@ -6,121 +6,253 @@
   <title>COrAL: Order-Agnostic Language Modeling</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .paper-figure { margin: 40px 0; text-align: center; }
-    .paper-figure.hero img { max-width: 100%; width: 650px; }
-    .paper-figure.medium img { max-width: 600px; width: 100%; }
-    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement</h1>
     <p class="paper-authors">Yuxi Xie, Anirudh Goyal, Xiaobao Wu, <b>Xunjian Yin</b>, Xiao Xu, Min-Yen Kan, Liangming Pan, William Yang Wang</p>
     <p class="paper-venue">ArXiv Preprint 2024</p>
 
     <div class="paper-links">
-      <a href="https://arxiv.org/abs/2410.09675">Paper</a>
-      <a href="https://github.com/YuxiXie/COrAL">Code</a>
+      <a href="https://arxiv.org/abs/2410.09675">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Paper
+      </a>
+      <a href="https://github.com/YuxiXie/COrAL">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
     </div>
 
-    <figure class="paper-figure hero">
-      <img src="https://arxiv.org/html/2410.09675v1/x1.png" alt="COrAL Performance">
-      <figcaption>COrAL achieves better performance-efficiency trade-offs on GSM8K: higher accuracy with lower inference cost compared to traditional autoregressive approaches.</figcaption>
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>COrAL breaks the left-to-right bottleneck in language models by enabling order-agnostic generation within local windows, achieving up to 3.9x inference speedup and +4.6% accuracy on GSM8K through built-in iterative refinement.</p>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn" aria-expanded="false">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>Iterative refinement has emerged as an effective paradigm for enhancing the capabilities of large language models (LLMs) on complex tasks. However, existing approaches face a critical trade-off between output quality and computational efficiency due to their reliance on autoregressive (left-to-right) generation. We introduce COrAL (Context-wise Order-Agnostic Language Modeling), which embeds iterative refinement directly into the language model architecture. Our approach employs sliding blockwise order-agnostic decoding, which performs multi-token forward prediction and backward reconstruction within context windows. On reasoning benchmarks, COrAL achieves absolute accuracy gains of 4.6% on GSM8K and 4.0% on LogiQA, along with inference speedups of up to 3.9x over next-token baselines. However, code generation tasks reveal performance degradation due to output inconsistencies, highlighting inherent quality-speed trade-offs in order-agnostic generation.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Hero Figure -->
+    <figure class="paper-figure hero fade-in-section">
+      <img src="https://arxiv.org/html/2410.09675v1/x1.png" alt="COrAL performance scaling on GSM8K">
+      <figcaption>Figure 1: Scaling of performance and inference cost on GSM8K with increasing minimum refinement times for each output position. COrAL achieves better performance-efficiency trade-offs compared to traditional autoregressive approaches.</figcaption>
     </figure>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>Breaking the Sequential Bottleneck</h2>
-      <p>Language models generate text one token at a time, left to right. This sequential constraint is so fundamental that we rarely question it. But it comes with a cost: every token must wait for all previous tokens, making iterative refinement—where models reconsider and improve their outputs—painfully slow.</p>
+      <p>Language models generate text one token at a time, left to right. This sequential constraint is so fundamental that we rarely question it. But it comes with a cost: every token must wait for all previous tokens, making iterative refinement -- where models reconsider and improve their outputs -- painfully slow.</p>
       <p>What if we could break free from strict left-to-right generation? What if a model could refine multiple positions simultaneously, reasoning about dependencies without the sequential bottleneck?</p>
     </div>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>Order-Agnostic Modeling</h2>
       <p>COrAL introduces a fundamentally different approach: Context-wise Order-Agnostic Language Modeling. Instead of predicting only the next token, COrAL models multiple token dependencies within manageable context windows. This allows the model to generate and refine tokens in parallel, capturing diverse dependencies without strict ordering.</p>
-      <p>The key insight is that within a local window, the "correct" order of generation isn't always clear—and enforcing one might actually hurt performance. By being agnostic to order, COrAL can choose the most informative generation sequence dynamically.</p>
+      <p>The key insight is that within a local window, the "correct" order of generation is not always clear -- and enforcing one might actually hurt performance. By being agnostic to order, COrAL can choose the most informative generation sequence dynamically.</p>
     </div>
 
-    <figure class="paper-figure medium">
-      <img src="https://arxiv.org/html/2410.09675v1/x2.png" alt="Sliding Blockwise Decoding">
-      <figcaption>Sliding Blockwise Order-Agnostic Decoding: the model performs multi-token forward prediction and backward reconstruction within sliding windows, enabling parallel iterative refinement.</figcaption>
+    <!-- Method Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2410.09675v1/x2.png" alt="Sliding Blockwise Order-Agnostic Decoding">
+      <figcaption>Figure 2: Sliding Blockwise Order-Agnostic Decoding. COrAL performs multi-token prediction and refinement in a sliding block, enabling parallel iterative refinement through forward prediction and backward reconstruction.</figcaption>
     </figure>
 
-    <div class="highlight-box">
+    <!-- Context-wise modeling figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2410.09675v1/x3.png" alt="Context-Wise Order-Agnostic Language Modeling">
+      <figcaption>Figure 3: Context-Wise Order-Agnostic Language Modeling. The model captures order-agnostic dependencies within a context window, enabling flexible generation sequences.</figcaption>
+    </figure>
+
+    <div class="highlight-box fade-in-section">
       <h3>The Technical Innovation</h3>
-      <p>We introduce sliding blockwise order-agnostic decoding. The model predicts multiple tokens forward, then reconstructs backward within each window. As the window slides, the model iteratively refines its outputs—all happening in parallel within each block. This achieves the benefits of iterative refinement without the sequential cost.</p>
+      <p>We introduce sliding blockwise order-agnostic decoding. The model predicts multiple tokens forward, then reconstructs backward within each window. As the window slides, the model iteratively refines its outputs -- all happening in parallel within each block. This achieves the benefits of iterative refinement without the sequential cost.</p>
     </div>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>Built Into the Architecture</h2>
-      <p>Previous approaches to iterative refinement operated at the prompting or application level—asking models to "think again" or "check your work." COrAL incorporates refinement directly into the architecture. The model doesn't need to be told to reconsider; it naturally refines as part of its generation process.</p>
+      <p>Previous approaches to iterative refinement operated at the prompting or application level -- asking models to "think again" or "check your work." COrAL incorporates refinement directly into the architecture. The model does not need to be told to reconsider; it naturally refines as part of its generation process.</p>
       <p>This architectural integration means refinement happens efficiently, without the overhead of multiple forward passes or explicit self-correction prompts.</p>
     </div>
 
-    <div class="highlight-box">
+    <div class="section-divider"></div>
+
+    <!-- Results Tables -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Arithmetic Reasoning (GSM8K &amp; MATH)</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Approach</th>
+            <th>GSM8K Acc.</th>
+            <th>GSM8K Speed</th>
+            <th>Speedup</th>
+            <th>MATH Acc.</th>
+            <th>MATH Speed</th>
+            <th>Speedup</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>NT (baseline)</td>
+            <td>74.1%</td>
+            <td>39.7</td>
+            <td>1.0x</td>
+            <td>21.8%</td>
+            <td>38.7</td>
+            <td>1.0x</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>COrAL (full)</td>
+            <td>75.3%</td>
+            <td>43.4</td>
+            <td>1.1x</td>
+            <td>22.7%</td>
+            <td>44.4</td>
+            <td>1.1x</td>
+          </tr>
+          <tr>
+            <td>COrAL w/o verifier</td>
+            <td>72.4%</td>
+            <td>156.8</td>
+            <td class="best-value">3.9x</td>
+            <td>20.0%</td>
+            <td>139.7</td>
+            <td class="best-value">3.6x</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>COrAL w/o multi-forward</td>
+            <td class="best-value">78.7%</td>
+            <td>14.9</td>
+            <td>--</td>
+            <td class="best-value">24.3%</td>
+            <td>11.5</td>
+            <td>--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Logical Reasoning (LogiQA &amp; ReClor)</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Approach</th>
+            <th>LogiQA Acc.</th>
+            <th>Speed</th>
+            <th>Speedup</th>
+            <th>ReClor Acc.</th>
+            <th>Speed</th>
+            <th>Speedup</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>NT (baseline)</td>
+            <td>55.1%</td>
+            <td>33.6</td>
+            <td>1.0x</td>
+            <td>63.2%</td>
+            <td>33.2</td>
+            <td>1.0x</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>COrAL (full)</td>
+            <td>58.2%</td>
+            <td>62.1</td>
+            <td>1.8x</td>
+            <td>62.7%</td>
+            <td>38.2</td>
+            <td>1.2x</td>
+          </tr>
+          <tr>
+            <td>COrAL w/o verifier</td>
+            <td>55.7%</td>
+            <td>99.1</td>
+            <td class="best-value">2.9x</td>
+            <td>61.6%</td>
+            <td>72.0</td>
+            <td class="best-value">2.2x</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>COrAL w/o multi-forward</td>
+            <td class="best-value">59.1%</td>
+            <td>8.9</td>
+            <td>--</td>
+            <td class="best-value">64.7%</td>
+            <td>11.3</td>
+            <td>--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-box fade-in-section">
       <h3>Key Results</h3>
       <ul>
-        <li><b>Efficiency Gains:</b> Parallel generation within blocks reduces inference latency</li>
-        <li><b>Better Reasoning:</b> Improved performance on mathematical reasoning tasks like GSM8K</li>
+        <li><b>Efficiency Gains:</b> Parallel generation within blocks achieves up to 3.9x inference speedup</li>
+        <li><b>Better Reasoning:</b> +4.6% absolute accuracy on GSM8K and +4.0% on LogiQA</li>
         <li><b>Scalable Refinement:</b> Performance improves with more refinement iterations</li>
         <li><b>Architectural Innovation:</b> Refinement built into the model, not bolted on</li>
       </ul>
     </div>
 
-    <div class="story-section">
-      <h2>Looking Forward</h2>
-      <p>COrAL challenges the assumption that autoregressive, left-to-right generation is the only way to build language models. By relaxing the ordering constraint within local windows, we unlock new possibilities for efficient iterative refinement—a capability increasingly important as we push models toward more complex reasoning tasks.</p>
+    <!-- Analysis Figures -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2410.09675v1/x4.png" alt="Code generation results on HumanEval">
+      <figcaption>Figure 4: Result comparison of pass rates and speed on code generation (HumanEval), revealing quality-speed trade-offs in format-sensitive tasks.</figcaption>
+    </figure>
+
+    <div class="note-box fade-in-section">
+      <h3>Trade-offs in Code Generation</h3>
+      <p>While COrAL excels at reasoning tasks, code generation reveals an important limitation. Strict syntactic requirements in code are harder to satisfy with order-agnostic generation, with syntax errors accounting for 70.1% of failure cases. This highlights that the approach is best suited for tasks where token ordering is less rigid.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@misc{xie2024coralorderagnosticlanguagemodeling,
+    <div class="story-section fade-in-section">
+      <h2>Looking Forward</h2>
+      <p>COrAL challenges the assumption that autoregressive, left-to-right generation is the only way to build language models. By relaxing the ordering constraint within local windows, we unlock new possibilities for efficient iterative refinement -- a capability increasingly important as we push models toward more complex reasoning tasks.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Citation with Copy Button -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@misc{xie2024coralorderagnosticlanguagemodeling,
     title={COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement},
     author={Yuxi Xie and Anirudh Goyal and Xiaobao Wu and Xunjian Yin and Xiao Xu and Min-Yen Kan and Liangming Pan and William Yang Wang},
     year={2024},
@@ -129,6 +261,7 @@
     primaryClass={cs.CL},
     url={https://arxiv.org/abs/2410.09675}
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -147,7 +280,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -155,6 +288,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

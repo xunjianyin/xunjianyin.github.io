@@ -6,113 +6,201 @@
   <title>Understanding the Interplay between Parametric and Contextual Knowledge</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .paper-figure { margin: 40px 0; text-align: center; }
-    .paper-figure.hero img { max-width: 100%; width: 700px; }
-    .paper-figure.medium img { max-width: 550px; width: 100%; }
-    .paper-figure.small img { max-width: 480px; width: 100%; }
-    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
-    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">Understanding the Interplay between Parametric and Contextual Knowledge for Large Language Models</h1>
     <p class="paper-authors">Sitao Cheng, Liangming Pan, <b>Xunjian Yin</b>, Xinyi Wang, William Yang Wang</p>
     <p class="paper-venue">KnowLM Workshop @ ACL 2025</p>
 
     <div class="paper-links">
-      <a href="https://arxiv.org/abs/2410.08414">Paper</a>
-      <a href="https://github.com/sitaocheng/Knowledge_Interplay">Code</a>
+      <a href="https://arxiv.org/abs/2410.08414">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Paper
+      </a>
+      <a href="https://github.com/sitaocheng/Knowledge_Interplay">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
     </div>
 
-    <figure class="paper-figure hero">
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>LLMs suppress their internal knowledge whenever external context is present -- even when that context is irrelevant or complementary. We introduce EchoQA, a benchmark with four knowledge-relationship types, revealing that models default to "defer to context" and struggle to integrate parametric and contextual knowledge.</p>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="abstract-content">
+        <p>Large language models (LLMs) encode vast amounts of knowledge during pre-training (parametric knowledge, or PK) and can further be enhanced by incorporating contextual knowledge (CK). Can LLMs effectively integrate their internal PK with external CK to solve complex problems? In this paper, we investigate the dynamic interaction between PK and CK, categorizing their relationships into four types: Supportive, Complementary, Conflicting, and Irrelevant. To support this investigation, we introduce EchoQA, a benchmark spanning scientific, factual, and commonsense knowledge. Our results show that LLMs tend to suppress their PK when contextual information is available, even when it is complementary or irrelevant. While tailored instructions can encourage LLMs to rely more on their PK, they still struggle to fully leverage it. These findings reveal a key vulnerability in LLMs, raising concerns about their reliability in knowledge-intensive tasks.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Hero Figure -->
+    <figure class="paper-figure hero fade-in-section">
       <img src="https://arxiv.org/html/2410.08414v1/x1.png" alt="EchoQA Benchmark Overview">
       <figcaption>The EchoQA benchmark categorizes knowledge relationships into four types: Supportive (context confirms what the model knows), Complementary (context adds to internal knowledge), Conflicting (context contradicts internal knowledge), and Irrelevant (context provides no useful information).</figcaption>
     </figure>
 
-    <div class="story-section">
+    <!-- Two Sources of Truth -->
+    <div class="story-section fade-in-section">
       <h2>Two Sources of Truth</h2>
-      <p>Large language models carry two kinds of knowledge. There's parametric knowledge—facts and patterns baked into their weights during pre-training. And there's contextual knowledge—information provided in the prompt, like retrieved documents or user-supplied context. Ideally, models should seamlessly integrate both to answer complex questions.</p>
-      <p>But how do these two knowledge sources actually interact? When they agree, when they conflict, when one fills gaps in the other—how does the model decide what to believe?</p>
+      <p>Large language models carry two kinds of knowledge. There's parametric knowledge -- facts and patterns baked into their weights during pre-training. And there's contextual knowledge -- information provided in the prompt, like retrieved documents or user-supplied context. Ideally, models should seamlessly integrate both to answer complex questions.</p>
+      <p>But how do these two knowledge sources actually interact? When they agree, when they conflict, when one fills gaps in the other -- how does the model decide what to believe?</p>
     </div>
 
-    <div class="story-section">
+    <!-- Taxonomy -->
+    <div class="story-section fade-in-section">
       <h2>A Taxonomy of Relationships</h2>
       <p>We developed a systematic taxonomy to study these interactions. Contextual knowledge can be <em>supportive</em> (confirming what the model already knows), <em>complementary</em> (adding necessary pieces the model lacks), <em>conflicting</em> (contradicting the model's beliefs), or <em>irrelevant</em> (providing no useful information). Each relationship presents different challenges.</p>
-      <p>To study these systematically, we created ECHOQA—a benchmark spanning scientific, factual, and commonsense knowledge domains, with carefully controlled examples of each relationship type.</p>
+      <p>To study these systematically, we created EchoQA -- a benchmark spanning scientific, factual, and commonsense knowledge domains, with carefully controlled examples of each relationship type.</p>
     </div>
 
-    <figure class="paper-figure medium">
+    <!-- Complementary Reasoning Figure -->
+    <figure class="paper-figure medium fade-in-section">
       <img src="https://arxiv.org/html/2410.08414v1/x2.png" alt="Complementary Reasoning Results">
       <figcaption>Accuracy on Complementary Reasoning tasks: models struggle to effectively combine their internal knowledge with contextual information, even when both are necessary to answer correctly.</figcaption>
     </figure>
 
-    <div class="warning-box">
+    <!-- Warning Box -->
+    <div class="note-box fade-in-section">
       <h3>The Troubling Discovery</h3>
-      <p>Our experiments revealed a concerning pattern: LLMs tend to suppress their parametric knowledge whenever contextual information is present—even when that context is irrelevant or when the model's own knowledge would be more helpful. The models seem to have learned "defer to context" as a default behavior, sometimes to their detriment.</p>
+      <p>Our experiments revealed a concerning pattern: LLMs tend to suppress their parametric knowledge whenever contextual information is present -- even when that context is irrelevant or when the model's own knowledge would be more helpful. The models seem to have learned "defer to context" as a default behavior, sometimes to their detriment.</p>
     </div>
 
-    <div class="story-section">
+    <!-- Failure of Complementary Reasoning -->
+    <div class="story-section fade-in-section">
       <h2>The Failure of Complementary Reasoning</h2>
-      <p>The most striking failure came in complementary reasoning tasks—questions that require combining internal and external knowledge. The model knows some facts; the context provides others; the answer requires integrating both. This should be the ideal use case for retrieval-augmented generation.</p>
-      <p>Instead, models struggled significantly. They would often ignore their parametric knowledge entirely, trying to answer using only the context—and failing when the context alone was insufficient.</p>
+      <p>The most striking failure came in complementary reasoning tasks -- questions that require combining internal and external knowledge. The model knows some facts; the context provides others; the answer requires integrating both. This should be the ideal use case for retrieval-augmented generation.</p>
+      <p>Instead, models struggled significantly. They would often ignore their parametric knowledge entirely, trying to answer using only the context -- and failing when the context alone was insufficient.</p>
     </div>
 
-    <figure class="paper-figure small">
+    <!-- Results Table: Unknown Ratio for Complementary Reasoning -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Unknown Ratio (%) for Complementary Reasoning on ALCUNA</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>w/o K</th>
+            <th>Neutral</th>
+            <th>Trust Yourself</th>
+            <th>Golden K</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>OpenAI o1</td>
+            <td>65.78</td>
+            <td>46.12</td>
+            <td>35.43</td>
+            <td class="best-value">20.63</td>
+          </tr>
+          <tr>
+            <td>GPT-4o</td>
+            <td>36.45</td>
+            <td>59.90</td>
+            <td>26.94</td>
+            <td class="best-value">8.08</td>
+          </tr>
+          <tr>
+            <td>Llama 3.1-70B</td>
+            <td>23.89</td>
+            <td>62.72</td>
+            <td>23.88</td>
+            <td class="best-value">0.08</td>
+          </tr>
+          <tr>
+            <td>Qwen 2-7B</td>
+            <td>40.28</td>
+            <td>81.26</td>
+            <td>73.62</td>
+            <td class="best-value">28.60</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Conflicting Reasoning Figure -->
+    <figure class="paper-figure small fade-in-section">
       <img src="https://arxiv.org/html/2410.08414v1/x3.png" alt="Conflicting Reasoning Results">
       <figcaption>Memorization Ratio for Conflicting Reasoning: how often models stick with their parametric knowledge when context contradicts it. The results reveal inconsistent behavior across different models and scenarios.</figcaption>
     </figure>
 
-    <div class="highlight-box">
+    <!-- Irrelevant Reasoning Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2410.08414v1/x4.png" alt="Irrelevant Reasoning Results">
+      <figcaption>Accuracy for Irrelevant Reasoning with multiple documents: models are distracted by irrelevant contextual information, leading to degraded performance compared to relying on parametric knowledge alone.</figcaption>
+    </figure>
+
+    <!-- Results Table: Unknown Ratio for Irrelevant Reasoning -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Unknown Ratio (%) for Irrelevant Reasoning on ConflictQA</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Neutral</th>
+            <th>Trust Yourself</th>
+            <th>Speak Out Loud</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>OpenAI o1</td>
+            <td class="best-value">6.12</td>
+            <td class="best-value">6.12</td>
+            <td class="best-value">0.98</td>
+          </tr>
+          <tr>
+            <td>GPT-4o</td>
+            <td>50.38</td>
+            <td>13.46</td>
+            <td>0.53</td>
+          </tr>
+          <tr>
+            <td>Llama 3.1-70B</td>
+            <td>55.14</td>
+            <td>27.36</td>
+            <td>2.33</td>
+          </tr>
+          <tr>
+            <td>Qwen 2-7B</td>
+            <td>80.59</td>
+            <td>41.82</td>
+            <td>4.57</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Key Findings -->
+    <div class="highlight-box fade-in-section">
       <h3>Key Findings</h3>
       <ul>
         <li><b>Context Dominance:</b> LLMs prioritize context even when parametric knowledge would be more reliable</li>
@@ -122,20 +210,46 @@
       </ul>
     </div>
 
-    <div class="story-section">
+    <div class="section-divider"></div>
+
+    <!-- Entity Popularity Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2410.08414v1/x5.png" alt="Memorization Ratio by Entity Popularity">
+      <figcaption>Memorization Ratio on ConflictQA by entity popularity categories: models are more likely to retain parametric knowledge for popular entities, suggesting that knowledge frequency during pre-training affects the balance between internal and contextual knowledge.</figcaption>
+    </figure>
+
+    <!-- Implications for RAG -->
+    <div class="story-section fade-in-section">
       <h2>Implications for RAG</h2>
-      <p>These findings have serious implications for retrieval-augmented generation. RAG systems assume that providing relevant context will help models answer better. But if models can't properly integrate context with their own knowledge—or worse, if they suppress useful internal knowledge when context is present—then RAG might not work as intended.</p>
+      <p>These findings have serious implications for retrieval-augmented generation. RAG systems assume that providing relevant context will help models answer better. But if models can't properly integrate context with their own knowledge -- or worse, if they suppress useful internal knowledge when context is present -- then RAG might not work as intended.</p>
       <p>Our work calls for more careful design of RAG systems, including mechanisms to help models know when to trust context, when to trust themselves, and when to synthesize both.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@inproceedings{cheng2025understanding,
+    <!-- Knowledge Fabrication Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2410.08414v1/x6.png" alt="Knowledge Fabrication Methods">
+      <figcaption>Memorization Ratio for Conflicting Reasoning under different knowledge fabrication methods: the way conflicting information is constructed significantly affects how models balance parametric and contextual knowledge.</figcaption>
+    </figure>
+
+    <div class="section-divider"></div>
+
+    <!-- Citation -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@inproceedings{cheng2025understanding,
   title={Understanding the Interplay between Parametric and Contextual Knowledge for Large Language Models},
   author={Sitao Cheng and Liangming Pan and Xunjian Yin and Xinyi Wang and William Yang Wang},
   booktitle={Knowledgeable Foundation Models at ACL 2025},
   year={2025},
   url={https://openreview.net/forum?id=4uisAcagzw}
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -154,7 +268,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -162,6 +276,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

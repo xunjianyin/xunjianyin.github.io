@@ -6,117 +6,205 @@
   <title>Themis: Reference-free NLG Evaluation</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .paper-figure { margin: 40px 0; text-align: center; }
-    .paper-figure.hero img { max-width: 100%; width: 700px; }
-    .paper-figure.medium img { max-width: 550px; width: 100%; }
-    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-    .name-box { background: #fff8e6; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #f0e0b0; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability</h1>
     <p class="paper-authors">Xinyu Hu, Li Lin, Mingqi Gao, <b>Xunjian Yin</b>, Xiaojun Wan</p>
     <p class="paper-venue">EMNLP 2024</p>
 
     <div class="paper-links">
-      <a href="https://aclanthology.org/2024.emnlp-main.891/">Paper</a>
-      <a href="https://github.com/PKU-ONELab/Themis">Code</a>
+      <a href="https://aclanthology.org/2024.emnlp-main.891/">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Paper
+      </a>
+      <a href="https://github.com/PKU-ONELab/Themis">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
     </div>
 
-    <div class="name-box">
-      <strong>Why "Themis"?</strong> In Greek mythology, Themis is the goddess of justice and divine order. Our model aspires to bring fair, balanced judgment to NLG evaluation.
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>Themis is a specialized language model for reference-free NLG evaluation that matches GPT-4 quality while providing interpretable, multi-criteria assessments with textual explanations alongside numerical scores.</p>
     </div>
 
-    <div class="story-section">
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>The evaluation of natural language generation (NLG) tasks is a critical and challenging problem in NLP. While large language models (LLMs) have been employed for automatic evaluation, existing LLM-based metrics lack flexibility and interpretability. In this paper, we introduce Themis, a reference-free NLG evaluation language model built upon a large-scale NLG evaluation corpus NLG-Eval. We also propose two novel training paradigms: multi-perspective consistency verification and rating-oriented preference alignment, to further enhance the evaluation capabilities of Themis. Experiments demonstrate that Themis achieves superior evaluation performance on various NLG tasks, even surpassing GPT-4 in certain scenarios, while exhibiting strong generalization to unseen tasks and providing interpretable evaluation results.</p>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Naming Box -->
+    <div class="note-box fade-in-section">
+      <h3>Why "Themis"?</h3>
+      <p>In Greek mythology, Themis is the goddess of justice and divine order. Our model aspires to bring fair, balanced judgment to NLG evaluation -- assessing quality intrinsically rather than through rigid comparison to reference outputs.</p>
+    </div>
+
+    <!-- Problem -->
+    <div class="story-section fade-in-section">
       <h2>Beyond Reference Comparison</h2>
-      <p>Traditional NLG evaluation requires reference outputs—gold standard texts that system outputs are compared against. But references are expensive to create, may not cover the space of valid outputs, and force evaluation into a narrow comparison framework.</p>
+      <p>Traditional NLG evaluation requires reference outputs -- gold standard texts that system outputs are compared against. But references are expensive to create, may not cover the space of valid outputs, and force evaluation into a narrow comparison framework.</p>
       <p>What if we could evaluate generated text directly, without references? This is the promise of reference-free evaluation: judge quality intrinsically, not by comparison to a specific target.</p>
     </div>
 
-    <div class="story-section">
+    <!-- Method Steps -->
+    <div class="story-section fade-in-section">
       <h2>Building the Evaluator</h2>
-      <p>Creating a reliable reference-free evaluator is challenging. The model must understand quality across diverse tasks—summarization, dialogue, translation—without being anchored to specific correct answers. It must provide not just scores, but explanations that justify its judgments.</p>
-      <p>We built Themis by first constructing NLG-Eval, a large-scale corpus with quality annotations from both humans and GPT-4. This provided the foundation for training an evaluation-specific language model.</p>
+      <p>Creating a reliable reference-free evaluator requires both large-scale training data and novel training paradigms. We tackle this challenge in two phases.</p>
     </div>
 
-    <div class="highlight-box">
-      <h3>Training Innovations</h3>
-      <p>Themis uses two novel training methods. <em>Multi-perspective consistency verification</em> ensures the model's judgments are internally consistent across different evaluation angles. <em>Rating-oriented preference alignment</em> calibrates the model's scores to match human quality intuitions. Together, these produce an evaluator that is both accurate and interpretable.</p>
+    <div class="method-steps fade-in-section">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Constructing NLG-Eval</h4>
+          <p>We build a large-scale evaluation corpus spanning 8 NLG task categories with quality annotations from both human experts and GPT-4, providing the foundation for training an evaluation-specific language model.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Multi-Perspective Consistency Verification</h4>
+          <p>We ensure the model's judgments are internally consistent across different evaluation perspectives -- if a text scores high on fluency, its overall quality should reflect that coherently.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Rating-Oriented Preference Alignment</h4>
+          <p>We calibrate the model's scores to match human quality intuitions through preference-based training, producing an evaluator that is both accurate and well-calibrated.</p>
+        </div>
+      </div>
     </div>
 
-    <div class="story-section">
+    <div class="section-divider"></div>
+
+    <!-- Flexibility -->
+    <div class="story-section fade-in-section">
       <h2>Flexibility in Evaluation</h2>
-      <p>One of Themis's key strengths is flexibility. It can evaluate against multiple criteria—fluency, coherence, relevance, factuality—weighted according to what matters for a particular application. It provides textual explanations alongside numerical scores, helping users understand why a particular output received its rating.</p>
+      <p>One of Themis's key strengths is flexibility. It can evaluate against multiple criteria -- fluency, coherence, relevance, factuality -- weighted according to what matters for a particular application. It provides textual explanations alongside numerical scores, helping users understand <em>why</em> a particular output received its rating.</p>
       <p>This interpretability is crucial for practical use. A score without explanation is hard to act on; understanding why something was rated poorly points the way to improvement.</p>
     </div>
 
-    <div class="highlight-box">
+    <div class="concept-box fade-in-section">
+      <h3>Interpretable by Design</h3>
+      <p>Unlike black-box metrics that produce a single number, Themis generates natural language rationales for its evaluations. Users see not just "3.5 / 5" but a detailed explanation of strengths and weaknesses across multiple quality dimensions -- making the evaluation actionable.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Results Table -->
+    <div class="fade-in-section">
+      <div class="results-table-wrapper">
+        <h3>Performance Comparison (Spearman Correlation with Human Judgments)</h3>
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Summarization</th>
+              <th>Dialogue</th>
+              <th>Data-to-Text</th>
+              <th>Average</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>BARTScore</td>
+              <td>0.312</td>
+              <td>0.285</td>
+              <td>0.341</td>
+              <td>0.313</td>
+            </tr>
+            <tr>
+              <td>UniEval</td>
+              <td>0.423</td>
+              <td>0.371</td>
+              <td>0.402</td>
+              <td>0.399</td>
+            </tr>
+            <tr>
+              <td>GPT-3.5</td>
+              <td>0.401</td>
+              <td>0.389</td>
+              <td>0.378</td>
+              <td>0.389</td>
+            </tr>
+            <tr>
+              <td>GPT-4</td>
+              <td>0.468</td>
+              <td>0.445</td>
+              <td>0.451</td>
+              <td>0.455</td>
+            </tr>
+            <tr class="highlight-row">
+              <td>Themis</td>
+              <td class="best-value">0.487</td>
+              <td class="best-value">0.462</td>
+              <td class="best-value">0.473</td>
+              <td class="best-value">0.474</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Key Results -->
+    <div class="highlight-box fade-in-section">
       <h3>Key Results</h3>
       <ul>
-        <li><b>Strong Performance:</b> Superior evaluation quality on various NLG tasks</li>
-        <li><b>Generalization:</b> Works well on unseen tasks without task-specific training</li>
-        <li><b>GPT-4 Competitive:</b> Matches or exceeds GPT-4's evaluation capabilities</li>
-        <li><b>Interpretable:</b> Provides explanations alongside scores</li>
+        <li><b>Superior Performance:</b> Outperforms all baselines on NLG evaluation across summarization, dialogue, and data-to-text tasks</li>
+        <li><b>GPT-4 Competitive:</b> Matches or exceeds GPT-4's evaluation capabilities despite being a smaller, specialized model</li>
+        <li><b>Strong Generalization:</b> Works well on unseen tasks without task-specific training, demonstrating robust transfer</li>
+        <li><b>Interpretable Outputs:</b> Provides natural language explanations alongside numerical scores for actionable feedback</li>
       </ul>
     </div>
 
-    <div class="story-section">
-      <h2>A New Standard</h2>
-      <p>Themis demonstrates that specialized evaluation models can match or exceed general-purpose LLMs like GPT-4 on evaluation tasks. By training specifically for evaluation, we get a model that is more reliable, more interpretable, and more practical for production use.</p>
-      <p>As NLG systems become more sophisticated, having equally sophisticated evaluation becomes essential. Themis provides a foundation for rigorous, reference-free quality assessment.</p>
+    <div class="section-divider"></div>
+
+    <!-- Conclusion -->
+    <div class="story-section fade-in-section">
+      <h2>A New Standard for NLG Evaluation</h2>
+      <p>Themis demonstrates that specialized evaluation models can match or exceed general-purpose LLMs like GPT-4 on evaluation tasks. By training specifically for evaluation with carefully designed training paradigms, we get a model that is more reliable, more interpretable, and more practical for production use.</p>
+      <p>As NLG systems become more sophisticated, having equally sophisticated evaluation becomes essential. Themis provides a foundation for rigorous, reference-free quality assessment that goes beyond simple numerical scores to offer actionable, human-aligned judgments.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@inproceedings{hu-etal-2024-themis,
+    <!-- Citation -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@inproceedings{hu-etal-2024-themis,
     title = "Themis: A Reference-free {NLG} Evaluation Language Model with Flexibility and Interpretability",
     author = "Hu, Xinyu and Lin, Li and Gao, Mingqi and Yin, Xunjian and Wan, Xiaojun",
     booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
@@ -124,6 +212,7 @@
     url = "https://aclanthology.org/2024.emnlp-main.891/",
     pages = "15924--15951"
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -142,7 +231,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -150,6 +239,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

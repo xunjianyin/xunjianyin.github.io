@@ -6,96 +6,175 @@
   <title>ALCUNA: LLMs Meet New Knowledge</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
-    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">ALCUNA: Large Language Models Meet New Knowledge</h1>
     <p class="paper-authors"><b>Xunjian Yin*</b>, Baizhou Huang*, Xiaojun Wan</p>
     <p class="paper-venue">EMNLP 2023</p>
 
     <div class="paper-links">
-      <a href="https://aclanthology.org/2023.emnlp-main.87/">Paper</a>
-      <a href="https://github.com/arvid-pku/alcuna">Code</a>
+      <a href="https://aclanthology.org/2023.emnlp-main.87/">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        Paper
+      </a>
+      <a href="https://arxiv.org/abs/2310.14820">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        arXiv
+      </a>
+      <a href="https://github.com/arvid-pku/alcuna">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
     </div>
 
-    <div class="story-section">
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr">
+      <div class="tldr-label">TL;DR</div>
+      <p>We create artificial entities guaranteed absent from training data and build ALCUNA, a benchmark that cleanly tests whether LLMs can understand, differentiate, and reason about genuinely new knowledge -- revealing that models struggle significantly when they cannot fall back on memorization.</p>
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract">
+      <button class="abstract-toggle-btn">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>With the rapid development of NLP, large-scale language models (LLMs) excel in various benchmarks. However, the existing benchmarks may not adequately measure an LLM's ability to handle new knowledge. In this paper, we address the lack of benchmarks to evaluate LLMs' ability to handle new knowledge, an important issue in the age of information. We propose an approach called KnowGen that generates new knowledge by altering existing entity attributes and relationships, resulting in artificial entities that are absent from LLMs' training data. With KnowGen, we introduce a benchmark named ALCUNA to assess LLMs' abilities in knowledge understanding, differentiation, and association. We benchmark several LLMs and the results reveal that LLM performance in the face of new knowledge is not satisfactory, particularly in reasoning between new and internal knowledge. We also explore the impact of entity similarity and context on LLM understanding of new knowledge.</p>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Hero Figure -->
+    <figure class="paper-figure hero fade-in-section">
+      <img src="https://raw.githubusercontent.com/Arvid-pku/alcuna/main/overview.png" alt="ALCUNA Framework Overview: KnowGen generates artificial entities with modified attributes and relationships to test LLM knowledge handling">
+      <figcaption>Overview of ALCUNA. KnowGen creates artificial entities by modifying attributes and relationships of existing ones, producing knowledge guaranteed to be absent from any training corpus. The benchmark then probes three dimensions: understanding, differentiation, and association.</figcaption>
+    </figure>
+
+    <div class="story-section fade-in-section">
       <h2>The Benchmark Contamination Problem</h2>
-      <p>How do we know if a language model truly understands, or if it's just memorized the answers? This question becomes urgent when we realize that many benchmarks test knowledge the model has seen during training. High scores might reflect recall rather than reasoning.</p>
-      <p>The world also keeps generating new knowledge—new people, new companies, new discoveries. Models trained on past data can't have this information, yet real-world applications constantly encounter it. How do models handle knowledge they've never seen?</p>
+      <p>How do we know if a language model truly understands, or if it has just memorized the answers? This question becomes urgent when we realize that many benchmarks test knowledge the model has seen during training. High scores might reflect recall rather than reasoning.</p>
+      <p>The world also keeps generating new knowledge -- new people, new companies, new discoveries. Models trained on past data cannot have this information, yet real-world applications constantly encounter it. How do models handle knowledge they have never seen?</p>
     </div>
 
-    <div class="story-section">
+    <div class="section-divider"></div>
+
+    <div class="story-section fade-in-section">
       <h2>Creating Artificial Entities</h2>
-      <p>We developed KnowGen, an approach that generates genuinely new knowledge by creating artificial entities. These aren't real people or places—they're fabricated with coherent attributes and relationships, but they're guaranteed to be absent from any training data.</p>
+      <p>We developed KnowGen, an approach that generates genuinely new knowledge by creating artificial entities. These are not real people or places -- they are fabricated with coherent attributes and relationships, but they are guaranteed to be absent from any training data.</p>
       <p>By testing models on these artificial entities, we can cleanly separate understanding from memorization. A model that performs well on ALCUNA must be reasoning from the provided context, not pulling answers from its training data.</p>
     </div>
 
-    <div class="highlight-box">
+    <!-- Method Steps -->
+    <div class="method-steps fade-in-section">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Entity Selection</h4>
+          <p>Select an existing real-world entity from a knowledge graph as the seed, along with its attributes and relationships.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Attribute Modification</h4>
+          <p>Systematically alter the entity's attributes (name, properties, connections) to create a new artificial entity that is coherent yet entirely novel.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Knowledge Generation</h4>
+          <p>Generate contextual descriptions and relational knowledge about the artificial entity, forming a complete knowledge profile.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Benchmark Construction</h4>
+          <p>Create evaluation tasks across three dimensions -- understanding, differentiation, and association -- using the artificial entities and their contexts.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="highlight-box fade-in-section">
       <h3>The ALCUNA Benchmark</h3>
-      <p>ALCUNA tests three core capabilities when models face new knowledge: <em>understanding</em> (can the model grasp the new information?), <em>differentiation</em> (can it distinguish new entities from similar known ones?), and <em>association</em> (can it reason about relationships between new and existing knowledge?).</p>
+      <p>ALCUNA tests three core capabilities when models face new knowledge: <em>knowledge understanding</em> (can the model grasp the new information?), <em>knowledge differentiation</em> (can it distinguish new entities from similar known ones?), and <em>knowledge association</em> (can it reason about relationships between new and existing knowledge?).</p>
     </div>
 
-    <div class="warning-box">
-      <h3>The Troubling Results</h3>
-      <p>Our experiments revealed that LLMs struggle significantly with new knowledge. They conflate artificial entities with similar real ones, fail to reason about relationships involving new entities, and show brittle performance when contexts require integrating new and internal knowledge. The capabilities that shine on standard benchmarks don't transfer well to genuinely novel scenarios.</p>
+    <div class="section-divider"></div>
+
+    <div class="story-section fade-in-section">
+      <h2>Results</h2>
+      <p>Our experiments revealed that LLMs struggle significantly with new knowledge. They conflate artificial entities with similar real ones, fail to reason about relationships involving new entities, and show brittle performance when contexts require integrating new and internal knowledge.</p>
     </div>
 
-    <div class="story-section">
+    <!-- Results Table -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Key Findings Across Evaluation Dimensions</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>Challenge</th>
+            <th>Observation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Understanding</td>
+            <td>Absorbing new knowledge from context</td>
+            <td>Models struggle to properly integrate novel information</td>
+          </tr>
+          <tr>
+            <td>Differentiation</td>
+            <td>Distinguishing new from known entities</td>
+            <td>Entity similarity causes significant interference</td>
+          </tr>
+          <tr>
+            <td>Association</td>
+            <td>Reasoning between new and internal knowledge</td>
+            <td>Particularly weak; models are biased toward training data</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note-box fade-in-section">
+      <h3>The Troubling Pattern</h3>
+      <p>The capabilities that shine on standard benchmarks do not transfer well to genuinely novel scenarios. Models show a strong bias toward their training knowledge, even when context clearly provides different information. Entity similarity is a major factor -- models confuse new entities with existing ones that share surface features.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="story-section fade-in-section">
       <h2>Understanding the Failures</h2>
-      <p>We dug deeper into what causes these failures. Entity similarity matters—models confuse new entities with existing ones that share surface features. Context structure matters—certain ways of presenting new information help models more than others. But fundamentally, models seem biased toward their training knowledge, even when context clearly provides different information.</p>
+      <p>We dug deeper into what causes these failures. Entity similarity matters -- models confuse new entities with existing ones that share surface features. Context structure matters -- certain ways of presenting new information help models more than others. But fundamentally, models seem biased toward their training knowledge, even when context clearly provides different information.</p>
     </div>
 
-    <div class="highlight-box">
+    <div class="highlight-box fade-in-section">
       <h3>Key Findings</h3>
       <ul>
         <li><b>Understanding Gap:</b> Models struggle to properly absorb new knowledge from context</li>
@@ -105,14 +184,29 @@
       </ul>
     </div>
 
-    <div class="story-section">
-      <h2>A Call for Caution</h2>
-      <p>ALCUNA serves as both a benchmark and a warning. As we deploy language models in ever-expanding domains, they will constantly encounter knowledge beyond their training. Our results suggest that the impressive performance on standard benchmarks may not transfer to these real-world scenarios.</p>
-      <p>We hope this work motivates research into models that can better handle the genuinely new—not just recall what they've already learned.</p>
+    <div class="concept-box fade-in-section">
+      <h3>Impact of Entity Similarity</h3>
+      <p>When artificial entities are more similar to real-world ones in surface form, model performance degrades further. This suggests that LLMs rely heavily on pattern matching against memorized entities rather than genuinely processing the provided context -- a fundamental limitation for handling truly novel information.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@inproceedings{yin-etal-2023-alcuna,
+    <div class="section-divider"></div>
+
+    <div class="story-section fade-in-section">
+      <h2>A Call for Caution</h2>
+      <p>ALCUNA serves as both a benchmark and a warning. As we deploy language models in ever-expanding domains, they will constantly encounter knowledge beyond their training. Our results suggest that the impressive performance on standard benchmarks may not transfer to these real-world scenarios.</p>
+      <p>We hope this work motivates research into models that can better handle the genuinely new -- not just recall what they have already learned.</p>
+    </div>
+
+    <!-- Citation -->
+    <div class="paper-citation-wrapper">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@inproceedings{yin-etal-2023-alcuna,
     title = "{ALCUNA}: Large Language Models Meet New Knowledge",
     author = "Yin, Xunjian and Huang, Baizhou and Wan, Xiaojun",
     booktitle = "Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing",
@@ -120,6 +214,7 @@
     url = "https://aclanthology.org/2023.emnlp-main.87/",
     pages = "1397--1414"
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -138,7 +233,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -146,6 +241,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -6,111 +6,335 @@
   <title>DERL: Differentiable Evolutionary Reinforcement Learning</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .paper-figure { margin: 40px 0; text-align: center; }
-    .paper-figure.hero img { max-width: 100%; width: 700px; }
-    .paper-figure.medium img { max-width: 550px; width: 100%; }
-    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">Differentiable Evolutionary Reinforcement Learning</h1>
     <p class="paper-authors">Sitao Cheng*, Tianle Li*, Xuhan Huang*, <b>Xunjian Yin</b>, Difan Zou</p>
     <p class="paper-venue">ArXiv Preprint 2025</p>
 
     <div class="paper-links">
-      <a href="https://arxiv.org/abs/2512.13399">Paper</a>
-      <a href="https://github.com/sitaocheng/DERL">Code</a>
+      <a href="https://arxiv.org/abs/2512.13399">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Paper
+      </a>
+      <a href="https://github.com/sitaocheng/DERL">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
     </div>
 
-    <div class="story-section">
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>DERL makes reward function design differentiable by evolving structured reward primitives with meta-gradients, enabling autonomous discovery of optimal reward signals that achieve state-of-the-art on robotic, scientific, and mathematical reasoning tasks.</p>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn" aria-expanded="false">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>The design of effective reward functions presents a central and often arduous challenge in reinforcement learning (RL), particularly when developing autonomous agents for complex reasoning tasks. While automated reward optimization approaches exist, they typically rely on derivative-free evolutionary heuristics that treat the reward function as a black box, failing to capture the causal relationship between reward structure and task performance. To bridge this gap, we propose Differentiable Evolutionary Reinforcement Learning (DERL), a bi-level framework that enables the autonomous discovery of optimal reward signals. In DERL, a Meta-Optimizer evolves a reward function (i.e., Meta-Reward) by composing structured atomic primitives, guiding the training of an inner-loop policy. Crucially, unlike previous evolution, DERL is differentiable in its meta-optimization: it treats the inner-loop validation performance as a signal to update the Meta-Optimizer via reinforcement learning. This allows DERL to approximate the "meta-gradient" of task success, progressively learning to generate denser and more actionable feedback. We validate DERL across three distinct domains: robotic agent (ALFWorld), scientific simulation (ScienceWorld), and mathematical reasoning (GSM8k, MATH). Experimental results show that DERL achieves state-of-the-art performance on ALFWorld and ScienceWorld, significantly outperforming methods relying on heuristic rewards, especially in out-of-distribution scenarios. Analysis of the evolutionary trajectory demonstrates that DERL successfully captures the intrinsic structure of tasks, enabling self-improving agent alignment without human intervention.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Hero Figure -->
+    <figure class="paper-figure hero fade-in-section">
+      <img src="https://arxiv.org/html/2512.13399v1/x1.png" alt="Overview of DERL framework showing Meta-Optimizer generating parameterized Meta-Reward with validation performance feedback, alongside performance comparisons across tasks">
+      <figcaption><b>Figure 1.</b> Overview of DERL. Left: the Meta-Optimizer generates a parameterized Meta-Reward; validation performance feeds back to update it via policy gradients. Right: performance comparisons of outcome reward, average reward, and Meta-Reward across tasks.</figcaption>
+    </figure>
+
+    <!-- Motivation -->
+    <div class="story-section fade-in-section">
       <h2>The Reward Design Problem</h2>
-      <p>Reinforcement learning has a dirty secret: the hardest part isn't the algorithm—it's the reward function. Getting the reward right often requires extensive trial and error, domain expertise, and sometimes luck. A poorly designed reward leads to agents that technically optimize what you asked for but not what you actually wanted.</p>
-      <p>Existing approaches to automatic reward design treat the reward function as a black box, using evolutionary heuristics to search for better rewards. But evolution is slow and inefficient—it can't see the causal relationship between reward structure and task performance.</p>
+      <p>Reinforcement learning has a dirty secret: the hardest part isn't the algorithm -- it's the reward function. Getting the reward right often requires extensive trial and error, domain expertise, and sometimes luck. A poorly designed reward leads to agents that technically optimize what you asked for but not what you actually wanted.</p>
+      <p>Existing approaches to automatic reward design treat the reward function as a black box, using evolutionary heuristics to search for better rewards. But evolution is slow and inefficient -- it can't see the causal relationship between reward structure and task performance.</p>
     </div>
 
-    <div class="story-section">
-      <h2>Making Evolution Differentiable</h2>
+    <!-- Method Steps -->
+    <div class="story-section fade-in-section">
+      <h2>How DERL Works</h2>
       <p>DERL bridges this gap with a key insight: what if we could make the evolutionary process differentiable? Instead of blind mutation and selection, what if we could compute gradients that tell us exactly how to improve the reward function?</p>
-      <p>The framework operates as a bilevel optimization: a Meta-Optimizer evolves reward functions by composing structured atomic primitives, and an inner-loop policy is trained using these rewards. Crucially, the validation performance of the inner policy flows back as a learning signal to update the Meta-Optimizer through reinforcement learning.</p>
     </div>
 
-    <div class="highlight-box">
+    <div class="method-steps fade-in-section">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Compose Structured Rewards</h4>
+          <p>The Meta-Optimizer generates reward functions by composing structured atomic primitives into computational graphs, producing a parameterized Meta-Reward.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Train Inner-Loop Policy</h4>
+          <p>An inner-loop policy is trained using GRPO with the generated Meta-Reward, learning to solve tasks guided by the evolved reward signal.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Evaluate on Validation</h4>
+          <p>The trained policy is evaluated on a held-out validation set. This validation performance serves as the learning signal for the Meta-Optimizer.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Update via Meta-Gradient</h4>
+          <p>The Meta-Optimizer is updated through reinforcement learning, approximating the meta-gradient of task success with respect to reward structure -- making evolution differentiable.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bilevel Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2512.13399v1/x2.png" alt="Bi-level evolutionary training structure showing Meta-Optimizer evolution and inner-loop policy training">
+      <figcaption><b>Figure 2.</b> Bi-level optimization structure. The blue block depicts Meta-Optimizer evolution with n generated Meta-Rewards. The green block illustrates inner-loop policy training using GRPO, with validation performance v serving as reward signal for Meta-Optimizer evolution.</figcaption>
+    </figure>
+
+    <!-- Technical Innovation -->
+    <div class="concept-box fade-in-section">
       <h3>The Technical Innovation</h3>
       <p>DERL approximates the meta-gradient of task success with respect to reward structure. This allows it to progressively learn to generate denser, more actionable feedback. Unlike black-box evolution, DERL understands <em>why</em> certain reward functions work better and can generalize this understanding to design better rewards.</p>
     </div>
 
-    <div class="story-section">
+    <div class="section-divider"></div>
+
+    <!-- Domains -->
+    <div class="story-section fade-in-section">
       <h2>From Robots to Math</h2>
       <p>We validated DERL across three distinct domains that test different aspects of reward design. In ALFWorld, robotic agents must navigate and manipulate objects in household environments. In ScienceWorld, agents conduct scientific experiments in simulation. In GSM8K and MATH, agents solve mathematical reasoning problems.</p>
-      <p>Across all domains, DERL discovers reward functions that outperform hand-designed baselines—without any domain-specific engineering of the rewards themselves.</p>
+      <p>Across all domains, DERL discovers reward functions that outperform hand-designed baselines -- without any domain-specific engineering of the rewards themselves.</p>
     </div>
 
-    <div class="highlight-box">
+    <!-- Results Table 1: ALFWorld & ScienceWorld -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>ALFWorld & ScienceWorld Performance</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>ALFWorld L0</th>
+            <th>ALFWorld L1</th>
+            <th>ALFWorld L2</th>
+            <th>SciWorld L0</th>
+            <th>SciWorld L1</th>
+            <th>SciWorld L2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>GRPO w/ Outcome</td>
+            <td>76.6</td>
+            <td>71.1</td>
+            <td>29.7</td>
+            <td>21.1</td>
+            <td>13.7</td>
+            <td>10.9</td>
+          </tr>
+          <tr>
+            <td>GRPO w/ Avg Reward</td>
+            <td>88.1</td>
+            <td>85.4</td>
+            <td>30.5</td>
+            <td>37.9</td>
+            <td>31.3</td>
+            <td>18.0</td>
+          </tr>
+          <tr>
+            <td>GiGPO</td>
+            <td>86.7</td>
+            <td>83.2</td>
+            <td>48.0</td>
+            <td>25.8</td>
+            <td>15.2</td>
+            <td>4.7</td>
+          </tr>
+          <tr>
+            <td>RLVMR</td>
+            <td>89.1</td>
+            <td>87.9</td>
+            <td>56.3</td>
+            <td>46.9</td>
+            <td>34.4</td>
+            <td>26.5</td>
+          </tr>
+          <tr>
+            <td>DERL</td>
+            <td>91.0</td>
+            <td>89.1</td>
+            <td>65.0</td>
+            <td>47.7</td>
+            <td>43.0</td>
+            <td>30.1</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>DERL-pop.</td>
+            <td class="best-value">91.8</td>
+            <td>88.3</td>
+            <td class="best-value">76.4</td>
+            <td class="best-value">98.2</td>
+            <td class="best-value">95.3</td>
+            <td class="best-value">31.3</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Results Table 2: Math -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Mathematical Reasoning Performance (GSM8K & MATH)</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Reward Function</th>
+            <th>Training Data</th>
+            <th>GSM8K</th>
+            <th>MATH</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Outcome</td>
+            <td>MATH+GSM8K</td>
+            <td>82.6</td>
+            <td>58.8</td>
+          </tr>
+          <tr>
+            <td>Outcome + Format</td>
+            <td>MATH+GSM8K</td>
+            <td>86.4</td>
+            <td>55.9</td>
+          </tr>
+          <tr>
+            <td>Avg Reward</td>
+            <td>MATH+GSM8K</td>
+            <td>86.5</td>
+            <td>55.8</td>
+          </tr>
+          <tr>
+            <td>Outcome</td>
+            <td>MATH</td>
+            <td>82.9</td>
+            <td>59.1</td>
+          </tr>
+          <tr>
+            <td>Outcome + Format</td>
+            <td>MATH</td>
+            <td>83.9</td>
+            <td>56.8</td>
+          </tr>
+          <tr>
+            <td>Avg Reward</td>
+            <td>MATH</td>
+            <td>83.6</td>
+            <td>54.9</td>
+          </tr>
+          <tr>
+            <td>DERL</td>
+            <td>MATH+GSM8K</td>
+            <td>87.0</td>
+            <td>60.2</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>DERL-pop.</td>
+            <td>MATH+GSM8K</td>
+            <td class="best-value">87.6</td>
+            <td>60.2</td>
+          </tr>
+          <tr>
+            <td>DERL</td>
+            <td>MATH</td>
+            <td>83.2</td>
+            <td>60.5</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>DERL-pop.</td>
+            <td>MATH</td>
+            <td>84.1</td>
+            <td class="best-value">60.9</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Key Results -->
+    <div class="highlight-box fade-in-section">
       <h3>Key Results</h3>
       <ul>
-        <li><b>ALFWorld:</b> Improved robotic task completion through learned reward shaping</li>
-        <li><b>ScienceWorld:</b> Better scientific reasoning via evolved reward signals</li>
-        <li><b>GSM8K & MATH:</b> Enhanced mathematical reasoning through meta-learned rewards</li>
-        <li><b>Generalization:</b> Learned reward principles transfer across related tasks</li>
+        <li><b>ALFWorld:</b> Improved robotic task completion through learned reward shaping, with DERL-pop. reaching 76.4% on the hardest L2 split (vs. 56.3% for RLVMR)</li>
+        <li><b>ScienceWorld:</b> Dramatic improvement in scientific reasoning -- 98.2% on L0 (vs. 46.9% for RLVMR)</li>
+        <li><b>GSM8K & MATH:</b> Enhanced mathematical reasoning through meta-learned rewards, achieving 87.6% and 60.9% respectively</li>
+        <li><b>Generalization:</b> Strongest gains in out-of-distribution scenarios where heuristic rewards prove less effective</li>
       </ul>
     </div>
 
-    <div class="story-section">
-      <h2>Toward Autonomous Reward Design</h2>
-      <p>DERL represents a step toward truly autonomous reinforcement learning—systems that can design their own training signals without human intervention. By making the reward design process differentiable, we open the door to more efficient and effective automatic curriculum design, where agents learn not just to solve tasks but to teach themselves how to learn.</p>
+    <!-- Training Dynamics Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2512.13399v1/x3.png" alt="Training trajectories on ALFWorld showing Meta-Optimizer convergence">
+      <figcaption><b>Figure 3.</b> Training trajectories on ALFWorld, GSM8K, and MATH benchmarks showing Meta-Optimizer convergence. Blue and orange lines represent average validation and testing performance, demonstrating stable optimization without overfitting.</figcaption>
+    </figure>
+
+    <!-- Evolution Dynamics -->
+    <div class="story-section fade-in-section">
+      <h2>Evolution of Reward Structures</h2>
+      <p>Analysis of the evolutionary trajectory reveals that DERL learns to progressively favor mathematically robust reward structures. Over the course of training, the proportion of stable reward primitives increases while unstable ones are naturally selected against -- the system discovers not just good rewards, but structurally sound ones.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@misc{cheng2025differentiableevolutionaryreinforcementlearning,
+    <figure class="paper-figure small fade-in-section">
+      <img src="https://arxiv.org/html/2512.13399v1/x7.png" alt="Proportion of stable versus unstable reward structures across training iterations on ALFWorld">
+      <figcaption><b>Figure 4.</b> Evolution dynamics: proportion of stable versus unstable reward structures across outer-loop training on ALFWorld, showing the system's increasing preference for mathematically robust structures.</figcaption>
+    </figure>
+
+    <div class="section-divider"></div>
+
+    <!-- Looking Forward -->
+    <div class="story-section fade-in-section">
+      <h2>Toward Autonomous Reward Design</h2>
+      <p>DERL represents a step toward truly autonomous reinforcement learning -- systems that can design their own training signals without human intervention. By making the reward design process differentiable, we open the door to more efficient and effective automatic curriculum design, where agents learn not just to solve tasks but to teach themselves how to learn.</p>
+    </div>
+
+    <!-- Computational Graph Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2512.13399v1/x8.png" alt="Training loop using graph neural networks to represent computational graphs for Meta-Reward">
+      <figcaption><b>Figure 5.</b> Differentiable evolutionary reward training loop using graph neural networks to represent computational graphs. The Meta-Reward is parameterized by twelve learnable weights across computational nodes.</figcaption>
+    </figure>
+
+    <!-- Citation -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@misc{cheng2025differentiableevolutionaryreinforcementlearning,
     title={Differentiable Evolutionary Reinforcement Learning},
     author={Sitao Cheng and Tianle Li and Xuhan Huang and Xunjian Yin and Difan Zou},
     year={2025},
@@ -119,6 +343,7 @@
     primaryClass={cs.AI},
     url={https://arxiv.org/abs/2512.13399}
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -137,7 +362,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -145,6 +370,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

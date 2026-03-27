@@ -22,13 +22,14 @@
     }
 
     .page-title {
-      text-align: center;
-      font-size: 36px;
-      font-weight: 300;
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
       margin-bottom: 20px;
-      color: var(--primary-color);
-      letter-spacing: 1px;
+      text-align: left;
     }
+
+    [data-theme="dark"] .page-title { color: var(--text-color); }
 
     .gallery-intro {
       text-align: center;
@@ -307,8 +308,10 @@
     <a href="index.html" class="nav-button">Home</a>
     <a href="publications.html" class="nav-button">Publications</a>
     <a href="projects.html" class="nav-button">Projects</a>
+    
     <a href="blogs.html" class="nav-button">Blogs</a>
     <a href="photography.html" class="nav-button" aria-current="page">Photography</a>
+    <a href="cv.html" class="nav-button">CV</a>
 
     <!-- Dark mode toggle -->
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">

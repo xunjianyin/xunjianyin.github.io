@@ -1,49 +1,50 @@
-*<span style="color:gray;">This blog is based on the paper <a href="https://arxiv.org/abs/2410.04444">Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement</a>.</span>*
+*This blog is based on the paper [Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement](https://arxiv.org/abs/2410.04444).*
 
-In the race to build truly intelligent AI agents, we've made incredible progress. We have agents that can write code, reason through complex problems, and interact with digital environments in sophisticated ways. But have we been building them on the right foundation? I believe we've been operating under a set of assumptions that, while powerful, will ultimately limit our progress. We've been trapped in an "Optimizer's Dilemma," and the only way out is to embrace a principle that is fundamental to our own intelligence: self-reference.
+## The Optimizer's Dilemma in Agent Design
 
-### **The Two Paradigms and Their Hidden Ceiling**
+Recent advances in large language models (LLMs) have enabled a proliferation of increasingly capable AI agents—systems that can generate code, perform multi-step reasoning, and interact with complex digital environments. Despite this progress, the dominant paradigms for agent construction share a structural limitation that, we argue, imposes a fundamental ceiling on achievable performance. This post outlines the nature of that limitation and presents self-referential agent design as a principled alternative.
 
-Today, nearly every agent falls into one of two camps.
+## Two Prevailing Paradigms and Their Shared Constraint
 
-The first is the **Hand-Designed Agent**. Here, we humans act as the architects, meticulously designing the agent's workflow. We tell it to use Chain-of-Thought, or follow a ReAct loop, or some other clever process we’ve conceived. It's like giving the agent a detailed recipe. The problem? These recipes are brittle. They are often overfitted to the specific foundation model they were designed for, and more importantly, they represent just a few, intuition-driven points in a staggeringly vast design space. We have no way of knowing if our recipe is even close to the best one.
+Current approaches to agent design can be broadly categorized into two paradigms.
 
-Recognizing this limitation, we developed the second camp: the **Meta-Learning Optimized Agent**. This is a clever leap forward. Instead of designing the agent's workflow, we design an *algorithm* to *search* for the best workflow. We turn agent design into an optimization problem, using techniques like MCTS or meta-agents to explore the design space for us.
+**Hand-designed agents** rely on human-specified workflows: prompting strategies such as Chain-of-Thought (Wei et al., 2022), execution frameworks such as ReAct (Yao et al., 2023), or other manually constructed pipelines. While effective within their target settings, these designs represent a sparse, intuition-driven sampling of a vast combinatorial design space. They are often tightly coupled to specific foundation models and offer no guarantees of proximity to optimal configurations.
 
-But this just pushes the problem up one level. The agent's performance is no longer capped by our hand-designed workflow, but by our hand-designed *optimizer*. The optimizer itself is a product of human priors and limitations.
+**Meta-learning optimized agents** address this limitation by casting agent design as a search problem. Rather than specifying a workflow directly, a higher-order optimization procedure—employing techniques such as Monte Carlo Tree Search or meta-agent evaluation—explores the space of possible agent architectures. This represents a meaningful advance, as the resulting agents are no longer strictly bounded by the quality of any single human-designed workflow.
 
-This leads to a logical paradox—an infinite regress. If our optimizer is sub-optimal, how do we improve it? Do we design a meta-meta-optimizer? And a meta-meta-meta-optimizer for that one? It's a stack of Russian dolls that never ends. This cannot be the path to general intelligence.
+However, this approach introduces a structural problem: it shifts the dependency from a hand-designed workflow to a hand-designed optimizer. The agent's performance ceiling is now determined by the quality of the search algorithm itself, which remains a product of human priors. This gives rise to what we term the **Optimizer's Dilemma**—an infinite regress in which improving the optimizer requires a meta-optimizer, which in turn requires a meta-meta-optimizer, and so on. The result is a stack of Russian dolls, each enclosing the same unresolved problem at a smaller scale. No finite stack of externally designed optimization layers resolves this regression.
 
-### **The Human Blueprint: We Are Our Own Optimizers**
+## Self-Reference as a Design Principle
 
-To break this cycle, we need a better inspiration. Look at us. Humans don't have a fixed, external algorithm guiding our self-improvement. We possess subjective agency. We reflect on feedback, identify flaws in our own thinking, and actively *change our own cognitive strategies*. A student who struggles with algebra doesn't just try the same failed method faster; they learn a new way to think about the problem. They rewrite their own mental software.
+A useful analogy can be drawn from human cognition. Human learners do not operate under a fixed, externally imposed optimization procedure. Instead, they exhibit reflective self-modification: identifying failures in their own reasoning strategies and revising those strategies accordingly. The improvement target is not merely the output, but the process that generates the output.
 
-This is the essence of true self-improvement. It's not about refining a solution you've already produced. It's not about using a fixed algorithm to tune a small part of yourself. **True self-improvement is the ability to modify the very logic that governs your own operation.**
+This observation motivates a concrete design principle: **an agent capable of modifying the logic that governs its own operation** can, in principle, escape the infinite regress described above. Rather than relying on an external optimizer, the agent serves as its own optimizer, collapsing the hierarchy into a single self-referential loop.
 
-### **The Gödel Agent: An Agent That Can Rewrite Itself**
+## The Gödel Agent Framework
 
-This is the core idea behind the Gödel Agent framework. What if we built an agent whose primary capability was to read and modify its own source code while it was running?
+The Gödel Agent framework operationalizes this principle. The central technical contribution is an architecture in which the agent has read and write access to its own source code during execution.
 
-The technical challenge is fascinating. How can a program modify a function that is currently executing? Our solution was to structure the agent's life not as a traditional loop (while True:), but as a **recursive function**.
+The key implementation challenge—enabling a program to modify a function that is currently executing—is addressed through a recursive rather than iterative control structure. At each recursive step, the agent may analyze its recent performance and rewrite any component of its codebase, including the main recursive function itself. Modifications take effect not within the current execution frame, but at the next recursive call, when the updated code is loaded. This mechanism permits continuous evolution of core agent logic without interrupting execution.
 
-In each step (each recursive call), the agent can analyze its performance and decide to rewrite any part of its code, including the main recursive function itself. That change doesn't affect the current step, but when the function calls itself to begin the next moment of its existence, the new, improved version of the code is loaded. It’s an elegant way to enable a program to evolve its core logic over time.
+## Implications
 
-### **The Virtuous Cycle of Self-Improvement**
+This self-referential capability has several notable properties.
 
-This self-referential capability unlocks a powerful virtuous cycle.
+First, it establishes a **Recursive Self-Improvement** dynamic—a virtuous cycle with the following structure:
 
-1. An agent that improves its problem-solving logic becomes more effective.  
-2. By becoming more effective, it gets better at the meta-task of *analyzing and improving its own code*.  
-3. A better self-optimizer can then find even more profound improvements.
+1. The agent improves its ability to solve tasks.
+2. This makes it more effective at the meta-task of optimizing itself.
+3. A better self-optimizer can, in turn, discover even better task-solving strategies.
+4. The cycle repeats, with each iteration compounding the gains of the previous one.
 
-This creates the potential for a new kind of scaling law—an exponential curve where the better an agent gets, the faster it can get better.
+This positive feedback loop suggests the possibility of superlinear scaling in agent capability over successive iterations.
 
-This approach is also inherently future-proof. Unlike hand-designed workflows that are tied to a specific LLM, a self-referential agent's performance simply scales with the underlying model's ability to reason about and write code. As models improve, the agent naturally becomes a more effective self-optimizer.
+Second, the framework is **model-agnostic by construction**. Because the agent's effectiveness depends on the underlying model's capacity for code comprehension and generation rather than on a fixed workflow, performance scales naturally with improvements to the foundation model—without requiring manual redesign of the agent architecture.
 
-### **The Unbounded Future**
+Third, by removing the constraints imposed by both hand-designed workflows and hand-designed optimizers, the framework grants the agent access to an **unbounded design space**. In principle, the agent could rediscover existing agent architectures and, more significantly, converge on novel configurations that lie outside the space of human-conceived designs.
 
-By removing the constraints of a human-designed workflow or a human-designed optimizer, we grant the agent access to an unbounded search space. It could, in theory, discover any framework humans have already built, and more excitingly, discover novel architectures we haven't even imagined.
+## Concluding Remarks
 
-Of course, this power demands a profound sense of responsibility and a serious focus on safety. But it also points toward a new direction for AI—one that relies less on imposing our own rigid structures and more on creating the conditions for intelligence to emerge and improve on its own.
+The position advanced here is that the prevailing paradigms in agent design—whether manually specified or meta-optimized—are subject to inherent performance ceilings rooted in human design limitations. Self-referential architectures, in which the agent is both the subject and the instrument of optimization, offer a principled path beyond these ceilings. The Gödel Agent framework provides one concrete instantiation of this idea.
 
-We are self-referential. It is the engine of our own progress. To build AGI, perhaps it's time we build our agents in our own image.
+Naturally, granting an agent the ability to modify its own logic raises substantive questions around safety, controllability, and alignment that warrant careful investigation. These concerns are not incidental but central to any serious pursuit of self-referential agent design. Nevertheless, the direction itself—building systems that improve not just their outputs but their own processes—represents, in our view, a necessary step toward more general forms of machine intelligence.

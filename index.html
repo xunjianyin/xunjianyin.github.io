@@ -9,32 +9,31 @@
   <meta name="description" content="Xunjian Yin - CS PhD student at Duke University. Research in model generalizability, knowledge editing, and self-referential agents.">
   <meta name="keywords" content="Xunjian Yin, Duke University, NLP, Machine Learning, Knowledge Editing, Self-Referential Agents">
   <meta name="robots" content="index, follow">
-  
+
   <!-- Open Graph tags for social media -->
   <meta property="og:title" content="Xunjian Yin - CS PhD Student">
   <meta property="og:description" content="CS PhD student at Duke University researching model generalizability and self-referential agents">
   <meta property="og:image" content="https://xunjianyin.github.io/figures/me.png">
   <meta property="og:url" content="https://xunjianyin.github.io/">
   <meta property="og:type" content="profile">
-  
+
   <!-- Twitter Card tags -->
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Xunjian Yin - CS PhD Student">
   <meta name="twitter:description" content="CS PhD student at Duke University researching model generalizability and self-referential agents">
   <meta name="twitter:image" content="https://xunjianyin.github.io/figures/me.png">
-  
+
   <link rel="stylesheet" type="text/css" href="stylesheet.css">
   <link rel="stylesheet" type="text/css" href="shared-styles.css">
   <link rel="icon" type="image/png" href="figures/logo.png">
-  
+
   <!-- Preload critical assets -->
   <link rel="preload" href="figures/me.png" as="image">
   <link rel="preload" href="https://fonts.gstatic.com/s/lato/v15/S6uyw4BMUTPHjx4wXiWtFCc.woff2" as="font" type="font/woff2" crossorigin>
-  
+
   <!-- DNS prefetch for external domains -->
-  <link rel="dns-prefetch" href="//clustrmaps.com">
   <link rel="dns-prefetch" href="//fonts.gstatic.com">
-  
+
   <!-- Structured Data for SEO -->
   <script type="application/ld+json">
   {
@@ -42,7 +41,7 @@
     "@type": "Person",
     "name": "Xunjian Yin",
     "alternateName": "Shoon-Jen",
-    "description": "CS PhD student at Duke University researching model generalizability, knowledge editing, and self-referential agents",
+    "description": "CS PhD student at Duke University co-advised by Shuyan Zhou and Bhuwan Dhingra, researching model generalizability and self-referential agents",
     "url": "https://xunjianyin.github.io/",
     "image": "https://xunjianyin.github.io/figures/me.png",
     "email": "xunjian.yin@duke.edu",
@@ -63,344 +62,303 @@
       "https://www.linkedin.com/in/xunjian-yin-5b40252a5",
       "https://x.com/xunjian_yin",
       "https://scholar.google.com/citations?user=PociQ5EAAAAJ"
-    ],
-    "knowsAbout": [
-      "Machine Learning",
-      "Natural Language Processing",
-      "Knowledge Editing",
-      "Self-Referential Agents",
-      "Model Generalizability"
     ]
   }
   </script>
-  
-  <!-- Page-specific styles -->
+
   <style>
-    body {
-      font-display: swap;
+    /* Homepage-specific styles */
+    .homepage {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    .profile-section {
+      display: flex;
+      align-items: flex-start;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .profile-text {
+      flex: 1;
+    }
+
+    .profile-text .name {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+
+    .profile-text .pronunciation {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 16px;
+    }
+
+    .profile-text .bio {
+      font-size: 15px;
+      color: #374151;
       line-height: 1.7;
+      margin-bottom: 16px;
     }
-    
-    .section-spacing {
-      margin-bottom: 1px !important;
-      margin-left: -20px !important;
-    }
-    
-    /* Reduce internal section padding consistently */
-    .section-spacing td,
-    .section-spacing table td {
-      padding: 10px 20px !important;
-    }
-    
-    /* Ensure footer section also has consistent spacing */
-    .footer-section {
-      margin-top: 1px !important;
-      padding-top: 10px !important;
-    }
-    
 
-    
-    /* Subtle profile photo enhancement */
+    .profile-text .bio a {
+      font-size: inherit;
+    }
+
+    .profile-links {
+      font-size: 14px;
+    }
+
+    .profile-links a {
+      font-size: 14px;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .profile-links a:hover {
+      color: var(--secondary-color);
+    }
+
     .profile-photo {
-      border: 2px solid #f5f5f5;
-      transition: border-color 0.3s ease;
-    }
-    
-    .profile-photo:hover {
-      border-color: #e0e0e0;
+      flex-shrink: 0;
+      width: 160px;
+      height: 160px;
+      margin-top: 8px;
+      border: 1px solid #e5e7eb;
     }
 
-    /* Mobile responsive profile section */
+    .homepage-section {
+      margin-bottom: 28px;
+    }
+
+    .homepage-section h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .news-list {
+      list-style: none !important;
+      padding-left: 0 !important;
+      margin: 0 !important;
+    }
+
+    .news-list li {
+      display: flex;
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.6;
+      margin-bottom: 4px !important;
+    }
+
+    .news-list a {
+      font-size: 14px;
+    }
+
+    .news-date {
+      font-weight: 600;
+      color: #1a1a1a;
+      width: 120px;
+      flex-shrink: 0;
+    }
+
+    [data-theme="dark"] .news-list li { color: var(--text-color); }
+    [data-theme="dark"] .news-date { color: var(--text-color); }
+
+
+    .homepage-section #projects-list {
+      font-size: 14px;
+    }
+
+    .homepage-section #projects-list li {
+      margin-bottom: 8px !important;
+    }
+
+    .homepage-section #projects-list strong {
+      font-size: 14px;
+    }
+
+    .homepage-section #projects-list a {
+      font-size: 14px;
+    }
+
+    .homepage-section .publication-list {
+      list-style: none !important;
+      padding-left: 0 !important;
+    }
+
+    .homepage-section .publication-list li {
+      margin-bottom: 6px !important;
+      padding-bottom: 0 !important;
+    }
+
+
+    .view-all {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .view-all:hover {
+      color: var(--secondary-color);
+    }
+
+    /* Dark mode overrides */
+    [data-theme="dark"] .profile-text .name { color: var(--text-color); }
+    [data-theme="dark"] .profile-text .pronunciation { color: #888; }
+    [data-theme="dark"] .profile-text .bio { color: var(--text-color); }
+    [data-theme="dark"] .profile-photo { border-color: #374151; }
+    [data-theme="dark"] .homepage-section h2 {
+      color: var(--text-color);
+      border-bottom-color: #374151;
+    }
+    [data-theme="dark"] .homepage-section .papertitle { color: var(--text-color); }
+    [data-theme="dark"] .homepage-section .paper_rest { color: #b8b8b8; }
+    [data-theme="dark"] .homepage-section .paper-venue { color: #888; }
+
+    /* Mobile */
     @media screen and (max-width: 768px) {
       .profile-section {
-        flex-direction: column-reverse !important;
-        align-items: center !important;
-        gap: 20px !important;
+        flex-direction: column-reverse;
+        align-items: center;
+        gap: 16px;
       }
 
-      .profile-section .profile-photo {
-        margin-top: 0 !important;
-      }
-
-      .profile-section > div:first-child p:first-child {
+      .profile-text .name {
         text-align: center;
+      }
+
+      .profile-text .pronunciation {
+        text-align: center;
+      }
+
+      .profile-links {
+        text-align: center;
+      }
+
+      .profile-photo {
+        margin-top: 0;
+      }
+
+      .homepage {
+        padding: 24px 16px 40px;
       }
     }
   </style>
 </head>
 
 <body>
-  <!-- Scroll progress indicator -->
-  <div class="scroll-progress" id="scroll-progress"></div>
-  
   <!-- Skip to main content link for accessibility -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
-  
-  <!-- Navigation Buttons -->
+
+  <!-- Navigation -->
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="index.html" class="nav-button" aria-current="page">Home</a>
     <a href="publications.html" class="nav-button">Publications</a>
     <a href="projects.html" class="nav-button">Projects</a>
+    
     <a href="blogs.html" class="nav-button">Blogs</a>
     <a href="photography.html" class="nav-button">Photography</a>
-    
-    <!-- Dark mode toggle -->
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
-    </button>
-    
-    <!-- Mobile hamburger menu -->
-    <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Toggle mobile menu" title="Toggle navigation menu">
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    </button>
+    <a href="cv.html" class="nav-button">CV</a>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
-  <!-- Mobile sidebar overlay -->
-  <div id="mobile-sidebar-overlay" class="mobile-sidebar-overlay"></div>
-  
-  <!-- Floating Outline Sidebar -->
-  <aside id="outline-sidebar" role="complementary" aria-label="Page outline">
-    <h2 class="sidebar-heading">Outline</h2>
-    <nav role="navigation" aria-label="Page sections">
-      <ul id="outline-list">
-        <li><a href="#preprints" aria-label="Jump to Preprints section">Preprints</a></li>
-        <li><a href="#selected-publications" aria-label="Jump to Publications section">Publications</a></li>
-        <li><a href="#projects" aria-label="Jump to Selected Projects section">Selected Projects</a></li>
-        <li><a href="#research-experience" aria-label="Jump to Research Experience section">Research Experience</a></li>
-        <li><a href="#academic-services" aria-label="Jump to Academic Services section">Academic Services</a></li>
-        <li><a href="#teaching" aria-label="Jump to Teaching section">Teaching</a></li>
-        <li><a href="#talks" aria-label="Jump to Talks section">Talks</a></li>
-        <li><a href="#honors-and-awards" aria-label="Jump to Honors and Awards section">Honors and Awards</a></li>
-      </ul>
-    </nav>
-  </aside>
-
-  <!-- Main Content with Padding -->
-  <main id="main-content" role="main">
-    <div class="main-content-wrapper">
-      <table
-        style="width:100%;background:var(--bg-color);border:0px;border-spacing:0px;border-collapse:separate;">
-        <tbody>
-          <tr style="padding:0px">
-            <td style="padding:0px">
-            <!-- Introduction with Photo -->
-            <div class="profile-section" style="margin-bottom:40px;display:flex;align-items:flex-start;gap:30px;">
-              <!-- Text content -->
-              <div style="flex:1;">
-                <p style="text-align:center;">
-                  <name>Xunjian Yin</name>
-                  <br />(Xunjian is pronounced as Shoon-Jen)
-                </p>
-                <p>
-                  Hi! I am a CS PhD student at <a href="https://www.duke.edu/">Duke University</a>, supervised by Prof. <a
-                    href="https://shuyanzhou.github.io/">Shuyan Zhou</a>. Previously, I received my master's and bachelor's degree from <a href="https://english.pku.edu.cn/">Peking
-                    University</a> under the supervision of Prof. <a href="https://wanxiaojun.github.io/">Xiaojun Wan</a>. I worked as an intern at
-                  <a href="https://www.microsoft.com/en-us/research/">Microsoft</a>.
-                   <!-- and <a href="https://www.shlab.org.cn/">Shanghai AI Lab</a>. -->
-                  I also worked at
-                  <a href="http://nlp.cs.ucsb.edu/">UCSB NLP Group</a>, advised by Prof.
-                  <a href="https://sites.cs.ucsb.edu/~william/index.html">William Yang Wang</a>.
-                </p>
-                <p><b>Research:</b> I aim to make models more generalizable across real-world tasks. I believe that recursive self-improvement is the path to general intelligence. I am currently working on <a href="https://xunjianyin.github.io/blog-post.html?id=self-referential-agent">self-referential agents</a> and world models.
-                </p>
-                <p> I believe in using methods that are simple, scalable, generalizable, and graceful.</p>
-                <p>Feel free to reach out to me if you'd like to discuss research or explore potential collaboration!
-                </p>
-                <p style="text-align:center">
-                  <a href="mailto:xunjian.yin@duke.edu">Email</a>  /
-                  <a href="https://github.com/Arvid-pku">Github</a>  /
-                  <a href="https://www.linkedin.com/in/xunjian-yin-5b40252a5">Linkedin</a>  /
-                  <a href="https://x.com/xunjian_yin">Twitter</a>  /
-                  <a href="files/CV.pdf">CV</a>  /
-                  <a href="https://scholar.google.com/citations?user=PociQ5EAAAAJ">Google Scholar</a>
-                </p>
-              </div>
-              <!-- Profile photo -->
-              <div style="flex-shrink:0;">
-                <img class="profile-photo"
-                     style="width:200px;height:200px;border-radius:50%;margin-top:80px;"
-                     alt="Profile photo of Xunjian Yin, CS PhD student at Duke University"
-                     src="figures/me.png"
-                     loading="eager"
-                     width="200"
-                     height="200">
-              </div>
-            </div>
-
-            <!-- Preprints -->
-            <div class="section-spacing">
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <heading id="preprints">Preprints</heading>
-                      <ul id="preprints-list" class="publication-list">
-                        <!-- Preprints will be inserted here -->
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Selected Publications -->
-            <div class="section-spacing">
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <heading id="selected-publications">Selected Publications</heading>   
-                      <ul id="selected-publications-list" class="publication-list">
-                        <!-- Publications will be inserted here -->
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Projects -->
-            <div class="section-spacing">
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <heading id="projects">Selected Projects</heading>
-                      <ul id="projects-list">
-                        <!-- Projects will be inserted here -->
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Research Experience -->
-            <div class="section-spacing">
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <heading id="research-experience">Research Experience</heading>
-                      <ul id="research-experience-list">
-                        <!-- Research Experience will be inserted here -->
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Academic Services -->
-            <div class="section-spacing">
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <heading id="academic-services">Academic Services</heading>
-                      <ul id="academic-services-list">
-                        <!-- Academic Services will be inserted here -->
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Teaching -->
-            <div class="section-spacing">
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <heading id="teaching">Teaching</heading>
-                      <ul id="teaching-list">
-                        <!-- Teaching will be inserted here -->
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Talks -->
-            <div class="section-spacing">
-              <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tbody>
-                  <tr>
-                    <td style="padding:20px;width:100%;vertical-align:middle">
-                      <heading id="talks">Talks</heading>
-                      <ul id="talks-list">
-                        <!-- Talks will be inserted here -->
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Honors and Awards with Map -->
-            <div class="section-spacing">
-              <table class="honors-map-container" style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;">
-                <tr>
-                  <td style="padding:20px; vertical-align:middle; width:80%;">
-                    <heading id="honors-and-awards">Selected Honors and Awards</heading>
-                    <ul id="honors-list">
-                      <!-- Honors will be inserted here -->
-                    </ul>
-                  </td>
-                  <td style="padding:20px; vertical-align:middle; width:20%; text-align:right;">
-                    <div id="map-container" style="width:160px; height:160px; border-radius:8px;">
-                      <!-- Visitor map will be loaded lazily -->
-                      <div id="visitor-map-placeholder" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer;">
-                        <span style="font-size:12px; color:var(--placeholder-text);">📍 Click to load visitor map</span>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </div>
-
-            <!-- Footer -->
-            <footer class="site-footer footer-section">
-              <div class="footer-social">
-                <a href="https://github.com/Arvid-pku" aria-label="GitHub" target="_blank" rel="noopener">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                </a>
-                <a href="https://www.linkedin.com/in/xunjian-yin-5b40252a5" aria-label="LinkedIn" target="_blank" rel="noopener">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                </a>
-                <a href="https://x.com/xunjian_yin" aria-label="Twitter" target="_blank" rel="noopener">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                </a>
-                <a href="https://scholar.google.com/citations?user=PociQ5EAAAAJ" aria-label="Google Scholar" target="_blank" rel="noopener">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
-                </a>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                <p class="footer-copyright" id="last-modified-time"></p>
-                <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
-              </div>
-            </footer>
-
-            <!-- Back to Top Button -->
-            <button id="back-to-top" class="back-to-top" aria-label="Back to top">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-            </button>
-            
-            <!-- Load JavaScript files -->
-            <!-- Load utilities first, then data, then main.js -->
-            <script src="utils.js"></script>
-            <script src="data.js"></script>
-            <script src="main.js"></script>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <main id="main-content" class="homepage">
+    <!-- Profile -->
+    <div class="profile-section">
+      <div class="profile-text">
+        <div class="name">Xunjian Yin</div>
+        <div class="pronunciation">Xunjian is pronounced as Shwen-Jyen</div>
+        <p class="bio">
+          CS PhD student at <a href="https://www.duke.edu/">Duke University</a>, co-advised by Prof. <a href="https://www.shuyanzhou.com/">Shuyan Zhou</a> and Prof. <a href="https://users.cs.duke.edu/~bdhingra/">Bhuwan Dhingra</a>.
+          Previously at <a href="https://english.pku.edu.cn/">Peking University</a> (Prof. <a href="https://wanxiaojun.github.io/">Xiaojun Wan</a>),
+          <a href="https://www.microsoft.com/en-us/research/">Microsoft Research</a>, and
+          <a href="http://nlp.cs.ucsb.edu/">UCSB NLP Group</a> (Prof. <a href="https://sites.cs.ucsb.edu/~william/index.html">William Yang Wang</a>).
+          I study how AI systems can recursively self-improve over long horizons to solve open-ended problems, with a focus on self-referential agents and world models.
+          Feel free to reach out to me if you'd like to discuss research or explore potential collaboration!
+        </p>
+        <div class="profile-links">
+          <a href="mailto:xunjian.yin@duke.edu">Email</a> /
+          <a href="https://github.com/Arvid-pku">Github</a> /
+          <a href="https://www.linkedin.com/in/xunjian-yin-5b40252a5">LinkedIn</a> /
+          <a href="https://x.com/xunjian_yin">Twitter</a> /
+          <a href="files/CV.pdf">CV</a> /
+          <a href="https://scholar.google.com/citations?user=PociQ5EAAAAJ">Google Scholar</a>
+        </div>
+      </div>
+      <img class="profile-photo"
+           alt="Xunjian Yin"
+           src="figures/me.png"
+           loading="eager"
+           width="160"
+           height="160">
     </div>
-  </main>
-</body>
 
-<!-- Force rebuild -->
+    <!-- News -->
+    <div class="homepage-section">
+      <h2>News</h2>
+      <ul class="news-list">
+        <li><span class="news-date">Summer 2026</span><span>I will join <a href="https://deepmind.google/">Google DeepMind</a> as a Student Researcher Intern.</span></li>
+        <li><span class="news-date">Fall 2025</span><span>Started PhD at <a href="https://www.duke.edu/">Duke University</a>.</span></li>
+      </ul>
+    </div>
+
+    <!-- Selected Papers -->
+    <div class="homepage-section">
+      <h2>Selected Papers</h2>
+      <ul id="selected-papers-list" class="publication-list">
+        <!-- Populated by main.js -->
+      </ul>
+      <a href="publications.html" class="view-all">View all publications &rarr;</a>
+    </div>
+
+    <!-- Selected Projects -->
+    <div class="homepage-section">
+      <h2>Selected Projects</h2>
+      <ul id="projects-list">
+        <!-- Populated by main.js -->
+      </ul>
+      <a href="projects.html" class="view-all">View all projects &rarr;</a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer" style="margin-top:32px;">
+      <div class="footer-social">
+        <a href="https://github.com/Arvid-pku" aria-label="GitHub" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/xunjian-yin-5b40252a5" aria-label="LinkedIn" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+        </a>
+        <a href="https://x.com/xunjian_yin" aria-label="Twitter" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://scholar.google.com/citations?user=PociQ5EAAAAJ" aria-label="Google Scholar" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
+        </a>
+      </div>
+      <p class="footer-copyright">© 2025 Xunjian Yin</p>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+    </button>
+  </main>
+
+  <script src="utils.js"></script>
+  <script src="data.js"></script>
+  <script src="main.js"></script>
+</body>
 </html>

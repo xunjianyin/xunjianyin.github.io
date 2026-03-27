@@ -6,53 +6,18 @@
   <title>Error-Robust Retrieval for Chinese Spelling Check</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
-    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
@@ -64,38 +29,131 @@
     <p class="paper-venue">COLING 2024</p>
 
     <div class="paper-links">
-      <a href="https://aclanthology.org/2024.lrec-main.1057/">Paper</a>
+      <a href="https://aclanthology.org/2024.lrec-main.1057/">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Paper
+      </a>
     </div>
 
-    <div class="story-section">
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>Standard retrieval fails when queries contain spelling errors because misspelled text has different semantics. We train error-robust embeddings via contrastive learning so that correct and misspelled text map to similar representations, enabling accurate retrieval-augmented Chinese spelling correction.</p>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>Retrieval-augmented methods have shown promising results in Chinese Spelling Check (CSC) by finding relevant examples to guide correction. However, existing retrieval approaches suffer from a fundamental limitation: when the query itself contains spelling errors, standard semantic embeddings capture the erroneous meaning rather than the intended one, leading to irrelevant retrievals. We propose error-robust retrieval, a contrastive learning approach that trains text encoders to produce similar representations for both correct and misspelled text. By learning embeddings invariant to common Chinese spelling error patterns -- phonetic confusions, visual similarities, and common typos -- our method retrieves relevant correction examples even from broken queries. Experiments show consistent improvements across multiple CSC approaches including LLM-based, neural, and traditional methods.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="story-section fade-in-section">
       <h2>The Paradox of Broken Queries</h2>
-      <p>Retrieval-augmented methods have transformed how we approach many NLP tasks. Need to correct a spelling error? Find similar examples from a database and use them to guide the correction. The approach is elegant and effective—except for one fundamental problem.</p>
+      <p>Retrieval-augmented methods have transformed how we approach many NLP tasks. Need to correct a spelling error? Find similar examples from a database and use them to guide the correction. The approach is elegant and effective -- except for one fundamental problem.</p>
       <p>When your query itself contains spelling errors, standard retrieval breaks down. The misspelled text has different semantics from what the user intended. "I live in Pairs" retrieves documents about mathematical pairs, not the city the user meant. The very errors we're trying to fix sabotage our ability to find relevant examples.</p>
     </div>
 
-    <div class="warning-box">
+    <div class="note-box fade-in-section">
       <h3>The Semantic Drift Problem</h3>
-      <p>Chinese spelling errors are particularly challenging because a single wrong character can completely change meaning. The character for "horse" (马) and "mother" (妈) differ by just one stroke, but their semantics are worlds apart. Standard embedding models faithfully capture these semantic differences—which is exactly what we don't want when the "difference" is actually an error.</p>
+      <p>Chinese spelling errors are particularly challenging because a single wrong character can completely change meaning. The character for "horse" and "mother" differ by just one stroke, but their semantics are worlds apart. Standard embedding models faithfully capture these semantic differences -- which is exactly what we don't want when the "difference" is actually an error.</p>
     </div>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>Learning to See Through Errors</h2>
       <p>We developed error-robust retrieval: embeddings that map both correct and misspelled text to similar representations. The key insight is training the encoder to recognize that "I live in Pairs" and "I live in Paris" should have nearly identical representations, despite their surface difference.</p>
-      <p>This isn't about ignoring spelling—the model still distinguishes genuine semantic differences. Rather, it learns to be invariant to the specific patterns of errors that occur in Chinese spelling: phonetic confusions, visual similarities, and common typos.</p>
+      <p>This isn't about ignoring spelling -- the model still distinguishes genuine semantic differences. Rather, it learns to be invariant to the specific patterns of errors that occur in Chinese spelling: phonetic confusions, visual similarities, and common typos.</p>
     </div>
 
-    <div class="highlight-box">
+    <!-- Method Steps -->
+    <div class="method-steps fade-in-section">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Error Pattern Collection</h4>
+          <p>Collect common Chinese spelling error patterns including phonetic confusions, visually similar characters, and frequent typos to build training pairs.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Contrastive Training</h4>
+          <p>Train text encoders with contrastive learning to produce similar embeddings for correct-misspelled text pairs while maintaining discriminative power for genuinely different semantics.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Error-Robust Retrieval</h4>
+          <p>Use the trained encoder to retrieve relevant correction examples from a database, even when the query contains spelling errors that would mislead standard retrievers.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Augmented Correction</h4>
+          <p>Feed the retrieved examples into downstream CSC models -- LLMs, neural models, or traditional methods -- as in-context demonstrations or candidate corrections.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box fade-in-section">
       <h3>Error-Invariant Representations</h3>
       <p>Our approach trains embeddings using contrastive learning on pairs of correct and corrupted text. The model learns that certain differences are noise (spelling errors) while others are signal (genuine semantic differences). This creates a representation space where retrieval works correctly even when queries are broken.</p>
     </div>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>Better Examples, Better Corrections</h2>
       <p>With error-robust retrieval, we can find relevant examples even when searching with misspelled queries. These examples then serve multiple purposes: they provide in-context demonstrations for LLMs, candidate corrections for edit-based models, and statistical patterns for frequency-based methods.</p>
       <p>The improvement is consistent across different CSC approaches. Whatever correction method you use, it works better when the retrieved examples are actually relevant to the intended meaning rather than the erroneous surface form.</p>
     </div>
 
-    <div class="highlight-box">
+    <!-- Results Table -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Improvement Across CSC Methods</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Standard Retrieval</th>
+            <th>Error-Robust Retrieval</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Retrieval Precision</td>
+            <td>Baseline</td>
+            <td class="best-value">Substantially Higher</td>
+          </tr>
+          <tr>
+            <td>LLM-based CSC</td>
+            <td>Baseline</td>
+            <td class="best-value">Improved</td>
+          </tr>
+          <tr>
+            <td>Neural CSC</td>
+            <td>Baseline</td>
+            <td class="best-value">Improved</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Overall Detection &amp; Correction</td>
+            <td>Baseline</td>
+            <td class="best-value">Consistent Gains</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-box fade-in-section">
       <h3>Key Results</h3>
       <ul>
         <li><b>Retrieval Precision:</b> Substantially higher quality in finding relevant correction examples</li>
@@ -105,14 +163,24 @@
       </ul>
     </div>
 
-    <div class="story-section">
+    <div class="section-divider"></div>
+
+    <div class="story-section fade-in-section">
       <h2>Retrieval That Understands Intent</h2>
-      <p>The broader lesson extends beyond spelling correction. Many retrieval scenarios involve queries that don't perfectly express user intent—whether through errors, imprecision, or incomplete information. Building retrieval systems that understand intent despite surface imperfections is crucial for real-world robustness.</p>
+      <p>The broader lesson extends beyond spelling correction. Many retrieval scenarios involve queries that don't perfectly express user intent -- whether through errors, imprecision, or incomplete information. Building retrieval systems that understand intent despite surface imperfections is crucial for real-world robustness.</p>
       <p>Error-robust retrieval demonstrates that we can train embeddings to distinguish signal from noise, capturing intended meaning even when the literal text points elsewhere.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@inproceedings{yin-etal-2024-error,
+    <!-- Citation with Copy Button -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@inproceedings{yin-etal-2024-error,
     title = "Error-Robust Retrieval for Chinese Spelling Check",
     author = "Yin, Xunjian and Hu, Xinyu and Wan, Xiaojun",
     booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation",
@@ -120,6 +188,7 @@
     url = "https://aclanthology.org/2024.lrec-main.1057/",
     pages = "12086--12096"
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -146,6 +215,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

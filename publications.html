@@ -10,53 +10,30 @@
   <link rel="stylesheet" type="text/css" href="stylesheet.css">
   <link rel="stylesheet" type="text/css" href="shared-styles.css">
   <link rel="icon" type="image/png" href="figures/logo.png">
-  <!-- Page-specific styles -->
   <style>
-    body {
-      font-display: swap; 
-    }
-    
-    /* Page-specific layout - consistent margins for non-index pages */
     .main-content-wrapper {
-      max-width: 1000px !important;
-      margin: 0 auto !important;
-      padding: 0 80px !important;
-      box-sizing: border-box !important;
-    }
-    
-    .publications-container {
-      max-width: 800px;
+      max-width: 820px;
       margin: 0 auto;
-      padding: 0;
+      padding: 32px 24px 48px;
     }
-    
 
-    
-    /* Fix for paper indentation */
-    .publication-table {
-      width: 100%;
-      border: 0px;
-      border-spacing: 0px;
-      border-collapse: separate;
-      margin: 0 auto 20px;
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 24px;
+      text-align: left;
     }
-    
-    .publication-table tr {
-      vertical-align: top;
+
+    .publication-list li {
+      margin-bottom: 6px !important;
     }
-    
-    .publication-table td {
-      padding: 10px 20px;
-      vertical-align: top;
-    }
-    
-    .paper_bottom_space {
-      margin-bottom: 20px;
-    }
-    
-    @media screen and (max-width: 600px) {
-      .publication-table td {
-        padding: 8px 15px;
+
+    [data-theme="dark"] .page-title { color: var(--text-color); }
+
+    @media screen and (max-width: 768px) {
+      .main-content-wrapper {
+        padding: 24px 16px 40px;
       }
     }
   </style>
@@ -68,8 +45,10 @@
     <a href="index.html" class="nav-button">Home</a>
     <a href="publications.html" class="nav-button" aria-current="page">Publications</a>
     <a href="projects.html" class="nav-button">Projects</a>
+    
     <a href="blogs.html" class="nav-button">Blogs</a>
     <a href="photography.html" class="nav-button">Photography</a>
+    <a href="cv.html" class="nav-button">CV</a>
     
     <!-- Dark mode toggle -->
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
@@ -78,22 +57,19 @@
 
   <!-- Main Content with Padding -->
   <div class="main-content-wrapper">
-    <!-- Page Title -->
-    <div style="text-align:center;margin-bottom:40px;">
-      <h1 class="page-title">Publications</h1>
-    </div>
-    
+    <h1 class="page-title">Publications</h1>
+
     <!-- Preprints -->
-    <div style="margin-bottom:40px;">
-      <heading id="preprints">Preprints</heading>
+    <div style="margin-bottom:24px;">
+      <h2 id="preprints">Preprints</h2>
       <ul id="preprints-list" class="publication-list">
         <!-- Preprints will be inserted here -->
       </ul>
     </div>
 
     <!-- Full Publications -->
-    <div style="margin-bottom:40px;">
-      <heading id="publications">Publications</heading>
+    <div style="margin-bottom:24px;">
+      <h2 id="publications">Publications</h2>
       <ul id="publications-list" class="publication-list">
         <!-- Publications will be inserted here -->
       </ul>
@@ -101,7 +77,7 @@
   </div>
 
   <!-- Footer -->
-  <div class="main-content-wrapper">
+  <div style="max-width:820px;margin:0 auto;padding:0 24px;">
     <footer class="site-footer">
       <div class="footer-social">
         <a href="https://github.com/Arvid-pku" aria-label="GitHub" target="_blank" rel="noopener">

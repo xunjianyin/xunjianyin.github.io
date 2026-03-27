@@ -21,7 +21,7 @@ const publications = [
       url={https://arxiv.org/abs/2512.01970}, 
 }</code></pre>`,
     isPreprint: true,
-    isSelected: true
+    isSelected: false
   },
   {
     title: "Differentiable Evolutionary Reinforcement Learning",
@@ -44,29 +44,6 @@ const publications = [
 }</code></pre>`,
     isPreprint: true,
     isSelected: false
-  },
-  {
-    title: "The Geometry of Reasoning: Flowing Logics in Representation Space",
-    authors: "Yufa Zhou*, Yixiao Wang*, <b>Xunjian Yin*</b>, Shuyan Zhou, Anru R. Zhang",
-    venue: "ICLR 2026",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2510.09782" },
-      { text: "Code", url: "https://github.com/MasterZhou1/Reasoning-Flow" },
-      { text: "Page", url: "papers/geometry-of-reasoning.html" }
-    ],
-    abstract: "We study how large language models (LLMs) ``think'' through their representation space. We propose a novel geometric framework that models an LLM's reasoning as flows -- embedding trajectories evolving where logic goes. We disentangle logical structure from semantics by employing the same natural deduction propositions with varied semantic carriers, allowing us to test whether LLMs internalize logic beyond surface form. This perspective connects reasoning with geometric quantities such as position, velocity, and curvature, enabling formal analysis in representation and concept spaces. Our theory establishes: (1) LLM reasoning corresponds to smooth flows in representation space, and (2) logical statements act as local controllers of these flows' velocities. Using learned representation proxies, we design controlled experiments to visualize and quantify reasoning flows, providing empirical validation of our theoretical framework. Our work serves as both a conceptual foundation and practical tools for studying reasoning phenomenon, offering a new lens for interpretability and formal analysis of LLMs' behavior.",
-    citation: `<pre><code>@misc{zhou2025geometryreasoningflowinglogics,
-      title={The Geometry of Reasoning: Flowing Logics in Representation Space}, 
-      author={Yufa Zhou and Yixiao Wang and Xunjian Yin and Shuyan Zhou and Anru R. Zhang},
-      year={2025},
-      eprint={2510.09782},
-      archivePrefix={arXiv},
-      primaryClass={cs.AI},
-      url={https://arxiv.org/abs/2510.09782},
-}</code></pre>`,
-    isNew: true,
-    isPreprint: false,
-    isSelected: true
   },
   {
     title: "Reverse Language Model",
@@ -132,7 +109,7 @@ const publications = [
       url={https://arxiv.org/abs/2406.08842}, 
 }</code></pre>`,
     isPreprint: true,
-    isSelected: true
+    isSelected: false
   },
   // Publications
   {
@@ -170,7 +147,7 @@ const publications = [
 }</code></pre>`,
     isNew: false,
     isPreprint: false,
-    isSelected: true
+    isSelected: false
   },
   {
     title: "Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement",
@@ -206,6 +183,29 @@ const publications = [
     abstract = {The rapid advancement of large language models (LLMs) has significantly enhanced the capabilities of agents across various tasks. However, existing agentic systems, whether based on fixed pipeline algorithms or pre-defined meta-learning frameworks, cannot search the whole agent design space due to the restriction of human-designed components, and thus might miss the more optimal agent design. In this paper, we introduce G{\"o}del Agent, a self-evolving framework inspired by the G{\"o}del Machine, enabling agents to recursively improve themselves without relying on predefined routines or fixed optimization algorithms. G{\"o}del Agent leverages LLMs to dynamically modify its own logic and behavior, guided solely by high-level objectives through prompting. Experimental results on multiple domains demonstrate that the implementation of G{\"o}del Agent can achieve continuous self-improvement, surpassing manually crafted agents in performance, efficiency, and generalizability.}
 }</code></pre>`,
     isNew: false,
+    isPreprint: false,
+    isSelected: true
+  },
+  {
+    title: "The Geometry of Reasoning: Flowing Logics in Representation Space",
+    authors: "Yufa Zhou*, Yixiao Wang*, <b>Xunjian Yin*</b>, Shuyan Zhou, Anru R. Zhang",
+    venue: "ICLR 2026",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2510.09782" },
+      { text: "Code", url: "https://github.com/MasterZhou1/Reasoning-Flow" },
+      { text: "Page", url: "papers/geometry-of-reasoning.html" }
+    ],
+    abstract: "We study how large language models (LLMs) ``think'' through their representation space. We propose a novel geometric framework that models an LLM's reasoning as flows -- embedding trajectories evolving where logic goes. We disentangle logical structure from semantics by employing the same natural deduction propositions with varied semantic carriers, allowing us to test whether LLMs internalize logic beyond surface form. This perspective connects reasoning with geometric quantities such as position, velocity, and curvature, enabling formal analysis in representation and concept spaces. Our theory establishes: (1) LLM reasoning corresponds to smooth flows in representation space, and (2) logical statements act as local controllers of these flows' velocities. Using learned representation proxies, we design controlled experiments to visualize and quantify reasoning flows, providing empirical validation of our theoretical framework. Our work serves as both a conceptual foundation and practical tools for studying reasoning phenomenon, offering a new lens for interpretability and formal analysis of LLMs' behavior.",
+    citation: `<pre><code>@misc{zhou2025geometryreasoningflowinglogics,
+      title={The Geometry of Reasoning: Flowing Logics in Representation Space}, 
+      author={Yufa Zhou and Yixiao Wang and Xunjian Yin and Shuyan Zhou and Anru R. Zhang},
+      year={2025},
+      eprint={2510.09782},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2510.09782},
+}</code></pre>`,
+    isNew: true,
     isPreprint: false,
     isSelected: true
   },
@@ -643,7 +643,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     pages = "7701--7710"
 }</code></pre>`,
     isPreprint: false,
-    isSelected: true
+    isSelected: false
   }
 ];
 

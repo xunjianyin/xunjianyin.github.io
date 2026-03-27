@@ -6,139 +6,281 @@
   <title>LEDOM: Reverse Language Model</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .paper-figure { margin: 40px 0; text-align: center; }
-    .paper-figure.hero img { max-width: 100%; width: 700px; }
-    .paper-figure.medium img { max-width: 550px; width: 100%; }
-    .paper-figure.small img { max-width: 450px; width: 100%; }
-    .paper-figure img { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .paper-figure figcaption { font-size: 14px; color: #666; margin-top: 15px; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6; }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-    .name-box { background: #fff8e6; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #f0e0b0; }
-    .name-box code { background: #f0e0b0; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
   <main class="paper-container">
-    <div class="back-link"><a href="../index.html">← Back to Home</a></div>
+    <div class="back-link"><a href="../index.html">&larr; Back to Home</a></div>
 
     <h1 class="paper-title">LEDOM: An Open and Fundamental Reverse Language Model</h1>
     <p class="paper-authors"><b>Xunjian Yin</b>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan</p>
-    <p class="paper-venue">ArXiv Preprint 2025</p>
+    <p class="paper-venue">arXiv 2025 &middot; Revised March 2026</p>
 
     <div class="paper-links">
-      <a href="https://arxiv.org/abs/2507.01335">Paper</a>
-      <a href="https://huggingface.co/Corning/Reverse-Model-7B-348B">Model (7B)</a>
-      <a href="https://huggingface.co/Corning/Reverse-Model-2B-348B">Model (2B)</a>
+      <a href="https://arxiv.org/abs/2507.01335">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Paper
+      </a>
+      <a href="https://huggingface.co/Corning/Reverse-Model-7B-348B">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        Model (7B)
+      </a>
+      <a href="https://huggingface.co/Corning/Reverse-Model-2B-348B">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        Model (2B)
+      </a>
+      <a href="https://github.com/Arvid-pku/ReverseModel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
     </div>
 
-    <div class="name-box">
-      <strong>Why "LEDOM"?</strong> Spell <code>MODEL</code> backwards. It captures the essence of what we've built—a language model that thinks in reverse.
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>We train the first open right-to-left language model at scale (2B/7B, 435B tokens). LEDOM develops unique capabilities like abductive inference and question synthesis, and its <em>Reverse Reward</em> mechanism boosts strong forward models by up to 6.6% on AIME 2024 and 15% on AMC 2023 -- purely at inference time.</p>
     </div>
 
-    <figure class="paper-figure medium">
-      <img src="https://arxiv.org/html/2507.01335v2/x1.png" alt="Reverse Language Model Pretraining">
-      <figcaption>While conventional language models predict "what comes next," LEDOM predicts "what came before"—a fundamentally different way of modeling language that unlocks unique capabilities.</figcaption>
+    <!-- Stat Cards -->
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn" aria-expanded="false">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="abstract-content">
+        <p>What reasoning patterns emerge when a model conditions on future context to predict the past? We investigate this question by training a right-to-left autoregressive language model at the 2B/7B parameter scale on 435 billion tokens. The resulting model develops distinctive capabilities including abductive inference, question synthesis, and natural resolution of the reversal curse. We propose Reverse Reward, which combines forward and reverse probabilities through noisy channel duality to rerank outputs. This approach achieves performance gains of up to 6.6% on AIME 2024 and 15% on AMC 2023 across multiple strong baselines. We release all models, code, and data publicly.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Hero Figure -->
+    <figure class="paper-figure hero fade-in-section">
+      <img src="https://arxiv.org/html/2507.01335v3/x1.png" alt="Forward vs. Reverse Language Modeling">
+      <figcaption>Forward vs. Reverse Language Modeling. Forward LMs decompose P(x) left-to-right; LEDOM decomposes right-to-left using an identical decoder-only architecture -- same model, opposite direction.</figcaption>
     </figure>
 
-    <div class="story-section">
+    <!-- What & Why -->
+    <div class="story-section fade-in-section">
       <h2>Thinking Backwards</h2>
-      <p>Every language model you've ever used—GPT, Claude, Llama—works the same way: given some text, predict the next token. It's so fundamental that we rarely question it. But what if we flipped this entirely? What if a model was trained to predict the <em>previous</em> token instead?</p>
-      <p>This isn't just a curiosity. LEDOM represents the first serious attempt to build a reverse language model at scale—trained on 435 billion tokens with both 2B and 7B parameter variants. We're releasing everything: the models, training code, and pre-training data.</p>
+      <p>Every language model you have ever used -- GPT, Claude, Llama -- works the same way: given some text, predict the next token. It is so fundamental that we rarely question it. But what if we flipped this entirely? What if a model was trained to predict the <em>previous</em> token instead?</p>
+      <p>This is not just a curiosity. LEDOM represents the first serious attempt to build a reverse language model at scale. The name itself is a hint: spell <strong>MODEL</strong> backwards. It captures the essence of what we have built -- a language model that thinks in reverse.</p>
     </div>
 
-    <figure class="paper-figure medium">
-      <img src="https://arxiv.org/html/2507.01335v2/x2.png" alt="Reverse Reward Mechanism">
-      <figcaption>The Reverse Reward application: LEDOM evaluates candidate solutions by computing how likely they are to have led to the given conclusion—a natural form of backward verification.</figcaption>
+    <!-- Method Steps -->
+    <div class="story-section fade-in-section">
+      <h2>How It Works</h2>
+      <p>Building a reverse language model requires rethinking every stage of the pipeline, from data to architecture to evaluation.</p>
+    </div>
+
+    <div class="method-steps fade-in-section">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Reverse the Data</h4>
+          <p>All training sequences are reversed at the token level. The model sees text right-to-left and learns to predict each token given only the tokens that originally came <em>after</em> it.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Standard Architecture, Opposite Direction</h4>
+          <p>We use the same decoder-only transformer architecture (Qwen2 family). No architectural changes are needed -- the causal mask naturally handles right-to-left dependencies once the data is reversed.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Large-Scale Pretraining</h4>
+          <p>We train on 435B tokens from three domains: 284B general text (DCLM), 103B mathematical data, and 48B code -- matching the data diet of strong forward models.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Reverse Reward Scoring</h4>
+          <p>At inference time, LEDOM scores forward-model candidates by computing how likely each solution is to have led to the given answer -- a natural backward verification via noisy channel duality.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Reverse Reward -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2507.01335v3/x2.png" alt="Reverse Reward Mechanism">
+      <figcaption>Verification by Inversion: a forward LM generates candidate solutions, then LEDOM scores each by estimating its posterior probability -- how likely is this reasoning chain to have produced this answer?</figcaption>
     </figure>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>A Different Kind of Intelligence</h2>
-      <p>When you read a sentence forward, you're predicting where it might go. When you read it backward, you're reasoning about how it got there. These are complementary forms of intelligence, and until now, we've only trained models for one of them.</p>
-      <p>LEDOM exhibits fascinating behaviors that emerge from backward processing. It naturally excels at verification—checking whether a conclusion follows from given premises. It develops unique attention patterns suited for tracking backward dependencies. It "thinks" in a way that's fundamentally different from forward models.</p>
+      <p>When you read a sentence forward, you are predicting where it might go. When you read it backward, you are reasoning about how it got there. These are complementary forms of intelligence, and until now, we have only trained models for one of them.</p>
+      <p>LEDOM exhibits fascinating behaviors that emerge from backward processing. It naturally excels at verification -- checking whether a conclusion follows from given premises. It develops unique attention patterns suited for tracking backward dependencies. It develops distinctive capabilities including abductive inference, question synthesis, and natural resolution of the reversal curse.</p>
     </div>
 
-    <div class="highlight-box">
-      <h3>Reverse Reward: A Killer Application</h3>
-      <p>We discovered a powerful application: using LEDOM to improve forward model outputs. Given multiple candidate answers from a forward model, LEDOM evaluates each by asking "how likely is this reasoning chain to have produced this answer?" This backward likelihood serves as a powerful reranking signal, achieving substantial improvements on mathematical reasoning benchmarks.</p>
+    <div class="highlight-box fade-in-section">
+      <h3>Reverse Reward: The Killer Application</h3>
+      <p>Given multiple candidate answers from a forward model, LEDOM evaluates each by asking "how likely is this reasoning chain to have produced this answer?" This backward likelihood, combined with forward probability through noisy channel duality, serves as a powerful reranking signal. The best part: it requires <strong>no additional training</strong> -- it is purely an inference-time improvement.</p>
     </div>
 
-    <figure class="paper-figure medium">
-      <img src="https://arxiv.org/html/2507.01335v2/x3.png" alt="Performance Results">
-      <figcaption>Reverse Reward consistently improves performance across different sampling sizes, demonstrating the complementary value of backward reasoning.</figcaption>
+    <div class="section-divider"></div>
+
+    <!-- Scaling Figure -->
+    <figure class="paper-figure medium fade-in-section">
+      <img src="https://arxiv.org/html/2507.01335v3/x3.png" alt="Performance vs Sampling Size">
+      <figcaption>Accuracy improvements with varying sampling sizes (N=1 to 64) on MATH-500 and GSM8K. Reverse Reward consistently improves performance across all sampling budgets.</figcaption>
     </figure>
 
-    <div class="story-section">
+    <!-- Results Table -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Reverse Reward Results on Competition Math</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Base Model</th>
+            <th>Method</th>
+            <th>GSM8K</th>
+            <th>MATH-500</th>
+            <th>AIME 2024</th>
+            <th>AMC 2023</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="2">Qwen2.5-Math-7B</td>
+            <td>Greedy</td>
+            <td>95.2%</td>
+            <td>83.6%</td>
+            <td>16.7%</td>
+            <td>55.0%</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>+ Reverse Reward</td>
+            <td class="best-value">96.1%</td>
+            <td class="best-value">85.4%</td>
+            <td class="best-value">23.3%</td>
+            <td class="best-value">57.5%</td>
+          </tr>
+          <tr>
+            <td rowspan="2">DeepSeek-Math-7B</td>
+            <td>Greedy</td>
+            <td>--</td>
+            <td>--</td>
+            <td>6.7%</td>
+            <td>--</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>+ Reverse Reward</td>
+            <td>--</td>
+            <td>--</td>
+            <td class="best-value">13.3%</td>
+            <td>--</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="concept-box fade-in-section">
+      <h3>Noisy Channel Duality</h3>
+      <p>The theoretical foundation of Reverse Reward comes from Bayes' rule. Instead of selecting the answer y that maximizes P(y|x) from the forward model alone, we combine it with the reverse probability P(x|y) from LEDOM. This noisy channel formulation -- long studied in machine translation -- turns out to be remarkably effective for mathematical reasoning verification.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Training Dynamics -->
+    <figure class="paper-figure small fade-in-section">
+      <img src="https://arxiv.org/html/2507.01335v3/x4.png" alt="Training Loss Curves">
+      <figcaption>Training loss curves comparing LEDOM and a forward LM. While reverse modeling converges slightly more slowly, both reach stable optima -- suggesting reverse modeling is equally learnable.</figcaption>
+    </figure>
+
+    <div class="story-section fade-in-section">
       <h2>What We Found</h2>
-      <p>Training LEDOM revealed several surprising insights. First, reverse language modeling converges just as stably as forward modeling—the training curves look remarkably similar. Second, the model develops genuinely different internal representations, not just mirror images of forward models. Third, combining forward generation with backward evaluation creates a more robust reasoning system than either alone.</p>
+      <p>Training LEDOM revealed several surprising insights. First, reverse language modeling converges stably, with training curves that look remarkably similar to forward modeling. Second, the model develops genuinely different internal representations, not just mirror images of forward models. Third, combining forward generation with backward evaluation creates a more robust reasoning system than either alone.</p>
     </div>
 
-    <figure class="paper-figure small">
-      <img src="https://arxiv.org/html/2507.01335v2/x4.png" alt="Training Loss Curves">
-      <figcaption>Training dynamics of LEDOM compared to a forward language model—both converge smoothly, suggesting reverse modeling is equally learnable.</figcaption>
-    </figure>
+    <!-- Training Data Breakdown -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Training Data Composition</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Domain</th>
+            <th>Source</th>
+            <th>Tokens</th>
+            <th>Proportion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>General Text</td>
+            <td>DCLM</td>
+            <td>284B</td>
+            <td>65.3%</td>
+          </tr>
+          <tr>
+            <td>Mathematics</td>
+            <td>Math corpora</td>
+            <td>103B</td>
+            <td>23.7%</td>
+          </tr>
+          <tr>
+            <td>Code</td>
+            <td>Code corpora</td>
+            <td>48B</td>
+            <td>11.0%</td>
+          </tr>
+          <tr style="font-weight: 600;">
+            <td>Total</td>
+            <td>--</td>
+            <td>435B</td>
+            <td>100%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <div class="highlight-box">
-      <h3>Key Results</h3>
+    <div class="highlight-box fade-in-section">
+      <h3>Key Contributions</h3>
       <ul>
-        <li><b>GSM8K:</b> Significant accuracy improvements through Reverse Reward reranking</li>
-        <li><b>MATH:</b> Consistent gains across difficulty levels</li>
-        <li><b>Scaling:</b> Larger LEDOM models provide better reverse reward signals</li>
-        <li><b>Efficiency:</b> No additional training required—purely inference-time improvement</li>
+        <li><b>First open reverse LM at scale</b> -- 2B and 7B models trained on 435B tokens, fully open-sourced</li>
+        <li><b>Emergent capabilities:</b> abductive inference, question synthesis, reversal curse resolution</li>
+        <li><b>Reverse Reward:</b> up to +6.6% on AIME 2024 and +15% on AMC 2023, with no additional training</li>
+        <li><b>Noisy channel duality:</b> principled Bayesian framework combining forward and reverse probabilities</li>
+        <li><b>Full reproducibility:</b> models, training code, and pre-training data all publicly released</li>
       </ul>
     </div>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>Open Science</h2>
-      <p>We believe in open research. That's why we're releasing not just the trained models, but the complete training code and pre-training data. We want others to explore reverse language modeling, to find applications we haven't imagined, and to push this direction further.</p>
-      <p>LEDOM is an invitation to think differently about language models. Forward isn't the only direction.</p>
+      <p>We believe in open research. That is why we are releasing not just the trained models, but the complete training code and pre-training data. We want others to explore reverse language modeling, to find applications we have not imagined, and to push this direction further.</p>
+      <p>LEDOM is an invitation to think differently about language models. Forward is not the only direction.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@misc{yin2025ledomopenfundamentalreverse,
+    <!-- Citation -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@misc{yin2025ledomopenfundamentalreverse,
     title={LEDOM: An Open and Fundamental Reverse Language Model},
     author={Xunjian Yin and Sitao Cheng and Yuxi Xie and Xinyu Hu and Li Lin and Xinyi Wang and Liangming Pan and William Yang Wang and Xiaojun Wan},
     year={2025},
@@ -147,6 +289,7 @@
     primaryClass={cs.CL},
     url={https://arxiv.org/abs/2507.01335}
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -165,7 +308,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
       </a>
     </div>
-    <p class="footer-copyright">© 2025 Xunjian Yin. All rights reserved.</p>
+    <p class="footer-copyright">&copy; 2025 Xunjian Yin. All rights reserved.</p>
   </footer>
 
   <!-- Back to Top Button -->
@@ -173,6 +316,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

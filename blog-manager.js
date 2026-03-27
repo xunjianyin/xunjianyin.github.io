@@ -117,7 +117,7 @@ class BlogManager {
       this.posts = await Promise.all(postsData.map(async (post) => {
         if (post.markdownFile) {
           try {
-            const response = await fetch(post.markdownFile);
+            const response = await fetch(encodeURI(post.markdownFile));
             if (response.ok) {
               const markdownContent = await response.text();
               const parsedContent = this.parseMarkdown(markdownContent);

@@ -230,11 +230,11 @@ ul, ol {
 }
 
 .paper-venue {
-  color: #CC0000;
+  color: #9ca3af;
 }
 
 [data-theme="dark"] .paper-venue {
-  color: var(--primary-color);
+  color: #888;
 }
 
 .paper-links {
@@ -326,10 +326,11 @@ ul, ol {
 
 /* Page Title Styles */
 .page-title {
-  text-align: center;
-  font-size: 28px;
-  margin-bottom: 30px;
-  color: var(--primary-color);
+  text-align: left;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #1a1a1a;
 }
 
 /* Responsive Design */

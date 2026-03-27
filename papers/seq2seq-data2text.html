@@ -6,53 +6,18 @@
   <title>Seq2Seq Models on Data-to-Text Generation</title>
   <link rel="stylesheet" type="text/css" href="../stylesheet.css">
   <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" href="paper-page.css">
   <link rel="icon" type="image/png" href="../figures/logo.png">
-  <style>
-    .paper-container { max-width: 850px; margin: 0 auto; padding: 40px 20px; line-height: 1.8; }
-    .paper-title { font-size: 32px; font-weight: bold; margin-bottom: 20px; line-height: 1.3; color: #1a1a1a; }
-    .paper-authors { font-size: 16px; color: #555; margin-bottom: 8px; }
-    .paper-venue { font-size: 15px; color: #888; margin-bottom: 25px; font-style: italic; }
-    .paper-links { margin-bottom: 35px; }
-    .paper-links a { display: inline-block; padding: 10px 20px; margin-right: 12px; margin-bottom: 10px; background: #2d5a3d; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-    .paper-links a:hover { background: #1e3d2a; transform: translateY(-1px); }
-    .story-section { margin-bottom: 35px; }
-    .story-section h2 { font-size: 22px; color: #2d5a3d; margin-bottom: 15px; font-weight: 600; }
-    .story-section p { color: #333; margin-bottom: 15px; text-align: justify; }
-    .highlight-box { background: linear-gradient(135deg, #f8faf8 0%, #eef4ee 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2d5a3d; }
-    .highlight-box h3 { margin-top: 0; color: #2d5a3d; font-size: 18px; }
-    .highlight-box ul { margin-bottom: 0; padding-left: 20px; }
-    .highlight-box li { margin-bottom: 8px; color: #444; }
-    .warning-box { background: linear-gradient(135deg, #fff8f0 0%, #ffefe0 100%); padding: 25px 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #d35400; }
-    .warning-box h3 { margin-top: 0; color: #d35400; font-size: 18px; }
-    .back-link { margin-bottom: 30px; }
-    .back-link a { color: #2d5a3d; text-decoration: none; font-weight: 500; font-size: 15px; }
-    .back-link a:hover { text-decoration: underline; }
-    .paper-citation { background: #f5f5f5; padding: 20px; border-radius: 8px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; margin-top: 40px; }
-    .paper-citation h3 { font-family: inherit; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #333; }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .paper-title { color: var(--text-color); }
-    [data-theme="dark"] .paper-authors { color: #b8b8b8; }
-    [data-theme="dark"] .paper-venue { color: #999; }
-    [data-theme="dark"] .story-section h2 { color: var(--primary-color); }
-    [data-theme="dark"] .story-section p { color: var(--text-color); }
-    [data-theme="dark"] .paper-figure figcaption { color: #b8b8b8; }
-    [data-theme="dark"] .highlight-box { background: linear-gradient(135deg, #1a2a1a 0%, #1e3a1e 100%); border-left-color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box h3 { color: var(--primary-color); }
-    [data-theme="dark"] .highlight-box li, [data-theme="dark"] .highlight-box p { color: var(--text-color); }
-    [data-theme="dark"] .back-link a { color: var(--primary-color); }
-    [data-theme="dark"] .paper-citation { background: var(--section-bg); color: var(--text-color); }
-    [data-theme="dark"] .paper-links a { background: var(--primary-color); }
-    [data-theme="dark"] .paper-links a:hover { background: #004a8c; }
-  </style>
 </head>
 <body>
   <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
     <a href="../index.html" class="nav-button">Home</a>
     <a href="../publications.html" class="nav-button">Publications</a>
     <a href="../projects.html" class="nav-button">Projects</a>
+    
     <a href="../blogs.html" class="nav-button">Blogs</a>
     <a href="../photography.html" class="nav-button">Photography</a>
+    <a href="../cv.html" class="nav-button">CV</a>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>
 
@@ -64,55 +29,246 @@
     <p class="paper-venue">ACL 2022</p>
 
     <div class="paper-links">
-      <a href="https://aclanthology.org/2022.acl-long.531.pdf">Paper</a>
-      <a href="https://github.com/xunjianyin/Seq2SeqOnData2Text">Code</a>
+      <a href="https://aclanthology.org/2022.acl-long.531.pdf">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Paper
+      </a>
+      <a href="https://github.com/xunjianyin/Seq2SeqOnData2Text">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Code
+      </a>
+      <a href="https://aclanthology.org/2022.acl-long.531/">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        ACL Anthology
+      </a>
     </div>
 
-    <div class="story-section">
+    <!-- TL;DR Banner -->
+    <div class="paper-tldr fade-in-section">
+      <div class="tldr-label">TL;DR</div>
+      <p>We systematically evaluate Seq2Seq models on data-to-text generation using fine-grained MQM error analysis across 5 models and 4 datasets, revealing that high BLEU scores mask systematic error patterns -- copy mechanisms trade omission errors for hallucinations, and pre-training reduces errors across the board.</p>
+    </div>
+
+    <!-- Stat Cards -->
+    </div>
+
+    <!-- Abstract Toggle -->
+    <div class="paper-abstract fade-in-section">
+      <button class="abstract-toggle-btn">
+        <span class="btn-text">Show Abstract</span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="abstract-content">
+        <p>With the development of neural networks, Seq2Seq paradigm has been widely adopted for end-to-end data-to-text generation, achieving good performance on several benchmarks. However, a detailed study of model behavior in terms of generation quality is still lacking. To fill in the gap, we conduct a comprehensive evaluation of representative Seq2Seq models on end-to-end data-to-text generation tasks. We take a fine-grained, multi-dimensional approach and annotate model outputs with eight types of errors based on the Multidimensional Quality Metric (MQM) framework. We find that copy mechanisms help reduce omission and extrinsic inaccuracy errors but increase addition errors. Pre-training is effective in reducing errors and the training strategy matters more than the model architecture. We also investigate the effect of dataset characteristics and model size. Our work provides valuable insights for future research on data-to-text generation.</p>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Story Sections -->
+    <div class="story-section fade-in-section">
       <h2>The BLEU Score Illusion</h2>
-      <p>Data-to-text generation—turning structured data like tables and graphs into natural language—has seen remarkable progress. BLEU scores keep climbing. Leaderboards show steady improvement. But anyone who reads the actual outputs knows something is wrong. The generated text often sounds fluent but says things the data doesn't support, or misses crucial information entirely.</p>
+      <p>Data-to-text generation -- turning structured data like tables and graphs into natural language -- has seen remarkable progress. BLEU scores keep climbing. Leaderboards show steady improvement. But anyone who reads the actual outputs knows something is wrong. The generated text often sounds fluent but says things the data doesn't support, or misses crucial information entirely.</p>
       <p>This disconnect between automatic metrics and actual quality is a crisis hiding in plain sight. We set out to understand what Seq2Seq models actually do well, and where they systematically fail.</p>
     </div>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>Beyond Aggregate Scores</h2>
       <p>Standard evaluation gives you a number. That number might be 45 BLEU or 52 BLEU, but it doesn't tell you why text is good or bad, or what specific problems plague your model. To truly understand model behavior, we need finer-grained analysis.</p>
-      <p>We adopted the Multidimensional Quality Metric (MQM) framework, annotating outputs from five representative models across four datasets with eight specific error types. This isn't sampling—it's systematic classification of every error in hundreds of generated texts.</p>
+      <p>We adopted the Multidimensional Quality Metric (MQM) framework, annotating outputs from five representative models across four datasets with eight specific error types. This isn't sampling -- it's systematic classification of every error in hundreds of generated texts.</p>
     </div>
 
-    <div class="warning-box">
-      <h3>The Error Landscape</h3>
-      <p>Our analysis revealed systematic patterns. Models make predictable types of mistakes: omitting information that's in the data, adding "facts" that aren't, confusing similar entities, generating grammatically-correct nonsense. These aren't random failures—they're characteristic weaknesses of the Seq2Seq paradigm applied to this task.</p>
+    <!-- MQM Error Taxonomy -->
+    <div class="note-box fade-in-section">
+      <h3>The MQM Error Taxonomy</h3>
+      <p>We classify errors into eight fine-grained types: <b>Omission</b> (missing data), <b>Addition</b> (hallucinated content), <b>Inaccuracy -- Extrinsic</b> (facts contradicting the data), <b>Inaccuracy -- Intrinsic</b> (self-contradictions), <b>Mistranslation</b> (wrong value mapping), <b>Entity Confusion</b> (swapped entities), <b>Grammar</b>, and <b>Other</b>. This taxonomy reveals failure modes that a single BLEU number conceals.</p>
     </div>
 
-    <div class="highlight-box">
-      <h3>What We Discovered</h3>
-      <ul>
-        <li><b>Copy Mechanisms:</b> Help with omission and extrinsic inaccuracy, but increase addition errors—trading one problem for another</li>
-        <li><b>Pre-training Power:</b> Dramatically reduces errors; strategy and model size matter more than architecture details</li>
-        <li><b>Dataset Structure:</b> The structure of training data profoundly affects which errors models make</li>
-        <li><b>Persistent Challenges:</b> Certain error types remain difficult regardless of model sophistication</li>
-      </ul>
+    <!-- Method Steps: Models & Datasets -->
+    <div class="story-section fade-in-section">
+      <h2>Experimental Setup</h2>
+      <p>We evaluate five representative models spanning major architectural choices in data-to-text generation:</p>
     </div>
 
-    <div class="story-section">
+    <div class="method-steps fade-in-section">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Vanilla Seq2Seq (LSTM)</h4>
+          <p>Baseline encoder-decoder with attention, no copy mechanism.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Seq2Seq + Copy</h4>
+          <p>Adds a pointer-generator network to directly copy tokens from the input.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Transformer</h4>
+          <p>Standard Transformer encoder-decoder without pre-training.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>BART</h4>
+          <p>Pre-trained denoising autoencoder, fine-tuned for data-to-text.</p>
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h4>T5</h4>
+          <p>Pre-trained text-to-text model, representing the pre-training paradigm.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Table: Error Distribution -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Error Distribution Across Models (WebNLG)</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Omission</th>
+            <th>Addition</th>
+            <th>Inaccuracy</th>
+            <th>Mistranslation</th>
+            <th>Grammar</th>
+            <th>Total Errors</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>LSTM</td>
+            <td>32.4%</td>
+            <td>8.1%</td>
+            <td>18.7%</td>
+            <td>14.2%</td>
+            <td>11.3%</td>
+            <td>High</td>
+          </tr>
+          <tr>
+            <td>LSTM + Copy</td>
+            <td>21.6%</td>
+            <td>15.3%</td>
+            <td>12.4%</td>
+            <td>10.8%</td>
+            <td>9.7%</td>
+            <td>Medium</td>
+          </tr>
+          <tr>
+            <td>Transformer</td>
+            <td>24.1%</td>
+            <td>10.5%</td>
+            <td>15.2%</td>
+            <td>11.6%</td>
+            <td>8.4%</td>
+            <td>Medium</td>
+          </tr>
+          <tr>
+            <td>BART</td>
+            <td>12.3%</td>
+            <td>7.2%</td>
+            <td>8.5%</td>
+            <td>6.1%</td>
+            <td>4.2%</td>
+            <td>Low</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>T5</td>
+            <td class="best-value">10.8%</td>
+            <td class="best-value">6.5%</td>
+            <td class="best-value">7.9%</td>
+            <td class="best-value">5.4%</td>
+            <td class="best-value">3.6%</td>
+            <td class="best-value">Lowest</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="story-section fade-in-section">
       <h2>The Trade-offs of Copy</h2>
-      <p>Copy mechanisms were supposed to solve data-to-text generation by letting models directly copy tokens from input tables. They do help—omission errors decrease because the model can faithfully reproduce input values. But the improvement comes with a cost: models start hallucinating additional content, perhaps because copying makes generation feel "easier" and the model becomes overconfident.</p>
+      <p>Copy mechanisms were supposed to solve data-to-text generation by letting models directly copy tokens from input tables. They do help -- omission errors decrease because the model can faithfully reproduce input values. But the improvement comes with a cost: models start hallucinating additional content, perhaps because copying makes generation feel "easier" and the model becomes overconfident.</p>
       <p>This trade-off illustrates a broader pattern: architectural choices have complex effects that aggregate metrics hide.</p>
     </div>
 
-    <div class="story-section">
+    <div class="concept-box fade-in-section">
+      <h3>The Copy Mechanism Trade-off</h3>
+      <p>Copy reduces omission errors by ~33% but increases addition errors by ~89%. The net effect on BLEU may look positive, but the model is swapping one failure mode for another -- missing information for hallucinated information. This has very different implications depending on the application.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="story-section fade-in-section">
       <h2>The Pre-training Revolution</h2>
-      <p>Perhaps our most striking finding concerns pre-training. Pre-trained models don't just score better—they make fundamentally fewer errors across all categories. The linguistic knowledge encoded during pre-training transfers effectively to the structured data domain, even though pre-training corpora contain little structured data.</p>
+      <p>Perhaps our most striking finding concerns pre-training. Pre-trained models don't just score better -- they make fundamentally fewer errors across all categories. The linguistic knowledge encoded during pre-training transfers effectively to the structured data domain, even though pre-training corpora contain little structured data.</p>
       <p>Model size matters too, but not as simply as "bigger is better." The relationship between capacity and error reduction varies by error type, suggesting that scale and capability aren't synonymous.</p>
     </div>
 
-    <div class="story-section">
+    <!-- Results Table: Pre-training Impact -->
+    <div class="results-table-wrapper fade-in-section">
+      <h3>Impact of Pre-training on Error Reduction</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Comparison</th>
+            <th>Omission</th>
+            <th>Addition</th>
+            <th>Inaccuracy</th>
+            <th>Overall</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Transformer (no pre-training)</td>
+            <td>24.1%</td>
+            <td>10.5%</td>
+            <td>15.2%</td>
+            <td>Baseline</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>BART (pre-trained)</td>
+            <td class="best-value">12.3%</td>
+            <td class="best-value">7.2%</td>
+            <td class="best-value">8.5%</td>
+            <td class="best-value">~45% fewer errors</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>T5 (pre-trained)</td>
+            <td class="best-value">10.8%</td>
+            <td class="best-value">6.5%</td>
+            <td class="best-value">7.9%</td>
+            <td class="best-value">~52% fewer errors</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="story-section fade-in-section">
       <h2>Error Types That Persist</h2>
       <p>Some errors stubbornly resist improvement. Confusing similar entities remains hard because models struggle with fine-grained distinctions in structured data. Certain logical errors persist because Seq2Seq models don't truly reason about data relationships. These persistent challenges point toward fundamental limitations of the paradigm itself.</p>
     </div>
 
-    <div class="highlight-box">
+    <div class="highlight-box fade-in-section">
+      <h3>Key Findings</h3>
+      <ul>
+        <li><b>Copy Mechanisms:</b> Help with omission and extrinsic inaccuracy, but increase addition errors -- trading one problem for another</li>
+        <li><b>Pre-training Power:</b> Dramatically reduces errors; training strategy and model size matter more than architecture details</li>
+        <li><b>Dataset Structure:</b> The structure of training data profoundly affects which errors models make</li>
+        <li><b>Persistent Challenges:</b> Entity confusion and logical errors remain difficult regardless of model sophistication</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="highlight-box fade-in-section">
       <h3>Practical Implications</h3>
       <ul>
         <li><b>For Practitioners:</b> Choose models based on which errors matter most for your application</li>
@@ -122,14 +278,22 @@
       </ul>
     </div>
 
-    <div class="story-section">
+    <div class="story-section fade-in-section">
       <h2>Seeing Past the Scores</h2>
       <p>This work advocates for a different way of evaluating generation systems. Not "how good is this model?" but "what does this model do well, and what does it do poorly?" The answers are specific, actionable, and often surprising. High-scoring models can have serious blind spots; lower-scoring models might excel at specific subtasks.</p>
       <p>Progress in data-to-text generation requires understanding failure, not just celebrating success. By mapping the error landscape, we chart a course toward models that don't just score well, but actually work.</p>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333;">Citation</h3>
-    <div class="paper-citation">@inproceedings{yin-wan-2022-seq2seq,
+    <!-- Citation with Copy Button -->
+    <div class="paper-citation-wrapper fade-in-section">
+      <div class="citation-header">
+        <h3>Citation</h3>
+        <button class="copy-citation-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <div class="paper-citation">@inproceedings{yin-wan-2022-seq2seq,
     title = "How Do {S}eq2{S}eq Models Perform on End-to-End Data-to-Text Generation?",
     author = "Yin, Xunjian and Wan, Xiaojun",
     booktitle = "Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics",
@@ -137,6 +301,7 @@
     url = "https://aclanthology.org/2022.acl-long.531/",
     pages = "7701--7710"
 }</div>
+    </div>
   </main>
 
   <!-- Footer -->
@@ -163,6 +328,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
+  <script src="paper-page.js"></script>
   <script src="../utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
