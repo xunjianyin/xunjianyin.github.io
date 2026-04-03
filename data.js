@@ -662,21 +662,6 @@ const fullPublications = getAllPublications();
 // Projects Data
 const projects = [
   {
-    title: "Overleaf-Bib-Helper",
-    description: "A <a href=\"https://greasyfork.org/scripts/532304-overleaf-bib-helper\">Userscript</a> to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\">Project Homepage</a>)",
-    badges: [
-      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
-      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
-      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/stargazers", img: "https://img.shields.io/github/stars/MLNLP-World/Overleaf-Bib-Helper" },
-      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/network/members", img: "https://img.shields.io/github/forks/MLNLP-World/Overleaf-Bib-Helper" },
-      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/issues", img: "https://img.shields.io/github/issues/MLNLP-World/Overleaf-Bib-Helper" },
-      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
-      { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" }
-    ],
-    isSelected: true,
-    demoPath: "photos/project-demo/Overleaf-Bib-Helper.jpg"
-  },
-  {
     title: "Gödel Agent",
     description: "A self-referential agent framework for recursive self-improvement implemented with Monkey Patching. (<a href=\"https://github.com/Arvid-pku/Godel_Agent\">Project Homepage</a>)",
     badges: [
@@ -692,6 +677,36 @@ const projects = [
     demoPath: "photos/project-demo/Gödel Agent.png"
   },
   {
+    title: "Claude Journal",
+      description: "A live web interface to view, annotate, search, and analyze your Claude Code & Codex conversations. Talk to your AI directly from the browser, edit real history, and manage every session. (<a href=\"https://arvid-pku.github.io/claude-journal/\">Interactive Guide</a> | <a href=\"https://github.com/Arvid-pku/claude-journal\">Project Homepage</a>)",
+      badges: [
+        { url: "https://www.npmjs.com/package/claude-journal", img: "https://img.shields.io/npm/v/claude-journal?color=c6603f&label=npm" },
+        { url: "https://github.com/Arvid-pku/claude-journal/blob/main/LICENSE", img: "https://img.shields.io/badge/License-MIT-blue" },
+        { url: "https://github.com/Arvid-pku/claude-journal/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/claude-journal" },
+        { url: "https://github.com/Arvid-pku/claude-journal/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/claude-journal" },
+        { url: "https://www.npmjs.com/package/claude-journal", img: "https://img.shields.io/npm/dm/claude-journal?color=2f7613&label=downloads" },
+        { url: "https://github.com/Arvid-pku/claude-journal/issues", img: "https://img.shields.io/github/issues/Arvid-pku/claude-journal" },
+        { url: "https://github.com/Arvid-pku/claude-journal/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
+      ],
+    isSelected: true,
+    demoPath: "photos/project-demo/Claude_Journal.png"
+  },
+  {
+    title: "Overleaf-Bib-Helper",
+    description: "A <a href=\"https://greasyfork.org/scripts/532304-overleaf-bib-helper\">Userscript</a> to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
+      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/stargazers", img: "https://img.shields.io/github/stars/MLNLP-World/Overleaf-Bib-Helper" },
+      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/network/members", img: "https://img.shields.io/github/forks/MLNLP-World/Overleaf-Bib-Helper" },
+      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/issues", img: "https://img.shields.io/github/issues/MLNLP-World/Overleaf-Bib-Helper" },
+      { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" },
+      { url: "https://greasyfork.org/zh-CN/scripts/532304-overleaf-bib-helper", img: "https://img.shields.io/badge/Install-Greasy_Fork-blue" }
+    ],
+    isSelected: true,
+    demoPath: "photos/project-demo/Overleaf-Bib-Helper.jpg"
+  },
+  {
     title: "Vision2Text",
     description: "Convert images and videos to ASCII art in real-time. (<a href=\"https://arvid-pku.github.io/image2text/\">Project Homepage</a>)",
     badges: [
@@ -702,7 +717,7 @@ const projects = [
       { url: "https://github.com/Arvid-pku/image2text/issues", img: "https://img.shields.io/github/issues/Arvid-pku/image2text" },
       { url: "https://github.com/Arvid-pku/image2text/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
     ],
-    isSelected: true,
+    isSelected: false,
     demoPath: "photos/project-demo/Vison2Text.jpg"
   },
   {
