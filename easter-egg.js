@@ -161,15 +161,11 @@
         }
       });
 
-      // Start content dissolution (blur + cool desaturation)
+      // Content dissolves cleanly — opacity only, no filter/transform
+      // (filter interpolation was producing muddy intermediate colors)
       children.forEach(function (el) {
-        el.style.transition =
-          'filter 1.3s cubic-bezier(0.4, 0, 0.2, 1),' +
-          'opacity 1.5s cubic-bezier(0.55, 0, 0.45, 1),' +
-          'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
-        el.style.filter = 'blur(5px) saturate(0.4) brightness(0.55) hue-rotate(-20deg)';
+        el.style.transition = 'opacity 1.3s cubic-bezier(0.4, 0, 0.2, 1)';
         el.style.opacity = '0';
-        el.style.transform = 'scale(0.985) translateY(4px)';
       });
 
       requestAnimationFrame(function () { night.style.opacity = '1'; });
@@ -333,17 +329,19 @@
         cctx.textBaseline = 'middle';
         cctx.font = 'bold ' + fontSize + 'px Lato, "Helvetica Neue", sans-serif';
 
-        // Outer colored glow (double-fill for intensity)
+        // Soft colored halo (single pass, moderate blur)
         cctx.shadowColor = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
-        cctx.shadowBlur = 22;
-        cctx.fillStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',1)';
-        cctx.fillText(word, w / 2, h / 2);
+        cctx.shadowBlur = 10;
+        cctx.fillStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.95)';
         cctx.fillText(word, w / 2, h / 2);
 
-        // Bright inner core
-        cctx.shadowColor = 'rgba(255,255,250,0.9)';
-        cctx.shadowBlur = 6;
-        cctx.fillStyle = 'rgba(255,255,248,0.96)';
+        // Crisp readable text on top — slightly brighter tint of the same color,
+        // no shadow, so the word stays legible rather than blown out.
+        cctx.shadowBlur = 0;
+        var lr = Math.min(255, rgb[0] + 35);
+        var lg = Math.min(255, rgb[1] + 35);
+        var lb = Math.min(255, rgb[2] + 35);
+        cctx.fillStyle = 'rgb(' + lr + ',' + lg + ',' + lb + ')';
         cctx.fillText(word, w / 2, h / 2);
 
         var sprite = { canvas: c, width: w, height: h, baseFontSize: fontSize };
@@ -364,32 +362,32 @@
         bctx.scale(dpr, dpr);
         bctx.translate(size / 2, size / 2);
 
-        var count = 14;
+        var count = 12;
         var radius = size / 2 - 8;
         for (var k = 0; k < count; k++) {
           var ang = (Math.PI * 2 * k) / count;
           var x2 = Math.cos(ang) * radius;
           var y2 = Math.sin(ang) * radius;
           var grad = bctx.createLinearGradient(0, 0, x2, y2);
-          grad.addColorStop(0, 'rgba(255,255,240,0.95)');
-          grad.addColorStop(0.15, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.85)');
+          grad.addColorStop(0, 'rgba(255,245,220,0.55)');
+          grad.addColorStop(0.2, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.55)');
           grad.addColorStop(1, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0)');
           bctx.strokeStyle = grad;
-          bctx.lineWidth = 1.6;
+          bctx.lineWidth = 1.2;
           bctx.beginPath();
           bctx.moveTo(0, 0);
           bctx.lineTo(x2, y2);
           bctx.stroke();
         }
 
-        // Central flash
-        var flash = bctx.createRadialGradient(0, 0, 0, 0, 0, 22);
-        flash.addColorStop(0, 'rgba(255,255,245,0.95)');
-        flash.addColorStop(0.4, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.6)');
+        // Soft central halo (toned down)
+        var flash = bctx.createRadialGradient(0, 0, 0, 0, 0, 18);
+        flash.addColorStop(0, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.55)');
+        flash.addColorStop(0.5, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.25)');
         flash.addColorStop(1, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0)');
         bctx.fillStyle = flash;
         bctx.beginPath();
-        bctx.arc(0, 0, 22, 0, Math.PI * 2);
+        bctx.arc(0, 0, 18, 0, Math.PI * 2);
         bctx.fill();
 
         var sprite = { canvas: c, size: size };
@@ -479,13 +477,13 @@
         lastFrame = now;
         var dtScale = dt / 16.67;
 
-        // Motion-trail fade
+        // Motion-trail fade (slightly stronger so glow doesn't build up)
         ctx.globalCompositeOperation = 'source-over';
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
         ctx.fillRect(0, 0, W, H);
 
-        // Ambient sparkles sprinkled across the sky
-        if (sparkles.length < MAX_SPARKLES && Math.random() < 0.55) {
+        // Ambient sparkles sprinkled across the sky (restrained)
+        if (sparkles.length < MAX_SPARKLES && Math.random() < 0.3) {
           sparkles.push(new Sparkle(Math.random() * W, Math.random() * H * 0.85));
         }
 
@@ -507,7 +505,7 @@
           sp.life -= sp.decay * dtScale;
           if (sp.life <= 0) { sparkles.splice(s, 1); continue; }
           var tw = 0.4 + 0.6 * Math.sin(elapsed * 0.016 + sp.phase);
-          var a = sp.life * tw;
+          var a = sp.life * tw * 0.65;
           ctx.fillStyle = 'rgba(255, 252, 220, ' + a + ')';
           ctx.beginPath();
           ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
@@ -598,144 +596,119 @@
   }
 
   /* ─────────────────────────────────────────────
-     Phase 3: Typewriter Reveal (sequential)
-     • Force light mode, fade out the dark overlay
-     • For each top-level child of #main-content, in order:
-         1. Drop it from above with a spring curve
-         2. Typewriter its *visible* text (skipping hidden DOM)
-         3. When finished, move on to the next
-     • No hard cap — reasonable per-element pacing
+     Phase 3: Typewriter Reveal (sequential, no drop)
+     • Force light mode
+     • SECRETLY (while still hidden behind the dark overlay):
+         – reset any filter/transform leftovers
+         – measure each top-level child's rendered height, lock min-height
+         – collect and *empty* all visible text nodes
+     • Fade out the dark overlay — user sees empty sections at correct height
+     • Typewriter each section's text back in, sequentially
      ───────────────────────────────────────────── */
   function phaseTypewriterReveal(state) {
     return new Promise(function (resolve) {
       var main = document.getElementById('main-content');
       if (!main) { resolve(); return; }
 
+      // Force light mode (theme switch happens under the opaque overlay)
       document.documentElement.setAttribute('data-theme', 'light');
       try { localStorage.setItem('theme', 'light'); } catch (e) {}
 
-      if (state && state.night) {
-        state.night.style.transition = 'opacity 0.35s ease-out';
-        state.night.style.opacity = '0';
-        setTimeout(function () {
-          if (state.night.parentNode) state.night.parentNode.removeChild(state.night);
-        }, 380);
+      var children = Array.from(main.children);
+      if (children.length === 0) {
+        if (state && state.night && state.night.parentNode) {
+          state.night.parentNode.removeChild(state.night);
+        }
+        resolve();
+        return;
       }
 
-      var children = Array.from(main.children);
-      if (children.length === 0) { resolve(); return; }
-
-      // Lock heights to prevent layout collapse during type-in
-      var savedMinHeights = children.map(function (el) {
-        var r = el.getBoundingClientRect();
-        var prev = el.style.minHeight;
-        el.style.minHeight = r.height + 'px';
-        return prev;
-      });
-
-      // Lift all children above viewport, invisible
+      // ── SECRET PRE-COMPUTATION (invisible behind dark overlay) ──
+      // Strip any phase-1 transitions/filters/transforms so measurements
+      // reflect the real layout, but keep opacity 0 so nothing flashes.
       children.forEach(function (el) {
         el.style.transition = 'none';
         el.style.filter = '';
+        el.style.transform = '';
         el.style.opacity = '0';
-        el.style.transform = 'translateY(-110vh)';
-        el.style.willChange = 'transform, opacity';
       });
       void main.offsetHeight;
 
-      var DROP_TIME = 380;
+      // Measure heights, lock them, then empty all visible text nodes.
+      var secret = children.map(function (el) {
+        var rect = el.getBoundingClientRect();
+        var prevMinHeight = el.style.minHeight;
+        el.style.minHeight = rect.height + 'px';
+
+        var textNodes = [];
+        var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+          acceptNode: makeTextNodeFilter(el)
+        });
+        var n;
+        while ((n = walker.nextNode())) textNodes.push(n);
+        var originals = textNodes.map(function (tn) { return tn.textContent; });
+        // Empty NOW so there's no flash of full text when we reveal
+        textNodes.forEach(function (tn) { tn.textContent = ''; });
+
+        return {
+          el: el,
+          prevMinHeight: prevMinHeight,
+          textNodes: textNodes,
+          originals: originals
+        };
+      });
+
+      // Make children visually present again (still hidden by dark overlay)
+      children.forEach(function (el) {
+        el.style.opacity = '1';
+      });
+
+      // Fade out the dark overlay — user sees empty, height-locked sections
+      if (state && state.night) {
+        state.night.style.transition = 'opacity 0.4s ease-out';
+        state.night.style.opacity = '0';
+        setTimeout(function () {
+          if (state.night.parentNode) state.night.parentNode.removeChild(state.night);
+        }, 420);
+      }
+
       var BASE_CHAR_DELAY = 9;
       var MAX_ELEMENT_TIME = 2200; // cap on typewriter time per top-level child
 
-      function dropAndType(idx) {
-        if (idx >= children.length) {
-          // cleanup styles
-          children.forEach(function (el, i) {
-            el.style.opacity = '1';
-            el.style.transform = '';
-            el.style.transition = '';
-            el.style.willChange = '';
-            el.style.minHeight = savedMinHeights[i];
+      // Start typewriter just as the overlay begins to dissipate
+      setTimeout(function () { typeNext(0); }, 180);
+
+      function typeNext(idx) {
+        if (idx >= secret.length) {
+          secret.forEach(function (s) {
+            s.el.style.minHeight = s.prevMinHeight;
+            s.el.style.transition = '';
           });
           resolve();
           return;
         }
+        var s = secret[idx];
+        var len = 0;
+        for (var i = 0; i < s.originals.length; i++) len += s.originals[i].length;
+        var naturalTime = len * BASE_CHAR_DELAY;
+        var chunkSize = naturalTime > MAX_ELEMENT_TIME
+          ? Math.ceil(naturalTime / MAX_ELEMENT_TIME)
+          : 1;
 
-        var el = children[idx];
-        el.style.transition =
-          'transform ' + DROP_TIME + 'ms cubic-bezier(0.34, 1.2, 0.55, 1), ' +
-          'opacity 160ms ease-out';
-        el.style.opacity = '1';
-        el.style.transform = 'translateY(0)';
-
-        setTimeout(function () {
-          // Measure visible text length for pacing
-          var visibleLen = measureVisibleTextLength(el);
-          var naturalTime = visibleLen * BASE_CHAR_DELAY;
-          var chunkSize = naturalTime > MAX_ELEMENT_TIME
-            ? Math.ceil(naturalTime / MAX_ELEMENT_TIME)
-            : 1;
-
-          typewriterReveal(el, BASE_CHAR_DELAY, chunkSize, function () {
-            dropAndType(idx + 1);
-          });
-        }, DROP_TIME);
+        playbackTypewriter(s.textNodes, s.originals, BASE_CHAR_DELAY, chunkSize, function () {
+          typeNext(idx + 1);
+        });
       }
-
-      dropAndType(0);
     });
   }
 
-  /* Count length of visible text nodes (skip hidden subtrees).  */
-  function measureVisibleTextLength(el) {
-    var total = 0;
-    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
-      acceptNode: makeTextNodeFilter(el)
-    });
-    var n;
-    while ((n = walker.nextNode())) total += n.textContent.length;
-    return total;
-  }
-
-  function makeTextNodeFilter(rootEl) {
-    return function (node) {
-      if (!node.textContent || !node.textContent.trim()) return NodeFilter.FILTER_REJECT;
-      var p = node.parentNode;
-      while (p && p !== rootEl) {
-        var tag = (p.tagName || '').toLowerCase();
-        if (tag === 'script' || tag === 'style' || tag === 'noscript') return NodeFilter.FILTER_REJECT;
-        // Skip anything explicitly hidden (e.g. collapsed abstracts/citations)
-        if (p.hidden === true) return NodeFilter.FILTER_REJECT;
-        if (p.getAttribute && p.getAttribute('aria-hidden') === 'true') return NodeFilter.FILTER_REJECT;
-        p = p.parentNode;
-      }
-      return NodeFilter.FILTER_ACCEPT;
-    };
-  }
-
-  /* Typewriter: empty all *visible* text nodes then retype them.
-     chunkSize = chars per tick (adapts for long content).
-     onDone fires when fully typed (or cancelled via complete()). */
-  function typewriterReveal(el, charDelay, chunkSize, onDone) {
-    var textNodes = [];
-    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
-      acceptNode: makeTextNodeFilter(el)
-    });
-    var node;
-    while ((node = walker.nextNode())) textNodes.push(node);
-    if (textNodes.length === 0) { if (onDone) onDone(); return { complete: function () {} }; }
-
-    var originals = textNodes.map(function (n) { return n.textContent; });
-    textNodes.forEach(function (n) { n.textContent = ''; });
-
+  /* Types pre-emptied text nodes back to their originals, char by char
+     (in `chunkSize` chunks per tick). Calls onDone when the last char lands. */
+  function playbackTypewriter(textNodes, originals, charDelay, chunkSize, onDone) {
+    if (textNodes.length === 0) { if (onDone) onDone(); return; }
     var nodeIdx = 0, charIdx = 0;
-    var cancelled = false;
-    var timerId = null;
-    var finished = false;
-
     function tick() {
-      if (cancelled || finished) return;
-      if (nodeIdx >= textNodes.length) { finished = true; if (onDone) onDone(); return; }
+      if (nodeIdx >= textNodes.length) { if (onDone) onDone(); return; }
       var tn = textNodes[nodeIdx];
       var orig = originals[nodeIdx];
       if (charIdx < orig.length) {
@@ -744,24 +717,30 @@
         tn.textContent = orig.substring(0, endCharIdx);
         if (/\S/.test(chunkStr)) playClick();
         charIdx = endCharIdx;
-        timerId = setTimeout(tick, charDelay);
+        setTimeout(tick, charDelay);
       } else {
         nodeIdx++;
         charIdx = 0;
-        timerId = setTimeout(tick, 14);
+        setTimeout(tick, 14);
       }
     }
     tick();
+  }
 
-    return {
-      complete: function () {
-        if (finished) return;
-        cancelled = true;
-        if (timerId) clearTimeout(timerId);
-        for (var i = nodeIdx; i < textNodes.length; i++) {
-          textNodes[i].textContent = originals[i];
-        }
+  /* TreeWalker filter: accept only text nodes that are actually visible
+     (skip <script>/<style>/<noscript> and anything with hidden/aria-hidden). */
+  function makeTextNodeFilter(rootEl) {
+    return function (node) {
+      if (!node.textContent || !node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+      var p = node.parentNode;
+      while (p && p !== rootEl) {
+        var tag = (p.tagName || '').toLowerCase();
+        if (tag === 'script' || tag === 'style' || tag === 'noscript') return NodeFilter.FILTER_REJECT;
+        if (p.hidden === true) return NodeFilter.FILTER_REJECT;
+        if (p.getAttribute && p.getAttribute('aria-hidden') === 'true') return NodeFilter.FILTER_REJECT;
+        p = p.parentNode;
       }
+      return NodeFilter.FILTER_ACCEPT;
     };
   }
 })();
