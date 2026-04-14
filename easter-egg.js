@@ -73,16 +73,19 @@
       }
       whooshBuffer = wbuf;
 
-      // Boom buffer: low sine thud + noise crackle with sharp decay
-      var blen = Math.floor(sr * 0.75);
+      // Boom buffer: PURE NOISE only — no sine oscillators (those sustain
+      // into a tonal "gong"). Three decay envelopes layered give the
+      // attack/body/tail shape of a real explosion; filters at playback
+      // shape the frequency content so it sounds like a boom.
+      var blen = Math.floor(sr * 0.9);
       var bbuf = audioCtx.createBuffer(1, blen, sr);
       var bdata = bbuf.getChannelData(0);
       for (var k = 0; k < blen; k++) {
         var bt = k / sr;
-        var thud = Math.sin(2 * Math.PI * 75 * bt) * Math.exp(-bt * 7);
-        var sub = Math.sin(2 * Math.PI * 45 * bt) * Math.exp(-bt * 5) * 0.6;
-        var crackle = (Math.random() * 2 - 1) * Math.exp(-bt * 3.5) * 0.55;
-        bdata[k] = (thud + sub + crackle) * 0.55;
+        var snap = (Math.random() * 2 - 1) * Math.exp(-bt * 28);   // initial crack
+        var body = (Math.random() * 2 - 1) * Math.exp(-bt * 4.5);  // main blast
+        var tail = (Math.random() * 2 - 1) * Math.exp(-bt * 1.8);  // rumble tail
+        bdata[k] = (snap * 0.85 + body * 0.6 + tail * 0.3) * 0.55;
       }
       boomBuffer = bbuf;
     } catch (e) { audioCtx = null; }
@@ -129,10 +132,35 @@
       var now = audioCtx.currentTime;
       var src = audioCtx.createBufferSource();
       src.buffer = boomBuffer;
-      src.playbackRate.value = 0.75 + Math.random() * 0.45;
-      var gain = audioCtx.createGain();
-      gain.gain.value = 0.28 + Math.random() * 0.14;
-      src.connect(gain).connect(audioCtx.destination);
+      src.playbackRate.value = 0.78 + Math.random() * 0.35;
+
+      // Low-pass path: deep rumbly body
+      var lpf = audioCtx.createBiquadFilter();
+      lpf.type = 'lowpass';
+      lpf.frequency.value = 240 + Math.random() * 60;
+      lpf.Q.value = 0.9;
+      var lpGain = audioCtx.createGain();
+      lpGain.gain.value = 0.9;
+
+      // Band-pass path: mid-frequency snap/crackle on top of the low body
+      var bpf = audioCtx.createBiquadFilter();
+      bpf.type = 'bandpass';
+      bpf.frequency.value = 1200 + Math.random() * 500;
+      bpf.Q.value = 0.6;
+      var bpGain = audioCtx.createGain();
+      bpGain.gain.value = 0.28;
+
+      // Hard high-pass to kill any sub-audible DC rumble
+      var hpf = audioCtx.createBiquadFilter();
+      hpf.type = 'highpass';
+      hpf.frequency.value = 35;
+
+      var master = audioCtx.createGain();
+      master.gain.value = 0.32 + Math.random() * 0.12;
+
+      src.connect(lpf).connect(lpGain).connect(master);
+      src.connect(bpf).connect(bpGain).connect(master);
+      master.connect(hpf).connect(audioCtx.destination);
       src.start(now);
     } catch (e) {}
   }
