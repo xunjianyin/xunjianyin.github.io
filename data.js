@@ -708,6 +708,20 @@ const projects = [
     demoPath: "photos/project-demo/Overleaf-Bib-Helper.jpg"
   },
   {
+    title: "MultAI",
+    description: "A Chrome extension that lets you talk to seven AI chat sites — ChatGPT, Claude, Gemini, Grok, Meta AI, DeepSeek, and Qwen — from one cockpit, with broadcast prompts, side-by-side compare, and a tiled layout. (<a href=\"https://github.com/Arvid-pku/MultAI\">Project Homepage</a>)",
+    badges: [
+      { url: "https://github.com/Arvid-pku/MultAI/releases", img: "https://img.shields.io/badge/Version-0.1.0-blue" },
+      { url: "https://github.com/Arvid-pku/MultAI/blob/main/LICENSE", img: "https://img.shields.io/badge/License-MIT-blue" },
+      { url: "https://github.com/Arvid-pku/MultAI/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/MultAI" },
+      { url: "https://github.com/Arvid-pku/MultAI/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/MultAI" },
+      { url: "https://github.com/Arvid-pku/MultAI/issues", img: "https://img.shields.io/github/issues/Arvid-pku/MultAI" },
+      { url: "https://github.com/Arvid-pku/MultAI/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
+    ],
+    isSelected: false,
+    demoPath: "photos/project-demo/MultAI.png"
+  },
+  {
     title: "Vision2Text",
     description: "Convert images and videos to ASCII art in real-time. (<a href=\"https://arvid-pku.github.io/image2text/\">Project Homepage</a>)",
     badges: [
