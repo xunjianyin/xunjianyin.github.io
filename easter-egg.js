@@ -114,10 +114,10 @@
   }
 
   /* ─────────────────────────────────────────────
-     Phase 1: Dissolve to Night
-     Content desaturates and sinks while fine cool-toned
-     dust particles rise from its positions and the page
-     deepens into an indigo night sky.
+     Phase 1: Shatter to Night
+     Each top-level section shatters outward with a staggered
+     explosive transform; the page then goes straight to pure
+     black (no intermediate tint) and stars emerge.
      ───────────────────────────────────────────── */
   function phaseDissolve(state) {
     return new Promise(function (resolve) {
@@ -126,20 +126,16 @@
 
       var children = Array.from(main.children);
 
-      // Deep-indigo night overlay — persists through fireworks
+      // Pure black overlay — no mid-color gradient
       var night = document.createElement('div');
       night.style.cssText =
         'position:fixed;inset:0;z-index:99990;pointer-events:none;opacity:0;' +
-        'background:' +
-        '  radial-gradient(ellipse at 50% 42%,' +
-        '    rgba(18,24,60,0.92) 0%,' +
-        '    rgba(8,12,34,0.97) 45%,' +
-        '    rgba(2,3,12,1) 100%);' +
-        'transition:opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);';
+        'background:#000;' +
+        'transition:opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1);';
       document.body.appendChild(night);
       state.night = night;
 
-      // Dust canvas
+      // Star canvas (above overlay) — stars emerge on black
       var canvas = document.createElement('canvas');
       canvas.style.cssText = 'position:fixed;inset:0;z-index:99991;pointer-events:none;';
       var setup = setupCanvas(canvas);
@@ -147,128 +143,68 @@
       var W = setup.width, H = setup.height;
       document.body.appendChild(canvas);
 
-      // Visible rects for dust emission
-      var rects = [];
-      children.forEach(function (el) {
-        var r = el.getBoundingClientRect();
-        if (r.width > 0 && r.bottom > 0 && r.top < H) {
-          rects.push({
-            x: r.left,
-            y: Math.max(0, r.top),
-            w: r.width,
-            h: Math.min(H, r.bottom) - Math.max(0, r.top)
-          });
-        }
-      });
+      // Shatter each top-level child: fly apart with rotation + scale
+      children.forEach(function (el, idx) {
+        var angle = Math.random() * Math.PI * 2;
+        var distance = 520 + Math.random() * 340;
+        var tx = Math.cos(angle) * distance;
+        var ty = Math.sin(angle) * distance * 0.7 - 80; // slight upward bias
+        var rot = (Math.random() - 0.5) * 90;
+        var scale = 0.35 + Math.random() * 0.35;
+        var delay = idx * 55;
 
-      // Content dissolves cleanly — opacity only, no filter/transform
-      // (filter interpolation was producing muddy intermediate colors)
-      children.forEach(function (el) {
-        el.style.transition = 'opacity 1.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        el.style.transition =
+          'transform 0.95s cubic-bezier(0.4, 0, 0.2, 1) ' + delay + 'ms, ' +
+          'opacity 0.75s cubic-bezier(0.4, 0, 0.6, 1) ' + (delay + 120) + 'ms';
+        el.style.transform =
+          'translate(' + tx + 'px,' + ty + 'px) ' +
+          'rotate(' + rot + 'deg) ' +
+          'scale(' + scale + ')';
         el.style.opacity = '0';
       });
 
-      requestAnimationFrame(function () { night.style.opacity = '1'; });
+      // Black fades in a beat after shatter begins, so the shatter itself
+      // stays legible before the screen goes dark.
+      setTimeout(function () { night.style.opacity = '1'; }, 220);
 
-      // Cool stardust palette
-      var palette = [
-        [180, 220, 255],  // ice blue
-        [120, 180, 245],  // soft steel
-        [95,  150, 235],  // cornflower
-        [160, 200, 255],  // lavender ice
-        [220, 235, 255],  // starlight
-        [130, 210, 245]   // cyan sky
-      ];
-
-      var dust = [];
-      var startTime = performance.now();
-      var emitDuration = 1600;
-      var totalDuration = 2300;
-      var lastFrame = startTime;
-
-      // Gently-drifting twinkle stars that accumulate in the night sky
+      // Stars on the black
       var stars = [];
-      var maxStars = 80;
+      var maxStars = 95;
+      var startTime = performance.now();
+      var totalDuration = 2100;
 
       function frame(now) {
         var elapsed = now - startTime;
-        var dt = Math.min(40, now - lastFrame);
-        lastFrame = now;
-        var dtScale = dt / 16.67;
 
-        // Emit dust from content rects (dense early, tapering off)
-        if (elapsed < emitDuration && rects.length > 0) {
-          var emitProgress = elapsed / emitDuration;
-          var rate = Math.max(3, Math.round(14 * (1 - emitProgress * 0.7)));
-          for (var i = 0; i < rate; i++) {
-            var r = rects[Math.floor(Math.random() * rects.length)];
-            var rgb = palette[Math.floor(Math.random() * palette.length)];
-            dust.push({
-              x: r.x + Math.random() * r.w,
-              y: r.y + Math.random() * r.h,
-              vx: (Math.random() - 0.5) * 0.25,
-              vy: -0.2 - Math.random() * 0.7,
-              wave: Math.random() * Math.PI * 2,
-              waveSpeed: 0.02 + Math.random() * 0.03,
-              waveAmp: 0.1 + Math.random() * 0.25,
-              life: 1,
-              decay: 0.003 + Math.random() * 0.006,
-              size: 0.4 + Math.random() * 1.3,
-              rgb: rgb
-            });
-          }
-        }
-
-        // Seed a few background stars as the night deepens
-        if (stars.length < maxStars && Math.random() < 0.6) {
+        // Seed stars once the overlay starts darkening
+        if (elapsed > 650 && stars.length < maxStars && Math.random() < 0.85) {
           stars.push({
             x: Math.random() * W,
             y: Math.random() * H,
             size: 0.3 + Math.random() * 1.1,
             phase: Math.random() * Math.PI * 2,
             speed: 0.015 + Math.random() * 0.025,
-            baseAlpha: 0.4 + Math.random() * 0.5,
-            rgb: palette[Math.floor(Math.random() * palette.length)]
+            baseAlpha: 0.35 + Math.random() * 0.55,
+            appearAt: elapsed
           });
         }
 
         ctx.clearRect(0, 0, W, H);
-
-        // Background twinkle stars
         ctx.globalCompositeOperation = 'lighter';
         for (var s = 0; s < stars.length; s++) {
           var st = stars[s];
+          var age = elapsed - st.appearAt;
+          var fadeIn = Math.min(1, age / 500);
           var tw = 0.55 + 0.45 * Math.sin(now * st.speed + st.phase);
-          var a = st.baseAlpha * tw * Math.min(1, elapsed / 800);
-          ctx.fillStyle = 'rgba(' + st.rgb[0] + ',' + st.rgb[1] + ',' + st.rgb[2] + ',' + a + ')';
+          var a = st.baseAlpha * tw * fadeIn;
+          ctx.fillStyle = 'rgba(230, 240, 255, ' + a + ')';
           ctx.beginPath();
           ctx.arc(st.x, st.y, st.size, 0, Math.PI * 2);
           ctx.fill();
         }
-
-        // Dust: additive with soft radial gradient per particle
-        for (var j = dust.length - 1; j >= 0; j--) {
-          var d = dust[j];
-          d.wave += d.waveSpeed * dtScale;
-          d.x += (d.vx + Math.sin(d.wave) * d.waveAmp) * dtScale;
-          d.y += d.vy * dtScale;
-          d.vy -= 0.008 * dtScale;
-          d.life -= d.decay * dtScale;
-          if (d.life <= 0) { dust.splice(j, 1); continue; }
-
-          var radius = d.size * 4;
-          var gr = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, radius);
-          gr.addColorStop(0,   'rgba(' + d.rgb[0] + ',' + d.rgb[1] + ',' + d.rgb[2] + ',' + d.life + ')');
-          gr.addColorStop(0.4, 'rgba(' + d.rgb[0] + ',' + d.rgb[1] + ',' + d.rgb[2] + ',' + (d.life * 0.4) + ')');
-          gr.addColorStop(1,   'rgba(' + d.rgb[0] + ',' + d.rgb[1] + ',' + d.rgb[2] + ',0)');
-          ctx.fillStyle = gr;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
-          ctx.fill();
-        }
         ctx.globalCompositeOperation = 'source-over';
 
-        if (elapsed < totalDuration || dust.length > 0) {
+        if (elapsed < totalDuration) {
           requestAnimationFrame(frame);
         } else {
           if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
@@ -658,12 +594,12 @@
         };
       });
 
-      // Make children visually present again (still hidden by dark overlay)
-      children.forEach(function (el) {
-        el.style.opacity = '1';
-      });
+      // Keep every section hidden until its typewriter turn — this
+      // prevents non-text elements (images/badges/link dividers) from
+      // appearing before the typewriter reaches their section.
+      // (opacity stays 0; the overlay fades out over a blank layout.)
 
-      // Fade out the dark overlay — user sees empty, height-locked sections
+      // Fade out the dark overlay — user sees blank page with reserved space
       if (state && state.night) {
         state.night.style.transition = 'opacity 0.4s ease-out';
         state.night.style.opacity = '0';
@@ -675,8 +611,8 @@
       var BASE_CHAR_DELAY = 9;
       var MAX_ELEMENT_TIME = 2200; // cap on typewriter time per top-level child
 
-      // Start typewriter just as the overlay begins to dissipate
-      setTimeout(function () { typeNext(0); }, 180);
+      // Start just after the overlay begins to dissipate
+      setTimeout(function () { typeNext(0); }, 260);
 
       function typeNext(idx) {
         if (idx >= secret.length) {
@@ -688,6 +624,11 @@
           return;
         }
         var s = secret[idx];
+
+        // Reveal this section now (fades in while typewriter runs)
+        s.el.style.transition = 'opacity 0.32s ease-out';
+        s.el.style.opacity = '1';
+
         var len = 0;
         for (var i = 0; i < s.originals.length; i++) len += s.originals[i].length;
         var naturalTime = len * BASE_CHAR_DELAY;
@@ -695,9 +636,12 @@
           ? Math.ceil(naturalTime / MAX_ELEMENT_TIME)
           : 1;
 
-        playbackTypewriter(s.textNodes, s.originals, BASE_CHAR_DELAY, chunkSize, function () {
-          typeNext(idx + 1);
-        });
+        // Small delay so the section fade-in is perceptible before typing starts
+        setTimeout(function () {
+          playbackTypewriter(s.textNodes, s.originals, BASE_CHAR_DELAY, chunkSize, function () {
+            typeNext(idx + 1);
+          });
+        }, 140);
       }
     });
   }
