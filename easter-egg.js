@@ -34,9 +34,11 @@
     return { ctx: ctx, dpr: dpr, width: w, height: h };
   }
 
-  /* ─── Audio (typewriter click) ─────────────────────────────── */
+  /* ─── Audio (typewriter click + firework whoosh/boom) ──────── */
   var audioCtx = null;
   var clickBuffer = null;
+  var whooshBuffer = null;
+  var boomBuffer = null;
   var lastClickTime = 0;
   var CLICK_MIN_GAP = 30;
 
@@ -45,17 +47,44 @@
     try {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       var sr = audioCtx.sampleRate;
-      var len = Math.floor(sr * 0.025);
-      var buf = audioCtx.createBuffer(1, len, sr);
-      var data = buf.getChannelData(0);
-      for (var i = 0; i < len; i++) {
+
+      // Click buffer: filtered noise + brief ping (typewriter strike)
+      var clen = Math.floor(sr * 0.025);
+      var cbuf = audioCtx.createBuffer(1, clen, sr);
+      var cdata = cbuf.getChannelData(0);
+      for (var i = 0; i < clen; i++) {
         var t = i / sr;
         var env = Math.exp(-t * 160);
         var noise = (Math.random() * 2 - 1) * 0.7;
         var ping = Math.sin(2 * Math.PI * 2200 * t) * 0.25;
-        data[i] = (noise + ping) * env * 0.55;
+        cdata[i] = (noise + ping) * env * 0.55;
       }
-      clickBuffer = buf;
+      clickBuffer = cbuf;
+
+      // Whoosh buffer: white noise with envelope; band-pass filter is
+      // applied at playback for a rising-pitch rocket hiss.
+      var wlen = Math.floor(sr * 0.45);
+      var wbuf = audioCtx.createBuffer(1, wlen, sr);
+      var wdata = wbuf.getChannelData(0);
+      for (var j = 0; j < wlen; j++) {
+        var wt = j / sr;
+        var wenv = Math.min(1, wt * 8) * Math.exp(-wt * 3.2);
+        wdata[j] = (Math.random() * 2 - 1) * wenv;
+      }
+      whooshBuffer = wbuf;
+
+      // Boom buffer: low sine thud + noise crackle with sharp decay
+      var blen = Math.floor(sr * 0.75);
+      var bbuf = audioCtx.createBuffer(1, blen, sr);
+      var bdata = bbuf.getChannelData(0);
+      for (var k = 0; k < blen; k++) {
+        var bt = k / sr;
+        var thud = Math.sin(2 * Math.PI * 75 * bt) * Math.exp(-bt * 7);
+        var sub = Math.sin(2 * Math.PI * 45 * bt) * Math.exp(-bt * 5) * 0.6;
+        var crackle = (Math.random() * 2 - 1) * Math.exp(-bt * 3.5) * 0.55;
+        bdata[k] = (thud + sub + crackle) * 0.55;
+      }
+      boomBuffer = bbuf;
     } catch (e) { audioCtx = null; }
   }
 
@@ -72,6 +101,39 @@
       src.playbackRate.value = 0.9 + Math.random() * 0.25;
       src.connect(gain).connect(audioCtx.destination);
       src.start();
+    } catch (e) {}
+  }
+
+  function playWhoosh() {
+    if (!audioCtx || !whooshBuffer) return;
+    try {
+      var now = audioCtx.currentTime;
+      var src = audioCtx.createBufferSource();
+      src.buffer = whooshBuffer;
+      src.playbackRate.value = 0.85 + Math.random() * 0.3;
+      var filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.Q.value = 1.4;
+      filter.frequency.setValueAtTime(600, now);
+      filter.frequency.exponentialRampToValueAtTime(3200, now + 0.38);
+      var gain = audioCtx.createGain();
+      gain.gain.value = 0.09 + Math.random() * 0.05;
+      src.connect(filter).connect(gain).connect(audioCtx.destination);
+      src.start(now);
+    } catch (e) {}
+  }
+
+  function playBoom() {
+    if (!audioCtx || !boomBuffer) return;
+    try {
+      var now = audioCtx.currentTime;
+      var src = audioCtx.createBufferSource();
+      src.buffer = boomBuffer;
+      src.playbackRate.value = 0.75 + Math.random() * 0.45;
+      var gain = audioCtx.createGain();
+      gain.gain.value = 0.28 + Math.random() * 0.14;
+      src.connect(gain).connect(audioCtx.destination);
+      src.start(now);
     } catch (e) {}
   }
 
@@ -245,9 +307,11 @@
       function getWordSprite(word, rgb) {
         var key = word + '|' + rgb[0] + ',' + rgb[1] + ',' + rgb[2];
         if (wordSpriteCache[key]) return wordSpriteCache[key];
-        var dpr = capDPR();
-        var fontSize = 22;
-        var pad = 26;
+        // Oversample the sprite so text stays crisp even when particles
+        // scale slightly up at draw time.
+        var dpr = Math.max(2, capDPR()) * 1.5;
+        var fontSize = 26;
+        var pad = 22;
 
         var measureCanvas = document.createElement('canvas');
         var mctx = measureCanvas.getContext('2d');
@@ -351,7 +415,9 @@
         this.vy = Math.sin(angle) * speed;
         this.alpha = 1;
         this.decay = 0.004 + Math.random() * 0.008;
-        this.scale = 0.55 + Math.random() * 0.5;
+        // Tighter scale range keeps words legible; sprite oversampling
+        // handles slight upscaling cleanly.
+        this.scale = 0.7 + Math.random() * 0.35;
         this.rotation = (Math.random() - 0.5) * 0.5;
         this.rotSpeed = (Math.random() - 0.5) * 0.018;
       }
@@ -396,6 +462,7 @@
         for (var s = 0; s < 12; s++) {
           sparkles.push(new Sparkle(x + (Math.random() - 0.5) * 80, y + (Math.random() - 0.5) * 80));
         }
+        playBoom();
         // Enforce caps (drop oldest)
         while (particles.length > MAX_PARTICLES) particles.shift();
         while (sparkles.length > MAX_SPARKLES) sparkles.shift();
@@ -413,10 +480,10 @@
         lastFrame = now;
         var dtScale = dt / 16.67;
 
-        // Motion-trail fade (slightly stronger so glow doesn't build up)
+        // Clear the canvas each frame so particle text stays crisp
+        // (the old motion-trail fillRect caused readability-killing blur).
         ctx.globalCompositeOperation = 'source-over';
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.fillRect(0, 0, W, H);
+        ctx.clearRect(0, 0, W, H);
 
         // Ambient sparkles sprinkled across the sky (restrained)
         if (sparkles.length < MAX_SPARKLES && Math.random() < 0.3) {
@@ -428,6 +495,7 @@
           var tx = W * (0.12 + Math.random() * 0.76);
           var ty = H * (0.1 + Math.random() * 0.4);
           rockets.push(new Rocket(tx, ty));
+          playWhoosh();
           lastLaunch = elapsed;
           launchInterval = Math.max(150, 320 - elapsed * 0.035);
         }
