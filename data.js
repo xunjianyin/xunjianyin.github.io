@@ -64,6 +64,7 @@ const publications = [
       primaryClass={cs.CL},
       url={https://arxiv.org/abs/2507.01335}, 
 }</code></pre>`,
+    isNew: true,
     isPreprint: true,
     isSelected: true
   },
@@ -205,7 +206,7 @@ const publications = [
       primaryClass={cs.AI},
       url={https://arxiv.org/abs/2510.09782},
 }</code></pre>`,
-    isNew: true,
+    isNew: false,
     isPreprint: false,
     isSelected: true
   },
