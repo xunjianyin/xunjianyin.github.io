@@ -1,8 +1,8 @@
 /**
  * Easter Egg — type "yxjgogogo"
- * Phase 1: Zero Gravity — page floats away
- * Phase 2: Word Fireworks — page words explode as fireworks
- * Phase 3: Reconstructing Rain — characters rain down and rebuild the page
+ * Phase 1: Shatter & Glitch — page fragments, distorts, and explodes outward
+ * Phase 2: Word Fireworks — page words + special words explode as fireworks
+ * Phase 3: Scroll Unfurl — a scroll unrolls top-to-bottom, revealing the page
  */
 (function () {
   var KONAMI = [
@@ -11,6 +11,9 @@
   ];
   var pos = 0;
   var running = false;
+
+  // Special words the user wants to always show up in fireworks
+  var SPECIAL_WORDS = ['Furong', 'Flora', 'Furong Jia', 'Flora Jia', 'Yeye'];
 
   document.addEventListener('keydown', function (e) {
     if (running) return;
@@ -35,20 +38,40 @@
       var j = Math.floor(Math.random() * (i + 1));
       var tmp = unique[i]; unique[i] = unique[j]; unique[j] = tmp;
     }
-    return unique.length > 0 ? unique : ['Xunjian', 'Yin', 'Duke', 'Research', 'AI', 'Agent'];
+    if (unique.length === 0) unique = ['Xunjian', 'Yin', 'Duke', 'Research', 'AI', 'Agent'];
+
+    // Interleave SPECIAL_WORDS so they appear frequently (roughly every ~4 particles)
+    var mixed = [];
+    var specialCopies = SPECIAL_WORDS.slice();
+    // Shuffle special words
+    for (var k = specialCopies.length - 1; k > 0; k--) {
+      var m = Math.floor(Math.random() * (k + 1));
+      var t = specialCopies[k]; specialCopies[k] = specialCopies[m]; specialCopies[m] = t;
+    }
+    var sIdx = 0;
+    for (var n = 0; n < unique.length; n++) {
+      mixed.push(unique[n]);
+      if (n % 3 === 0) {
+        mixed.push(specialCopies[sIdx % specialCopies.length]);
+        sIdx++;
+      }
+    }
+    return mixed;
   }
 
   function runSpectacle() {
     var words = harvestWords();
-    return phaseZeroGravity()
+    return phaseShatter()
       .then(function () { return phaseFireworks(words); })
-      .then(phaseReconstructingRain);
+      .then(phaseScrollUnfurl);
   }
 
   /* ─────────────────────────────────────────────
-     Phase 1: Zero Gravity
+     Phase 1: Shatter & Glitch
+     Page jitters with chromatic glitch, then fragments
+     fly outward with heavy distortion.
      ───────────────────────────────────────────── */
-  function phaseZeroGravity() {
+  function phaseShatter() {
     return new Promise(function (resolve) {
       var main = document.getElementById('main-content');
       if (!main) { resolve(); return; }
@@ -56,38 +79,90 @@
       var children = Array.from(main.children);
       var saved = [];
 
-      children.forEach(function (el) {
+      // Inject glitch keyframes
+      var styleEl = document.createElement('style');
+      styleEl.textContent =
+        '@keyframes yxj-glitch-shake{' +
+        '0%{transform:translate(0,0) skew(0,0)}' +
+        '15%{transform:translate(-5px,2px) skew(3deg,0)}' +
+        '30%{transform:translate(4px,-3px) skew(-2deg,1deg)}' +
+        '45%{transform:translate(-3px,4px) skew(2deg,-1deg)}' +
+        '60%{transform:translate(5px,-2px) skew(-3deg,0)}' +
+        '75%{transform:translate(-4px,3px) skew(1deg,2deg)}' +
+        '90%{transform:translate(3px,-4px) skew(-1deg,-1deg)}' +
+        '100%{transform:translate(0,0) skew(0,0)}' +
+        '}' +
+        '@keyframes yxj-glitch-hue{' +
+        '0%{filter:hue-rotate(0) contrast(1.2) saturate(1.6)}' +
+        '25%{filter:hue-rotate(90deg) contrast(1.6) saturate(2.2) drop-shadow(3px 0 0 rgba(255,0,80,0.7)) drop-shadow(-3px 0 0 rgba(0,200,255,0.7))}' +
+        '50%{filter:hue-rotate(200deg) contrast(1.4) saturate(1.8)}' +
+        '75%{filter:hue-rotate(320deg) contrast(1.8) saturate(2.4) drop-shadow(-2px 0 0 rgba(255,50,0,0.6)) drop-shadow(2px 0 0 rgba(0,255,200,0.6))}' +
+        '100%{filter:hue-rotate(360deg) contrast(1.2) saturate(1.6)}' +
+        '}';
+      document.head.appendChild(styleEl);
+
+      // Phase 1a: glitch shake with chromatic aberration
+      children.forEach(function (el, idx) {
         saved.push({
           el: el,
           origTransform: el.style.transform,
           origTransition: el.style.transition,
-          origPosition: el.style.position,
-          origZIndex: el.style.zIndex,
-          origOpacity: el.style.opacity
+          origFilter: el.style.filter,
+          origAnimation: el.style.animation,
+          origOpacity: el.style.opacity,
+          origWillChange: el.style.willChange
         });
-
-        var tx = (Math.random() - 0.5) * 200;
-        var ty = -(Math.random() * 300 + 100);
-        var rot = (Math.random() - 0.5) * 40;
-
-        el.style.transition = 'transform 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s ease';
-        el.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) rotate(' + rot + 'deg)';
+        el.style.willChange = 'transform, filter, opacity';
+        el.style.animation =
+          'yxj-glitch-shake 0.18s steps(3) infinite, ' +
+          'yxj-glitch-hue 0.6s linear infinite';
       });
 
+      // Phase 1b: shatter outward with extreme distortion
       setTimeout(function () {
-        children.forEach(function (el) { el.style.opacity = '0'; });
-      }, 2000);
+        children.forEach(function (el) {
+          var tx = (Math.random() - 0.5) * 1000;
+          var ty = (Math.random() - 0.5) * 700 - 120;
+          var rot = (Math.random() - 0.5) * 280;
+          var skX = (Math.random() - 0.5) * 55;
+          var skY = (Math.random() - 0.5) * 30;
+          var sc = 0.2 + Math.random() * 1.4;
+          var blur = 3 + Math.random() * 10;
+          var hue = Math.floor(Math.random() * 360);
 
+          el.style.animation = 'none';
+          el.style.transition =
+            'transform 1.5s cubic-bezier(0.5,-0.1,0.75,0.4), ' +
+            'opacity 1.2s ease 0.25s, ' +
+            'filter 1.5s ease';
+          el.style.transform =
+            'translate(' + tx + 'px,' + ty + 'px) ' +
+            'rotate(' + rot + 'deg) ' +
+            'skew(' + skX + 'deg,' + skY + 'deg) ' +
+            'scale(' + sc + ')';
+          el.style.filter =
+            'blur(' + blur + 'px) ' +
+            'hue-rotate(' + hue + 'deg) ' +
+            'contrast(2.2) saturate(3) ' +
+            'drop-shadow(4px 0 0 rgba(255,40,80,0.7)) ' +
+            'drop-shadow(-4px 0 0 rgba(60,200,255,0.7))';
+          el.style.opacity = '0';
+        });
+      }, 750);
+
+      // Cleanup & hand off
       setTimeout(function () {
         saved.forEach(function (s) {
           s.el.style.transform = s.origTransform;
           s.el.style.transition = s.origTransition;
-          s.el.style.position = s.origPosition;
-          s.el.style.zIndex = s.origZIndex;
+          s.el.style.filter = s.origFilter;
+          s.el.style.animation = s.origAnimation;
+          s.el.style.willChange = s.origWillChange;
           s.el.style.opacity = '0';
         });
+        if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
         resolve();
-      }, 3000);
+      }, 2600);
     });
   }
 
@@ -115,19 +190,26 @@
         [168,216,234], [255,111,97], [136,216,176], [252,186,211]
       ];
 
-      function Particle(x, y, rgb) {
+      function Particle(x, y, rgb, forceSpecial) {
         this.x = x;
         this.y = y;
         this.r = rgb[0]; this.g = rgb[1]; this.b = rgb[2];
-        this.word = words[wordIdx % words.length];
-        wordIdx++;
+        if (forceSpecial) {
+          this.word = SPECIAL_WORDS[Math.floor(Math.random() * SPECIAL_WORDS.length)];
+          this.isSpecial = true;
+        } else {
+          this.word = words[wordIdx % words.length];
+          wordIdx++;
+          this.isSpecial = SPECIAL_WORDS.indexOf(this.word) !== -1;
+        }
         var angle = Math.random() * Math.PI * 2;
         var speed = Math.random() * 3 + 1.5;
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
         this.alpha = 1;
         this.decay = Math.random() * 0.008 + 0.005;
-        this.fontSize = 10 + Math.random() * 8;
+        // Special words draw larger so they stand out
+        this.fontSize = this.isSpecial ? (16 + Math.random() * 8) : (10 + Math.random() * 8);
         this.rotation = (Math.random() - 0.5) * 0.6;
         this.rotSpeed = (Math.random() - 0.5) * 0.02;
       }
@@ -149,8 +231,10 @@
       function explode(x, y) {
         var rgb = colors[Math.floor(Math.random() * colors.length)];
         var count = 25 + Math.floor(Math.random() * 15);
+        // Guarantee at least 3 special words per burst so they appear often
         for (var i = 0; i < count; i++) {
-          particles.push(new Particle(x, y, rgb));
+          var forceSpecial = i < 3;
+          particles.push(new Particle(x, y, rgb, forceSpecial));
         }
       }
 
@@ -210,10 +294,10 @@
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate(p.rotation);
-          ctx.font = 'bold ' + Math.round(p.fontSize) + 'px Lato, sans-serif';
+          ctx.font = (p.isSpecial ? 'bold italic ' : 'bold ') + Math.round(p.fontSize) + 'px Lato, sans-serif';
           ctx.fillStyle = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + p.alpha + ')';
           ctx.shadowColor = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + (p.alpha * 0.5) + ')';
-          ctx.shadowBlur = 10;
+          ctx.shadowBlur = p.isSpecial ? 18 : 10;
           ctx.textAlign = 'center';
           ctx.fillText(p.word, 0, 0);
           ctx.restore();
@@ -233,185 +317,118 @@
   }
 
   /* ─────────────────────────────────────────────
-     Phase 3: Reconstructing Rain
-     Full sentences / titles / author lists rain down,
-     then the page rebuilds itself top-to-bottom.
+     Phase 3: Scroll Unfurl
+     A rolled scroll descends from the top, unfurling
+     the page line-by-line as its leading edge sweeps down.
      ───────────────────────────────────────────── */
-  function phaseReconstructingRain() {
+  function phaseScrollUnfurl() {
     return new Promise(function (resolve) {
       var main = document.getElementById('main-content');
       if (!main) { resolve(); return; }
 
-      // ── Harvest meaningful phrases from the page ──
-      var phrases = [];
-      // Paper titles
-      main.querySelectorAll('.papertitle').forEach(function (el) {
-        var t = el.textContent.trim();
-        if (t) phrases.push(t);
-      });
-      // Author lines
-      main.querySelectorAll('.paper_rest').forEach(function (el) {
-        var t = el.textContent.trim().split('\n')[0].trim();
-        if (t && t.length > 5) phrases.push(t);
-      });
-      // Section headings
-      main.querySelectorAll('h1, h2, h3').forEach(function (el) {
-        var t = el.textContent.trim();
-        if (t) phrases.push(t);
-      });
-      // News items
-      main.querySelectorAll('.news-list li').forEach(function (el) {
-        var t = el.textContent.trim();
-        if (t) phrases.push(t);
-      });
-      // Bio paragraphs / any <p>
-      main.querySelectorAll('.bio, p').forEach(function (el) {
-        var t = el.textContent.trim();
-        if (t && t.length > 10) {
-          // Split long text into sentence-ish chunks
-          var sentences = t.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [t];
-          sentences.forEach(function (s) {
-            s = s.trim();
-            if (s.length > 5) phrases.push(s);
-          });
-        }
-      });
-      // Project descriptions
-      main.querySelectorAll('#projects-list li').forEach(function (el) {
-        var t = el.textContent.trim();
-        if (t) phrases.push(t);
-      });
-      // Name
-      var nameEl = main.querySelector('.name');
-      if (nameEl) phrases.push(nameEl.textContent.trim());
-
-      // Deduplicate and shuffle
-      phrases = Array.from(new Set(phrases));
-      for (var i = phrases.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var tmp = phrases[i]; phrases[i] = phrases[j]; phrases[j] = tmp;
-      }
-      if (phrases.length === 0) phrases = ['Xunjian Yin', 'Duke University', 'Research'];
-
-      // ── Create overlay container for falling text ──
-      var overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;pointer-events:none;overflow:hidden;';
-      document.body.appendChild(overlay);
-
-      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-
-      var colors = [
-        [0, 101, 192],    // site blue
-        [107, 163, 245],  // light blue
-        [78, 205, 196],   // teal
-        [150, 230, 161],  // green
-        [240, 146, 40],   // site orange
-        [255, 183, 178],  // pink
-      ];
-
-      // ── Raindrop: a falling phrase ──
-      var drops = [];
-      var phraseIdx = 0;
-      var startTime = Date.now();
-      var spawnDuration = 3500;  // how long we keep spawning new drops
-      var totalDuration = 5000;  // total phase time
-
-      function spawnDrop() {
-        var text = phrases[phraseIdx % phrases.length];
-        phraseIdx++;
-        var rgb = colors[Math.floor(Math.random() * colors.length)];
-
-        var el = document.createElement('div');
-        var fSize = 11 + Math.floor(Math.random() * 6);
-        el.textContent = text;
-        el.style.cssText =
-          'position:absolute;white-space:nowrap;font-family:Lato,sans-serif;' +
-          'font-size:' + fSize + 'px;font-weight:600;pointer-events:none;' +
-          'color:rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.85);' +
-          'text-shadow:0 0 8px rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.3);' +
-          'left:' + (Math.random() * 90) + '%;' +
-          'top:-40px;';
-        overlay.appendChild(el);
-
-        var speed = 1.5 + Math.random() * 3;  // px per frame
-        var y = -40;
-        var maxY = window.innerHeight + 50;
-
-        drops.push({ el: el, y: y, speed: speed, maxY: maxY, done: false });
-      }
-
-      // Get children for progressive reveal
       var children = Array.from(main.children);
-      var childData = children.map(function (el) {
-        var rect = el.getBoundingClientRect();
-        return { el: el, revealed: false };
-      });
-      var revealDelay = 800;
-      var revealDuration = 3200;
 
-      // Spawn initial batch
-      var spawnInterval = 80;
-      var lastSpawn = 0;
+      // Restore children to visible so the clip-path is what controls reveal
+      children.forEach(function (el) {
+        el.style.opacity = '1';
+        el.style.transform = '';
+        el.style.filter = '';
+      });
+
+      // Save original styles on main for clipping
+      var origClip = main.style.clipPath;
+      var origWebkitClip = main.style.webkitClipPath;
+      var origTransition = main.style.transition;
+
+      // Start fully hidden via clip-path (clip from top)
+      main.style.transition = 'none';
+      main.style.clipPath = 'inset(0 0 100% 0)';
+      main.style.webkitClipPath = 'inset(0 0 100% 0)';
+      void main.offsetHeight; // force reflow
+
+      // The scroll roller: a warm parchment-colored bar with a rolled cylinder
+      // edge, positioned at the current reveal line. Spans full viewport width.
+      var roller = document.createElement('div');
+      roller.style.cssText =
+        'position:fixed;left:0;right:0;height:22px;z-index:99998;pointer-events:none;' +
+        'background:' +
+        '  linear-gradient(180deg,' +
+        '    rgba(120,82,40,0) 0%,' +
+        '    rgba(168,125,74,0.35) 20%,' +
+        '    rgba(120,82,40,0.85) 45%,' +
+        '    rgba(80,54,24,0.95) 52%,' +
+        '    rgba(120,82,40,0.85) 60%,' +
+        '    rgba(168,125,74,0.35) 85%,' +
+        '    rgba(120,82,40,0) 100%' +
+        '  );' +
+        'box-shadow:' +
+        '  0 6px 14px rgba(60,40,20,0.35),' +
+        '  0 -2px 6px rgba(200,160,100,0.25),' +
+        '  inset 0 1px 0 rgba(255,230,180,0.45),' +
+        '  inset 0 -1px 0 rgba(40,25,10,0.5);';
+      document.body.appendChild(roller);
+
+      // Subtle "paper shadow" just above the roller for a lifted scroll look
+      var paperShadow = document.createElement('div');
+      paperShadow.style.cssText =
+        'position:fixed;left:0;right:0;height:40px;z-index:99997;pointer-events:none;' +
+        'background:linear-gradient(180deg,' +
+        '  rgba(0,0,0,0) 0%,' +
+        '  rgba(0,0,0,0.08) 70%,' +
+        '  rgba(0,0,0,0.15) 100%' +
+        ');';
+      document.body.appendChild(paperShadow);
+
+      var duration = 4500;
+      var startTime = Date.now();
+      var mainRect = main.getBoundingClientRect();
+      var pageTop = mainRect.top;      // relative to viewport
+      var pageHeight = mainRect.height;
 
       function animate() {
         var elapsed = Date.now() - startTime;
+        var t = Math.min(1, elapsed / duration);
+        // Ease-out cubic for a gentle settling
+        var eased = 1 - Math.pow(1 - t, 3);
 
-        // Spawn new drops
-        if (elapsed < spawnDuration && elapsed - lastSpawn > spawnInterval) {
-          // Spawn 1-3 at a time for density
-          var count = 1 + Math.floor(Math.random() * 2);
-          for (var s = 0; s < count; s++) spawnDrop();
-          lastSpawn = elapsed;
-          // Increase density over time
-          spawnInterval = Math.max(30, 80 - elapsed * 0.012);
-        }
+        // Reveal from top: inset bottom shrinks from 100% to 0%
+        var insetBottom = (1 - eased) * 100;
+        var clip = 'inset(0 0 ' + insetBottom + '% 0)';
+        main.style.clipPath = clip;
+        main.style.webkitClipPath = clip;
 
-        // Move drops
-        var activeDrop = false;
-        for (var d = 0; d < drops.length; d++) {
-          var drop = drops[d];
-          if (drop.done) continue;
-          drop.y += drop.speed;
-          drop.el.style.top = drop.y + 'px';
+        // Position the roller at the leading edge of the reveal.
+        // The reveal reaches from main's top down to: top + eased * height.
+        var edgeY = pageTop + eased * pageHeight;
+        // Clamp into viewport so the roller stays visible even on short pages
+        var viewportMax = window.innerHeight - 22;
+        var rollerY = Math.max(0, Math.min(viewportMax, edgeY - 11));
+        roller.style.top = rollerY + 'px';
+        paperShadow.style.top = (rollerY - 40) + 'px';
 
-          // Fade out as it nears bottom
-          if (drop.y > drop.maxY * 0.7) {
-            var fadeAlpha = Math.max(0, 1 - (drop.y - drop.maxY * 0.7) / (drop.maxY * 0.3));
-            drop.el.style.opacity = String(fadeAlpha);
-          }
-
-          if (drop.y > drop.maxY) {
-            drop.done = true;
-            if (drop.el.parentNode) drop.el.parentNode.removeChild(drop.el);
-          } else {
-            activeDrop = true;
-          }
-        }
-
-        // Progressive page reveal
-        var revealProgress = Math.max(0, Math.min(1, (elapsed - revealDelay) / revealDuration));
-        var revealCount = Math.floor(revealProgress * childData.length);
-        for (var c = 0; c < childData.length; c++) {
-          if (c < revealCount && !childData[c].revealed) {
-            childData[c].revealed = true;
-            var el = childData[c].el;
-            el.style.transition = 'opacity 0.8s ease';
-            el.style.opacity = '1';
-          }
-        }
-
-        // End condition
-        if (elapsed > totalDuration && !activeDrop) {
-          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-          children.forEach(function (el) {
-            el.style.opacity = '1';
-            el.style.transition = '';
-          });
-          resolve();
+        if (t < 1) {
+          requestAnimationFrame(animate);
           return;
         }
 
-        requestAnimationFrame(animate);
+        // Cleanup: restore main, remove roller
+        main.style.clipPath = origClip;
+        main.style.webkitClipPath = origWebkitClip;
+        main.style.transition = origTransition;
+
+        // Roller slides out of view (bottom) as a finishing touch
+        roller.style.transition = 'top 0.5s ease, opacity 0.5s ease';
+        paperShadow.style.transition = 'top 0.5s ease, opacity 0.5s ease';
+        roller.style.top = (window.innerHeight + 30) + 'px';
+        paperShadow.style.top = window.innerHeight + 'px';
+        roller.style.opacity = '0';
+        paperShadow.style.opacity = '0';
+
+        setTimeout(function () {
+          if (roller.parentNode) roller.parentNode.removeChild(roller);
+          if (paperShadow.parentNode) paperShadow.parentNode.removeChild(paperShadow);
+          resolve();
+        }, 550);
       }
 
       animate();

@@ -46,9 +46,9 @@ const publications = [
     isSelected: false
   },
   {
-    title: "Reverse Language Model",
+    title: "LEDOM: Reverse Language Model",
     authors: "<b>Xunjian Yin</b>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
-    venue: "ArXiv:2507",
+    venue: "ACL 2026",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2507.01335" },
       { text: "Model", url: "https://huggingface.co/Corning/Reverse-Model-7B-348B" },
