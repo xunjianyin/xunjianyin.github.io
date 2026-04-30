@@ -16,18 +16,18 @@ function closeOtherDetails(activeToggle) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Homepage: single selected papers list
+  // Homepage: single selected papers list (preprints + conference papers, both filtered to isSelected)
   if (document.getElementById('selected-papers-list')) {
     const selected = [...getSelectedPreprints(), ...getSelectedPublications()];
     populatePublications(selected, 'selected-papers-list');
   }
 
-  // Full publications page
+  // Full publications page (renders all preprints and all conference/journal papers)
   if (document.getElementById('preprints-list')) {
-    populatePublications(getSelectedPreprints(), 'preprints-list');
+    populatePublications(getPreprints(), 'preprints-list');
   }
-  if (document.getElementById('selected-publications-list')) {
-    populatePublications(getSelectedPublications(), 'selected-publications-list');
+  if (document.getElementById('publications-list')) {
+    populatePublications(getPublications(), 'publications-list');
   }
 
   // Other sections (used on homepage or other pages if present)
@@ -65,7 +65,7 @@ function populatePublications(publications, listId) {
 
     const titleDiv = document.createElement('div');
     titleDiv.className = 'papertitle';
-    titleDiv.innerHTML = (pub.isNew ? '<span style="color:#6b7280;font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;">New</span>   ' : '') + pub.title;
+    titleDiv.innerHTML = (pub.isNew ? '<span class="new-badge">New</span>' : '') + pub.title;
 
     const restDiv = document.createElement('div');
     restDiv.className = 'paper_rest';
@@ -84,6 +84,10 @@ function populatePublications(publications, listId) {
       const anchor = document.createElement('a');
       anchor.href = link.url;
       anchor.textContent = link.text;
+      if (/^https?:\/\//i.test(link.url)) {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener';
+      }
       return anchor;
     });
 
@@ -177,7 +181,7 @@ function populateProjects(showAllBadges) {
       ? project.badges
       : project.badges.filter(b => b.img.includes('/github/stars/'));
     const badgeHtml = badges.map(badge =>
-      `<a href="${badge.url}"><img alt="stars" src="${badge.img}" loading="lazy" style="vertical-align:middle;" /></a>`
+      `<a href="${badge.url}" target="_blank" rel="noopener"><img alt="stars" src="${badge.img}" loading="lazy" style="vertical-align:middle;" /></a>`
     ).join(' ');
     li.innerHTML = `<strong>${project.title}</strong> ${badgeHtml}<br>${project.description}`;
     list.appendChild(li);

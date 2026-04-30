@@ -664,7 +664,7 @@ const fullPublications = getAllPublications();
 const projects = [
   {
     title: "Gödel Agent",
-    description: "A self-referential agent framework for recursive self-improvement implemented with Monkey Patching. (<a href=\"https://github.com/Arvid-pku/Godel_Agent\">Project Homepage</a>)",
+    description: "A self-referential agent framework for recursive self-improvement implemented with Monkey Patching. (<a href=\"https://github.com/Arvid-pku/Godel_Agent\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/Godel_Agent/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/Godel_Agent/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -679,7 +679,7 @@ const projects = [
   },
   {
     title: "Claude Journal",
-      description: "A live web interface to view, annotate, search, and analyze your Claude Code & Codex conversations. Talk to your AI directly from the browser, edit real history, and manage every session. (<a href=\"https://arvid-pku.github.io/claude-journal/\">Interactive Guide</a> | <a href=\"https://github.com/Arvid-pku/claude-journal\">Project Homepage</a>)",
+      description: "A live web interface to view, annotate, search, and analyze your Claude Code & Codex conversations. Talk to your AI directly from the browser, edit real history, and manage every session. (<a href=\"https://arvid-pku.github.io/claude-journal/\" target=\"_blank\" rel=\"noopener\">Interactive Guide</a> | <a href=\"https://github.com/Arvid-pku/claude-journal\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
       badges: [
         { url: "https://www.npmjs.com/package/claude-journal", img: "https://img.shields.io/npm/v/claude-journal?color=c6603f&label=npm" },
         { url: "https://github.com/Arvid-pku/claude-journal/blob/main/LICENSE", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -694,7 +694,7 @@ const projects = [
   },
   {
     title: "Overleaf-Bib-Helper",
-    description: "A <a href=\"https://greasyfork.org/scripts/532304-overleaf-bib-helper\">Userscript</a> to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\">Project Homepage</a>)",
+    description: "A <a href=\"https://greasyfork.org/scripts/532304-overleaf-bib-helper\" target=\"_blank\" rel=\"noopener\">Userscript</a> to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -709,7 +709,7 @@ const projects = [
   },
   {
     title: "MultAI",
-    description: "A Chrome extension that lets you talk to seven AI chat sites — ChatGPT, Claude, Gemini, Grok, Meta AI, DeepSeek, and Qwen — from one cockpit, with broadcast prompts, side-by-side compare, and a tiled layout. (<a href=\"https://github.com/Arvid-pku/MultAI\">Project Homepage</a>)",
+    description: "A Chrome extension that lets you talk to seven AI chat sites — ChatGPT, Claude, Gemini, Grok, Meta AI, DeepSeek, and Qwen — from one cockpit, with broadcast prompts, side-by-side compare, and a tiled layout. (<a href=\"https://github.com/Arvid-pku/MultAI\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/MultAI/releases", img: "https://img.shields.io/badge/Version-0.1.0-blue" },
       { url: "https://github.com/Arvid-pku/MultAI/blob/main/LICENSE", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -723,7 +723,7 @@ const projects = [
   },
   {
     title: "nnviz",
-    description: "Inspect any HuggingFace transformer's weights, activations, gradients, and KV cache as an interactive 3D web app. (<a href=\"https://arvid-pku.github.io/nnviz/\">Live Demo</a> | <a href=\"https://github.com/Arvid-pku/nnviz\">Project Homepage</a>)",
+    description: "Inspect any HuggingFace transformer's weights, activations, gradients, and KV cache as an interactive 3D web app. (<a href=\"https://arvid-pku.github.io/nnviz/\" target=\"_blank\" rel=\"noopener\">Live Demo</a> | <a href=\"https://github.com/Arvid-pku/nnviz\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/nnviz/blob/main/LICENSE", img: "https://img.shields.io/badge/License-Apache_2.0-blue" },
       { url: "https://github.com/Arvid-pku/nnviz/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/nnviz" },
@@ -735,7 +735,7 @@ const projects = [
   },
   {
     title: "CodeRead",
-    description: "Turns a Python codebase into an interactive, importance-ranked dependency graph in a single self-contained HTML file. (<a href=\"https://arvid-pku.github.io/coderead/\">Project Homepage</a>)",
+    description: "Turns a Python codebase into an interactive, importance-ranked dependency graph in a single self-contained HTML file. (<a href=\"https://arvid-pku.github.io/coderead/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://arvid-pku.github.io/coderead/", img: "https://img.shields.io/badge/Demo-Live-brightgreen" }
     ],
@@ -744,7 +744,7 @@ const projects = [
   },
   {
     title: "Puzzle Game Hub",
-    description: "A single-page hub of 80+ web mini-games with a unified achievement system. (<a href=\"https://arvid-pku.github.io/games/\">Project Homepage</a>)",
+    description: "A single-page hub of 80+ web mini-games with a unified achievement system. (<a href=\"https://arvid-pku.github.io/games/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://arvid-pku.github.io/games/", img: "https://img.shields.io/badge/Demo-Live-brightgreen" }
     ],
@@ -753,7 +753,7 @@ const projects = [
   },
   {
     title: "Squirrel IM",
-    description: "Personal customizations of Squirrel (Rime), the macOS Chinese input method engine. (<a href=\"https://github.com/Arvid-pku/IM\">Project Homepage</a>)",
+    description: "Personal customizations of Squirrel (Rime), the macOS Chinese input method engine. (<a href=\"https://github.com/Arvid-pku/IM\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/IM/blob/master/LICENSE.txt", img: "https://img.shields.io/badge/License-GPL_v3-blue" },
       { url: "https://github.com/Arvid-pku/IM/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/IM" },
@@ -764,7 +764,7 @@ const projects = [
   },
   {
     title: "Vision2Text",
-    description: "Convert images and videos to ASCII art in real-time. (<a href=\"https://arvid-pku.github.io/image2text/\">Project Homepage</a>)",
+    description: "Convert images and videos to ASCII art in real-time. (<a href=\"https://arvid-pku.github.io/image2text/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/image2text/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/image2text/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -778,7 +778,7 @@ const projects = [
   },
   // {
   //   title: "LLM Interpretability Workbench",
-  //   description: "A workbench for interpreting the internals of large language models. (<a href=\"https://github.com/Arvid-pku/Modelen\">Project Homepage</a>)",
+  //   description: "A workbench for interpreting the internals of large language models. (<a href=\"https://github.com/Arvid-pku/Modelen\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
   //   badges: [
   //     { url: "https://github.com/Arvid-pku/Modelen/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
   //     { url: "https://github.com/Arvid-pku/Modelen/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Modelen" },
@@ -790,7 +790,7 @@ const projects = [
   // },
   {
     title: "History Visualization",
-    description: "A web application that visualizes world history through an interactive timeline and map. (<a href=\"https://arvid-pku.github.io/history_vis/\">Project Homepage</a>)",
+    description: "A web application that visualizes world history through an interactive timeline and map. (<a href=\"https://arvid-pku.github.io/history_vis/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://arvid-pku.github.io/history_vis/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://arvid-pku.github.io/history_vis/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -800,7 +800,7 @@ const projects = [
   },
   {
     title: "Tower of Babel",
-    description: "Type words and watch the letters stack, collide, and topple as physical bodies. (<a href=\"https://arvid-pku.github.io/Babel/\">Project Homepage</a>)",
+    description: "Type words and watch the letters stack, collide, and topple as physical bodies. (<a href=\"https://arvid-pku.github.io/Babel/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://arvid-pku.github.io/Babel/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://arvid-pku.github.io/Babel/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -810,7 +810,7 @@ const projects = [
   },
     {
     title: "World of Physics",
-    description: "A physics simulation platform where we can play with blocks, spring, rope, electric field, magnetic field, and more. (<a href=\"https://arvid-pku.github.io/worldofphysics/\">Project Homepage</a>)",
+    description: "A physics simulation platform where we can play with blocks, spring, rope, electric field, magnetic field, and more. (<a href=\"https://arvid-pku.github.io/worldofphysics/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://arvid-pku.github.io/worldofphysics/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://arvid-pku.github.io/worldofphysics/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -820,7 +820,7 @@ const projects = [
   },
   {
     title: "Proactive AI Assistant",
-    description: "An AI assistant extension that proactively helps users with tasks and reminders. (<a href=\"https://github.com/Arvid-pku/Proactive-AI\">Project Homepage</a>)",
+    description: "An AI assistant extension that proactively helps users with tasks and reminders. (<a href=\"https://github.com/Arvid-pku/Proactive-AI\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/Proactive-AI/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/Proactive-AI/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Proactive-AI" },
@@ -832,7 +832,7 @@ const projects = [
   },
   {
     title: "Music Letter",
-    description: "Turn your letter into a song and let your heart be heard. (<a href=\"https://xunjianyin.github.io/MusicLetter\">Project Homepage</a>)",
+    description: "Turn your letter into a song and let your heart be heard. (<a href=\"https://xunjianyin.github.io/MusicLetter\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/MusicLetter/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/MusicLetter/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -847,7 +847,7 @@ const projects = [
   },
   {
     title: "Text of Sisyphus",
-    description: "An interactive simulation where Sisyphus's collapse builds a text archive. (<a href=\"https://Arvid-pku.github.io/Sisyphus/\">Project Homepage</a>)",
+    description: "An interactive simulation where Sisyphus's collapse builds a text archive. (<a href=\"https://Arvid-pku.github.io/Sisyphus/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/Sisyphus/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/Sisyphus/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -859,7 +859,7 @@ const projects = [
   },
   //   {
   //   title: "Harmony Cube",
-  //   description: "Music Meets Geometry. (<a href=\"https://arvid-pku.github.io/harmony-cube/\">Project Homepage</a>)",
+  //   description: "Music Meets Geometry. (<a href=\"https://arvid-pku.github.io/harmony-cube/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
   //   badges: [
   //     { url: "https://arvid-pku.github.io/harmony-cube/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
   //     { url: "https://arvid-pku.github.io/harmony-cube/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -869,7 +869,7 @@ const projects = [
   // },
   // {
   //   title: "Academic-Homepage-Template",
-  //   description: "A clean, customizable template for academic homepages. (<a href=\"https://github.com/Arvid-pku/Academic-Homepage-Template\">Project Homepage</a>)",
+  //   description: "A clean, customizable template for academic homepages. (<a href=\"https://github.com/Arvid-pku/Academic-Homepage-Template\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
   //   badges: [
   //     { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
   //     { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -879,7 +879,7 @@ const projects = [
   // },
   {
     title: "Game-of-Life",
-    description: "An interactive sandbox for Conway's Game of Life. (<a href=\"https://xunjianyin.github.io/Game-of-Life/\">Project Homepage</a>)",
+    description: "An interactive sandbox for Conway's Game of Life. (<a href=\"https://xunjianyin.github.io/Game-of-Life/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/Game-of-Life/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/Game-of-Life/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -891,7 +891,7 @@ const projects = [
   },
   // {
   //   title: "Audio-Visualizer",
-  //   description: "A website to visualize audio. (<a href=\"https://xunjianyin.github.io/Audio-Visualizer/\">Project Homepage</a>)",
+  //   description: "A website to visualize audio. (<a href=\"https://xunjianyin.github.io/Audio-Visualizer/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
   //   badges: [
   //     { url: "https://github.com/xunjianyin/Audio-Visualizer/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
   //     { url: "https://github.com/xunjianyin/Audio-Visualizer/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -903,7 +903,7 @@ const projects = [
   // },
   // {
   //   title: "Maze-Generator-And-Solver",
-  //   description: "Generates random mazes and animates pathfinding solvers walking through them. (<a href=\"https://xunjianyin.github.io/Maze-Generator-And-Solver/\">Project Homepage</a>)",
+  //   description: "Generates random mazes and animates pathfinding solvers walking through them. (<a href=\"https://xunjianyin.github.io/Maze-Generator-And-Solver/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
   //   badges: [
   //     { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
   //     { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -915,7 +915,7 @@ const projects = [
   // },
   // {
   //   title: "Overleaf-Bib-Helper-Dev",
-  //   description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/Arvid-pku/Overleaf-Bib-Helper\">Project Homepage</a>)",
+  //   description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/Arvid-pku/Overleaf-Bib-Helper\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
   //   badges: [
   //     { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
   //     { url: "https://github.com/Arvid-pku/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -930,7 +930,7 @@ const projects = [
   // },
   {
     title: "Bouncing Ball",
-    description: "A physics playground where you drop and fling bouncing balls. (<a href=\"https://xunjianyin.github.io/bouncing-ball-animation/\">Project Homepage</a>)",
+    description: "A physics playground where you drop and fling bouncing balls. (<a href=\"https://xunjianyin.github.io/bouncing-ball-animation/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/bouncing-ball-animation/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/bouncing-ball-animation/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -945,7 +945,7 @@ const projects = [
   },
   {
     title: "Star-Maker",
-    description: "Build star systems and watch planets orbit under live gravitational simulation. (<a href=\"https://xunjianyin.github.io/star-maker/\">Project Homepage</a>)",
+    description: "Build star systems and watch planets orbit under live gravitational simulation. (<a href=\"https://xunjianyin.github.io/star-maker/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/star-maker/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/star-maker/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -960,7 +960,7 @@ const projects = [
   },
   {
     title: "HF-Downloader",
-    description: "A <a href=\"https://greasyfork.org/zh-CN/scripts/543283-hugging-face-batch-downloader\">Tampermonkey userscript</a> that enhances Hugging Face model pages with batch download functionality. (<a href=\"https://github.com/Arvid-pku/HF-Downloader\">Project Homepage</a>)",
+    description: "A <a href=\"https://greasyfork.org/zh-CN/scripts/543283-hugging-face-batch-downloader\" target=\"_blank\" rel=\"noopener\">Tampermonkey userscript</a> that enhances Hugging Face model pages with batch download functionality. (<a href=\"https://github.com/Arvid-pku/HF-Downloader\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
     badges: [
       { url: "https://greasyfork.org/zh-CN/scripts/543283-hugging-face-batch-downloader", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/HF-Downloader/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -972,7 +972,7 @@ const projects = [
   },
   // {
   //   title: "ID-Photo-Helper",
-  //   description: "Help everyone deal with the complicated issues of ID photo format and layout. (<a href=\"https://github.com/Arvid-pku/ID-Photo-Helper\">Project Homepage</a>)",
+  //   description: "Help everyone deal with the complicated issues of ID photo format and layout. (<a href=\"https://github.com/Arvid-pku/ID-Photo-Helper\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
   //   badges: [
   //     { url: "https://github.com/Arvid-pku/ID-Photo-Helper/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
   //     { url: "https://github.com/Arvid-pku/ID-Photo-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -984,7 +984,7 @@ const projects = [
   // },
   // {
   //   title: "Rank-Anything",
-  //   description: "A website to rank anything (developing). (<a href=\"https://xunjianyin.github.io/rank-anything/\">Project Homepage</a>)",
+  //   description: "A website to rank anything (developing). (<a href=\"https://xunjianyin.github.io/rank-anything/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
   //   badges: [
   //     { url: "https://github.com/Arvid-pku/ID-Photo-Helper/releases", img: "https://img.shields.io/badge/Version-0.1-blue" },
   //     { url: "https://github.com/xunjianyin/rank-anything/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -1016,7 +1016,7 @@ const researchExperience = [
     period: "June 2024 - February 2025",
     institution: "University of California, Santa Barbara (NLP Group)",
     mentor: "Prof. William Yang Wang",
-    description: "<a href=\"https://arxiv.org/abs/2410.04444\">One paper</a> about Self-Referential Agent Framework; Ongoing work on reverse language model pre-training."
+    description: "<a href=\"https://arxiv.org/abs/2410.04444\" target=\"_blank\" rel=\"noopener\">One paper</a> about Self-Referential Agent Framework; Ongoing work on reverse language model pre-training."
   },
   {
     period: "Feb. 2022 ~ Aug. 2022",
@@ -1028,7 +1028,7 @@ const researchExperience = [
     period: "Oct. 2020 - June 2022",
     institution: "Wangxuan Institute of Computer Technology, Peking University",
     mentor: "Prof. Xiaojun Wan",
-    description: "<a href=\"https://aclanthology.org/2022.acl-long.531.pdf\">One paper</a> at ACL 2022 on data-to-text generation"
+    description: "<a href=\"https://aclanthology.org/2022.acl-long.531.pdf\" target=\"_blank\" rel=\"noopener\">One paper</a> at ACL 2022 on data-to-text generation"
   },
   {
     period: "Apr. 2020 - Nov. 2021",
@@ -1066,8 +1066,8 @@ const talks = [
     venue: "JetBrains",
     date: "Sep 8, 2025",
     attachments: [
-      { text: "Slides", url: "files/Talk at Jetbrains/slides.pdf", type: "pdf" },
-      { text: "Blog", url: "https://xunjianyin.github.io/blog-post.html?id=self-referential-agent", type: "link" }
+      { text: "Slides", url: "files/Talk at Jetbrains/slides.pdf" },
+      { text: "Blog", url: "https://xunjianyin.github.io/blog-post.html?id=self-referential-agent" }
     ]
   },
   {
@@ -1075,9 +1075,9 @@ const talks = [
     venue: "Peking University",
     date: "Jun 26, 2025",
     attachments: [
-      { text: "News", url: "https://mp.weixin.qq.com/s/fzxzfwheU-5rATVypjenwg", type: "link" },
-      { text: "Slides", url: "files/Speech at the Graduation Ceremony/slides.pdf", type: "pdf" },
-      { text: "Speech Draft", url: "files/Speech at the Graduation Ceremony/speech draft.pdf", type: "pdf" }
+      { text: "News", url: "https://mp.weixin.qq.com/s/fzxzfwheU-5rATVypjenwg" },
+      { text: "Slides", url: "files/Speech at the Graduation Ceremony/slides.pdf" },
+      { text: "Speech Draft", url: "files/Speech at the Graduation Ceremony/speech draft.pdf" }
     ]
   },
   {
@@ -1085,8 +1085,8 @@ const talks = [
     venue: "NICE Community",
     date: "Jun 14, 2025",
     attachments: [
-      { text: "Slides", url: "files/Speech at NICE/slides.pdf", type: "pdf" },
-      { text: "Video", url: "https://www.bilibili.com/video/BV16GNvzfE92", type: "video" }
+      { text: "Slides", url: "files/Speech at NICE/slides.pdf" },
+      { text: "Video", url: "https://www.bilibili.com/video/BV16GNvzfE92" }
     ]
   },
   {
@@ -1094,7 +1094,7 @@ const talks = [
     venue: "Founder",
     date: "Jan 25, 2024",
     attachments: [
-      { text: "News", url: "https://mp.weixin.qq.com/s/1LBHCS1GypM62GQWZ2VX9w", type: "link" }
+      { text: "News", url: "https://mp.weixin.qq.com/s/1LBHCS1GypM62GQWZ2VX9w" }
     ]
   }
 

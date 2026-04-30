@@ -6,9 +6,23 @@
   <title>Projects - Xunjian Yin</title>
   <meta name="author" content="Xunjian Yin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Projects by Xunjian Yin — research code, web apps, and tools.">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="Projects - Xunjian Yin">
+  <meta property="og:description" content="Projects by Xunjian Yin — research code, web apps, and tools.">
+  <meta property="og:image" content="https://xunjianyin.github.io/figures/me.png">
+  <meta property="og:url" content="https://xunjianyin.github.io/projects.html">
+  <meta property="og:type" content="profile">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Projects - Xunjian Yin">
+  <meta name="twitter:description" content="Projects by Xunjian Yin — research code, web apps, and tools.">
+  <meta name="twitter:image" content="https://xunjianyin.github.io/figures/me.png">
+
   <link rel="stylesheet" type="text/css" href="stylesheet.css">
   <link rel="stylesheet" type="text/css" href="shared-styles.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+  <link rel="icon" type="image/png" href="figures/logo.png">
   <style>
     .page-title {
       font-size: 24px;
@@ -141,6 +155,7 @@
             const imgLink = document.createElement('a');
             imgLink.href = homepageUrl;
             imgLink.target = '_blank';
+            imgLink.rel = 'noopener';
             imgLink.style.textDecoration = 'none';
             imgLink.appendChild(img);
             imgDiv.appendChild(imgLink);
@@ -164,7 +179,7 @@
         if (homepageMatch) {
           const homepageUrl = homepageMatch[1];
           const titleText = project.title;
-          titleDiv.innerHTML = `<strong><a href="${homepageUrl}" target="_blank">${titleText}</a></strong>`;
+          titleDiv.innerHTML = `<strong><a href="${homepageUrl}" target="_blank" rel="noopener">${titleText}</a></strong>`;
         } else {
           titleDiv.textContent = project.title;
         }

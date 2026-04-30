@@ -6,7 +6,20 @@
   <title>Publications - Xunjian Yin</title>
   <meta name="author" content="Xunjian Yin">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Publications of Xunjian Yin">
+  <meta name="description" content="Publications and preprints of Xunjian Yin.">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="Publications - Xunjian Yin">
+  <meta property="og:description" content="Publications and preprints of Xunjian Yin.">
+  <meta property="og:image" content="https://xunjianyin.github.io/figures/me.png">
+  <meta property="og:url" content="https://xunjianyin.github.io/publications.html">
+  <meta property="og:type" content="profile">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Publications - Xunjian Yin">
+  <meta name="twitter:description" content="Publications and preprints of Xunjian Yin.">
+  <meta name="twitter:image" content="https://xunjianyin.github.io/figures/me.png">
+
   <link rel="stylesheet" type="text/css" href="stylesheet.css">
   <link rel="stylesheet" type="text/css" href="shared-styles.css">
   <link rel="icon" type="image/png" href="figures/logo.png">
@@ -56,148 +69,8 @@
   <!-- Load JavaScript files -->
   <script src="site-shell.js"></script>
   <script src="utils.js"></script>
-  <!-- Load data first, then main.js which depends on the data -->
   <script src="data.js"></script>
-  <script>
-    // Publications page specific script
-    document.addEventListener('DOMContentLoaded', function() {
-      // Populate all preprints (both selected and non-selected)
-      populatePublications(getPreprints(), 'preprints-list');
-      
-      // Populate all publications (both selected and non-selected)
-      populatePublications(getPublications(), 'publications-list');
-      
-      // Initialize dark mode toggle (uses utils.js with sun/moon icons)
-      initializeDarkMode();
-
-      // Initialize back to top button
-      initializeBackToTop();
-    });
-
-    const detailToggleRegistry = [];
-    let detailIdCounter = 0;
-    
-    function closeOtherDetails(activeToggle) {
-      detailToggleRegistry.forEach(({ toggle, content, label }) => {
-        if (toggle !== activeToggle && toggle.getAttribute('aria-expanded') === 'true') {
-          toggle.setAttribute('aria-expanded', 'false');
-          toggle.textContent = label;
-          content.hidden = true;
-        }
-      });
-    }
-    
-    function populatePublications(publications, listId) {
-      const list = document.getElementById(listId);
-      if (!list) return;
-      
-      publications.forEach(pub => {
-        const li = document.createElement('li');
-        
-        const titleDiv = document.createElement('div');
-        titleDiv.className = 'papertitle';
-        titleDiv.innerHTML = (pub.isNew ? '<span style="color:#6b7280;font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;">New</span>   ' : '') + pub.title;
-        
-        const restDiv = document.createElement('div');
-        restDiv.className = 'paper_rest';
-        restDiv.innerHTML = `${pub.authors}<br />`;
-        
-        const venueSpan = document.createElement('span');
-        venueSpan.className = 'paper-venue';
-        venueSpan.innerHTML = `<i>${pub.venue}</i>`;
-        restDiv.appendChild(venueSpan);
-        
-        const linksWrapper = document.createElement('span');
-        linksWrapper.className = 'paper-links';
-        linksWrapper.appendChild(document.createTextNode('[ '));
-        
-        const linkElements = pub.links.map(link => {
-          const anchor = document.createElement('a');
-          anchor.href = link.url;
-          anchor.textContent = link.text;
-          return anchor;
-        });
-        
-        const createDetailToggle = (label, contentValue, fallbackText, baseClass) => {
-          const container = document.createElement('div');
-          container.className = `${baseClass}-container detail-container`;
-          
-          const toggle = document.createElement('button');
-          toggle.type = 'button';
-          toggle.className = `${baseClass}-toggle detail-toggle`;
-          toggle.setAttribute('aria-expanded', 'false');
-          toggle.textContent = label;
-          
-          const content = document.createElement('div');
-          content.className = `${baseClass}-content detail-content`;
-          const hasContent = typeof contentValue === 'string' && contentValue.trim().length > 0;
-          content.innerHTML = hasContent ? contentValue : fallbackText;
-          content.hidden = true;
-          const contentId = `pub-detail-${detailIdCounter++}`;
-          content.id = contentId;
-          content.setAttribute('role', 'region');
-          content.setAttribute('aria-label', `${pub.title} ${label.toLowerCase()}`);
-          toggle.setAttribute('aria-controls', contentId);
-          
-          toggle.addEventListener('click', () => {
-            const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
-            if (!isExpanded) {
-              closeOtherDetails(toggle);
-            }
-            const nextState = !isExpanded;
-            toggle.setAttribute('aria-expanded', String(nextState));
-            content.hidden = !nextState;
-            toggle.textContent = nextState ? `Hide ${label}` : label;
-          });
-          
-          container.appendChild(content);
-          detailToggleRegistry.push({ toggle, content, label });
-          
-          return { container, toggle };
-        };
-        
-        const { container: abstractContainer, toggle: abstractToggle } =
-          createDetailToggle('Abstract', pub.abstract, 'Abstract coming soon.', 'abstract');
-        const { container: citationContainer, toggle: citationToggle } =
-          createDetailToggle('Citation', pub.citation, 'Citation coming soon.', 'citation');
-        
-        const interactiveItems = [];
-        if (linkElements.length > 0) {
-          interactiveItems.push(linkElements[0]);
-        }
-        interactiveItems.push(abstractToggle);
-        if (linkElements.length > 1) {
-          linkElements.slice(1).forEach(linkElement => {
-            interactiveItems.push(linkElement);
-          });
-        }
-        interactiveItems.push(citationToggle);
-        
-        interactiveItems.forEach((item, index) => {
-          if (index > 0) {
-            linksWrapper.appendChild(document.createTextNode(' | '));
-          }
-          linksWrapper.appendChild(item);
-        });
-        linksWrapper.appendChild(document.createTextNode(' ]'));
-        
-        restDiv.appendChild(document.createTextNode(' '));
-        restDiv.appendChild(linksWrapper);
-        
-        const bottomSpaceDiv = document.createElement('div');
-        bottomSpaceDiv.className = 'paper_bottom_space';
-        
-        li.appendChild(titleDiv);
-        li.appendChild(restDiv);
-        li.appendChild(abstractContainer);
-        li.appendChild(citationContainer);
-        li.appendChild(bottomSpaceDiv);
-        list.appendChild(li);
-      });
-    }
-    
-    // Dark mode functions are loaded from utils.js
-  </script>
+  <script src="main.js"></script>
 </body>
 
 </html> 

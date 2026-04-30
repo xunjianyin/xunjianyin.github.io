@@ -170,13 +170,6 @@ a:focus, a:hover {
 }
 
 
-name {
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 28px;
-  color: var(--text-color);
-  font-weight: bold;
-}
-
 /* Publication styles */
 .papertitle {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
@@ -233,56 +226,6 @@ name {
 
 span.highlight {
   background-color: #ffffd0;
-}
-
-/* Floating Outline Sidebar - ensure it doesn't affect content */
-#outline-sidebar {
-  position: fixed;
-  top: 200px;
-  left: 10px;
-  width: 200px;
-  background-color: var(--sidebar-bg);
-  border: none;
-  padding: 15px;
-  border-radius: 8px;
-  z-index: 1000;
-  transition: all 0.3s ease;
-  /* Ensure it doesn't affect document flow */
-  pointer-events: auto;
-}
-
-#outline-sidebar .sidebar-heading {
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 18px;
-  color: var(--primary-color);
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-#outline-sidebar ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-#outline-sidebar ul li {
-  margin-bottom: 8px;
-}
-
-#outline-sidebar ul li a {
-  font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 14px;
-  color: var(--primary-color);
-  text-decoration: none;
-  display: block;
-  padding: 3px 0;
-  transition: all 0.2s ease;
-}
-
-#outline-sidebar ul li a:hover,
-#outline-sidebar ul li a:focus {
-  color: var(--secondary-color);
-  transform: translateX(3px);
 }
 
 /* Main Content */
@@ -364,25 +307,7 @@ a:focus, button:focus {
 
 
 /* Responsive Design */
-@media screen and (max-width: 992px) {
-  #outline-sidebar {
-    width: 180px;
-  }
-}
-
 @media screen and (max-width: 768px) {
-  #outline-sidebar {
-    display: block; /* Changed from none to block to allow mobile menu */
-  }
-  
-  name {
-    font-size: 28px;
-  }
-  
-  heading {
-    font-size: 20px;
-  }
-  
   /* Improve mobile layout for profile section */
   .profile-photo {
     float: none !important;
@@ -410,19 +335,11 @@ a:focus, button:focus {
   body {
     font-size: 14px;
   }
-  
+
   p, strong, td, th, tr, a {
     font-size: 14px;
   }
-  
-  name {
-    font-size: 24px;
-  }
-  
-  heading {
-    font-size: 18px;
-  }
-  
+
   .papertitle {
     font-size: 16px;
   }
@@ -455,10 +372,6 @@ a:focus, button:focus {
 
 /* Print styles */
 @media print {
-  #outline-sidebar {
-    display: none;
-  }
-  
   a {
     color: var(--text-color);
     text-decoration: underline;

@@ -152,10 +152,21 @@
       footerMount.innerHTML = buildFooter();
     }
 
-    // Load easter egg
-    var eeScript = document.createElement('script');
-    eeScript.src = toRootHref('easter-egg.js');
-    document.body.appendChild(eeScript);
+    // Lazy-load the easter egg only after the user starts typing its trigger.
+    // The first key of the sequence is 'y'; load on the first matching keydown.
+    var eeLoaded = false;
+    function loadEasterEgg() {
+      if (eeLoaded) return;
+      eeLoaded = true;
+      document.removeEventListener('keydown', maybeLoad, true);
+      var eeScript = document.createElement('script');
+      eeScript.src = toRootHref('easter-egg.js');
+      document.body.appendChild(eeScript);
+    }
+    function maybeLoad(e) {
+      if (e.code === 'KeyY') loadEasterEgg();
+    }
+    document.addEventListener('keydown', maybeLoad, true);
   }
 
   whenReady(injectSiteShell);

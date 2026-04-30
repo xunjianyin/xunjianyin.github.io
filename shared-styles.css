@@ -98,74 +98,6 @@
   border-radius: 1px;
 }
 
-/* Mobile Hamburger Menu */
-.mobile-menu-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 30px;
-  height: 30px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 1001;
-  position: relative;
-}
-
-.hamburger-line {
-  width: 100%;
-  height: 3px;
-  background-color: var(--text-color);
-  transition: all 0.3s ease;
-  transform-origin: center;
-}
-
-.mobile-menu-toggle:hover .hamburger-line,
-.mobile-menu-toggle:active .hamburger-line {
-  background-color: var(--primary-color);
-}
-
-/* Touch-friendly mobile button */
-@media (hover: none) and (pointer: coarse) {
-  .mobile-menu-toggle {
-    width: 44px;
-    height: 44px;
-    padding: 7px;
-  }
-}
-
-/* Hamburger animation when active */
-.mobile-menu-toggle.active .hamburger-line:nth-child(1) {
-  transform: rotate(45deg) translate(7px, 7px);
-}
-
-.mobile-menu-toggle.active .hamburger-line:nth-child(2) {
-  opacity: 0;
-}
-
-.mobile-menu-toggle.active .hamburger-line:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -7px);
-}
-
-/* Mobile sidebar overlay */
-.mobile-sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  transition: opacity 0.3s ease;
-}
-
-.mobile-sidebar-overlay.active {
-  display: block !important;
-  opacity: 1;
-}
-
 /* Main Content Layout - Only applies to pages without specific overrides */
 
 /* List Spacing */
@@ -232,6 +164,19 @@ ul, ol {
 
 .papertitle {
   margin-bottom: 6px;
+}
+
+.new-badge {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-right: 8px;
+}
+
+[data-theme="dark"] .new-badge {
+  color: #9ca3af;
 }
 
 .paper_rest {
@@ -349,7 +294,7 @@ ul, ol {
     gap: 12px 16px;
     padding: 12px 16px;
   }
-  
+
   .nav-button {
     display: inline-flex;
     align-items: center;
@@ -357,41 +302,11 @@ ul, ol {
     padding: 8px 14px;
     font-size: 16px;
   }
-  
+
   .theme-toggle {
     order: -1; /* Move theme toggle to the left */
   }
-  
-  .mobile-menu-toggle {
-    display: flex; /* Show hamburger menu on mobile */
-    margin-left: auto;
-  }
-  
-  /* Mobile sidebar modifications */
-  #outline-sidebar {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: min(300px, 80vw) !important;
-    display: none !important;
-    padding: 80px 20px 20px !important;
-    border-radius: 0 !important;
-    border: none !important;
-    transition: transform 0.3s ease !important;
-    overflow-y: auto !important;
-    z-index: 1000 !important;
-    transform: translateX(-110%) !important; /* Hide off-screen */
-    opacity: 1 !important; /* Override section animations */
-    animation: none !important; /* Disable section animations */
-    height: 100vh !important;
-  }
-  
-  #outline-sidebar.mobile-active {
-    transform: translateX(0) !important; /* Slide into view */
-    display: block !important; /* Force display when active */
-    background-color: var(--sidebar-bg) !important;
-  }
-  
+
   .main-content-wrapper:not(.page-shell) {
     padding: 0 15px;
   }
