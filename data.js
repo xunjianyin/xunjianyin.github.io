@@ -723,7 +723,7 @@ const projects = [
   },
   {
     title: "nnviz",
-    description: "Look inside any HuggingFace transformer — weights, activations, gradients, attention, and KV cache — as an interactive 3D web app. Capture from a training loop, then explore outliers, diff runs, and trace per-token KV norms in your browser. (<a href=\"https://arvid-pku.github.io/nnviz/\">Live Demo</a> | <a href=\"https://github.com/Arvid-pku/nnviz\">Project Homepage</a>)",
+    description: "Inspect any HuggingFace transformer's weights, activations, gradients, and KV cache as an interactive 3D web app. (<a href=\"https://arvid-pku.github.io/nnviz/\">Live Demo</a> | <a href=\"https://github.com/Arvid-pku/nnviz\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/nnviz/blob/main/LICENSE", img: "https://img.shields.io/badge/License-Apache_2.0-blue" },
       { url: "https://github.com/Arvid-pku/nnviz/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/nnviz" },
@@ -735,7 +735,7 @@ const projects = [
   },
   {
     title: "CodeRead",
-    description: "Turns a Python codebase into an interactive, importance-ranked dependency graph in a single self-contained HTML file. Distinguishes the load-bearing 5% from glue with PageRank, entry-point detection, and API-surface signals — built for fast onboarding to unfamiliar repos. (<a href=\"https://arvid-pku.github.io/coderead/\">Project Homepage</a>)",
+    description: "Turns a Python codebase into an interactive, importance-ranked dependency graph in a single self-contained HTML file. (<a href=\"https://arvid-pku.github.io/coderead/\">Project Homepage</a>)",
     badges: [
       { url: "https://arvid-pku.github.io/coderead/", img: "https://img.shields.io/badge/Demo-Live-brightgreen" }
     ],
@@ -744,7 +744,7 @@ const projects = [
   },
   {
     title: "Puzzle Game Hub",
-    description: "A hub of 80+ web mini-games — 2048, chess, sudoku, sokoban, snake, breakout, tetris, mahjong, and many more — all running in one tab with a unified achievement system and shared progress. (<a href=\"https://arvid-pku.github.io/games/\">Project Homepage</a>)",
+    description: "A single-page hub of 80+ web mini-games with a unified achievement system. (<a href=\"https://arvid-pku.github.io/games/\">Project Homepage</a>)",
     badges: [
       { url: "https://arvid-pku.github.io/games/", img: "https://img.shields.io/badge/Demo-Live-brightgreen" }
     ],
@@ -753,7 +753,7 @@ const projects = [
   },
   {
     title: "Squirrel IM",
-    description: "Personal customizations of Squirrel (Rime) — the macOS Chinese input method engine — with a redesigned input controller, UI tweaks, and tailored input-source behavior on top of the upstream rime/squirrel codebase. (<a href=\"https://github.com/Arvid-pku/IM\">Project Homepage</a>)",
+    description: "Personal customizations of Squirrel (Rime), the macOS Chinese input method engine. (<a href=\"https://github.com/Arvid-pku/IM\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/IM/blob/master/LICENSE.txt", img: "https://img.shields.io/badge/License-GPL_v3-blue" },
       { url: "https://github.com/Arvid-pku/IM/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/IM" },
@@ -800,7 +800,7 @@ const projects = [
   },
   {
     title: "Tower of Babel",
-    description: "An interactive playground where letters become physical bodies — type words and watch them stack, collide, and topple as you build your own Tower of Babel. (<a href=\"https://arvid-pku.github.io/Babel/\">Project Homepage</a>)",
+    description: "Type words and watch the letters stack, collide, and topple as physical bodies. (<a href=\"https://arvid-pku.github.io/Babel/\">Project Homepage</a>)",
     badges: [
       { url: "https://arvid-pku.github.io/Babel/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://arvid-pku.github.io/Babel/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -869,7 +869,7 @@ const projects = [
   // },
   {
     title: "Academic-Homepage-Template",
-    description: "A clean, easily customizable template for academic homepages — publications, projects, talks, and a dark-mode toggle out of the box. (<a href=\"https://github.com/Arvid-pku/Academic-Homepage-Template\">Project Homepage</a>)",
+    description: "A clean, customizable template for academic homepages. (<a href=\"https://github.com/Arvid-pku/Academic-Homepage-Template\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -879,7 +879,7 @@ const projects = [
   },
   {
     title: "Game-of-Life",
-    description: "An interactive sandbox for Conway's Game of Life — paint patterns, scrub the speed, and watch cellular automata evolve generation by generation. (<a href=\"https://xunjianyin.github.io/Game-of-Life/\">Project Homepage</a>)",
+    description: "An interactive sandbox for Conway's Game of Life. (<a href=\"https://xunjianyin.github.io/Game-of-Life/\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/Game-of-Life/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/Game-of-Life/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -903,7 +903,7 @@ const projects = [
   // },
   {
     title: "Maze-Generator-And-Solver",
-    description: "Generates random mazes with multiple algorithms and animates pathfinding solvers walking through them in real time. (<a href=\"https://xunjianyin.github.io/Maze-Generator-And-Solver/\">Project Homepage</a>)",
+    description: "Generates random mazes and animates pathfinding solvers walking through them. (<a href=\"https://xunjianyin.github.io/Maze-Generator-And-Solver/\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -930,7 +930,7 @@ const projects = [
   // },
   {
     title: "Bouncing Ball",
-    description: "An interactive playground where you can drop, fling, and watch balls bounce around with realistic physics. (<a href=\"https://xunjianyin.github.io/bouncing-ball-animation/\">Project Homepage</a>)",
+    description: "A physics playground where you drop and fling bouncing balls. (<a href=\"https://xunjianyin.github.io/bouncing-ball-animation/\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/bouncing-ball-animation/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/bouncing-ball-animation/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -945,7 +945,7 @@ const projects = [
   },
   {
     title: "Star-Maker",
-    description: "Build your own star systems — drop suns, planets, and moons and watch them orbit under live gravitational simulation. (<a href=\"https://xunjianyin.github.io/star-maker/\">Project Homepage</a>)",
+    description: "Build star systems and watch planets orbit under live gravitational simulation. (<a href=\"https://xunjianyin.github.io/star-maker/\">Project Homepage</a>)",
     badges: [
       { url: "https://github.com/xunjianyin/star-maker/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/star-maker/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
