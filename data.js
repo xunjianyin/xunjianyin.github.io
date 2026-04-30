@@ -776,18 +776,18 @@ const projects = [
     isSelected: false,
     demoPath: "photos/project-demo/Vison2Text.jpg"
   },
-  {
-    title: "LLM Interpretability Workbench",
-    description: "A workbench for interpreting the internals of large language models. (<a href=\"https://github.com/Arvid-pku/Modelen\">Project Homepage</a>)",
-    badges: [
-      { url: "https://github.com/Arvid-pku/Modelen/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
-      { url: "https://github.com/Arvid-pku/Modelen/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Modelen" },
-      { url: "https://github.com/Arvid-pku/Modelen/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Modelen" },
-      { url: "https://github.com/Arvid-pku/Modelen/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
-    ],
-    isSelected: false,
-    demoPath: "photos/project-demo/Model_Len.png"
-  },
+  // {
+  //   title: "LLM Interpretability Workbench",
+  //   description: "A workbench for interpreting the internals of large language models. (<a href=\"https://github.com/Arvid-pku/Modelen\">Project Homepage</a>)",
+  //   badges: [
+  //     { url: "https://github.com/Arvid-pku/Modelen/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+  //     { url: "https://github.com/Arvid-pku/Modelen/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Modelen" },
+  //     { url: "https://github.com/Arvid-pku/Modelen/issues", img: "https://img.shields.io/github/issues/Arvid-pku/Modelen" },
+  //     { url: "https://github.com/Arvid-pku/Modelen/pulls", img: "https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" }
+  //   ],
+  //   isSelected: false,
+  //   demoPath: "photos/project-demo/Model_Len.png"
+  // },
   {
     title: "History Visualization",
     description: "A web application that visualizes world history through an interactive timeline and map. (<a href=\"https://arvid-pku.github.io/history_vis/\">Project Homepage</a>)",
@@ -867,16 +867,16 @@ const projects = [
   //   isSelected: false,
   //   demoPath: "photos/project-demo/Harmony Cube.png"
   // },
-  {
-    title: "Academic-Homepage-Template",
-    description: "A clean, customizable template for academic homepages. (<a href=\"https://github.com/Arvid-pku/Academic-Homepage-Template\">Project Homepage</a>)",
-    badges: [
-      { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
-      { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
-    ],
-    isSelected: false,
-    demoPath: "photos/project-demo/Academic-Homepage-Template.png"
-  },
+  // {
+  //   title: "Academic-Homepage-Template",
+  //   description: "A clean, customizable template for academic homepages. (<a href=\"https://github.com/Arvid-pku/Academic-Homepage-Template\">Project Homepage</a>)",
+  //   badges: [
+  //     { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+  //     { url: "https://github.com/Arvid-pku/Academic-Homepage-Template/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+  //   ],
+  //   isSelected: false,
+  //   demoPath: "photos/project-demo/Academic-Homepage-Template.png"
+  // },
   {
     title: "Game-of-Life",
     description: "An interactive sandbox for Conway's Game of Life. (<a href=\"https://xunjianyin.github.io/Game-of-Life/\">Project Homepage</a>)",
@@ -901,18 +901,18 @@ const projects = [
   //   isSelected: false,
   //   demoPath: "photos/project-demo/Audio-Visualizer.png"
   // },
-  {
-    title: "Maze-Generator-And-Solver",
-    description: "Generates random mazes and animates pathfinding solvers walking through them. (<a href=\"https://xunjianyin.github.io/Maze-Generator-And-Solver/\">Project Homepage</a>)",
-    badges: [
-      { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
-      { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
-      { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Maze-Generator-And-Solver" },
-      { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Maze-Generator-And-Solver" },
-    ],
-    isSelected: false,
-    demoPath: "photos/project-demo/Maze-Generator-And-Solver.png"
-  },
+  // {
+  //   title: "Maze-Generator-And-Solver",
+  //   description: "Generates random mazes and animates pathfinding solvers walking through them. (<a href=\"https://xunjianyin.github.io/Maze-Generator-And-Solver/\">Project Homepage</a>)",
+  //   badges: [
+  //     { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+  //     { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+  //     { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/stargazers", img: "https://img.shields.io/github/stars/xunjianyin/Maze-Generator-And-Solver" },
+  //     { url: "https://github.com/xunjianyin/Maze-Generator-And-Solver/network/members", img: "https://img.shields.io/github/forks/xunjianyin/Maze-Generator-And-Solver" },
+  //   ],
+  //   isSelected: false,
+  //   demoPath: "photos/project-demo/Maze-Generator-And-Solver.png"
+  // },
   // {
   //   title: "Overleaf-Bib-Helper-Dev",
   //   description: "A UserScript to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/Arvid-pku/Overleaf-Bib-Helper\">Project Homepage</a>)",
@@ -970,18 +970,18 @@ const projects = [
     isSelected: false,
     demoPath: "photos/project-demo/HF-Downloader.png"
   },
-  {
-    title: "ID-Photo-Helper",
-    description: "Help everyone deal with the complicated issues of ID photo format and layout. (<a href=\"https://github.com/Arvid-pku/ID-Photo-Helper\">Project Homepage</a>)",
-    badges: [
-      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
-      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
-      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/ID-Photo-Helper" },
-      { url: "https://github.com/Arvid-pku/ID-Photo-Helper/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/ID-Photo-Helper" },
-    ],
-    isSelected: false,
-    demoPath: "photos/project-demo/ID-Photo-Helper.png"
-  },
+  // {
+  //   title: "ID-Photo-Helper",
+  //   description: "Help everyone deal with the complicated issues of ID photo format and layout. (<a href=\"https://github.com/Arvid-pku/ID-Photo-Helper\">Project Homepage</a>)",
+  //   badges: [
+  //     { url: "https://github.com/Arvid-pku/ID-Photo-Helper/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
+  //     { url: "https://github.com/Arvid-pku/ID-Photo-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
+  //     { url: "https://github.com/Arvid-pku/ID-Photo-Helper/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/ID-Photo-Helper" },
+  //     { url: "https://github.com/Arvid-pku/ID-Photo-Helper/network/members", img: "https://img.shields.io/github/forks/Arvid-pku/ID-Photo-Helper" },
+  //   ],
+  //   isSelected: false,
+  //   demoPath: "photos/project-demo/ID-Photo-Helper.png"
+  // },
   // {
   //   title: "Rank-Anything",
   //   description: "A website to rank anything (developing). (<a href=\"https://xunjianyin.github.io/rank-anything/\">Project Homepage</a>)",
