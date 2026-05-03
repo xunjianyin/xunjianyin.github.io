@@ -46,29 +46,6 @@ const publications = [
     isSelected: false
   },
   {
-    title: "LEDOM: Reverse Language Model",
-    authors: "<b>Xunjian Yin</b>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
-    venue: "ACL 2026",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2507.01335" },
-      { text: "Model", url: "https://huggingface.co/Corning/Reverse-Model-7B-348B" },
-      { text: "Page", url: "papers/reverse-lm.html" }
-    ],
-    abstract: "We introduce LEDOM, the first purely reverse language model, trained autoregressively on 435B tokens with 2B and 7B parameter variants, which processes sequences in reverse temporal order through previous token prediction. For the first time, we present the reverse language model as a potential foundational model across general tasks, accompanied by a set of intriguing examples and insights. Based on LEDOM, we further introduce a novel application: Reverse Reward, where LEDOM-guided reranking of forward language model outputs leads to substantial performance improvements on mathematical reasoning tasks. This approach leverages LEDOM's unique backward reasoning capability to refine generation quality through posterior evaluation. Our findings suggest that LEDOM exhibits unique characteristics with broad application potential. We will release all models, training code, and pre-training data to facilitate future research.",
-    citation: `<pre><code>@misc{yin2025ledomopenfundamentalreverse,
-      title={LEDOM: An Open and Fundamental Reverse Language Model}, 
-      author={Xunjian Yin and Sitao Cheng and Yuxi Xie and Xinyu Hu and Li Lin and Xinyi Wang and Liangming Pan and William Yang Wang and Xiaojun Wan},
-      year={2025},
-      eprint={2507.01335},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2507.01335}, 
-}</code></pre>`,
-    isNew: true,
-    isPreprint: true,
-    isSelected: true
-  },
-  {
     title: "COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement",
     authors: "Yuxi Xie, Anirudh Goyal, Xiaobao Wu, <b>Xunjian Yin</b>, Xiao Xu, Min-Yen Kan, Liangming Pan, William Yang Wang",
     venue: "ArXiv:2410",
@@ -113,6 +90,29 @@ const publications = [
     isSelected: false
   },
   // Publications
+  {
+    title: "LEDOM: Reverse Language Model",
+    authors: "<b>Xunjian Yin</b>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
+    venue: "ACL 2026",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2507.01335" },
+      { text: "Model", url: "https://huggingface.co/Corning/Reverse-Model-7B-348B" },
+      { text: "Page", url: "papers/reverse-lm.html" }
+    ],
+    abstract: "We introduce LEDOM, the first purely reverse language model, trained autoregressively on 435B tokens with 2B and 7B parameter variants, which processes sequences in reverse temporal order through previous token prediction. For the first time, we present the reverse language model as a potential foundational model across general tasks, accompanied by a set of intriguing examples and insights. Based on LEDOM, we further introduce a novel application: Reverse Reward, where LEDOM-guided reranking of forward language model outputs leads to substantial performance improvements on mathematical reasoning tasks. This approach leverages LEDOM's unique backward reasoning capability to refine generation quality through posterior evaluation. Our findings suggest that LEDOM exhibits unique characteristics with broad application potential. We will release all models, training code, and pre-training data to facilitate future research.",
+    citation: `<pre><code>@misc{yin2025ledomopenfundamentalreverse,
+      title={LEDOM: An Open and Fundamental Reverse Language Model},
+      author={Xunjian Yin and Sitao Cheng and Yuxi Xie and Xinyu Hu and Li Lin and Xinyi Wang and Liangming Pan and William Yang Wang and Xiaojun Wan},
+      year={2025},
+      eprint={2507.01335},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2507.01335},
+}</code></pre>`,
+    isNew: true,
+    isPreprint: false,
+    isSelected: true
+  },
   {
     title: "DAMON: A Dialogue-Aware MCTS Framework for Jailbreaking Large Language Models",
     authors: "Xu Zhang, <b>Xunjian Yin</b>, Dinghao Jing, Huixuan Zhang, Xinyu Hu, Xiaojun Wan",
