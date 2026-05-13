@@ -1102,6 +1102,7 @@ const talks = [
 
 // Honors Data
 const honors = [
+  "Gold Reviewer Award, ICML 2026, May 2026",
   "Outstanding Graduate of Beijing, Jun. 2025",
   "Outstanding Graduate of Peking University, Jun. 2025",
   "Outstanding Master's Thesis Award of WICT, Peking University, Jun. 2025",
