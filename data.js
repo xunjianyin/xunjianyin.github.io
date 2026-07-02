@@ -1012,6 +1012,13 @@ const researchExperience = [
     mentor: "Dr. Jingmeng Rao",
     description: "Long-horizon agents."
   },
+  {
+    period: "Oct. 2025 - May 2026",
+    institution: "Amazon AGI SF Lab",
+    mentor: "Xianjun Wang",
+    mentorLabel: "Manager",
+    description: "World models and benchmarks for computer-use agents."
+  },
   // {
   //   period: "June 2025 - Aug. 2025",
   //   institution: "Shanghai AI Lab",
