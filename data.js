@@ -1006,6 +1006,12 @@ const getAllProjects = () => projects;
 
 // Research Experience Data
 const researchExperience = [
+  {
+    period: "May 2026 - Present",
+    institution: "Google DeepMind",
+    mentor: "Dr. Jingmeng Rao",
+    description: "Long-horizon agents."
+  },
   // {
   //   period: "June 2025 - Aug. 2025",
   //   institution: "Shanghai AI Lab",
