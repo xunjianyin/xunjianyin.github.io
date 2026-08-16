@@ -26,9 +26,15 @@
   </url>
   <url>
     <loc>https://xunjianyin.github.io/blogs.html</loc>
-    <lastmod>2026-04-30</lastmod>
+    <lastmod>2026-08-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://xunjianyin.github.io/blogs/agents-that-learn-after-deployment.html</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://xunjianyin.github.io/photography.html</loc>

@@ -69,6 +69,10 @@
       return 'publications';
     }
 
+    if (segments.includes('blogs')) {
+      return 'blogs';
+    }
+
     const fileName = segments.length === 0 || window.location.pathname.endsWith('/')
       ? 'index.html'
       : segments[segments.length - 1].split('?')[0];

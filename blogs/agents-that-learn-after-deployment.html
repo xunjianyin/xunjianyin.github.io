@@ -1,0 +1,351 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Agents That Learn After Deployment - Xunjian Yin</title>
+  <meta name="author" content="Xunjian Yin">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A position on recursive self-improvement: long-horizon agents need sufficient self-modification freedom, reversible weight changes, and principled exploration.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://xunjianyin.github.io/blogs/agents-that-learn-after-deployment.html">
+
+  <meta property="og:title" content="Agents That Learn After Deployment">
+  <meta property="og:description" content="A position on building long-horizon agents that turn experience into auditable, reversible capabilities.">
+  <meta property="og:image" content="https://xunjianyin.github.io/blogs/assets/agents-that-learn-after-deployment/self-modification-levels-og.png">
+  <meta property="og:image:width" content="1378">
+  <meta property="og:image:height" content="563">
+  <meta property="og:url" content="https://xunjianyin.github.io/blogs/agents-that-learn-after-deployment.html">
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2026-08-16">
+  <meta property="article:author" content="Xunjian Yin">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Agents That Learn After Deployment">
+  <meta name="twitter:description" content="A position on building long-horizon agents that turn experience into auditable, reversible capabilities.">
+  <meta name="twitter:image" content="https://xunjianyin.github.io/blogs/assets/agents-that-learn-after-deployment/self-modification-levels-og.png">
+
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" type="text/css" href="../shared-styles.css">
+  <link rel="stylesheet" type="text/css" href="../blog-styles.css">
+  <link rel="icon" type="image/png" href="../figures/logo.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Agents That Learn After Deployment: A Position on Recursive Self-Improvement",
+    "description": "A position on building long-horizon agents that turn experience into auditable, reversible capabilities.",
+    "author": { "@type": "Person", "name": "Xunjian Yin" },
+    "datePublished": "2026-08-16",
+    "dateModified": "2026-08-16",
+    "image": "https://xunjianyin.github.io/blogs/assets/agents-that-learn-after-deployment/self-modification-levels-og.png",
+    "mainEntityOfPage": "https://xunjianyin.github.io/blogs/agents-that-learn-after-deployment.html"
+  }
+  </script>
+</head>
+
+<body>
+  <div id="site-nav"></div>
+
+  <main id="main-content" class="main-content-wrapper page-shell article-shell">
+    <article class="longform-article">
+      <a href="../blogs.html" class="back-link">&larr; Back to Blogs</a>
+
+      <header class="article-header">
+        <p class="article-kicker">Position</p>
+        <h1 class="article-title">Agents That Learn After Deployment</h1>
+        <p class="article-subtitle">A position on recursive self-improvement for long-horizon tasks</p>
+        <p class="article-dek">Long-horizon agents should do more than accumulate context. They should be able to turn experience into new capabilities - without making their own evolution opaque or irreversible.</p>
+        <div class="article-meta" aria-label="Article metadata">
+          <span>August 16, 2026</span>
+          <span>Xunjian Yin</span>
+          <span>16 min read</span>
+        </div>
+        <div class="post-tags" aria-label="Topics">
+          <span class="tag">AI Agents</span>
+          <span class="tag">Self-Improvement</span>
+          <span class="tag">Position</span>
+        </div>
+      </header>
+
+      <div class="article-note article-note-status" role="note">
+        <p><strong>Research status.</strong> This essay connects peer-reviewed results, ongoing work, and a proposed research direction. <a href="https://aclanthology.org/2025.acl-long.1354/">Gödel Agent</a> is published; WeAct is ongoing work; the Diversity Critic is a proposal. I keep these categories explicit throughout.</p>
+      </div>
+
+      <nav class="article-toc" aria-labelledby="toc-title">
+        <p id="toc-title" class="article-toc-title">Contents</p>
+        <ol>
+          <li><a href="#context-trap">The context accumulation trap</a></li>
+          <li><a href="#four-levels">Four levels of self-modification</a></li>
+          <li><a href="#freedom">Requirement I: freedom to improve the improver</a></li>
+          <li><a href="#stability">Requirement II: reversible internal actions</a></li>
+          <li><a href="#exploration">Requirement III: choosing what to learn next</a></li>
+          <li><a href="#closed-loop">A closed loop for post-deployment learning</a></li>
+          <li><a href="#boundaries">Safety boundaries and open questions</a></li>
+        </ol>
+      </nav>
+
+      <div class="article-body">
+        <p>Imagine a coding agent that works with the same team for six months. It sees every code review, recurring failure, abandoned abstraction, and correction that never made it into the documentation. A capable memory system can retrieve those events later. Yet retrieval alone does not ensure that the agent becomes better at the underlying work. Its context grows; its learning procedure stays fixed.</p>
+
+        <p>This distinction matters as agents move from short benchmark episodes to persistent deployment. A long-running agent should not need to reread its entire history before every decision. At some point, repeated experience should be consolidated into a more efficient policy, a better tool, a new memory procedure, or a capability the original model did not reliably possess.</p>
+
+        <blockquote class="position-statement">
+          <p><strong>Position.</strong> Recursive self-improvement will be useful only when an agent can modify a sufficiently expressive part of itself, can reverse and audit each modification, and can deliberately seek capabilities outside its current repertoire.</p>
+        </blockquote>
+
+        <p>The three conditions are interdependent. Freedom without stability produces brittle systems. Stability without exploration produces a well-behaved local optimum. Exploration without a sufficiently expressive update surface merely rearranges what the agent already knows. The rest of this essay develops this argument and separates what we have demonstrated from what remains a research program.</p>
+
+        <section id="context-trap" aria-labelledby="context-trap-title">
+          <h2 id="context-trap-title">The context accumulation trap</h2>
+
+          <p>The default response to a long deployment is to retain more state: longer contexts, retrieval indexes, episodic memory, user profiles, and logs. These mechanisms are necessary. They let the agent recover facts and decisions that no single prompt can hold. But they change the information available to a fixed system; they do not necessarily change the system's capability.</p>
+
+          <p>Our work on <a href="https://aclanthology.org/2024.acl-long.124/">knowledge boundaries</a> makes the limitation concrete. For a fixed model, some knowledge can be elicited by prompting, some becomes available only with external evidence, and some remains beyond reliable reach. Likewise, <a href="https://aclanthology.org/2023.emnlp-main.87/">ALCUNA</a> shows that models struggle with genuinely new knowledge, especially when new information must interact with what is already stored internally. These results do not prove that every agent needs online weight updates. They do show why “put it in the context” is not a complete theory of learning.</p>
+
+          <p>A useful deployment architecture therefore needs two forms of adaptation:</p>
+
+          <ul>
+            <li><strong>Non-parametric adaptation</strong> changes prompts, memory, tools, workflows, and other harness state.</li>
+            <li><strong>Parametric adaptation</strong> changes how the model itself represents or executes a capability.</li>
+          </ul>
+
+          <p>The research question is not which form wins. It is how an agent should decide between them, modify them safely, and evaluate whether a change deserves to persist.</p>
+        </section>
+
+        <section id="four-levels" aria-labelledby="four-levels-title">
+          <h2 id="four-levels-title">Four levels of self-modification</h2>
+
+          <p>It helps to organize agent designs by the deepest surface their optimization loop can change. The levels below describe increasing freedom, not a universal ranking: a lower level can be the right engineering choice when the task is narrow or the risk of adaptation is high.</p>
+
+          <figure class="article-figure article-figure-wide">
+            <p class="horizontal-scroll-hint">Swipe horizontally to compare all four levels.</p>
+            <div class="figure-scroll" tabindex="0" aria-label="Scrollable diagram of four levels of self-modification">
+              <img src="assets/agents-that-learn-after-deployment/self-modification-levels.svg" alt="Four levels of self-modification: L1 optimizes outputs, L2 optimizes harness components under a fixed optimizer, L3 recursively optimizes the harness and optimizer, and L4 also exposes weights to bounded optimization.">
+            </div>
+            <figcaption><span class="figure-label">Figure 1.</span> Four levels of self-modification. Blue marks optimization by a fixed algorithm; amber marks a recursively optimized component. The two consequential boundaries are whether the optimizer is editable and whether the model's weights are editable.</figcaption>
+          </figure>
+
+          <p class="horizontal-scroll-hint">Swipe horizontally to compare all columns.</p>
+          <div class="article-table-wrap" tabindex="0" aria-label="Scrollable comparison table">
+            <table class="article-table">
+              <thead>
+                <tr>
+                  <th scope="col">Level</th>
+                  <th scope="col">Editable surface</th>
+                  <th scope="col">What remains fixed</th>
+                  <th scope="col">Representative system</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>L1</strong></td>
+                  <td>Task output or solution artifact</td>
+                  <td>Harness, optimizer, model</td>
+                  <td><a href="https://arxiv.org/abs/2506.13131">AlphaEvolve</a></td>
+                </tr>
+                <tr>
+                  <td><strong>L2</strong></td>
+                  <td>Prompt, memory, tools, modules</td>
+                  <td>Update rule or meta-optimizer</td>
+                  <td><a href="https://openreview.net/forum?id=kuhIqeVg0e">ChemAgent</a></td>
+                </tr>
+                <tr>
+                  <td><strong>L3</strong></td>
+                  <td>Harness and its optimizer</td>
+                  <td>Base-model weights</td>
+                  <td><a href="https://aclanthology.org/2025.acl-long.1354/">Gödel Agent</a></td>
+                </tr>
+                <tr>
+                  <td><strong>L4</strong></td>
+                  <td>Harness, optimizer, and bounded weight updates</td>
+                  <td>External safety and evaluation boundary</td>
+                  <td>WeAct (ongoing)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>At L1, the system searches over answers or programs. <a href="https://arxiv.org/abs/2506.13131">AlphaEvolve</a>, for example, uses an evolutionary coding pipeline to improve a target algorithm under evaluator feedback. At L2, a fixed meta-algorithm updates parts of the harness. <a href="https://openreview.net/forum?id=kuhIqeVg0e">ChemAgent</a> updates structured memories for chemical reasoning, but the rule that performs the update is still designed in advance.</p>
+
+          <p>L3 crosses the <em>recursion boundary</em>: the machinery that proposes improvements is itself editable. L4 crosses a second boundary between conditioning a model and changing the function it computes. That extra freedom is necessary only when the desired capability cannot be recovered reliably from the current weights.</p>
+        </section>
+
+        <section id="freedom" aria-labelledby="freedom-title">
+          <h2 id="freedom-title">Requirement I: freedom to improve the improver</h2>
+
+          <p>A fixed optimizer creates a subtle ceiling. It may search an enormous space of prompts, workflows, or agents, but its own proposal rule, decomposition strategy, and acceptance criteria remain human choices. Adding a meta-optimizer simply moves the fixed boundary up one level.</p>
+
+          <p><a href="https://aclanthology.org/2025.acl-long.1354/">Gödel Agent</a> tests a more direct alternative. The agent includes a sensor that reads its running logic and an executor that can rewrite that logic, including the procedure responsible for future rewrites. Changes take effect in the next recursive call, so the current execution can finish before the new implementation is loaded.</p>
+
+          <p>The important result is not merely that code was edited. The agent changed the method by which later solutions would be produced. On MGSM, Gödel Agent outperformed the prior Meta Agent Search baseline by 11%. In a Game of 24 case study, it abandoned an LLM-based solver after repeated failures, wrote a search procedure, and reached 100% accuracy. The system found a qualitatively different algorithm rather than another prompt variation.</p>
+
+          <p>Subsequent systems strengthen the case that an editable optimizer is a useful design primitive. The <a href="https://arxiv.org/abs/2505.22954">Darwin Gödel Machine</a> evolves a growing archive of coding agents and empirically validates self-modifications. <a href="https://arxiv.org/abs/2603.19461">Hyperagents</a> combines a task agent and the meta-agent that modifies it into a single editable program, so improvements can target both task behavior and the procedure that generates future agents.</p>
+
+          <div class="article-note">
+            <p><strong>What this establishes.</strong> L3 systems can discover useful changes to their own optimization machinery. It does not establish monotonic improvement, an unbounded design space in practice, or safety under unrestricted self-modification. In Gödel Agent's MGSM robustness analysis, 14% of optimization trials ultimately ended below the initial policy.</p>
+          </div>
+
+          <p>That failure rate is not an incidental footnote. It motivates the second requirement: a self-modifying system needs an update representation that makes rollback, attribution, and regression testing ordinary operations.</p>
+        </section>
+
+        <section id="stability" aria-labelledby="stability-title">
+          <h2 id="stability-title">Requirement II: reversible internal actions</h2>
+
+          <p>Harness-level changes remain limited by the base model. When the missing capability is not reliably represented in the weights, L3 can reorganize inference but cannot manufacture the capability from nothing. Direct weight editing appears to solve this problem, yet it creates three others.</p>
+
+          <ol>
+            <li><strong>Catastrophic forgetting:</strong> a narrow update can overwrite capabilities that were not part of the local objective.</li>
+            <li><strong>Verifiability collapse:</strong> an opaque gradient update is difficult for the agent, evaluator, or operator to attribute to a specific decision.</li>
+            <li><strong>Recursive instability:</strong> every flawed update changes the model responsible for judging and producing the next update.</li>
+          </ol>
+
+          <p>Our ongoing WeAct work treats weight changes as <em>internal actions</em>. A frozen base model is paired with a library of capability-specific, low-rank deltas. During a trajectory, the agent can load or offload a delta through the same explicit action interface it uses for search or code execution.</p>
+
+          <figure class="article-figure article-figure-compact">
+            <img src="assets/agents-that-learn-after-deployment/weact-internal-actions.svg" alt="WeAct sequence: the agent loads a math weight delta when math capability is needed, then replaces it with a code delta while preserving the same context, memory, and intermediate results.">
+            <figcaption><span class="figure-label">Figure 2.</span> WeAct exposes weight deltas as internal actions. The agent preserves its context and intermediate state while changing the capability configuration used for the next step.</figcaption>
+          </figure>
+
+          <p>This interface is different from calling a specialist sub-agent. A sub-agent receives a query and returns a result across an interface boundary. A loaded delta changes how the same agent processes the context, memory, and intermediate results it already holds. The implementation currently uses LoRA because adapters are cheap to swap and easy to version, but the design principle is broader: a weight change should be named, bounded, inspectable, and reversible.</p>
+
+          <p>Reversibility does not make an update safe by itself. It makes safety mechanisms implementable. A failed delta can be removed. A regression can be attributed to a specific artifact. Two configurations can be evaluated under the same context. The base model remains a recovery point, and acceptance can depend on both target-task gain and a held-out regression suite.</p>
+
+          <div class="article-note article-note-status">
+            <p><strong>Preliminary evidence.</strong> In current internal evaluations, WeAct improves over the strongest tested baseline by 8% on <a href="https://arxiv.org/abs/2311.12983">GAIA</a> and 6% on <a href="https://arxiv.org/abs/2504.12516">BrowseComp</a>. These results are ongoing and have not yet undergone peer review. The completed system selects from a pre-trained delta library; autonomous creation of new deltas remains future work.</p>
+          </div>
+        </section>
+
+        <section id="exploration" aria-labelledby="exploration-title">
+          <h2 id="exploration-title">Requirement III: choosing what to learn next</h2>
+
+          <p>An agent can have expressive and reversible updates and still stop improving. If every new training target is derived from its own successful outputs, the loop is biased toward variations of capabilities it already has. The system needs an exploration pressure that points beyond its covered region.</p>
+
+          <p>I propose a <strong>Diversity Critic</strong> for this role. The Critic receives candidate capabilities from sources outside the current policy - a paper abstract, code commit, user correction, tool description, or recurring failure cluster - and estimates how different each candidate is from what the base model and current delta library already cover.</p>
+
+          <div class="process-grid" aria-label="Diversity Critic proposal stages">
+            <div>
+              <span class="process-number">1</span>
+              <h3>Encode candidates</h3>
+              <p>Map methods and capabilities into a representation initialized from text and refined with behavioral or activation fingerprints.</p>
+            </div>
+            <div>
+              <span class="process-number">2</span>
+              <h3>Estimate coverage</h3>
+              <p>Represent the elicitable skills of the base model together with the capabilities supplied by validated deltas.</p>
+            </div>
+            <div>
+              <span class="process-number">3</span>
+              <h3>Select a frontier</h3>
+              <p>Rank candidates by novelty, deployment value, learnability, and safety rather than distance alone.</p>
+            </div>
+            <div>
+              <span class="process-number">4</span>
+              <h3>Train and validate</h3>
+              <p>Create a bounded delta, test target gains and regressions, and add it to the library only after acceptance.</p>
+            </div>
+          </div>
+
+          <p>Diversity is a search heuristic, not a utility function. The farthest capability may be irrelevant, impossible to learn with the available data, or unsafe to acquire. A practical Critic must combine novelty with deployment value, learning cost, confidence, and policy constraints. Its output should be a falsifiable proposal - what to learn, why it is not already covered, how success will be measured, and which existing capabilities are at risk.</p>
+
+          <p>Composition adds another constraint. The current public version of our <a href="https://arxiv.org/abs/2512.01970">atomic-skills study</a> finds that reinforcement learning synthesizes composite reasoning only after the atomic prerequisites are sufficiently mastered. This suggests an ordering principle for the Critic: acquire missing atomic capabilities before spending updates on a composite target that depends on them.</p>
+
+          <p>The representation itself must also evolve. As the base model and delta library change, the boundary between “covered” and “novel” moves. The <a href="https://arxiv.org/abs/2510.09782">geometry-of-reasoning</a> perspective offers one possible tool: activation trajectories can complement text descriptions when two methods sound different but induce similar internal behavior, or sound similar while changing reasoning in distinct ways.</p>
+        </section>
+
+        <section id="closed-loop" aria-labelledby="closed-loop-title">
+          <h2 id="closed-loop-title">A closed loop for post-deployment learning</h2>
+
+          <p>The three requirements fit into a conservative improvement loop. The loop is recursive because the editable harness includes parts of the proposal and learning machinery. It is controlled because evaluation, permissions, and recovery remain outside the editable boundary.</p>
+
+          <ol class="loop-list">
+            <li><strong>Observe.</strong> Collect task outcomes, corrections, traces, and recurring failures without treating the raw log as permanent context.</li>
+            <li><strong>Diagnose.</strong> Separate missing information from a missing procedure, a harness defect, or a missing model capability.</li>
+            <li><strong>Propose.</strong> Let the self-referential harness revise its workflow, or ask the Diversity Critic for a capability target outside current coverage.</li>
+            <li><strong>Train.</strong> When a weight-level change is justified, create a versioned delta rather than mutate the base model in place.</li>
+            <li><strong>Validate.</strong> Measure the predicted gain, held-out generalization, and regressions under fixed budgets and reproducible configurations.</li>
+            <li><strong>Accept or revert.</strong> Promote only changes that satisfy the external acceptance policy; retain rejected proposals as evidence for later iterations.</li>
+          </ol>
+
+          <p>The output of a six-month deployment is therefore not a six-month prompt. It is an inspectable collection of artifacts: a compact memory, an evolved harness, a library of validated capability deltas, the evaluations that justified each change, and a record of rejected updates.</p>
+
+          <div class="evidence-ledger">
+            <h3>Evidence ledger</h3>
+            <dl>
+              <div>
+                <dt>Demonstrated</dt>
+                <dd>Harness-level recursive self-modification can improve task-solving and the optimization procedure itself (Gödel Agent; follow-on evidence from DGM and Hyperagents).</dd>
+              </div>
+              <div>
+                <dt>Preliminary</dt>
+                <dd>Reversible, mid-trajectory weight deltas can improve deep-research agents while preserving a stable base (WeAct).</dd>
+              </div>
+              <div>
+                <dt>Proposed</dt>
+                <dd>An agent can autonomously train new deltas and use a Diversity Critic to choose capability targets beyond its current covered region.</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <section id="boundaries" aria-labelledby="boundaries-title">
+          <h2 id="boundaries-title">Safety boundaries and open questions</h2>
+
+          <p>Recursive self-improvement is sometimes framed as a demand for fewer constraints. I take the opposite engineering view: a more editable inner system requires a more explicit outer boundary. The goal is not unrestricted self-modification. It is to expose a useful action space while keeping authority, evaluation, and recovery outside that space.</p>
+
+          <ul>
+            <li><strong>Immutable control plane.</strong> The agent must not be able to disable its evaluator, expand its own permissions, change its compute budget, or overwrite the recovery path.</li>
+            <li><strong>Versioned modifications.</strong> Every harness edit and weight delta needs an identity, parent version, predicted effect, and rollback operation.</li>
+            <li><strong>Independent acceptance tests.</strong> The same component that proposes an update should not unilaterally decide that it succeeded.</li>
+            <li><strong>Cumulative regression suites.</strong> A new capability is not an improvement if it silently erases previously validated behavior.</li>
+            <li><strong>Bounded deployment.</strong> Update frequency, data access, tool authority, and target domains should be governed by an external policy.</li>
+          </ul>
+
+          <p>Several research questions remain open. How should a system distinguish a retrieval problem from a capability problem? When do multiple deltas compose cleanly, and when do they interfere? What representation measures meaningful novelty rather than surface difference? How much evidence is required before an update persists across users or deployments? And how should operators inspect an evolved harness once its structure no longer resembles the human-written seed?</p>
+
+          <p>The central evaluation should be longitudinal. A self-improving agent should face a stream whose capability targets shift over time, while a fixed held-out suite measures whether useful coverage grows without unacceptable regressions. Short benchmark gains are necessary evidence, but they do not test the claim that motivates the architecture: that an agent can become a more capable collaborator after release.</p>
+        </section>
+
+        <section aria-labelledby="conclusion-title">
+          <h2 id="conclusion-title">Conclusion</h2>
+
+          <p>Persistent agents need a path from experience to capability. Memory and retrieval preserve what happened; self-modification changes what the agent can do with it. The four-level taxonomy identifies where that change can occur, from output search to harness updates, editable optimizers, and bounded weight actions.</p>
+
+          <p>My position is deliberately conditional. Recursive self-improvement is not achieved by granting arbitrary write access to an agent's code or weights. It requires three pieces at once: enough freedom to improve the learning process, an update representation that is reversible and auditable, and an exploration mechanism that selects capabilities the current system does not already cover. Gödel Agent provides evidence for the first piece. WeAct is an ongoing attempt at the second. The Diversity Critic defines the proposed third piece. Building and evaluating the full loop is the work ahead.</p>
+        </section>
+
+        <section class="article-references" aria-labelledby="references-title">
+          <h2 id="references-title">References</h2>
+          <ol>
+            <li>Novikov et al. (2025). <a href="https://arxiv.org/abs/2506.13131">AlphaEvolve: A Coding Agent for Scientific and Algorithmic Discovery</a>.</li>
+            <li>Tang et al. (2025). <a href="https://openreview.net/forum?id=kuhIqeVg0e">ChemAgent: Self-updating Memories in Large Language Models Improves Chemical Reasoning</a>. ICLR 2025.</li>
+            <li>Yin et al. (2025). <a href="https://aclanthology.org/2025.acl-long.1354/">Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement</a>. ACL 2025.</li>
+            <li>Zhang et al. (2026). <a href="https://arxiv.org/abs/2505.22954">Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents</a>. ICLR 2026.</li>
+            <li>Zhang et al. (2026). <a href="https://arxiv.org/abs/2603.19461">Hyperagents</a>.</li>
+            <li>Yin et al. (2024). <a href="https://aclanthology.org/2024.acl-long.124/">Benchmarking Knowledge Boundary for Large Language Models</a>. ACL 2024.</li>
+            <li>Yin et al. (2023). <a href="https://aclanthology.org/2023.emnlp-main.87/">ALCUNA: Large Language Models Meet New Knowledge</a>. EMNLP 2023.</li>
+            <li>Yin et al. (2024). <a href="https://arxiv.org/abs/2312.05497">History Matters: Temporal Knowledge Editing in Large Language Model</a>. AAAI 2024.</li>
+            <li>Mialon et al. (2023). <a href="https://arxiv.org/abs/2311.12983">GAIA: A Benchmark for General AI Assistants</a>. ICLR 2024.</li>
+            <li>Wei et al. (2025). <a href="https://arxiv.org/abs/2504.12516">BrowseComp: A Simple Yet Challenging Benchmark for Browsing Agents</a>.</li>
+            <li>Cheng et al. (2025). <a href="https://arxiv.org/abs/2512.01970">Atomic Skills are the Prerequisite: When Reinforcement Learning Synthesizes Compositional Reasoning, and When It Only Amplifies</a>.</li>
+            <li>Zhou et al. (2026). <a href="https://arxiv.org/abs/2510.09782">The Geometry of Reasoning: Flowing Logics in Representation Space</a>. ICLR 2026.</li>
+          </ol>
+        </section>
+      </div>
+    </article>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../site-shell.js"></script>
+  <script src="../utils.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeDarkMode();
+      initializeBackToTop();
+    });
+  </script>
+</body>
+
+</html>

@@ -124,12 +124,20 @@ class BlogManager {
   }
 
   /**
+   * Resolve a post's canonical route. New long-form posts can define a static
+   * permalink while legacy posts continue to use the generic renderer.
+   */
+  getPostUrl(post) {
+    return post.url || `blog-post.html?id=${encodeURIComponent(post.id)}`;
+  }
+
+  /**
    * Generate blog post preview HTML
    */
   generatePostPreview(post) {
     const formattedDate = this.formatDate(post.date);
     const tags = Array.isArray(post.tags) ? post.tags.join(', ') : '';
-    const postUrl = `blog-post.html?id=${encodeURIComponent(post.id)}`;
+    const postUrl = this.getPostUrl(post);
     
     return `
       <li class="blog-post" data-post-id="${post.id}">

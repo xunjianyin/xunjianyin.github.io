@@ -5,6 +5,16 @@
 
 const blogPosts = [
   {
+    id: "agents-that-learn-after-deployment",
+    title: "Agents That Learn After Deployment: A Position on Recursive Self-Improvement",
+    date: "2026-08-16",
+    author: "Xunjian Yin",
+    excerpt: "Long-horizon agents should do more than accumulate context. They need a path from experience to auditable, reversible capabilities.",
+    tags: ["AI Agents", "Self-Improvement", "Position"],
+    readTime: 16,
+    url: "blogs/agents-that-learn-after-deployment.html"
+  },
+  {
     id: "self-referential-agent",
     title: "Beyond the Optimizer's Dilemma: Why the Future of AI Must Be Self-Referential",
     date: "2025-08-10",
@@ -31,10 +41,10 @@ const blogPosts = [
 
 // Helper function to get all blog posts
 function getAllBlogPosts() {
-  return blogPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return [...blogPosts].sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
 // Helper function to get a specific blog post by ID
 function getBlogPost(id) {
   return blogPosts.find(post => post.id === id);
-} 
+}
