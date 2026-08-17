@@ -270,13 +270,6 @@
   line-height: 1.08;
 }
 
-.article-subtitle {
-  margin: 10px 0 0;
-  color: #374151;
-  font-size: 21px;
-  line-height: 1.35;
-}
-
 .article-dek {
   max-width: 680px;
   margin: 20px 0 0;
@@ -365,14 +358,6 @@
   line-height: 1.25;
 }
 
-.article-body h3 {
-  margin: 26px 0 8px;
-  color: #1f2937;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
 .article-body p {
   margin: 0 0 17px;
   color: inherit;
@@ -412,20 +397,6 @@
   padding: 0 0 0 3px !important;
 }
 
-.position-statement {
-  margin: 30px 0;
-  padding: 17px 20px;
-  border-left: 3px solid var(--primary-color);
-  background: #f8fafc;
-  color: #1f2937;
-  font-size: 19px;
-  line-height: 1.58;
-}
-
-.position-statement p {
-  margin: 0;
-}
-
 .article-note {
   margin: 27px 0;
   padding: 15px 18px;
@@ -451,6 +422,7 @@
 
 .article-figure img {
   display: block;
+  width: 100%;
   max-width: 100%;
   height: auto;
   margin: 0 auto;
@@ -466,6 +438,14 @@
   max-width: 620px;
 }
 
+.article-figure-overview {
+  max-width: 560px;
+}
+
+.article-figure-small {
+  max-width: 480px;
+}
+
 .horizontal-scroll-hint {
   display: none;
 }
@@ -475,8 +455,7 @@
   overscroll-behavior-inline: contain;
 }
 
-.figure-scroll:focus-visible,
-.article-table-wrap:focus-visible {
+.figure-scroll:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 4px;
 }
@@ -493,141 +472,6 @@
 .figure-label {
   color: #374151;
   font-weight: 700;
-}
-
-.article-table-wrap {
-  width: min(940px, calc(100vw - 48px));
-  margin: 30px 0 30px 50%;
-  overflow-x: auto;
-  transform: translateX(-50%);
-}
-
-.article-table {
-  width: 100%;
-  min-width: 720px;
-  border-collapse: collapse;
-  background: transparent !important;
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.article-table th,
-.article-table td {
-  padding: 11px 13px;
-  border-bottom: 1px solid #d1d5db;
-  color: #374151;
-  text-align: left;
-  vertical-align: top;
-}
-
-.article-table th {
-  border-top: 1px solid #9ca3af;
-  border-bottom-color: #9ca3af;
-  color: #111827;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.process-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 28px;
-  margin: 30px 0;
-  border-top: 1px solid #d1d5db;
-}
-
-.process-grid > div {
-  position: relative;
-  padding: 18px 0 10px 38px;
-  border-bottom: 1px solid #d1d5db;
-}
-
-.process-grid h3 {
-  margin: 0 0 5px;
-  font-size: 16px;
-}
-
-.process-grid p {
-  margin: 0;
-  color: #4b5563;
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.process-number {
-  position: absolute;
-  top: 19px;
-  left: 0;
-  color: var(--primary-color);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.longform-article .article-body .loop-list {
-  padding-left: 0 !important;
-  list-style: none !important;
-  counter-reset: article-loop;
-}
-
-.longform-article .article-body .loop-list li {
-  position: relative;
-  margin: 0 !important;
-  padding: 11px 0 11px 42px !important;
-  border-bottom: 1px solid #e5e7eb;
-  counter-increment: article-loop;
-}
-
-.loop-list li::before {
-  position: absolute;
-  top: 11px;
-  left: 0;
-  width: 28px;
-  color: var(--primary-color);
-  content: counter(article-loop, decimal-leading-zero);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.evidence-ledger {
-  margin: 32px 0;
-  padding: 20px 0 4px;
-  border-top: 1px solid #9ca3af;
-  border-bottom: 1px solid #9ca3af;
-}
-
-.evidence-ledger h3 {
-  margin: 0 0 7px;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.evidence-ledger dl {
-  margin: 0;
-}
-
-.evidence-ledger dl > div {
-  display: grid;
-  grid-template-columns: 105px minmax(0, 1fr);
-  gap: 18px;
-  padding: 12px 0;
-  border-top: 1px solid #e5e7eb;
-}
-
-.evidence-ledger dt {
-  color: #1f2937;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.evidence-ledger dd {
-  margin: 0;
-  color: #4b5563;
-  font-size: 14px;
-  line-height: 1.55;
 }
 
 .article-references {
@@ -653,13 +497,6 @@
 
 [data-theme="dark"] .article-header,
 [data-theme="dark"] .article-toc,
-[data-theme="dark"] .article-table th,
-[data-theme="dark"] .article-table td,
-[data-theme="dark"] .process-grid,
-[data-theme="dark"] .process-grid > div,
-[data-theme="dark"] .longform-article .article-body .loop-list li,
-[data-theme="dark"] .evidence-ledger,
-[data-theme="dark"] .evidence-ledger dl > div,
 [data-theme="dark"] .article-references {
   border-color: #4b5563;
 }
@@ -667,36 +504,24 @@
 [data-theme="dark"] .article-title,
 [data-theme="dark"] .article-toc-title,
 [data-theme="dark"] .article-body h2,
-[data-theme="dark"] .article-body h3,
-[data-theme="dark"] .article-table th,
-[data-theme="dark"] .figure-label,
-[data-theme="dark"] .evidence-ledger dt {
+[data-theme="dark"] .figure-label {
   color: #f3f4f6;
 }
 
-[data-theme="dark"] .article-subtitle,
 [data-theme="dark"] .article-toc a,
 [data-theme="dark"] .article-body,
-[data-theme="dark"] .article-table td,
-[data-theme="dark"] .position-statement,
 [data-theme="dark"] .article-note {
   color: #d1d5db;
 }
 
 [data-theme="dark"] .article-dek,
-[data-theme="dark"] .process-grid p,
-[data-theme="dark"] .evidence-ledger dd,
 [data-theme="dark"] .longform-article .article-body .article-references li,
 [data-theme="dark"] .horizontal-scroll-hint {
   color: #b8b8b8;
 }
 
-[data-theme="dark"] .position-statement,
 [data-theme="dark"] .article-note {
   background: #252525;
-}
-
-[data-theme="dark"] .article-note {
   border-top-color: #4b5563;
   border-right-color: #4b5563;
   border-bottom-color: #4b5563;
@@ -713,10 +538,6 @@
 
   .article-title {
     font-size: 34px;
-  }
-
-  .article-subtitle {
-    font-size: 18px;
   }
 
   .article-dek {
@@ -737,8 +558,7 @@
     font-size: 23px;
   }
 
-  .article-figure-wide,
-  .article-table-wrap {
+  .article-figure-wide {
     width: calc(100vw - 32px);
   }
 
@@ -760,20 +580,10 @@
     margin-right: auto !important;
     margin-left: auto !important;
   }
-
-  .process-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .evidence-ledger dl > div {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
 }
 
 @media print {
-  .article-figure-wide,
-  .article-table-wrap {
+  .article-figure-wide {
     width: 100%;
     margin-left: 0;
     transform: none;

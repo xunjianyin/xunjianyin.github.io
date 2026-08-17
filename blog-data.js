@@ -6,12 +6,12 @@
 const blogPosts = [
   {
     id: "agents-that-learn-after-deployment",
-    title: "Agents That Learn After Deployment: A Position on Recursive Self-Improvement",
+    title: "Building Recursive Self-Improving Agents for Long-Horizon Tasks",
     date: "2026-08-16",
     author: "Xunjian Yin",
-    excerpt: "Long-horizon agents should do more than accumulate context. They need a path from experience to auditable, reversible capabilities.",
+    excerpt: "A position on editable harnesses, reversible weight actions, and directed capability exploration.",
     tags: ["AI Agents", "Self-Improvement", "Position"],
-    readTime: 16,
+    readTime: 8,
     url: "blogs/agents-that-learn-after-deployment.html"
   },
   {
