@@ -1008,10 +1008,10 @@ const getAllProjects = () => projects;
 // Research Experience Data
 const researchExperience = [
   {
-    period: "May 2026 - Present",
+    period: "May 2026 - Sep. 2026",
     institution: "Google DeepMind",
     mentor: "Dr. Jingmeng Rao",
-    description: "Long-horizon agents."
+    description: "Working memory management for long horizon agentic tasks. We designed a method that enables internal agents to autonomously and dynamically manage their context and retrieve necessary information from their history without loss."
   },
   {
     period: "Oct. 2025 - May 2026",
