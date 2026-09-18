@@ -1016,7 +1016,7 @@ const researchExperience = [
   {
     period: "Oct. 2025 - May 2026",
     institution: "Amazon AGI SF Lab",
-    mentor: "Xianjun Wang",
+    mentor: "Xiangjun Wang",
     mentorLabel: "Manager",
     description: "World models and benchmarks for computer-use agents."
   },
