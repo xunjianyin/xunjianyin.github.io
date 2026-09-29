@@ -1,0 +1,31 @@
+{
+  "story": {
+    "title": "Novelty has to be controlled",
+    "paragraphs": [
+      "A benchmark about new knowledge faces a basic identification problem: a model may answer because it memorized the entity, because it understood the supplied description, or because a familiar name suggested a plausible guess. ALCUNA makes novelty part of the experimental design. It creates artificial biological entities whose properties can be traced back to a controlled transformation of an existing knowledge graph.",
+      "The construction preserves enough biological structure for the questions to remain meaningful. Properties shared by a class are retained, while selected attributes and relationships change. This produces a harder test than inventing an arbitrary name with an unrelated list of facts: the new entity resembles something the model already knows, so familiar knowledge can help with reasoning but can also interfere with the new description."
+    ]
+  },
+  "mechanism": {
+    "title": "A missing fact is also a test",
+    "paragraphs": [
+      "KnowGen uses four operations: inherit a property, vary its value, extend the entity with a related property, or drop a property. The paper's example starts from Alpaca: the new entity keeps a leaf diet, changes body mass from 60 to 56.5 kilograms, drops lifespan, and gains a first-appearance property from a related species. Each operation gives the evaluator a specific expectation about the answer.",
+      "Dropping lifespan is especially revealing. The description does not authorize copying the parent's lifespan, even if that value is readily available from memory. A correct response must distinguish an unspecified fact from an inherited one. Association questions add another requirement: follow a relationship from the artificial entity into existing knowledge, then complete the reasoning chain using a fact that was not repeated in the new description.",
+      "To isolate this last ability, the authors check whether each model already answers the prerequisite questions about existing entities. Association evaluation is filtered accordingly. Question templates are also generated before the artificial entity is inserted. These controls help separate failures to combine available facts from failures caused by an unknown prerequisite or a template that accidentally reveals the answer."
+    ]
+  },
+  "evidence": {
+    "title": "The bottleneck is integration",
+    "paragraphs": [
+      "The ablations make the benchmark more informative than a single average score. For ChatGLM, the association score rises from 27.47 to 44.43 when relevant entities along the reasoning chain are supplied, but falls to 18.56 with irrelevant entity information. For Vicuna, differentiation drops from 46.76 to 35.04 when the parent entity's information is added. Related context can therefore assist a missing connection or strengthen the wrong association.",
+      "These results concern the tested 2023 models, biological entities, and particular prompting conditions. They do not establish a permanent limit on learning novel facts. They instead show why evaluation should track understanding, separation from similar entities, and connection to existing knowledge individually. The paper also finds sensitivity to structured versus natural-language presentation, so success depends partly on how new knowledge is communicated."
+    ]
+  },
+  "sources": [
+    {
+      "label": "EMNLP 2023 paper · Sections 3–6; Tables 3–5",
+      "url": "https://aclanthology.org/2023.emnlp-main.87/"
+    }
+  ],
+  "reading_notes": "Read full construction, evaluation, ablations, and limitations. Figure 1 supports the Alpaca example. Table 4 association values: ChatGLM vanilla 27.47, chain 44.43, irrelevant 18.56. Table 3 Vicuna differentiation 46.76 to 35.04 with parent information. Avoid the internally inconsistent headline question total. Prerequisite filtering is model-specific. Biological examples describe benchmark-generated entities, not claims about real organisms."
+}

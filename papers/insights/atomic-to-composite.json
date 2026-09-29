@@ -1,0 +1,41 @@
+{
+  "story": {
+    "title": "A high score can hide the missing skill",
+    "paragraphs": [
+      "Suppose a document identifies the new editor of a magazine, while the editor’s business partner and that partner’s occupation are facts stored in a model. Answering the full question requires crossing between context and memory. Success on either source alone leaves this transition untested. Ordinary question-answering benchmarks make the diagnosis difficult: a model might already know the complete answer from pretraining.",
+      "The study therefore builds synthetic biographies and separates which relations are learned through parameters from which arrive in context. Questions follow paths of two to five relations. This makes the location of each required fact explicit, so a failure to combine sources can be distinguished from the absence of the underlying information."
+    ]
+  },
+  "mechanism": {
+    "title": "Control what is new at test time",
+    "paragraphs": [
+      "The evaluation separates three kinds of novelty. IID questions use a practiced relational path with different entities. Composition questions recombine relations that appeared in other training paths. Structural zero-shot questions contain a relation absent from the training questions, although its facts remain available in biographies or context. This final category tests a broader transfer than changing the names in a familiar template.",
+      "The key intervention is the preparation before RL. One model receives SFT on parametric and contextual reasoning separately; another learns complete complementary questions. Both then receive the same composite RL examples, with GRPO rewarded only for the final answer. A further comparison matches SFT sample counts and hop distributions, reducing the possibility that an easier dataset or more reasoning steps explains the advantage.",
+      "The interactive example follows the paper’s editor-and-business-partner question. Switching between parametric, contextual, and combined tasks makes the required source of each fact explicit. A separate comparison shows measured SFT accuracy across the three generalization splits; the worked answer is not presented as a new model result."
+    ]
+  },
+  "evidence": {
+    "title": "The prerequisite matters beyond the starting score",
+    "paragraphs": [
+      "In Section 5.2, models with comparable initial complementary-task scores respond differently to the same 12,800 RL examples. Learning both atomic skills provides a stronger foundation than limited direct composite supervision. Starting from the atomic model, further SFT, LoRA, and RL all help, but SFT is strongest on familiar paths while RL is strongest on the structural zero-shot split.",
+      "The pass@k analysis adds a separate test: after atomic preparation, the RL advantage persists even with 512 samples. After composite preparation, the curves approach each other. This is evidence of different changes to the answer distribution, but finite sampling cannot prove that a solution had exactly zero probability beforehand. The practical result is the curriculum effect; identifying the internal mechanism remains open."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Task definitions and controlled dataset · Sections 3–4",
+      "url": "https://arxiv.org/html/2512.01970v1#S3"
+    },
+    {
+      "label": "Training comparisons and pass@k · Sections 5–6",
+      "url": "https://arxiv.org/html/2512.01970v1#S5"
+    }
+  ],
+  "reading_notes": "Reread full primary HTML on 2026-09-29: Sections 3, 4.1–4.3, 5.1–5.2, 6.1–6.3 and Limitations. Demo uses illustrative two-hop paths, not study instances or model outputs. Definitions preserve the crucial distinction between relations absent from QA and facts absent from knowledge. Table 1 and adjacent prose contain inconsistent baseline numbers; this extension avoids repeating them. Pass@k k=2^9 is 512; interpretation explicitly bounded by finite sampling. Concrete demo revision: Figure 1(a) facts visually verified from primary multi-gen.png. Table 1(b) numeric SFT baselines used rather than conflicting adjacent prose: atomic35.18/28.20/24.07, composite90.30/76.25/18.41. RL evidence linked separately to Figure2, not conflated with SFT numbers.",
+  "demo": {
+    "kind": "atomic-trace",
+    "title": "One question, two sources of knowledge",
+    "caption": "Choose a task type to see every fact the question needs and where each one comes from. Below, measured SFT results for all three test splits appear together.",
+    "eyebrow": "Published example · Figure 1(a)"
+  }
+}

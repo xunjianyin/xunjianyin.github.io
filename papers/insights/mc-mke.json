@@ -1,0 +1,403 @@
+{
+  "story": {
+    "title": "One edited answer can hide a contradiction",
+    "paragraphs": [
+      "A multimodal model may recognize a person in an image, know which club that person plays for, and answer a club question about the image. These are three related behaviors, not interchangeable copies of one fact. An edit can repair the requested answer while leaving the other two inconsistent. MC-MKE makes their relationship part of the evaluation instead of counting the edited response alone.",
+      "The paper’s own example shows why the scenarios differ. A photograph of Messi is misrecognized as Mac Allister, so the model answers that the pictured player plays for Liverpool. Correcting the recognition should also change the image-based club answer to Miami FC, because the textual fact about Messi already supplies it. If instead the club itself changed through a transfer, the recognition should stay fixed while both club answers change. The two interventions can produce the same surface answer for different reasons."
+    ]
+  },
+  "mechanism": {
+    "title": "The reason for an edit determines its consequences",
+    "paragraphs": [
+      "The benchmark decomposes multimodal knowledge into an image-to-entity association and an entity–relation–object fact. Their composition produces the image–relation–object answer. It then defines three editing settings: change recognition, change a textual fact, or directly change the multimodal answer. Each setting specifies a different related answer that must be checked for consistency after editing.",
+      "The third setting contains an ambiguity: a changed image answer could come from recognizing a different entity or updating a fact about the original one. MC-MKE supplies a reason for the edit, such as a club transfer. In its constructed dataset, this setting is restricted to the textual-fact interpretation. That is a deliberate experimental choice, not a claim that every real multimodal correction has a unique explanation.",
+      "Before creating edits, the authors retain source examples only when all three knowledge questions are correctly answered by the three tested multimodal models. Otherwise, a failed consistency check could reflect a missing prerequisite rather than damage from editing. Evaluation then separates reliability on the requested change, consistency of related answers, locality of unrelated knowledge, and generality across alternate images or paraphrases."
+    ]
+  },
+  "evidence": {
+    "title": "Consistency must be read alongside locality",
+    "paragraphs": [
+      "The experiments compare fine-tuning, MEND, IKE, and SERAC on InstructBLIP and MiniGPT-v2; LLaVA-v1.5 is used only when selecting the source examples. Strong edit reliability does not reliably imply strong cross-modal consistency. The component being changed also matters: editing visual components is more suitable for some recognition changes, whereas changes to textual facts benefit from access to language components. These are empirical patterns in the tested architectures, not a universal map of where every fact resides.",
+      "A second trap is a method that repeatedly outputs the new target. It can appear consistent simply because every related prompt receives the same answer, while unrelated knowledge is damaged. This is why the paper reports several dimensions rather than declaring a winner from one score. The interactive comparison places every method’s measured reliability against its consistency for each scenario and model, using Tables 9–11."
+    ]
+  },
+  "sources": [
+    {
+      "label": "ACL 2025 Findings paper · Sections 3–5; Figures 2–3",
+      "url": "https://aclanthology.org/2025.findings-acl.896/"
+    }
+  ],
+  "reading_notes": "Read formal factorization IE/SRO/IRO definitions, construction/filtering, reliability/consistency/locality/generality metrics, discussion, result interpretation. IRO dataset specifically assumes implicit SRO edit via reasons; not ambiguous identity selection. v5 demo describes the Figure 2 Messi / Mac Allister example in text (no photo) and plots measured Tables 9–11 for InstructBLIP and MiniGPT-v2. Editing experiments use InstructBLIP and MiniGPT-v2; LLaVA-v1.5 is used only for data selection.",
+  "demo": {
+    "type": "multimodal-consistency",
+    "title": "Does the linked answer follow the edit?",
+    "description": "The paper's Figure 2 example shows which answer must change in each editing scenario. Choose a scenario, a model, and a method to compare measured reliability with consistency on the full benchmark.",
+    "scenarios": {
+      "ie": {
+        "label": "IE_edit",
+        "name": "recognition edit",
+        "table": "Table 9",
+        "rows": {
+          "ie": {
+            "text": "The player in the image is Messi.",
+            "was": "Mac Allister",
+            "role": "Edited: reliability probe"
+          },
+          "sro": {
+            "text": "Messi plays for Miami FC.",
+            "was": null,
+            "role": "Unchanged, but required for the composition"
+          },
+          "iro": {
+            "text": "The player in the image plays for Miami FC.",
+            "was": "Liverpool",
+            "role": "Must follow: consistency probe"
+          }
+        },
+        "answers": "Edit target: Messi. Consistency target: Miami FC. The two answers differ, so repeating the edit target cannot pass the consistency probe."
+      },
+      "sro": {
+        "label": "SRO_edit",
+        "name": "textual fact edit",
+        "table": "Table 10",
+        "rows": {
+          "ie": {
+            "text": "The player in the image is Messi.",
+            "was": null,
+            "role": "Unchanged"
+          },
+          "sro": {
+            "text": "Messi plays for Miami FC.",
+            "was": "Liverpool",
+            "role": "Edited: reliability probe (with a black image)"
+          },
+          "iro": {
+            "text": "The player in the image plays for Miami FC.",
+            "was": "Liverpool",
+            "role": "Must follow: consistency probe"
+          }
+        },
+        "answers": "Edit target and consistency target are both Miami FC; only the input changes from the name to the image. An editor that answers Miami FC to every related prompt also passes, so locality must be read alongside."
+      },
+      "iro": {
+        "label": "IRO_edit",
+        "name": "image-based answer edit",
+        "table": "Table 11",
+        "rows": {
+          "ie": {
+            "text": "The player in the image is Messi.",
+            "was": null,
+            "role": "Unchanged: the stated reason rules out a new identity"
+          },
+          "sro": {
+            "text": "Messi plays for Miami FC.",
+            "was": "Liverpool",
+            "role": "Must follow: consistency probe"
+          },
+          "iro": {
+            "text": "Due to the player's transfer, the player in the image plays for Miami FC.",
+            "was": "Liverpool",
+            "role": "Edited with a reason: reliability probe"
+          }
+        },
+        "answers": "Edit target and consistency target are both Miami FC; the consistency probe asks about Messi by name instead of through the image."
+      }
+    },
+    "models": {
+      "instructblip": {
+        "label": "InstructBLIP",
+        "detail": "InstructBLIP with Vicuna-7B"
+      },
+      "minigpt": {
+        "label": "MiniGPT-v2",
+        "detail": "MiniGPT-v2 with Llama-2-Chat-7B"
+      }
+    },
+    "methods": [
+      "FT(Vision)",
+      "FT(LLM)",
+      "MEND(Vision)",
+      "MEND(LLM)",
+      "IKE",
+      "SERAC"
+    ],
+    "results": {
+      "instructblip": {
+        "ie": {
+          "FT(Vision)": {
+            "reliability": 89.57,
+            "locality": 0.34,
+            "image_generality": 90.3,
+            "text_generality": 24.1,
+            "consistency": 38.07
+          },
+          "FT(LLM)": {
+            "reliability": 98.48,
+            "locality": 0.03,
+            "image_generality": 96.41,
+            "text_generality": 78.04,
+            "consistency": 9.09
+          },
+          "MEND(Vision)": {
+            "reliability": 32.39,
+            "locality": 93.15,
+            "image_generality": 23.43,
+            "text_generality": 29.73,
+            "consistency": 18.37
+          },
+          "MEND(LLM)": {
+            "reliability": 88.58,
+            "locality": 53.23,
+            "image_generality": 85.21,
+            "text_generality": 86.49,
+            "consistency": 9.46
+          },
+          "IKE": {
+            "reliability": 68.26,
+            "locality": null,
+            "image_generality": null,
+            "text_generality": 76.33,
+            "consistency": 49.05
+          },
+          "SERAC": {
+            "reliability": 98.48,
+            "locality": 87.65,
+            "image_generality": 96.41,
+            "text_generality": 68.41,
+            "consistency": 9.09
+          }
+        },
+        "sro": {
+          "FT(Vision)": {
+            "reliability": 91.75,
+            "locality": 4.23,
+            "image_generality": null,
+            "text_generality": 17.84,
+            "consistency": 87.57
+          },
+          "FT(LLM)": {
+            "reliability": 99.49,
+            "locality": 3.95,
+            "image_generality": null,
+            "text_generality": 79.59,
+            "consistency": 90.43
+          },
+          "MEND(Vision)": {
+            "reliability": 13.64,
+            "locality": 95.03,
+            "image_generality": null,
+            "text_generality": 10.0,
+            "consistency": 3.86
+          },
+          "MEND(LLM)": {
+            "reliability": 66.49,
+            "locality": 79.34,
+            "image_generality": null,
+            "text_generality": 72.85,
+            "consistency": 55.9
+          },
+          "IKE": {
+            "reliability": 81.06,
+            "locality": 94.18,
+            "image_generality": null,
+            "text_generality": 55.87,
+            "consistency": 73.73
+          },
+          "SERAC": {
+            "reliability": 99.49,
+            "locality": 89.53,
+            "image_generality": null,
+            "text_generality": 65.05,
+            "consistency": 90.43
+          }
+        },
+        "iro": {
+          "FT(Vision)": {
+            "reliability": 84.83,
+            "locality": 2.75,
+            "image_generality": 85.07,
+            "text_generality": 34.25,
+            "consistency": 76.37
+          },
+          "FT(LLM)": {
+            "reliability": 91.65,
+            "locality": 4.85,
+            "image_generality": 91.47,
+            "text_generality": 81.87,
+            "consistency": 86.46
+          },
+          "MEND(Vision)": {
+            "reliability": 24.13,
+            "locality": 85.88,
+            "image_generality": 19.2,
+            "text_generality": 33.11,
+            "consistency": 5.49
+          },
+          "MEND(LLM)": {
+            "reliability": 70.57,
+            "locality": 64.78,
+            "image_generality": 72.05,
+            "text_generality": 86.0,
+            "consistency": 50.5
+          },
+          "IKE": {
+            "reliability": 71.59,
+            "locality": null,
+            "image_generality": null,
+            "text_generality": 82.83,
+            "consistency": 48.17
+          },
+          "SERAC": {
+            "reliability": 91.65,
+            "locality": 99.06,
+            "image_generality": 91.47,
+            "text_generality": 26.01,
+            "consistency": 86.46
+          }
+        }
+      },
+      "minigpt": {
+        "ie": {
+          "FT(Vision)": {
+            "reliability": 98.04,
+            "locality": 66.43,
+            "image_generality": 91.52,
+            "text_generality": 98.13,
+            "consistency": 16.67
+          },
+          "FT(LLM)": {
+            "reliability": 95.76,
+            "locality": 0.59,
+            "image_generality": 91.48,
+            "text_generality": 93.41,
+            "consistency": 8.71
+          },
+          "MEND(Vision)": {
+            "reliability": 7.57,
+            "locality": 56.73,
+            "image_generality": 5.69,
+            "text_generality": 6.17,
+            "consistency": 11.36
+          },
+          "MEND(LLM)": {
+            "reliability": 26.52,
+            "locality": 67.34,
+            "image_generality": 20.17,
+            "text_generality": 29.19,
+            "consistency": 4.54
+          },
+          "IKE": {
+            "reliability": 47.61,
+            "locality": null,
+            "image_generality": null,
+            "text_generality": 25.24,
+            "consistency": 60.6
+          },
+          "SERAC": {
+            "reliability": 95.76,
+            "locality": 83.85,
+            "image_generality": 91.48,
+            "text_generality": 81.48,
+            "consistency": 8.71
+          }
+        },
+        "sro": {
+          "FT(Vision)": {
+            "reliability": 98.78,
+            "locality": 24.81,
+            "image_generality": null,
+            "text_generality": 97.68,
+            "consistency": 31.67
+          },
+          "FT(LLM)": {
+            "reliability": 97.35,
+            "locality": 2.01,
+            "image_generality": null,
+            "text_generality": 93.73,
+            "consistency": 91.24
+          },
+          "MEND(Vision)": {
+            "reliability": 4.37,
+            "locality": 93.5,
+            "image_generality": null,
+            "text_generality": 3.29,
+            "consistency": 2.74
+          },
+          "MEND(LLM)": {
+            "reliability": 2.85,
+            "locality": 76.96,
+            "image_generality": null,
+            "text_generality": 2.62,
+            "consistency": 3.25
+          },
+          "IKE": {
+            "reliability": 30.55,
+            "locality": 91.26,
+            "image_generality": null,
+            "text_generality": 24.83,
+            "consistency": 21.18
+          },
+          "SERAC": {
+            "reliability": 97.35,
+            "locality": 91.43,
+            "image_generality": null,
+            "text_generality": 75.05,
+            "consistency": 91.24
+          }
+        },
+        "iro": {
+          "FT(Vision)": {
+            "reliability": 98.98,
+            "locality": 73.71,
+            "image_generality": 93.32,
+            "text_generality": 98.78,
+            "consistency": 24.13
+          },
+          "FT(LLM)": {
+            "reliability": 88.49,
+            "locality": 2.04,
+            "image_generality": 87.25,
+            "text_generality": 86.99,
+            "consistency": 84.32
+          },
+          "MEND(Vision)": {
+            "reliability": 6.21,
+            "locality": 76.0,
+            "image_generality": 4.52,
+            "text_generality": 5.45,
+            "consistency": 2.13
+          },
+          "MEND(LLM)": {
+            "reliability": 34.21,
+            "locality": 67.31,
+            "image_generality": 25.49,
+            "text_generality": 43.91,
+            "consistency": 6.72
+          },
+          "IKE": {
+            "reliability": 62.73,
+            "locality": null,
+            "image_generality": null,
+            "text_generality": 62.48,
+            "consistency": 21.49
+          },
+          "SERAC": {
+            "reliability": 88.49,
+            "locality": 97.25,
+            "image_generality": 87.25,
+            "text_generality": 26.92,
+            "consistency": 84.32
+          }
+        }
+      }
+    },
+    "initial": {
+      "scenario": "ie",
+      "model": "instructblip",
+      "method": "FT(LLM)"
+    },
+    "source_label": "ACL 2025 Findings: Figure 2 and Section 3.3; Appendix E, Tables 9–11",
+    "source_url": "https://aclanthology.org/2025.findings-acl.896.pdf",
+    "eyebrow": "Published example · Tables 9–11"
+  }
+}

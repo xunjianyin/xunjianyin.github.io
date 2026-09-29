@@ -1,0 +1,31 @@
+{
+  "story": {
+    "title": "Generated context is a representation choice",
+    "paragraphs": [
+      "Asking a model to write a document and then answer from it does not automatically add new knowledge. The document externalizes what the generator can already produce, potentially making useful facts easier for the answerer to access. This creates a useful research question: if the source is generated rather than retrieved, which properties of that intermediate text determine whether it helps?",
+      "The paper studies this representation layer instead of treating all generated passages as one category. A compact overview, an explanatory essay, and a detailed formal report may contain overlapping information while supporting different tasks. A fact verification question needs specific evidence; a long-form explanation needs useful coverage and organization. There is no reason to assume the same document style optimizes both."
+    ]
+  },
+  "mechanism": {
+    "title": "Vary the generator, the document, and the mixture",
+    "paragraphs": [
+      "The experiments first separate three factors that can otherwise be confounded: answer-model size, number of generated documents, and generator size while the answer model stays fixed. The default backbone is Qwen2.5-32B-Instruct. Generation follows a GenRead-style few-shot pipeline, using diverse query–document examples selected through clustering. Thus, a gain from a larger generator can be examined separately from giving the answerer more parameters.",
+      "The style taxonomy crosses three binary choices: fine- versus coarse-grained content, authoritative versus conversational tone, and structured versus unstructured presentation. The resulting eight types provide a controlled way to compare communicative properties. As an illustrative example, a question about why seasons occur could receive a formal outline of orbital facts or a conversational explanation connecting axial tilt to changing sunlight. The comparison concerns how information is presented, not a guarantee that either passage is factually sound.",
+      "Finally, the study combines generated documents with retrieved Wikipedia passages. Direct Mix concatenates the two sources. Style-Transformation Mix rewrites the retrieved material to match the target style before combination. This asks whether the interface between sources matters in addition to their individual contents. Rewriting is itself a model operation, so any accuracy gain should be interpreted as a property of the full pipeline."
+    ]
+  },
+  "evidence": {
+    "title": "The improvements depend on the task",
+    "paragraphs": [
+      "For authoritative, fine-grained, unstructured documents, HotpotQA F1 is 39.9 with generated documents alone, 41.0 with Direct Mix, and 43.3 with Style-Transformation Mix. The corresponding ELI5 F1 values are 22.8, 23.1, and 22.7. The same transformation therefore improves one measured task while slightly reducing another. It is more informative to inspect these task-level changes than to average exact-match and F1 scores into one universal quality measure.",
+      "The main study uses the first 500 examples of each of four datasets and emphasizes one model family, with additional models in the appendix. More documents and larger generators do not produce uniform gains. Human checks assess adherence to the intended document style, but do not establish factual correctness. The resulting guidance is to validate generation style, source mixing, and document count for the actual downstream task rather than treating self-generated context as independently verified evidence."
+    ]
+  },
+  "sources": [
+    {
+      "label": "NAACL 2025 Findings paper · Sections 2–6; Tables 2 and 5",
+      "url": "https://aclanthology.org/2025.findings-naacl.149/"
+    }
+  ],
+  "reading_notes": "Read main full methods, taxonomy, factor analysis, task-level Tables2/3/5, mixing methods, limitations and ethics; appendix model-dependence checked in previous pass. AFU Hotpot39.9→41.0→43.3, ELI522.8→23.1→22.7. Style taxonomy intended controls can change content; do not claim causally isolated style or guaranteed faithful rewriting. Generated-doc example newly authored illustrative."
+}

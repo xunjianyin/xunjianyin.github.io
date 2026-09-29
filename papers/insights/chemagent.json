@@ -1,0 +1,35 @@
+{
+  "story": {
+    "title": "Reuse the part of a solution that transfers",
+    "paragraphs": [
+      "Two chemistry questions may share a calculation even when their complete solutions look different. Retrieving an entire worked example can bury that useful operation under irrelevant conditions. ChemAgent stores smaller units: the conditions under which a subproblem is posed, the subproblem itself, and its solution. This representation makes prior work available at the point where the new calculation needs it.",
+      "A library does not remove every failure mode. The paper’s error analysis (Figure 7) examines an entropy problem for a gas compressed reversibly and adiabatically, a process with no entropy change. The agent’s plan ignores that condition and applies ΔS = n·C_V,m·ln(T_final/T_initial), while the memories it retrieves, about standard reaction entropy and the temperature dependence of cell potentials, are irrelevant to an adiabatic process. A flawed decomposition and irrelevant retrieval compound each other, so the quality of the plan matters as much as the contents of the library."
+    ]
+  },
+  "mechanism": {
+    "title": "Memory must support both execution and replanning",
+    "paragraphs": [
+      "The initial library is built from development problems with supplied solutions. Their conditions are extracted and checked, their solutions are decomposed, and low-confidence memory units are filtered. Planning memory retains higher-level strategies; execution memory stores the structured subproblems. Knowledge memory is different: formulas and principles are generated for the current problem and are not permanently added to the shared library.",
+      "Consider the electron-wavelength example in the framework figure. Given a kinetic energy of 100 eV, the task is decomposed into two sub-tasks: use the kinetic-energy formula to obtain the electron’s velocity, then use the de Broglie formula to compute its wavelength. Each sub-task retrieves its own memories, so a previous velocity calculation can help without requiring the entire earlier question to match. The result of one sub-task becomes a condition for the next.",
+      "Review can change either the current answer or the remaining plan. A unit error calls for revising a sub-solution. A subtask that calculates energy when wavelength is requested requires restructuring subsequent steps. This distinction matters: repeatedly correcting arithmetic cannot rescue a plan aimed at the wrong quantity. If no suitable execution memory exists, the agent can construct related practice problems from its own knowledge."
+    ]
+  },
+  "evidence": {
+    "title": "Separate a growing library from guaranteed improvement",
+    "paragraphs": [
+      "The GPT-4 ablation in Table 1 separates the contributions: removing evaluation and refinement lowers the reported average by 5.04 percentage points, and removing memory as well lowers it by another 2.90 points. Thus the full gain cannot be attributed to storing examples alone. Review adds computation: the paper reports roughly 12,000 tokens per problem without review and 23,000 with it, excluding initial library construction.",
+      "The repeated-exposure experiment is narrower than unrestricted autonomous learning. It uses MATTER, removes the review module, retains experiences judged correct, and excludes a problem’s own earlier memory when solving that problem again. These controls help isolate reuse across problems. They also make correctness feedback and memory quality part of the result; a larger unfiltered library is not automatically a better one."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Memory construction and refinement · Sections 2.2–2.6",
+      "url": "https://arxiv.org/html/2501.06590v1#S2.SS2"
+    },
+    {
+      "label": "Ablations, repeated exposure, and errors · Sections 2.8–3",
+      "url": "https://arxiv.org/html/2501.06590v1#S2.SS8"
+    }
+  ],
+  "reading_notes": "Reread primary HTML 2026-09-29 Sections 2.2–2.11, 3.1–3.2, Table 1, Figures 2/4/5/7. Worked example follows Figure 2 task, with standard nonrelativistic equations added for explanation; no model trace or measured example accuracy invented. Table 1 simple averages differ from Table 2 weighted averages, so use only within-table deltas. Token counts are reported experimental costs, not current API prices. Correctness filtering and exclusion of same-problem memory are explicit in 2.9."
+}

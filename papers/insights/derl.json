@@ -1,0 +1,35 @@
+{
+  "story": {
+    "title": "More reward signals can teach the wrong behavior",
+    "paragraphs": [
+      "A final correct-or-incorrect reward is clear but sparse. Adding checks for formatting, intermediate progress, or explicit reasoning steps creates more feedback, yet it also changes what the policy is encouraged to do. The design problem is not only obtaining these signals; it is deciding how they should interact.",
+      "The mathematical reasoning comparison makes this tension concrete. With combined GSM8K and MATH training data, adding a format reward improves GSM8K from 82.6% to 86.4%, while MATH falls from 58.8% to 55.9%. A seemingly helpful auxiliary criterion can favor one evaluation setting at another’s expense. A fixed average of available signals has a similar trade-off."
+    ]
+  },
+  "mechanism": {
+    "title": "Judge a reward by the policy it teaches",
+    "paragraphs": [
+      "DERL turns reward design into the action space of a second trainable model. This meta-optimizer proposes a symbolic expression over supplied atomic checks. An inner policy is trained with that expression; its held-out task performance then becomes the outer reward. GRPO updates both levels, but for different objectives: the policy optimizes the generated reward, while the generator optimizes the policy’s subsequent validation performance.",
+      "A concrete example from the agent setup uses six step rewards: [1, 0, 1, 1, 0, 0]. Averaging the first, middle, and final thirds gives three primitives, 0.5, 1, and 0, alongside the final success signal. Their combination matters: multiplying all three would erase the early progress because the final segment is zero; averaging would preserve some credit. These are explanatory alternatives, not a claim that either is the learned optimum.",
+      "Standard DERL restarts the inner policy from the base model for each candidate reward, helping attribute validation differences to reward design. DERL-pop instead continues from the best policy of the previous round, allowing rewards to adapt as the learner changes. Valid-format SFT examples, constrained decoding, and penalties for invalid expressions keep reward proposals executable."
+    ]
+  },
+  "evidence": {
+    "title": "Generalization requires more than dense feedback",
+    "paragraphs": [
+      "On ALFWorld, averaging the primitives improves success on the familiar L0 split from 76.6% to 88.1%, but barely changes the held-out-task L2 split: 29.7% to 30.5%. Standard DERL reaches 65.0% on L2. The comparison supports learning the combination rather than assuming that denser feedback alone transfers. On combined-data mathematical training, its 87.0% GSM8K and 60.2% MATH results also avoid the simple format reward’s observed trade-off.",
+      "The outer update is a policy-gradient estimate over generated reward programs; it does not require differentiating through discrete task correctness or backpropagating through every inner training step. The cost is substantial repeated policy training. Available primitives still define the search space, and a reward generator cannot evaluate a useful property that its supplied checks never expose."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Bi-level objectives and reward parameterization · Section 3",
+      "url": "https://arxiv.org/html/2512.13399v1#S3"
+    },
+    {
+      "label": "Task primitives and controlled comparisons · Section 4",
+      "url": "https://arxiv.org/html/2512.13399v1#S4"
+    }
+  ],
+  "reading_notes": "Reread primary HTML 2026-09-29 Sections 3.1–3.2, 4.1–4.3, 5 and Limitations; Tables 1–2. Six-step [1,0,1,1,0,0] example is directly provided in Section 4.2; multiplication/averaging comparison is explicitly illustrative. Avoid overclaiming direct differentiability through all policy updates. Keep standard DERL and DERL-pop distinct. ALFWorld L2: four task types in train, two held out."
+}

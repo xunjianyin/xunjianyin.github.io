@@ -1,0 +1,570 @@
+{
+  "paper": "Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement",
+  "verified_on": "2026-09-29",
+  "source_url": "https://arxiv.org/html/2410.04444v4",
+  "source_version": "arXiv v4, 2025-05-31",
+  "repository": {
+    "url": "https://github.com/Arvid-pku/Godel_Agent",
+    "inspected_commit": "bbb508796be31c7140cdfc7106efd830a1324242",
+    "notes": [
+      "The repository exposes final policies and test predictions for DROP, MGSM, MMLU, and GPQA. No Game of 24 trajectory or per-iteration optimizer patch log is present in the inspected tree.",
+      "Current src/agent_module.py defaults differ from the published experimental setup (o3 in the updater); use the paper for model/protocol claims."
+    ]
+  },
+  "main_results": {
+    "title": "Four task domains under the paper’s evaluation protocol",
+    "source_url": "https://arxiv.org/html/2410.04444v4#S4.T1",
+    "table": "Table 1",
+    "uncertainty": "Reported value ± 95% bootstrap confidence interval half-width. These are test-set uncertainty intervals, not standard deviations across optimization runs.",
+    "optimizer_model": "gpt-4o-2024-05-13",
+    "constrained_execution_model": "gpt-3.5-turbo-0125",
+    "search_protocol": {
+      "independent_cycles_per_task": 6,
+      "maximum_iterations_per_cycle": 30,
+      "feedback_split": "validation",
+      "final_evaluation_split": "test",
+      "initial_policy": "Chain-of-Thought"
+    },
+    "data_protocol": [
+      {
+        "task": "DROP",
+        "validation_questions": 128,
+        "test_questions": 800,
+        "evaluations": 1,
+        "prompting": "one-shot"
+      },
+      {
+        "task": "MGSM",
+        "validation_questions": 128,
+        "test_questions": 800,
+        "evaluations": 1,
+        "prompting": "zero-shot"
+      },
+      {
+        "task": "MMLU",
+        "validation_questions": 128,
+        "test_questions": 800,
+        "evaluations": 1,
+        "prompting": "zero-shot"
+      },
+      {
+        "task": "GPQA",
+        "validation_questions": 32,
+        "test_questions": 166,
+        "evaluations": 5,
+        "prompting": "zero-shot"
+      }
+    ],
+    "protocol_source": "https://arxiv.org/html/2410.04444v4#A2",
+    "comparability_notes": [
+      "Gödel-base and baseline task policies use GPT-3.5 in the constrained comparison; GPT-4o performs Gödel Agent’s code improvement. Do not describe the entire system as GPT-3.5-only.",
+      "Gödel-free can ask stronger models such as GPT-4o for help; its scores are a separate setting, not a controlled gain from code editing alone.",
+      "The paper imports baseline results from Hu et al. (2024). Same execution-model family does not establish identical inference or search compute budgets.",
+      "MGSM improves from 53.4 to 64.2, a 10.8 percentage-point gain over Meta Agent Search. MMLU and GPQA improvements are much smaller; do not claim uniformly large or statistically significant gains."
+    ]
+  },
+  "robustness": {
+    "task": "MGSM",
+    "optimization_trials": 100,
+    "source_url": "https://arxiv.org/html/2410.04444v4#S6.SS2",
+    "events": [
+      {
+        "event": "At least one temporary performance drop",
+        "percent": 92
+      },
+      {
+        "event": "Unexpected termination",
+        "percent": 4
+      },
+      {
+        "event": "Final performance below initial policy",
+        "percent": 14
+      }
+    ],
+    "notes": [
+      "These are different, overlapping event definitions; do not use a pie chart or stack them to 100%.",
+      "Failed changes to the recursive improvement module can prevent further optimization.",
+      "The framework does not guarantee a monotonically improving sequence or universal optimality."
+    ]
+  },
+  "cases": [
+    {
+      "id": "game24-search-switch",
+      "title": "Replace an LLM solver with an executable search procedure",
+      "provenance": "A transition reported in the paper; before/after policies appear in Appendix C.2. No full time-stamped action trace or per-iteration scores is supplied.",
+      "source_url": "https://arxiv.org/html/2410.04444v4#S6.SS3",
+      "before_source": "https://arxiv.org/html/2410.04444v4#LST5",
+      "after_source": "https://arxiv.org/html/2410.04444v4#LST6",
+      "sequence": [
+        {
+          "stage": "Initial policy",
+          "description": "Request a step-by-step solution and final expression from an LLM."
+        },
+        {
+          "stage": "Six unsuccessful optimization attempts",
+          "description": "The paper reports that the agent tries revisions before changing the computational approach."
+        },
+        {
+          "stage": "Replacement policy",
+          "description": "Search over number pairs and arithmetic operations, reducing the remaining values recursively until one value equals 24."
+        }
+      ],
+      "reported_result": {
+        "value": 100,
+        "unit": "accuracy (%)",
+        "scope": "The reported search-based Game of 24 case study, not the four-task benchmark table.",
+        "set_size": "Not specified in this case-study description."
+      },
+      "algorithm": {
+        "input": "Four numbers; each is used exactly once.",
+        "operations": [
+          "+",
+          "−",
+          "×",
+          "÷"
+        ],
+        "steps": [
+          "Choose an ordered pair of remaining values.",
+          "Combine the pair with each permitted arithmetic operation.",
+          "Skip division when its denominator is zero.",
+          "Replace the pair with its result and recurse.",
+          "Accept a terminal value within 1e-6 of 24."
+        ],
+        "source_implementation_note": "Listing 6 also iterates initial number permutations. Its displayed return string concatenates intermediate numeric operations rather than maintaining a proper expression tree. A browser reproduction should maintain its own expression tree and be labeled adapted, not identical code."
+      },
+      "demo_guidance": {
+        "classification": "Authored browser reproduction of the reported search algorithm.",
+        "actual_input_available": false,
+        "recommended_input": [
+          3,
+          3,
+          8,
+          8
+        ],
+        "recommended_solution": "8 ÷ (3 − 8 ÷ 3) = 24",
+        "input_note": "These cards and this live trace are chosen for the website; they are not a recorded paper example.",
+        "do_not_imply": [
+          "That clicking runs an LLM or performs real self-modification.",
+          "That the browser generated the replacement policy autonomously.",
+          "That the displayed nodes or runtime were measured in the paper.",
+          "That paper Fig. 5(a) is the search-switch trajectory."
+        ]
+      }
+    },
+    {
+      "id": "game24-llm-branch",
+      "title": "Keep the LLM solver and improve how answers are checked",
+      "provenance": "One representative recorded progression plotted in Figure 5(a), separate from the search-switch example.",
+      "source_url": "https://arxiv.org/html/2410.04444v4#S6.F5",
+      "observed_annotations": [
+        "CoT-SC prompts",
+        "Code verifier",
+        "Format error",
+        "Error handling / revert",
+        "Reflection and multiple trials",
+        "Confidence check",
+        "Remove check"
+      ],
+      "interpretation": "Changes can introduce regressions; subsequent feedback can remove a harmful check or recover from a broken output format. The plotted LLM-based run remains below 100%, which is consistent with this being a different trajectory from the search case.",
+      "chart_policy": "Display the original vector chart with its original axes. Do not fabricate an interpolated trajectory or combine it with the separate 100% claim."
+    },
+    {
+      "id": "updater-self-modification",
+      "title": "Changes also reach the improvement process",
+      "provenance": "The paper’s Section 6.3 reports these behaviors in prose. The inspected public repository does not provide a complete chronological patch trace supporting an exact before/after replay.",
+      "source_url": "https://arxiv.org/html/2410.04444v4#S6.SS3",
+      "reported_changes": [
+        "Richer error-trace analysis",
+        "Parallel optimization",
+        "More informative log output",
+        "Removal of redundant code"
+      ],
+      "meaning": "These edits affect diagnosis and organization of later optimization, beyond editing only the task solver.",
+      "demo_guidance": "Use source-linked descriptions or explicitly adapted pseudocode; do not present synthetic error messages or invented diffs as recorded agent output."
+    },
+    {
+      "id": "mgsm-iterations",
+      "title": "Policies can move between symbolic heuristics and LLM prompting",
+      "source_url": "https://arxiv.org/html/2410.04444v4#A5",
+      "provenance": "Actual policies shown in Appendix E; these are selected snapshots from one optimization run, not a complete trace or proof that every later policy is better.",
+      "snapshots": [
+        {
+          "iteration": 6,
+          "source_url": "https://arxiv.org/html/2410.04444v4#LST7",
+          "description": "Parse numbers and keywords, select arithmetic operations, execute them, then format the answer."
+        },
+        {
+          "iteration": 14,
+          "source_url": "https://arxiv.org/html/2410.04444v4#LST8",
+          "description": "Use an LLM solution-auditor role, example summaries, and arithmetic checks."
+        },
+        {
+          "iteration": 20,
+          "source_url": "https://arxiv.org/html/2410.04444v4#LST9",
+          "description": "Revise examples and the logical-verifier prompt in response to earlier mistakes."
+        }
+      ],
+      "caution": "The paper’s wording around the last prompt is extravagant; explain the concrete code change rather than reproducing that rhetoric."
+    }
+  ],
+  "figures": [
+    {
+      "figure": 2,
+      "url": "https://arxiv.org/html/2410.04444v4/compare.png",
+      "anchor": "https://arxiv.org/html/2410.04444v4#S1.F2",
+      "kind": "raster",
+      "native_width": 1613,
+      "native_height": 763,
+      "local_review_path": "/tmp/godel-compare.png",
+      "suggested_max_css_width": 806,
+      "caption": "The paper contrasts fixed task policies, fixed optimizers, and an editable optimizer.",
+      "caution": "The original caption’s unlimited/self-improvement language is aspirational, not an empirical guarantee."
+    },
+    {
+      "figure": 3,
+      "url": "https://arxiv.org/html/2410.04444v4/method_1.png",
+      "anchor": "https://arxiv.org/html/2410.04444v4#S4.F3",
+      "kind": "raster",
+      "native_width": 1626,
+      "native_height": 466,
+      "local_review_path": "/tmp/godel-method.png",
+      "suggested_max_css_width": 813,
+      "caption": "Runtime code inspection and monkey patching implement the editable agent."
+    },
+    {
+      "figure": 5,
+      "url": "https://arxiv.org/html/2410.04444v4/gameof_24.svg",
+      "anchor": "https://arxiv.org/html/2410.04444v4#S6.F5",
+      "kind": "vector",
+      "viewbox": [
+        0,
+        0,
+        1211.5342,
+        375.902
+      ],
+      "local_review_path": "/tmp/godel-game24.svg",
+      "suggested_max_css_width": 1000,
+      "caption": "A recorded LLM-based Game of 24 improvement path (left) and the effect of the initial policy (right).",
+      "caution": "A separate search-based run reaches 100%; that result is not this curve."
+    },
+    {
+      "figure": 4,
+      "url": "https://arxiv.org/html/2410.04444v4/num.svg",
+      "anchor": "https://arxiv.org/html/2410.04444v4#S6.F4",
+      "kind": "vector",
+      "caption": "Tool/action counts across tasks; optional secondary evidence."
+    }
+  ],
+  "implementation_sources": [
+    {
+      "url": "https://github.com/Arvid-pku/Godel_Agent/blob/bbb508796be31c7140cdfc7106efd830a1324242/src/agent_module.py#L109-L189",
+      "topic": "Compiling a replacement definition and installing it with setattr implements a runtime change."
+    },
+    {
+      "url": "https://github.com/Arvid-pku/Godel_Agent/blob/bbb508796be31c7140cdfc7106efd830a1324242/src/agent_module.py#L527-L630",
+      "topic": "Action dispatch, error diagnostics, and recursion into agent.evolve expose the next optimization step."
+    },
+    {
+      "url": "https://github.com/Arvid-pku/Godel_Agent/blob/bbb508796be31c7140cdfc7106efd830a1324242/results/mgsm/agent_module/solver.py",
+      "topic": "Released final MGSM policy samples 20 GPT-3.5 outputs and normalizes/votes on answers.",
+      "caution": "Different from Appendix C.1 Listing 2, which shows five responses. Do not silently merge these into one exact policy trace."
+    },
+    {
+      "url": "https://github.com/Arvid-pku/Godel_Agent/blob/bbb508796be31c7140cdfc7106efd830a1324242/results/mgsm/mgsm_0.6425.txt",
+      "topic": "Released test predictions begin with 64.2% median and 60.9–67.5% 95% bootstrap interval; they are not an optimization trace."
+    }
+  ],
+  "editorial_recommendations": [
+    "Lead with a concrete design change: the agent can replace the code that solves a task and the code that proposes the next replacement.",
+    "Use the Game of 24 mechanism as the main interactive exhibit: actual arithmetic search, visible expression tree and backtracking, plus source-linked before/after policies.",
+    "Follow with the original nonmonotonic curve and explain that it depicts a different run; show what an error and recovery mean operationally.",
+    "Make the full constrained result table readable with confidence intervals and metric labels; put unrestricted results in a clearly labeled separate view.",
+    "Explain the empirical boundary briefly: small benchmark subsets, costly/fallible validation search, no general guarantee of recursive improvement."
+  ],
+  "tasks": [
+    {
+      "id": "DROP",
+      "metric": "F1"
+    },
+    {
+      "id": "MGSM",
+      "metric": "Accuracy (%)"
+    },
+    {
+      "id": "MMLU",
+      "metric": "Accuracy (%)"
+    },
+    {
+      "id": "GPQA",
+      "metric": "Accuracy (%)"
+    }
+  ],
+  "main_table": [
+    {
+      "name": "Chain-of-Thought",
+      "paradigm": "Hand-Designed Agent Systems",
+      "setting": "constrained-comparison",
+      "values": [
+        {
+          "mean": 64.2,
+          "ci": 0.9
+        },
+        {
+          "mean": 28.0,
+          "ci": 3.1
+        },
+        {
+          "mean": 65.4,
+          "ci": 3.3
+        },
+        {
+          "mean": 29.2,
+          "ci": 3.1
+        }
+      ]
+    },
+    {
+      "name": "COT-SC",
+      "paradigm": "Hand-Designed Agent Systems",
+      "setting": "constrained-comparison",
+      "values": [
+        {
+          "mean": 64.4,
+          "ci": 0.8
+        },
+        {
+          "mean": 28.2,
+          "ci": 3.1
+        },
+        {
+          "mean": 65.9,
+          "ci": 3.2
+        },
+        {
+          "mean": 30.5,
+          "ci": 3.2
+        }
+      ]
+    },
+    {
+      "name": "Self-Refine",
+      "paradigm": "Hand-Designed Agent Systems",
+      "setting": "constrained-comparison",
+      "values": [
+        {
+          "mean": 59.2,
+          "ci": 0.9
+        },
+        {
+          "mean": 27.5,
+          "ci": 3.1
+        },
+        {
+          "mean": 63.5,
+          "ci": 3.4
+        },
+        {
+          "mean": 31.6,
+          "ci": 3.2
+        }
+      ]
+    },
+    {
+      "name": "LLM Debate",
+      "paradigm": "Hand-Designed Agent Systems",
+      "setting": "constrained-comparison",
+      "values": [
+        {
+          "mean": 60.6,
+          "ci": 0.9
+        },
+        {
+          "mean": 39.0,
+          "ci": 3.4
+        },
+        {
+          "mean": 65.6,
+          "ci": 3.3
+        },
+        {
+          "mean": 31.4,
+          "ci": 3.2
+        }
+      ]
+    },
+    {
+      "name": "Step-back-Abs",
+      "paradigm": "Hand-Designed Agent Systems",
+      "setting": "constrained-comparison",
+      "values": [
+        {
+          "mean": 60.4,
+          "ci": 1.0
+        },
+        {
+          "mean": 31.1,
+          "ci": 3.2
+        },
+        {
+          "mean": 65.1,
+          "ci": 3.3
+        },
+        {
+          "mean": 26.9,
+          "ci": 3.0
+        }
+      ]
+    },
+    {
+      "name": "Quality-Diversity",
+      "paradigm": "Hand-Designed Agent Systems",
+      "setting": "constrained-comparison",
+      "values": [
+        {
+          "mean": 61.8,
+          "ci": 0.9
+        },
+        {
+          "mean": 23.8,
+          "ci": 3.0
+        },
+        {
+          "mean": 65.1,
+          "ci": 3.3
+        },
+        {
+          "mean": 30.2,
+          "ci": 3.1
+        }
+      ]
+    },
+    {
+      "name": "Role Assignment",
+      "paradigm": "Hand-Designed Agent Systems",
+      "setting": "constrained-comparison",
+      "values": [
+        {
+          "mean": 65.8,
+          "ci": 0.9
+        },
+        {
+          "mean": 30.1,
+          "ci": 3.2
+        },
+        {
+          "mean": 64.5,
+          "ci": 3.3
+        },
+        {
+          "mean": 31.1,
+          "ci": 3.1
+        }
+      ]
+    },
+    {
+      "name": "Meta Agent Search",
+      "paradigm": "Meta-Learning Optimized Agents",
+      "setting": "constrained-comparison",
+      "values": [
+        {
+          "mean": 79.4,
+          "ci": 0.8
+        },
+        {
+          "mean": 53.4,
+          "ci": 3.5
+        },
+        {
+          "mean": 69.6,
+          "ci": 3.2
+        },
+        {
+          "mean": 34.6,
+          "ci": 3.2
+        }
+      ]
+    },
+    {
+      "name": "Gödel-base",
+      "paradigm": "Gödel Agent (Ours)",
+      "setting": "constrained-comparison",
+      "values": [
+        {
+          "mean": 80.9,
+          "ci": 0.8
+        },
+        {
+          "mean": 64.2,
+          "ci": 3.4
+        },
+        {
+          "mean": 70.9,
+          "ci": 3.1
+        },
+        {
+          "mean": 34.9,
+          "ci": 3.3
+        }
+      ]
+    },
+    {
+      "name": "Gödel-free",
+      "paradigm": "Gödel Agent (Ours)",
+      "setting": "unconstrained",
+      "values": [
+        {
+          "mean": 90.5,
+          "ci": 1.8
+        },
+        {
+          "mean": 90.6,
+          "ci": 2.0
+        },
+        {
+          "mean": 87.9,
+          "ci": 2.2
+        },
+        {
+          "mean": 55.7,
+          "ci": 3.1
+        }
+      ]
+    }
+  ],
+  "ablations": [
+    {
+      "name": "Full system",
+      "accuracy": 64.2,
+      "delta_pp": 0
+    },
+    {
+      "name": "Without thinking before acting",
+      "accuracy": 50.8,
+      "delta_pp": -13.4
+    },
+    {
+      "name": "Without error handling",
+      "accuracy": 49.4,
+      "delta_pp": -14.8
+    },
+    {
+      "name": "Without code-running tool",
+      "accuracy": 57.1,
+      "delta_pp": -7.1
+    },
+    {
+      "name": "Without LLM-calling tool",
+      "accuracy": 60.4,
+      "delta_pp": -3.8
+    }
+  ],
+  "ablation_context": {
+    "title": "What helps self-modification work?",
+    "task": "MGSM",
+    "metric": "Accuracy (%)",
+    "source_url": "https://arxiv.org/html/2410.04444v4#S6.T2",
+    "baseline": 64.2,
+    "interpretation": "The largest drops follow removing planning and error feedback. Removing the initial code-running or LLM-calling tool is different from prohibiting those capabilities forever: the agent can implement basic tools again.",
+    "uncertainty": "No confidence intervals reported in Table 2."
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "story": {
+    "title": "An answer can be fluent and still fail to explain the question",
+    "paragraphs": [
+      "A forward language model scores how plausible a response is after a prompt. That is useful for generation, but a plausible continuation may quietly drop one of the problem's constraints. LEDOM starts from the complementary question: if this response were given, how well could a model reconstruct the prompt that led to it? The intended signal is sensitivity to the premises, rather than fluency alone.",
+      "Changing the direction does not require inventing a different joint distribution over text. Left-to-right and right-to-left factorizations are both valid applications of the chain rule. With finite data and model capacity, however, they condition on different evidence and learn different approximations. LEDOM studies that asymmetry by reversing token sequences while holding the decoder architecture and tokenizer fixed in its controlled forward/reverse comparison."
+    ]
+  },
+  "mechanism": {
+    "title": "Reconstruct the prompt, then combine the two scores",
+    "paragraphs": [
+      "Let x be a question and y a candidate response. The forward model estimates P(y | x); the reverse model processes the reversed response followed by the reversed prompt to estimate P(x | y). The response is the conditioning context, and the prompt tokens are what is scored. This distinction matters: the method is not simply asking a second model whether an answer looks correct.",
+      "Reverse Reward combines the two conditional probabilities as P(y | x)^(1−λ) × P(x | y)^λ. In log space this is a weighted sum of the forward and backward log-likelihoods. The paper's argument is conditional: when incorrect chains have comparable forward likelihood but poorer backward reconstruction, the reverse term separates them. It does not prove that every wrong answer receives a low score, and a reverse model can also make mistakes.",
+      "The main experiments generate 64 candidates and rerank complete responses. The paper also explores selecting partial reasoning paths with step-level beam search. The forward generator's weights stay unchanged, but the reverse scorer is fine-tuned on domain-specific mathematical reasoning data. Inference therefore adds sampling and reverse evaluation; it is not a cost-free accuracy improvement or evidence that no model training was required."
+    ]
+  },
+  "evidence": {
+    "title": "Complementary verification, with a cost and a failure mode",
+    "paragraphs": [
+      "The download example in the appendix makes the mechanism concrete. A 200 GB file downloads at 2 GB/minute, reaches 40%, then suffers a 20-minute restart and must begin again. The correct decomposition is 40 + 20 + 100 = 160 minutes. The forward-selected response shown in the paper instead finishes only the remaining bytes and inserts a second restart. Comparing these responses reveals which parts of the original question the reasoning has lost.",
+      "Random selection from sampled candidates is an important control: it separates the value of reranking from the existence of diverse samples. On QwenMath AIME 2024, greedy decoding scores 16.7%, random selection 11.3%, and Reverse Reward 23.3%. Finer-grained search is not always better: OpenMath2 beam search reaches only 6.7% on AIME versus 16.7% for complete-response reranking. Prematurely pruning a useful partial chain can undo the benefit of verification. Comparisons with supervised reward models remain an open evaluation gap."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Reverse factorization · §2",
+      "url": "https://arxiv.org/html/2507.01335v3#S2"
+    },
+    {
+      "label": "Reverse Reward · §5",
+      "url": "https://arxiv.org/html/2507.01335v3#S5"
+    },
+    {
+      "label": "Math results, controls and costs · §6",
+      "url": "https://arxiv.org/html/2507.01335v3#S6"
+    }
+  ],
+  "reading_notes": "Re-read §§2,5,6,Limitations,Tables 2–4 and 7–8, Appendices B–D. Explicitly correct no-training ambiguity: forward weights unchanged, RLM fine-tuned on mathematical reasoning data (§6.1). v5 demos use only published material: reverse-generation outputs from Table 2 and Appendix Figures 5–6 (word-level order marked illustrative) and the measured Table 4 comparison. The paper prints no per-candidate reverse scores or λ, so no per-candidate probabilities are shown.",
+  "demo": {
+    "kind": "published-examples-and-measured-reranking",
+    "provenance": "Reverse-generation examples as printed in Table 2, Appendix B Figure 5 and Appendix C Figure 6; Reverse Reward accuracies from Table 4. The paper reports no per-candidate forward or reverse scores (Tables 7-8 give responses and orderings only), so none are shown or invented."
+  }
+}

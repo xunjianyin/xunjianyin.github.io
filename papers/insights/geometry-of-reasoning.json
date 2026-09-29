@@ -1,0 +1,35 @@
+{
+  "story": {
+    "title": "Similar meanings can obscure similar reasoning",
+    "paragraphs": [
+      "A representation of an argument contains several signals at once: its topic, language, entities, and logical structure. Two English passages about weather may occupy nearby positions even when their deductions differ. Conversely, the same deduction expressed in different languages can look far apart. Comparing isolated embeddings therefore risks measuring the surface content when the question concerns reasoning.",
+      "A minimal illustration is “If it rains, the ground is wet; it rains; therefore the ground is wet.” Replace weather with “If a server is overloaded, latency rises; the server is overloaded; therefore latency rises.” The concepts change, but the inference pattern is preserved. The paper extends this controlled variation to longer natural-deduction structures across topics and languages."
+    ]
+  },
+  "mechanism": {
+    "title": "Measure how a trajectory changes from step to step",
+    "paragraphs": [
+      "For each reasoning step, the experiment averages its token representations from the model’s final transformer layer. The resulting sequence of vectors is a trajectory indexed by reasoning progress. This is not a visualization of one token moving through successive transformer layers; it compares successive textual steps represented at the same final layer.",
+      "Position asks where each step is embedded. Velocity uses the difference between neighboring step vectors. Curvature asks how sharply the trajectory turns, using a quantity derived from triples of points. Position and velocity similarities use cosine similarity, while curvature sequences are compared by Pearson correlation. Measuring changes can reduce the dominance of components shared across a passage, such as language or topic.",
+      "The theoretical framework relates these discrete increments to a continuous representation curve: a logical step corresponds to accumulated semantic change along part of that curve. This motivates looking for geometric patterns shared by the same logical structure under different semantic realizations. The experiment then compares grouping by logic, by topic, and by language, rather than relying on a visually appealing low-dimensional plot alone."
+    ]
+  },
+  "evidence": {
+    "title": "A change in which factor explains similarity",
+    "paragraphs": [
+      "For Qwen3-0.6B, Table 1 reports position similarity of 0.85 for shared language but only 0.26 for shared logic. With velocity, shared logic reaches 0.17 versus 0.08 for language; curvature correlation is 0.53 for logic versus 0.13 for language. The numerical scales belong to different measurements and should not be compared as accuracy gains. The meaningful comparison is which grouping dominates within each measurement.",
+      "The main experiments find this change across three Qwen3 sizes and LLaMA3-8B. That supports a geometric signature of logical organization beyond surface form. It does not establish that these quantities cause correct reasoning, that every generated reasoning trace is faithful, or that an intervention on curvature would improve answers. Those are possible follow-up uses of the framework rather than results demonstrated by the controlled comparison."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Representation trajectories and geometric quantities · Sections 3–4",
+      "url": "https://arxiv.org/html/2510.09782v1#S4"
+    },
+    {
+      "label": "Controlled semantic variation and Table 1 · Sections 5–6",
+      "url": "https://arxiv.org/html/2510.09782v1#S6"
+    }
+  ],
+  "reading_notes": "Reread primary HTML 2026-09-29 Sections 3.1–3.2, 4.3, 5.1–5.2, 6.1–6.2, 7; Table 1 and Figure 2. Worked modus-ponens weather/server illustration is authored for this page, not a paper datum or model trace. Verified Qwen3-0.6B metrics in Table 1: pos language .85/logic .26; velocity language .08/logic .17; curvature language .13/logic .53. Avoid source dataset total discrepancy and unsupported causal/intervention claims."
+}

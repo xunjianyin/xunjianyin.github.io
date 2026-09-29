@@ -1,0 +1,41 @@
+{
+  "story": {
+    "title": "A collection of plausible judgments can be inconsistent",
+    "paragraphs": [
+      "Preference training commonly treats responses as if each had a single underlying quality score. That implies a coherent ordering for a fixed prompt. Yet a model judging pairs separately can prefer A to B, B to C, and C to A. Each local decision may look plausible, while the collection supplies conflicting supervision.",
+      "Confidence-only selection does not ask where a comparison sits in this structure. It may retain redundant preferences and miss comparisons that explain a contradiction elsewhere. ContraSolver instead makes the response set a directed graph. An arrow records a preference; a directed cycle exposes a conflict that cannot be represented by one consistent ranking."
+    ]
+  },
+  "mechanism": {
+    "title": "Train on the evidence surrounding a contradiction",
+    "paragraphs": [
+      "The algorithm first constructs a maximum spanning tree, preserving a connected set of strong comparisons. A reverse pass examines remaining edges from lower to higher confidence. When an edge closes a directed cycle, it is marked contradictory, while the existing edges along that cycle become candidate training evidence. A forward pass then considers stronger remaining edges, adding a new ordering relationship and skipping relationships already implied by a path.",
+      "An important detail is the final DPO dataset: it contains the supporting, or heuristic, edges selected around contradictions. The algorithm does not simply flip every suspicious label and train on the rewritten graph. Its intended effect is that learning the more reliable supporting comparisons will also change weaker inconsistent judgments.",
+      "The demo runs Algorithm 1 on five responses and ten illustrative judgments. Raising one confidence can move a wrong judgment into the kept structure, so that a correct comparison is flagged as contradictory and the wrong one becomes a DPO pair. This makes the assumption visible: higher confidence is treated as stronger evidence, so the procedure can produce a consistent ordering that is still factually wrong."
+    ]
+  },
+  "evidence": {
+    "title": "Consistency improves, but it is not fully solved",
+    "paragraphs": [
+      "The data-selection baselines use the same number of preference pairs, making their comparison informative about which pairs are chosen. On positive-sentiment generation, Llama-2-7b-chat reaches 87.2%, compared with 80.3% for maximum-confidence selection and 79.5% for random selection. The safety analysis also includes human assessment on 100 sampled AdvBench prompts; its reported harmless rate is 91% for ContraSolver and 86% for confidence-only selection.",
+      "Graph analysis provides a different outcome from task accuracy. For Llama-2-7b-chat on SafeEdit, the share of training inputs with a contradictory preference graph decreases from 13.3% to 10.4%. Contradictions therefore remain after model training, even though the graph-processing algorithm has a consistency property. These measurements use the original response nodes on training prompts, so they do not establish contradiction-free behavior on arbitrary new responses. Ties and confidence calibration remain limitations."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Graph algorithm and DPO selection · Section 3",
+      "url": "https://arxiv.org/html/2406.08842v1#S3"
+    },
+    {
+      "label": "Matched selection baselines and consistency analysis · Sections 4–5",
+      "url": "https://arxiv.org/html/2406.08842v1#S4"
+    }
+  ],
+  "reading_notes": "Reread primary HTML 2026-09-29 Sections 2–5, Algorithm 1, Tables 1–4, Limitations. Crucial correction: DPO trains E_h, not directly the reversed E_c set. v5 demo implements Algorithm 1 (Kruskal maximum spanning tree, reverse and forward loops, 0.51 edge threshold) on a five-response graph, mirrored in Python at build time; ties are broken by list position and every kept edge on a closed cycle is marked heuristic. All demo probabilities are illustrative. Table 4 measures fraction of training input graphs containing cycles, not number of cycles or test-set generalization.",
+  "demo": {
+    "kind": "preference-graph",
+    "title": "Which of the model’s own judgments become training pairs?",
+    "caption": "Five responses to one prompt and ten pairwise judgments. Flip a judgment or change its illustrative confidence: the paper’s graph algorithm reruns and reports the spanning tree, the contradictions, the resulting order, and the pairs it would use for DPO.",
+    "eyebrow": "Algorithm 1 · illustrative judgments"
+  }
+}

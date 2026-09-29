@@ -1,0 +1,55 @@
+{
+  "story": {
+    "title": "A better-sounding rewrite is not always a better correction",
+    "paragraphs": [
+      "Grammatical error correction has two competing expectations: fix the language, and preserve what the writer intended. An LLM may produce an elegant paraphrase that uses few of the reference’s words; it may also rewrite a sentence unnecessarily or subtly change its meaning. A reference-overlap score struggles with the first case, while a fluency-only judgment can reward the second. Evaluation needs to distinguish a valid alternative correction from an overconfident rewrite.",
+      "DSGram makes the trade-off explicit. Semantic coherence asks whether meaning is preserved. Edit level asks whether the changes are necessary and appropriate, rather than merely counting edited tokens. Fluency covers grammatical correctness and natural expression. This decomposition also avoids giving grammaticality and fluency two largely redundant votes: the paper reports a 0.89 correlation between those dimensions in the earlier SOME setup."
+    ]
+  },
+  "mechanism": {
+    "title": "Separate the quality judgments from their relative importance",
+    "paragraphs": [
+      "There are two stages of judgment. First, an LLM scores the original–corrected pair on the three dimensions. Second, it compares the importance of those dimensions for the sentence’s context. A formal instruction may demand restraint and exact meaning preservation; a casual conversation may place greater value on natural phrasing. These comparisons are organized into a reciprocal matrix using the Analytic Hierarchy Process, checked for consistency, and normalized into weights for the overall score.",
+      "The distinction matters because a low edit-level score can be hidden by averaging. The weights therefore come from a judgment matrix rather than a fixed rule: the LLM states how much more one criterion matters than another, the principal eigenvector gives the weights, and a consistency ratio above 0.1 sends the judgments back for revision. The demo runs this step on the two Figure 5 sentence pairs. Cyclic judgments yield equal weights yet fail the consistency check, and consistent judgments that favor edit restraint strongly enough can rank a meaning-destroying output above the Figure 5 correction."
+    ]
+  },
+  "evidence": {
+    "title": "Weighting helps, but the evaluator still determines the ceiling",
+    "paragraphs": [
+      "The paper separately tests score generation and aggregation. When human-provided sub-scores are combined, dynamic weights correlate 0.8764 with human overall ratings, compared with 0.8544 for average weighting. Because the input sub-scores already come from humans, this comparison isolates weighting more closely than an end-to-end metric comparison. It does not show that an LLM has learned to assign each component score reliably.",
+      "That reliability remains uneven. On DSGram-Eval, zero-shot GPT-4 has an overall Pearson correlation of 0.772; the fine-tuned LLaMA3-8B reaches 0.419, improving on its five-shot 0.373 while remaining well behind GPT-4. Likewise, SEEDA results vary across system versus sentence evaluation and correlation measures. DSGram offers a more inspectable account of correction quality, but a plausible weighted score is only as dependable as its component judgments and the priorities it assigns."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Paper · Sections 3–4 and Tables 3–4",
+      "url": "https://arxiv.org/html/2412.12832v2"
+    },
+    {
+      "label": "Code and evaluation resources",
+      "url": "https://github.com/jxtse/GEC-Metrics-DSGram"
+    }
+  ],
+  "reading_notes": "Re-read submetric definitions, AHP procedure (Section 3.2, Algorithm 1), Figure 5, weighting validation and scorer ablations. v5 demo computes principal-eigenvector weights and CR (RI = 0.58) from reader-set pairwise judgments; Figure 5 weights and released DSGram-Eval human sub-scores are measured; the paper does not print its matrices. Released generate_weight.py indexes RI by matrix size (0.90 for 3×3), more lenient than the paper's 0.58; the page follows the paper.",
+  "demo": {
+    "kind": "dsgram-ahp",
+    "title": "Derive the weights from pairwise judgments",
+    "description": "DSGram does not ask for weights directly. For each sentence pair, an LLM compares the three criteria two at a time on the 1–9 scale; the weights are the principal eigenvector of that judgment matrix, accepted only when its consistency ratio is below 0.1 (Section 3.2, Algorithm 1). Make the three judgments yourself for a sentence pair from Figure 5.",
+    "note": "Measured: Figure 5 weights and scores; human sub-scores and overall scores from the released DSGram-Eval annotation. Adapted: sentence pairs from Figure 5; RI = 0.58 and the CR < 0.1 rule from Section 3.2; scale wording from the released weight prompt. Computed: your weights, λmax, CI, CR and weighted scores. The paper prints GPT-4's weights but not its matrices; “Closest match to Figure 5” is our search over consistent integer judgments, which differs from the printed weights by up to 0.032 for (a) and 0.010 for (b). No model runs in this page.",
+    "sources": [
+      {
+        "label": "Section 3.2 and Algorithm 1",
+        "url": "https://arxiv.org/html/2412.12832v2#S3.SS2"
+      },
+      {
+        "label": "Figure 5",
+        "url": "https://arxiv.org/html/2412.12832v2#S3.F5"
+      },
+      {
+        "label": "Released DSGram-Eval annotation",
+        "url": "https://github.com/jxtse/GEC-Metrics-DSGram/blob/main/Dataset/DSGram-Eval/gec_human_eval_test_1.json"
+      }
+    ],
+    "eyebrow": "Algorithm 1 · Figure 5 examples"
+  }
+}

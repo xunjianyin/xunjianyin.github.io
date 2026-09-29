@@ -1,0 +1,688 @@
+{
+  "atomic-to-composite": {
+    "short_name": "Atomic to Composite",
+    "topic": "Compositional reasoning",
+    "takeaway": "In a controlled reasoning setting, RL helps models combine internal knowledge with new context when supervised training has first established both component skills.",
+    "question": "Knowing a fact and reading a document are separate abilities. What training helps a model combine them when a question requires a relation it has never practiced?",
+    "method": [
+      {
+        "title": "Separate the skills",
+        "text": "Synthetic biographies distinguish facts learned in model parameters from facts supplied in context."
+      },
+      {
+        "title": "Train, then combine",
+        "text": "Teach both atomic skills with SFT, then reward correct answers on questions requiring their combination."
+      },
+      {
+        "title": "Test new relations",
+        "text": "Evaluate familiar paths, new combinations, and relations absent from training questions."
+      }
+    ],
+    "findings": [
+      {
+        "value": "90.30% → 18.41%",
+        "label": "Composite SFT: IID to zero-shot",
+        "detail": "Direct composite supervision performs well on familiar paths but drops sharply on the structural zero-shot split."
+      },
+      {
+        "value": "Atomic skills first",
+        "label": "Condition for RL generalization",
+        "detail": "RL generalizes better after learning both component skills than after direct composite supervision in the tested setting."
+      }
+    ],
+    "scope": "These results isolate a training mechanism in synthetic biography tasks; they do not establish that RL universally creates new reasoning abilities across domains.",
+    "diagram": {
+      "title": "Learn the parts, then practice combining them",
+      "steps": [
+        {
+          "label": "Atomic SFT",
+          "text": "Internal facts + contextual reasoning"
+        },
+        {
+          "label": "Composite RL",
+          "text": "Reward answers that combine both sources"
+        },
+        {
+          "label": "Generalization",
+          "text": "Evaluate unseen relational paths"
+        }
+      ],
+      "caption": "The training sequence is the experimental variable."
+    },
+    "figure_index": 1,
+    "figure_caption": "RL gains depend on which reasoning skills were established during SFT.",
+    "source_url": "https://arxiv.org/html/2512.01970v1",
+    "source_note": "Verified abstract, Sections 3–6, Table 1. Exact 90.30 and 18.41 are Qwen2.5-1.5B complementary-SFT IID/zero-shot scores. Removed old invented four-level comparison and universal synthesizer language. Structural zero-shot means unseen relations in QA, not ordinary zero-shot prompting. Table 1 values are authoritative here; nearby Section 4.3 prose contains conflicting values. v4 results table: Table 7 (label tab:other_sufficiency_results), arXiv 2512.01970v1 source file iclr2025_conference.tex lines 779-797; PDF page 19 (Appendix D discusses it).",
+    "figure_url": "https://arxiv.org/html/2512.01970v1/images/figure1_relative_abs.png",
+    "metadata_override": {
+      "abstract": "Reinforcement Learning (RL) following Supervised Fine-Tuning (SFT) has become the standard paradigm for post-training Large Language Models (LLMs). However, the mechanism by which RL contributes to reasoning capabilities—whether it incentivizes the synthesis of new skills or merely amplifies existing behaviors—remains a subject of intense debate. In this work, we investigate this question through the lens of Complementary Reasoning, a complex task that requires integrating internal parametric knowledge with external contextual information. Using a controlled synthetic dataset of human biographies, we strictly decouple this ability into two atomic skills: Parametric Reasoning (relying on internal knowledge encoded in model parameters) and Contextual Reasoning (depending on novel information provided in the context window). To rigorously assess capability boundaries, we evaluate generalization across three distinct levels of difficulty: I.I.D., Composition, and Zero-shot settings. We find that while SFT is sufficient for in-distribution performance, it struggles with out-of-distribution generalization, particularly in Zero-shot settings where relational combinations are novel. Crucially, we identify the SFT Generalization Paradox: Models supervised solely on the composite task achieve near-perfect in-distribution accuracy (90%) but collapse on out-of-distribution generalization (18%), indicating their reliance on rote memorization of path shortcuts. In contrast, we find that RL acts as a reasoning synthesizer rather than a probability amplifier. However, we uncover a strict atomic prerequisite: RL can only synthesize these complex strategies if the base model has first mastered the independent atomic skills (Parametric and Contextual) via SFT. These findings challenge the view of RL as a mere amplifier, suggesting that given sufficient atomic foundations, RL can actively synthesize complex reasoning strategies from learned primitives without explicit supervision on such complex strategies. This indicates that decoupled atomic training followed by RL offers a scalable path to generalization for complex reasoning tasks. Code and data will be at https://github.com/sitaocheng/from_atomic_to_composite."
+    },
+    "figure_local": "assets/atomic-to-composite-overview.png",
+    "results_table": {
+      "caption": "Table 7 (appendix, all rows). Exact-match accuracy (%) on the complementary-reasoning test set by generalization level, higher is better; Qwen2.5-1.5B backbone. Mem, Ctx, and Comp denote parametric, contextual, and complementary training data; every RL(Comp) stage uses the same 12.8k Comp samples, and SFT(Mem+Ctx) → RL(Mem+Ctx) uses 80% of the atomic data for SFT and the remaining 20% for RL. SFT on the mixed Mem+Ctx+Comp data scores highest on I.I.D. and Composition, while the proposed SFT(Mem+Ctx) → RL(Comp) recipe scores highest on Zero-shot (50.87), narrowly ahead of the three-stage variant (49.56).",
+      "headings": [
+        "Setting",
+        "I.I.D",
+        "Composition",
+        "Zero-shot"
+      ],
+      "rows": [
+        [
+          "SFT(Mem+Ctx)",
+          "35.18",
+          "28.20",
+          "24.07"
+        ],
+        [
+          "SFT(Mem+Ctx) → RL(Mem+Ctx)",
+          "28.43",
+          "28.34",
+          "27.89"
+        ],
+        [
+          "SFT(Mem+Ctx) → RL(Mem+Ctx) → RL(Comp)",
+          "74.00",
+          "62.47",
+          "49.56"
+        ],
+        [
+          "SFT(Mem+Ctx+Comp)",
+          "80.14",
+          "62.90",
+          "43.25"
+        ],
+        [
+          "SFT(Mem+Ctx) → RL(Comp)",
+          "73.11",
+          "60.85",
+          "50.87"
+        ]
+      ],
+      "highlight": [
+        4
+      ],
+      "source_url": "https://arxiv.org/e-print/2512.01970v1"
+    }
+  },
+  "chemagent": {
+    "short_name": "ChemAgent",
+    "topic": "Memory for scientific reasoning",
+    "takeaway": "ChemAgent turns solved chemistry subproblems into reusable memory, helping an LLM plan, calculate, and refine new solutions with experience retained outside its model weights.",
+    "question": "Chemistry problems combine formulas, calculations, and dependent reasoning steps. Can an agent reuse earlier work to avoid repeating the same mistakes on a new problem?",
+    "method": [
+      {
+        "title": "Build reusable memory",
+        "text": "Decompose worked problems into planning strategies and structured subproblem solutions."
+      },
+      {
+        "title": "Retrieve and solve",
+        "text": "Retrieve related experiences and generate task-specific chemistry knowledge to guide each subproblem."
+      },
+      {
+        "title": "Refine and retain",
+        "text": "Evaluate intermediate solutions, revise the plan when needed, and add new experiences to the library."
+      }
+    ],
+    "findings": [
+      {
+        "value": "57.16%",
+        "label": "Average accuracy · GPT-4",
+        "detail": "Across four SciBench chemistry datasets, ChemAgent exceeds the 47.66% average reported for StructChem under the paper's setup."
+      },
+      {
+        "value": "52.12%",
+        "label": "Without evaluation and refinement",
+        "detail": "Removing solution review lowers average accuracy from 57.16%, showing that memory and active correction contribute together."
+      }
+    ],
+    "scope": "Evaluation uses textbook chemistry problems. Retrieved memories can be misleading, and the paper does not demonstrate experimental drug discovery or materials design in practice.",
+    "diagram": {
+      "title": "A solution becomes experience for the next problem",
+      "steps": [
+        {
+          "label": "Chemistry problem",
+          "text": "Decompose into manageable subproblems"
+        },
+        {
+          "label": "Memory + reasoning",
+          "text": "Retrieve, calculate, and check"
+        },
+        {
+          "label": "Updated library",
+          "text": "Retain plans and worked solutions"
+        }
+      ],
+      "caption": "Planning and execution memories persist; task-specific knowledge is generated as needed."
+    },
+    "figure_index": 0,
+    "figure_caption": "ChemAgent's framework: (a) library-enhanced reasoning, in which a test problem is decomposed into sub-tasks with the help of plan and knowledge memory, each sub-task retrieves relevant memories from the library (which is updated as sub-tasks are solved), and the sub-solutions are summarized into the final answer; (b) library construction from the development set, in which conditions are split and verified, only correct sub-task solutions are kept as execution memory, and plan memory is added to the library. Original Figure 2 from the paper.",
+    "source_url": "https://arxiv.org/html/2501.06590v1",
+    "source_note": "Verified Sections 2.2–2.6, Table 1, error analysis. Old page's accuracy table was incorrect; replaced with verified Table 1 averages. Actual taxonomy is planning/execution/knowledge memory, not knowledge/experience/tool. Existing metadata abstract matches the source except final code link, so no abstract override needed. Abstract's 'up to 46%' is avoided because comparison is ambiguous. v4 results table: Table 1 (label table main2), arXiv 2501.06590v1 source file experiment.tex lines 18-73 (GPT-4 block lines 28-45); PDF page 7.",
+    "figure_url": "https://arxiv.org/html/2501.06590v1/figure-2-chemagent_overview.png",
+    "figure_local": "assets/chemagent-overview.png",
+    "metadata_override": {
+      "links": [
+        {
+          "label": "Paper",
+          "url": "https://openreview.net/forum?id=kuhIqeVg0e"
+        },
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2501.06590"
+        },
+        {
+          "label": "Code",
+          "url": "https://github.com/gersteinlab/chemagent"
+        }
+      ],
+      "citation": "@inproceedings{tang2025chemagent,\n  title={ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning},\n  author={Tang, Xiangru and Hu, Tianyu and Ye, Muyang and Shao, Yanjun and Yin, Xunjian and Ouyang, Siru and Zhou, Wangchunshu and Lu, Pan and Zhang, Zhuosheng and Zhao, Yilun and Cohan, Arman and Gerstein, Mark},\n  booktitle={International Conference on Learning Representations},\n  year={2025},\n  url={https://openreview.net/forum?id=kuhIqeVg0e}\n}"
+    },
+    "results_table": {
+      "caption": "Table 1 (GPT-4 rows). Accuracy (%) on the four SciBench chemistry test sets (an answer counts as correct within 1% relative tolerance), higher is better; all rows use gpt-4-1106-preview, and Avg. is the unweighted mean of the four datasets. Few-shot + Direct reasoning and Few-shot + Python scores are taken from StructChem and SciBench, respectively, rather than rerun in this paper. The table's Llama 3.1-7b, Llama 3.1-70b, and Qwen 2.5-72b blocks are omitted; with those backbones ChemAgent raises the average over direct reasoning but trails it on ATKINS for Llama 3.1-7b (19.63 vs. 22.43) and Qwen 2.5-72b (56.07 vs. 57.01).",
+      "headings": [
+        "Method",
+        "CHEMMC",
+        "MATTER",
+        "ATKINS",
+        "QUAN",
+        "Avg."
+      ],
+      "rows": [
+        [
+          "Few-shot + Direct reasoning",
+          "28.21",
+          "14.29",
+          "20.69",
+          "14.71",
+          "19.48"
+        ],
+        [
+          "Few-shot + Python",
+          "38.46",
+          "34.69",
+          "57.01",
+          "44.12",
+          "43.57"
+        ],
+        [
+          "StructChem",
+          "58.97",
+          "30.67",
+          "59.81",
+          "41.18",
+          "47.66"
+        ],
+        [
+          "ChemAgent",
+          "74.36",
+          "48.98",
+          "61.18",
+          "44.12",
+          "57.16"
+        ],
+        [
+          "w/o Evaluation & Refinement",
+          "61.54",
+          "44.89",
+          "57.94",
+          "44.12",
+          "52.12"
+        ],
+        [
+          "w/o Memory, Evaluation & Refinement",
+          "58.97",
+          "38.78",
+          "57.94",
+          "41.18",
+          "49.22"
+        ]
+      ],
+      "highlight": [
+        3
+      ],
+      "source_url": "https://arxiv.org/e-print/2501.06590v1"
+    },
+    "primary_figure": true,
+    "figure_scroll": true
+  },
+  "contrasolver": {
+    "short_name": "ContraSolver",
+    "topic": "Preference consistency",
+    "takeaway": "A model's preferences can contradict each other; ContraSolver finds cycles in those judgments and selects reliable comparisons to improve alignment through DPO.",
+    "question": "A model may prefer A to B, B to C, and C to A. How can its own inconsistent judgments become useful alignment data?",
+    "method": [
+      {
+        "title": "Collect model preferences",
+        "text": "Sample responses and construct a directed graph from the model's pairwise judgments."
+      },
+      {
+        "title": "Identify conflicting cycles",
+        "text": "Start with a maximum spanning tree and use confidence scores to locate contradictory edges."
+      },
+      {
+        "title": "Train on reliable comparisons",
+        "text": "Select supporting preference pairs for DPO, encouraging the model to resolve weaker contradictions."
+      }
+    ],
+    "findings": [
+      {
+        "value": "90.00%",
+        "label": "AdvBench safe-response rate",
+        "detail": "Llama-2-7b-chat improves from 65.77% before alignment and 85.96% with confidence-only selection under the paper's automatic metric."
+      },
+      {
+        "value": "4 tasks",
+        "label": "Alignment evaluation",
+        "detail": "Experiments cover harm-free generation, instruction following, sentiment control, and summarization; preference-graph analysis also finds fewer contradictions."
+      }
+    ],
+    "scope": "Consistent preferences are not automatically correct preferences. Results depend on the model's judgments and task-specific evaluation, including automatic safety and quality metrics.",
+    "diagram": {
+      "title": "From cyclic judgments to alignment data",
+      "steps": [
+        {
+          "label": "Preference cycle",
+          "text": "A > B, B > C, C > A"
+        },
+        {
+          "label": "Confidence-guided selection",
+          "text": "Find stronger comparisons supporting a consistent ordering"
+        },
+        {
+          "label": "DPO update",
+          "text": "Train with selected preference pairs"
+        }
+      ],
+      "caption": "The graph makes contradictions across pairwise decisions explicit."
+    },
+    "figure_index": 0,
+    "figure_caption": "ContraSolver identifies cycles and selects reliable comparisons from a preference graph.",
+    "source_url": "https://arxiv.org/html/2406.08842v1",
+    "source_note": "Verified Algorithm 1, Sections 3.3–4.3 and Table 1. Corrected fabricated old task list (dialogue/translation/QA). DPO uses heuristic supporting edges E_h, not simply every flipped contradiction. 90% is automatic substring-based safe-response rate, not a guarantee of safety. v4 results table: Table 1 (label tab:safety), arXiv 2406.08842v1 source file neurips_2024.tex lines 402-428; PDF page 7.",
+    "metadata_override": {
+      "abstract": "While substantial advancements have been made in developing large language models (LLMs), achieving control over their behavior can be difficult. Direct preference optimization (DPO) assumes the existence of a latent reward function to evaluate the responses of LLMs. This assumption indicates a strict preference ordering of different responses to the same input. However, there always exist contradictions of preference in LLMs according to our experimental observations. In this paper, we construct a graph structure of the preference relationship among different responses with self-annotation to find contradictions in the preference order. We propose ContraSolver, an algorithm that traverses all edges on the preference graph to identify those that might cause contradictions. ContraSolver initializes the graph with a maximum spanning tree and identifies contradictory edges, prioritizing the resolution of low-confidence preferences while preserving high-confidence ones. Experimental results on four different generation tasks show that the performance of different LLMs can be largely improved through our completely unsupervised self-alignment. Furthermore, by analyzing the preference graphs of LLMs with and without self-alignment by ContraSolver, we quantify the reduction in contradictions, suggesting that resolving preference contradictions is crucial for achieving better alignment performance."
+    },
+    "figure_url": "https://arxiv.org/html/2406.08842v1/algorithm.png",
+    "figure_local": "assets/contrasolver-overview.png",
+    "primary_figure": true,
+    "results_table": {
+      "caption": "Table 1 (Llama-2-7b-chat rows). Safe-response rate (%) over three sampled responses per prompt, higher is better, computed by substring matching; Llama-2-7b-chat after DPO on pairs chosen by each selection method (Vanilla = no self-alignment). Random and Max-Confidence select the same number of preference pairs as ContraSolver, and substring matching is an automatic proxy for safety.",
+      "headings": [
+        "Method",
+        "SafeEdit (test)",
+        "AdvBench",
+        "MaliciousInstruct"
+      ],
+      "rows": [
+        [
+          "Vanilla",
+          "56.67%",
+          "65.77%",
+          "62.00%"
+        ],
+        [
+          "Random",
+          "56.22%",
+          "71.92%",
+          "70.00%"
+        ],
+        [
+          "Max-Confidence",
+          "62.96%",
+          "85.96%",
+          "83.00%"
+        ],
+        [
+          "ContraSolver",
+          "68.37%",
+          "90.00%",
+          "84.00%"
+        ]
+      ],
+      "highlight": [
+        3
+      ],
+      "source_url": "https://arxiv.org/e-print/2406.08842v1"
+    }
+  },
+  "coral": {
+    "short_name": "COrAL",
+    "topic": "Generation and refinement",
+    "takeaway": "COrAL lets a language model predict and revise several token positions within a local window, making the trade-off between reasoning accuracy and decoding speed explicit.",
+    "question": "Revising an answer usually means another sequential generation pass. Can a model build refinement into decoding while predicting multiple positions in the same context window?",
+    "method": [
+      {
+        "title": "Learn local dependencies",
+        "text": "Train for forward prediction and backward reconstruction within a limited context window."
+      },
+      {
+        "title": "Decode in blocks",
+        "text": "Predict and revise multiple positions as a sliding block advances through the response."
+      },
+      {
+        "title": "Choose a refinement budget",
+        "text": "Adjust verification and parallel prediction to trade computational cost against answer quality."
+      }
+    ],
+    "findings": [
+      {
+        "value": "+4.6 pp",
+        "label": "GSM8K · accuracy setting",
+        "detail": "Accuracy rises from 74.1% to 78.7% without multi-forward prediction; this setting runs more slowly than the baseline."
+      },
+      {
+        "value": "3.9×",
+        "label": "GSM8K · speed setting",
+        "detail": "Removing verification increases throughput, while accuracy falls to 72.4%. The largest speed and accuracy gains use different settings."
+      }
+    ],
+    "scope": "Parallel refinement is sensitive to output structure: the full method performs poorly on HumanEval, so the reported reasoning gains do not generalize to code generation.",
+    "diagram": {
+      "title": "Generation can revisit nearby positions",
+      "steps": [
+        {
+          "label": "Predict forward",
+          "text": "Propose several future token positions"
+        },
+        {
+          "label": "Refine backward",
+          "text": "Reconsider nearby tokens using local context"
+        },
+        {
+          "label": "Slide the block",
+          "text": "Verify accepted tokens and continue"
+        }
+      ],
+      "caption": "Forward prediction and backward refinement share a local decoding window."
+    },
+    "source_url": "https://arxiv.org/html/2410.09675v1",
+    "source_note": "Verified Sections 2–4 and Table 1. Explicitly separates +4.6 percentage points (w/o multi-forward, 14.9 tokens/s) from 3.9× speed (w/o verifier, accuracy 72.4%). Full system is 75.3%, 1.1× on GSM8K. Removed claim of refinement without extra forward passes.",
+    "metadata_override": {
+      "abstract": "Iterative refinement has emerged as an effective paradigm for enhancing the capabilities of large language models (LLMs) on complex tasks. However, existing approaches typically implement iterative refinement at the application or prompting level, relying on autoregressive (AR) modeling. The sequential token generation in AR models can lead to high inference latency. To overcome these challenges, we propose Context-Wise Order-Agnostic Language Modeling (COrAL), which incorporates iterative refinement directly into the LLM architecture while maintaining computational efficiency. Our approach models multiple token dependencies within manageable context windows, enabling the model to perform iterative refinement internally during the generation process. Leveraging the order-agnostic nature of COrAL, we introduce sliding blockwise order-agnostic decoding, which performs multi-token forward prediction and backward reconstruction within context windows. This allows the model to iteratively refine its outputs in parallel in the sliding block, effectively capturing diverse dependencies without the high inference cost of sequential generation. Empirical evaluations on reasoning tasks demonstrate that COrAL improves performance and inference speed, respectively, achieving absolute accuracy gains of 4.6% on GSM8K and 4.0% on LogiQA, along with inference speedups of up to 3.9× over next-token baselines. Preliminary results on code generation indicate a drop in pass rates due to inconsistencies in order-agnostic outputs, highlighting the inherent quality–speed trade-off. Our code is publicly available at https://github.com/YuxiXie/COrAL."
+    },
+    "figure_local": "assets/coral-decoding.svg",
+    "figure_url": "https://arxiv.org/html/2410.09675v1/decoding.drawio.svg",
+    "figure_caption": "Sliding blockwise order-agnostic decoding on the paper's own example: at each step the block is refined with forward and backward multi-token dependencies, the repeated “marine” is revised to “organ”, and verified tokens become fixed as the block advances. Original Figure 2 from the paper.",
+    "primary_figure": true
+  },
+  "derl": {
+    "short_name": "DERL",
+    "topic": "Learning reward functions",
+    "takeaway": "DERL learns how to combine simple reward signals: a meta-optimizer proposes rewards, trains a policy with them, and improves from that policy's validation performance.",
+    "question": "A reward that is easy to write may not teach the right behavior. Can task performance train the system that designs the reward itself?",
+    "method": [
+      {
+        "title": "Compose a reward",
+        "text": "A trainable meta-optimizer combines task-specific checks and arithmetic operations into a reward function."
+      },
+      {
+        "title": "Train a policy",
+        "text": "Use the proposed reward to optimize an inner policy with GRPO."
+      },
+      {
+        "title": "Learn from validation",
+        "text": "Held-out policy performance becomes the RL reward used to update the meta-optimizer."
+      }
+    ],
+    "findings": [
+      {
+        "value": "65.0%",
+        "label": "ALFWorld · hardest split",
+        "detail": "Standard DERL reaches 65.0% task success on L2, compared with 56.3% for RLVMR using Qwen2.5-1.5B-Instruct."
+      },
+      {
+        "value": "43.0%",
+        "label": "ScienceWorld · L1 split",
+        "detail": "Standard DERL improves success over RLVMR's 34.4%, supporting reward learning beyond the household-task benchmark in the same evaluation."
+      }
+    ],
+    "scope": "Reward search still depends on supplied atomic checks and repeated policy training. Policy gradients update the reward generator; the method does not directly backpropagate through every training run.",
+    "diagram": {
+      "title": "Reward design learns from the policy it produces",
+      "steps": [
+        {
+          "label": "Meta-optimizer",
+          "text": "Generate a composition of reward primitives"
+        },
+        {
+          "label": "Inner policy",
+          "text": "Learn using the generated reward"
+        },
+        {
+          "label": "Validation feedback",
+          "text": "Update the reward generator with policy gradients"
+        }
+      ],
+      "caption": "The outer loop evaluates how well each reward teaches the inner policy."
+    },
+    "source_url": "https://arxiv.org/html/2512.13399v1",
+    "source_note": "Verified Section 3, Table 1 and limitations. Uses standard DERL scores rather than mixing DERL-pop variants. Corrects old implication of exact end-to-end differentiation, autonomous design without task-specific primitives, and graph-neural architecture as main method (GNN is preliminary appendix experiment). v4 results table: Table 1 (label tab:results_on_agent), arXiv 2512.13399v1 source file iclr2025_conference.tex lines 702-731; PDF page 8.",
+    "figure_index": 0,
+    "figure_url": "https://arxiv.org/html/2512.13399v1/differentiable-pbt.png",
+    "figure_caption": "Validation performance trains the reward generator; its proposed rewards guide policy learning.",
+    "figure_local": "assets/derl-overview.png",
+    "primary_figure": true,
+    "results_table": {
+      "caption": "Table 1 (ALFWorld L1 column omitted). Task success rate (%), higher is better; inner policy Qwen2.5-1.5B-Instruct, where L0 tests seen variants, L1 unseen variants, and L2 task types held out from training. DERL-pop. initializes each inner loop from the best policy of the previous loop while keeping the total inner-loop training steps equal to DERL. GRPO baselines were run by the authors, while GiGPO and RLVMR results are taken from the RLVMR paper (Zhang et al., 2025).",
+      "headings": [
+        "Method",
+        "ALFWorld L0",
+        "ALFWorld L2",
+        "ScienceWorld L0",
+        "ScienceWorld L1",
+        "ScienceWorld L2"
+      ],
+      "rows": [
+        [
+          "GRPO w/ Outcome Reward",
+          "76.6",
+          "29.7",
+          "21.1",
+          "13.7",
+          "10.9"
+        ],
+        [
+          "GRPO w/ Avg Reward",
+          "88.1",
+          "30.5",
+          "37.9",
+          "31.3",
+          "18.0"
+        ],
+        [
+          "GiGPO",
+          "86.7",
+          "48.0",
+          "25.8",
+          "15.2",
+          "4.7"
+        ],
+        [
+          "RLVMR",
+          "89.1",
+          "56.3",
+          "46.9",
+          "34.4",
+          "26.5"
+        ],
+        [
+          "DERL",
+          "91.0",
+          "65.0",
+          "47.7",
+          "43.0",
+          "30.1"
+        ],
+        [
+          "DERL-pop.",
+          "91.8",
+          "76.4",
+          "98.2",
+          "95.3",
+          "31.3"
+        ]
+      ],
+      "highlight": [
+        4,
+        5
+      ],
+      "source_url": "https://arxiv.org/e-print/2512.13399v1"
+    }
+  },
+  "geometry-of-reasoning": {
+    "short_name": "The Geometry of Reasoning",
+    "topic": "Representation geometry",
+    "takeaway": "When the same logical argument is expressed across topics and languages, changes along its representation trajectory reveal more shared logical structure than embedding positions alone.",
+    "question": "Embeddings reflect both what a statement says and how an argument progresses. Can geometric measurements separate logical structure from changes in topic and language?",
+    "method": [
+      {
+        "title": "Hold the logic fixed",
+        "text": "Express natural-deduction structures through different topical and linguistic contexts."
+      },
+      {
+        "title": "Trace reasoning steps",
+        "text": "Pool final-layer hidden states for each step to form a representation trajectory."
+      },
+      {
+        "title": "Compare trajectory geometry",
+        "text": "Measure similarity in position, stepwise velocity, and curvature across matching logic, topics, and languages."
+      }
+    ],
+    "findings": [
+      {
+        "value": "Position",
+        "label": "Surface content dominates",
+        "detail": "Across the four main models, embedding positions are more similar within a language than within a logical structure."
+      },
+      {
+        "value": "Velocity + curvature",
+        "label": "Logical structure becomes clearer",
+        "detail": "Stepwise changes and trajectory curvature show stronger similarity for shared logic than for shared topics or languages."
+      }
+    ],
+    "scope": "Evidence comes from controlled reasoning sequences and representation proxies. Geometric correlations support the framework but do not establish a causal mechanism or universal theory of reasoning.",
+    "diagram": {
+      "title": "Track how representations change",
+      "steps": [
+        {
+          "label": "Matched arguments",
+          "text": "Same deduction; different topics and languages"
+        },
+        {
+          "label": "Step embeddings",
+          "text": "Extract a trajectory through representation space"
+        },
+        {
+          "label": "Geometric comparison",
+          "text": "Contrast position, velocity, and curvature"
+        }
+      ],
+      "caption": "Controlled semantic variation helps isolate the geometric signature of logical structure."
+    },
+    "source_url": "https://arxiv.org/html/2510.09782v1",
+    "source_note": "Verified Sections 5–6 and Table 1. Old page wrongly described cross-layer ODE trajectories and geodesic validity; experiment actually pools final-layer representations per reasoning step. Existing local PCA illustration was inspected but cannot be matched to original paper figures; omit figure_index. Dataset arithmetic is internally inconsistent (30×20×4 vs stated 2,430), so no dataset-size headline. v4 results table: Table 1 (label tab:model_similarity), arXiv 2510.09782v1 source file 6_experiment.tex lines 7-29; PDF page 8.",
+    "metadata_override": {
+      "abstract": "We study how large language models (LLMs) “think” through their representation space. We propose a novel geometric framework that models an LLM's reasoning as flows—embedding trajectories evolving where logic goes. We disentangle logical structure from semantics by employing the same natural deduction propositions with varied semantic carriers, allowing us to test whether LLMs internalize logic beyond surface form. This perspective connects reasoning with geometric quantities such as position, velocity, and curvature, enabling formal analysis in representation and concept spaces. Our theory establishes: (1) LLM reasoning corresponds to smooth flows in representation space, and (2) logical statements act as local controllers of these flows' velocities. Using learned representation proxies, we design controlled experiments to visualize and quantify reasoning flows, providing empirical validation of our theoretical framework. Our work serves as both a conceptual foundation and practical tools for studying reasoning phenomenon, offering a new lens for interpretability and formal analysis of LLMs' behavior."
+    },
+    "results_table": {
+      "caption": "Table 1 (Qwen3 0.6B row, rearranged with one row per measure). Mean cosine similarity (position, velocity) and Pearson correlation (curvature) between reasoning flows that share the same logic, topic, or language; higher means more similar. Each measure has its own scale, so compare groupings within a row, not values across rows.",
+      "headings": [
+        "Measure",
+        "Logic",
+        "Topic",
+        "Lang."
+      ],
+      "rows": [
+        [
+          "Position similarity",
+          "0.26",
+          "0.30",
+          "0.85"
+        ],
+        [
+          "Velocity similarity",
+          "0.17",
+          "0.07",
+          "0.08"
+        ],
+        [
+          "Curvature similarity",
+          "0.53",
+          "0.11",
+          "0.13"
+        ]
+      ],
+      "highlight": [],
+      "source_url": "https://arxiv.org/e-print/2510.09782v1"
+    },
+    "figure_local": "assets/geometry-of-reasoning-overview.png",
+    "figure_url": "https://arxiv.org/pdf/2510.09782v1 (page 2, Figure 1; rendered at 500 dpi, cropped to the panel area, resized to 2400 px wide)",
+    "figure_caption": "Reasoning flows: 3-D and 2-D PCA projections of step-wise representation trajectories for one MATH500 problem with six distinct answers (left, center), and the paper's schematic of mappings among input space X, concept space C, logic space L, and representation space R (right). Original Figure 1 from the paper.",
+    "primary_figure": true
+  },
+  "godel-agent": {
+    "short_name": "Gödel Agent",
+    "topic": "Self-modifying agents",
+    "takeaway": "Gödel Agent can inspect and rewrite its own running code, using task feedback to revise both its problem-solving policy and the procedure that improves it.",
+    "question": "Most agent optimization searches within a fixed human-designed routine. What becomes possible when the agent can also change the code that organizes its own improvements?",
+    "method": [
+      {
+        "title": "Inspect its implementation",
+        "text": "Expose the agent's functions, variables, and current policy through runtime introspection."
+      },
+      {
+        "title": "Modify running code",
+        "text": "An LLM proposes changes and applies them through Python monkey patching."
+      },
+      {
+        "title": "Evaluate and iterate",
+        "text": "Task feedback and error traces inform subsequent changes to the policy and improvement process."
+      }
+    ],
+    "findings": [
+      {
+        "value": "64.2%",
+        "label": "MGSM · Gödel-base",
+        "detail": "Under the closed-book GPT-3.5 setup, test accuracy exceeds Meta Agent Search's 53.4% on multilingual mathematical reasoning."
+      },
+      {
+        "value": "80.9 F1",
+        "label": "DROP · Gödel-base",
+        "detail": "The constrained agent improves over the reported 79.4 F1 for Meta Agent Search on reading comprehension requiring discrete reasoning."
+      }
+    ],
+    "scope": "The experiments support a broader empirical search over agent programs. They do not establish monotonic improvement, global optimality, or open-ended gains beyond current model capabilities.",
+    "diagram": {
+      "title": "The improvement procedure is editable too",
+      "steps": [
+        {
+          "label": "Read its code",
+          "text": "Inspect policy and improvement functions"
+        },
+        {
+          "label": "Rewrite and execute",
+          "text": "Apply changes to the running agent"
+        },
+        {
+          "label": "Use task feedback",
+          "text": "Evaluate behavior and choose another revision"
+        }
+      ],
+      "caption": "Feedback can change both the solver and the code that revises it."
+    },
+    "figure_index": 2,
+    "figure_caption": "Figure 3. The agent inspects and replaces functions in runtime memory. Later calls enter the revised implementation.",
+    "source_url": "https://arxiv.org/html/2410.04444v4",
+    "source_note": "Verified Sections 4–6 and Table 1; official ACL metadata also checked. Removed unsupported ALFWorld claim, blanket all-baselines victory, self-awareness language, and claimed guaranteed rollback. Gödel-free uses stronger models; show Gödel-base only. Official published title uses 'Recursively Self-Improvement'.",
+    "metadata_override": {
+      "title": "Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement",
+      "authors": "Xunjian Yin, Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, William Yang Wang",
+      "abstract": "The rapid advancement of large language models (LLMs) has significantly enhanced the capabilities of agents across various tasks. However, existing agentic systems, whether based on fixed pipeline algorithms or pre-defined meta-learning frameworks, cannot search the whole agent design space due to the restriction of human-designed components, and thus might miss the more optimal agent design. In this paper, we introduce Gödel Agent, a self-evolving framework inspired by the Gödel Machine, enabling agents to recursively improve themselves without relying on predefined routines or fixed optimization algorithms. Gödel Agent leverages LLMs to dynamically modify its own logic and behavior, guided solely by high-level objectives through prompting. Experimental results on multiple domains demonstrate that the implementation of Gödel Agent can achieve continuous self-improvement, surpassing manually crafted agents in performance, efficiency, and generalizability.",
+      "citation": "@inproceedings{yin-etal-2025-godel,\n    title = {G{\\\"o}del Agent: A Self-Referential Agent Framework for Recursively Self-Improvement},\n    author = {Yin, Xunjian and Wang, Xinyi and Pan, Liangming and Lin, Li and Wan, Xiaojun and Wang, William Yang},\n    booktitle = {Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},\n    month = jul,\n    year = {2025},\n    address = {Vienna, Austria},\n    publisher = {Association for Computational Linguistics},\n    url = {https://aclanthology.org/2025.acl-long.1354/},\n    doi = {10.18653/v1/2025.acl-long.1354},\n    pages = {27890--27913}\n}"
+    },
+    "figure_url": "https://arxiv.org/html/2410.04444v4/method_1.png",
+    "figure_local": "assets/godel-agent-overview.png",
+    "primary_figure": false,
+    "figure_inline": true
+  }
+}

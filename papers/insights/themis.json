@@ -1,0 +1,34 @@
+{
+  "story": {
+    "title": "The evaluator should follow the rubric, not just recognize good prose",
+    "paragraphs": [
+      "Imagine a summary that is smooth and concise but attributes an action to the wrong person. A fluency assessment and a factual-consistency assessment should reach different conclusions about the same text. A flexible evaluator must track which question it has been asked, rather than letting a generally positive impression determine every score. Themis is designed around this need for task-specific criteria and an explanation tied to the requested aspect.",
+      "Reference-free evaluation removes one practical dependency: a user does not need to supply a gold answer for every output. It does not remove the need for evidence. Themis still receives the task context, candidate output, and evaluation criteria. Its central engineering problem is obtaining training judgments that reliably connect those inputs to both a rating and a relevant analysis, rather than merely collecting a large quantity of plausible critiques."
+    ]
+  },
+  "mechanism": {
+    "title": "Agreement is checked at the rating and explanation levels",
+    "paragraphs": [
+      "NLG-Eval combines existing human evaluations with GPT-4 annotations and explicit criterion descriptions. The training pipeline balances tasks, aspects, and rating categories. It then filters from three perspectives: repeated GPT-4 judgments should agree; the resulting rating should be close to the human label; and the generated analysis should match both its numerical rating and the requested evaluation aspect. Agreement alone is not treated as sufficient if an explanation discusses the wrong criterion.",
+      "The preference stage also differs from applying standard DPO to arbitrary good and bad answers. The outputs being compared are evaluations themselves. Judgments that match the consistent rating become preferred examples, while inconsistent judgments become rejected ones. The optimization incorporates the size of the rating difference, making the desired separation sensitive to how far apart the evaluations are. The result is an evaluator trained to produce a rating and analysis, rather than a general response model given an evaluation prompt after training."
+    ]
+  },
+  "evidence": {
+    "title": "The ablations support data selection, not just more data",
+    "paragraphs": [
+      "With approximately the same 67,000-example training budget, the paper reports an average Spearman correlation of 0.476 using raw samples, compared with 0.542 for the complete method. Training on all raw data reaches 0.493, so data quantity alone does not recover the selected pipeline’s performance. Removing DPO gives 0.508, while vanilla DPO gives 0.528. These comparisons support contributions from both consistency-based selection and the rating-guided alignment design.",
+      "Generalization is tested on instruction-following and long-form question-answering evaluation, with different quality criteria. Themis’s average correlation is 0.545 versus 0.442 for the tested GPT-4 baseline, but individual criteria vary: GPT-4 remains stronger on completeness and simple language. The appropriate conclusion is a competitive specialized evaluator with evidence of transfer, not uniform superiority. Human ratings, GPT-4-derived supervision, and benchmark-specific criteria still shape what the model learns to call a good evaluation."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Paper · Sections 2–5 and Tables 2–4",
+      "url": "https://aclanthology.org/2024.emnlp-main.891.pdf"
+    },
+    {
+      "label": "Themis model and corpus",
+      "url": "https://github.com/PKU-ONELab/Themis"
+    }
+  ],
+  "reading_notes": "Re-read Section3 filtering and rating-guided DPO and Tables3–4. Explain preference outputs as evaluations, not generated task answers. Ablations are reported full-model settings; avoid implying a clean isolated causal estimate beyond those comparisons."
+}

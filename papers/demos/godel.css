@@ -1,0 +1,106 @@
+/* Case, executable arithmetic and original evidence use the paper's shared type. */
+.godel-case { margin-top: 22px; }
+.godel-case-heading { max-width: 780px; }
+.godel-case-heading h3 { margin: 8px 0 16px; }
+.godel-code-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 27px; }
+.godel-code-comparison section { min-width: 0; border-top: 2px solid #9aac9e; background: white; }
+.godel-code-comparison section:last-child { border-color: var(--accent); }
+.godel-code-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 15px 17px 0; }
+.godel-code-title h4 { font-size: 14px; margin: 0; }
+.godel-code-title a { font-size: 11px; white-space: nowrap; }
+.godel-code-comparison pre { margin: 15px 0; padding: 0 17px; font: 12px/1.8 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; color: #304d3e; }
+.godel-code-comparison p { padding: 0 17px 17px; font-size: 12px; line-height: 1.7; color: var(--muted); }
+.godel-source-note, .godel-provenance { font-size: 11px; line-height: 1.8; color: var(--muted); margin-top: 14px; }
+.godel-provenance { border-top: 1px solid var(--line); padding-top: 15px; }
+.godel-workbench { background: white; border: 1px solid var(--line); margin-top: 28px; padding: 25px; }
+.godel-workbench-title { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; }
+.godel-workbench-title h4 { font-size: 16px; margin: 0; }
+.godel-workbench-title > span { font-size: 10px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.godel-input-controls { margin: 22px 0; }
+.godel-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.godel-form label { display: flex; flex: 1; min-width: 180px; flex-direction: column; gap: 5px; font-size: 12px; }
+.godel-form input { width: 100%; padding: 10px 12px; border: 1px solid #bcc9c0; border-radius: 0; font: 16px ui-monospace, monospace; background: #fff; color: var(--ink); }
+.godel-case button { min-height: 42px; padding: 8px 14px; font-size: 12px; color: var(--ink); border: 1px solid #bcc9c0; background: white; border-radius: 0; }
+.godel-form button { background: var(--accent); border-color: var(--accent); color: white; }
+.godel-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.godel-presets button[aria-pressed="true"] { background: var(--wash); border-color: var(--accent); }
+.godel-case button:hover { filter: brightness(.97); }
+#godel-input-help { color: var(--muted); margin-top: 6px; font-size: 11px; }
+.godel-search-state { border-top: 1px solid var(--line); padding-top: 24px; margin-top: 20px; }
+.godel-number-cards { display: flex; gap: 10px; margin-bottom: 20px; }
+.godel-number-cards span { width: 48px; height: 56px; display: grid; place-items: center; border: 1px solid #c7d3c9; font: 28px Georgia, serif; background: #fbfcfa; }
+.godel-solution-label { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: .09em; }
+.godel-expression { font: 400 clamp(21px, 3vw, 30px)/1.55 Georgia, serif; color: var(--ink); margin-top: 7px; overflow-wrap: anywhere; }
+.godel-validation { margin-top: 9px; font-size: 12px; color: var(--muted); }
+.godel-arithmetic { list-style: none; margin-top: 22px; display: flex; flex-wrap: wrap; gap: 12px 30px; padding: 0; }
+.godel-arithmetic li { display: flex; align-items: baseline; gap: 10px; }
+.godel-arithmetic li > span { color: #83968a; font: 11px ui-monospace, monospace; }
+.godel-arithmetic code { font-size: 13px; }
+.godel-search-count { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+.godel-search-state[data-outcome="unsolved"] .godel-solution-label, .godel-search-state[data-outcome="invalid"] .godel-expression { color: #985232; }
+.godel-observed-run { margin-top: 45px; }
+.godel-observed-run h3, .godel-results h3, .godel-change-table h3 { font: 400 24px/1.4 Georgia, serif; margin: 7px 0 14px; }
+.godel-reading { max-width: 780px; font-size: 14px; color: #424e47; line-height: 1.85; }
+.godel-paper-figure { margin-top: 25px; }
+.godel-figure-scroll { overflow-x: auto; }
+.godel-figure-scroll > a { display: block; }
+.godel-paper-figure img { width: 100%; max-width: 968px; height: auto; display: block; margin: auto; background: white; }
+.godel-paper-figure figcaption { font-size: 11px; line-height: 1.8; color: var(--muted); margin-top: 12px; }
+.godel-change-table { margin-top: 30px; }
+.godel-change-table > p { font-size: 13px; color: var(--muted); }
+.godel-change-table table { min-width: 590px; width: 100%; margin-top: 18px; border-collapse: collapse; font-size: 12px; line-height: 1.7; }
+.godel-change-table td, .godel-change-table th { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.godel-change-table th:first-child { min-width: 140px; }
+.godel-change-table thead { background: var(--wash); }
+.godel-results { margin-top: 34px; }
+.godel-results .table-scroll table { min-width: 640px; width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+.godel-results td, .godel-results th { text-align: left; border-bottom: 1px solid var(--line); padding: 12px 13px; }
+.godel-results thead { background: var(--wash); }
+.godel-results td { white-space: nowrap; }
+.godel-results td span { color: var(--muted); font-size: 11px; }
+.godel-results td strong { font-weight: 400; }
+.godel-results .godel-result-focus { background: #edf3ec; }
+.godel-results .godel-result-focus td strong { font-weight: 700; }
+.godel-table-caption { font-size: 12px; line-height: 1.75; margin: 20px 0 10px; color: var(--muted); }
+.godel-protocol { margin: 30px 0; }
+.godel-protocol h4 { font-size: 14px; margin-bottom: 10px; }
+.godel-protocol dl { margin: 0; }
+.godel-protocol dl > div { display: grid; grid-template-columns: 250px 1fr; gap: 20px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+.godel-protocol dt { color: var(--muted); }
+.godel-protocol dd { margin: 0; }
+.godel-ablation { margin-top: 34px; }
+.godel-ablation ul { list-style: none; padding: 0; margin-top: 22px; max-width: 780px; }
+.godel-ablation li { display: grid; grid-template-columns: 175px 1fr 52px; gap: 15px; align-items: center; padding: 9px 0; font-size: 12px; }
+.godel-ablation strong { font-variant-numeric: tabular-nums; font-weight: 500; }
+.godel-bar-track { height: 12px; background: #eef2ec; }
+.godel-bar-track i { display: block; height: 100%; background: #839780; }
+.godel-ablation li:first-child i { background: var(--accent); }
+.godel-robustness { margin-top: 34px; }
+.godel-robustness > p { font-size: 13px; color: var(--muted); }
+.godel-robustness dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin: 22px 0 0; }
+.godel-robustness dl > div { border-top: 1px solid var(--line); padding-top: 15px; }
+.godel-robustness dt { font: 32px Georgia, serif; color: var(--accent); }
+.godel-robustness dd { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+@media (max-width: 700px) {
+  .godel-code-comparison { grid-template-columns: 1fr; gap: 18px; }
+  .godel-workbench { padding: 18px 15px; }
+  .godel-form { gap: 10px; }
+  .godel-form button { width: 100%; }
+  .godel-presets button { text-align: left; }
+  .godel-reading { font-size: 13px; }
+  .godel-paper-figure img { min-width: 760px; }
+  .godel-protocol dl > div { grid-template-columns: 1fr; gap: 4px; }
+  /* Prose table: stack each row instead of scrolling sideways. */
+  .godel-change-table table { min-width: 0; }
+  .godel-change-table thead { display: none; }
+  .godel-change-table tr, .godel-change-table th, .godel-change-table td { display: block; }
+  .godel-change-table tr { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .godel-change-table tbody th, .godel-change-table td { border: 0; padding: 0; }
+  .godel-change-table tbody th { font-weight: 600; margin-bottom: 4px; }
+  .godel-change-table td + td { color: var(--muted); margin-top: 4px; }
+  .godel-ablation li { grid-template-columns: 1fr 54px; gap: 8px; }
+  .godel-ablation li > span { grid-column: 1 / -1; }
+  .godel-robustness dl { gap: 15px; }
+  .godel-robustness dt { font-size: 28px; }
+  .godel-robustness dd { font-size: 11px; }
+}

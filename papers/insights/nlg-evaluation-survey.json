@@ -1,0 +1,34 @@
+{
+  "story": {
+    "title": "Choosing an evaluator also chooses what quality means",
+    "paragraphs": [
+      "A generated answer can be fluent, relevant, complete, and factually wrong at the same time. This makes NLG evaluation unlike checking a single label: valid outputs differ, and different users may value different qualities. The survey’s organizing question is not whether an LLM can emit a plausible score. It is how the score is obtained, what information supports it, and which assumptions are hidden inside the evaluation procedure.",
+      "For example, likelihood-based scoring asks whether text is probable under a model, while a prompted judge is asked to apply an explicit rubric. A fine-tuned evaluator learns from examples of judgments; human–LLM collaboration keeps people involved in defining criteria or inspecting assessments. These approaches can use the same underlying language model and still measure different things. The four-part taxonomy makes those design choices visible rather than grouping every use of an LLM under one metric label."
+    ]
+  },
+  "mechanism": {
+    "title": "The taxonomy separates signals, interfaces, and supervision",
+    "paragraphs": [
+      "LLM-derived metrics extract evaluation signals from model representations or generation probabilities. Their numerical outputs are convenient, but a score’s relation to a chosen quality dimension may be indirect. Prompted evaluation supplies task instructions and criteria, then requests scores, pairwise comparisons, rankings, answers to evaluation questions, or error analyses. Changing the output format changes the decision being asked of the model; a preference between two answers is not automatically a calibrated absolute rating.",
+      "Fine-tuning moves part of the evaluation design into training data. Important differences include who produces the labels, whether explanations are included, whether references are required, and whether criteria can vary at inference. The final survey also distinguishes human-guided LLM evaluation from LLM-assisted human evaluation. People may define or refine rubrics for a model, while a model may propose critiques or test cases for a human to review. These are different divisions of work, with different costs and failure modes."
+    ]
+  },
+  "evidence": {
+    "title": "Useful evaluation needs its own evaluation",
+    "paragraphs": [
+      "Because this is a survey, its contribution is a structured synthesis rather than a new shared leaderboard experiment. The literature documents cases where prompted judges favor a response’s presentation position, length, or stylistic resemblance to model-generated text. Fine-tuning can address some behaviors, but synthetic evaluation data can also carry the teacher model’s biases into a smaller evaluator. An explanation can expose the judge’s stated reasoning without guaranteeing that the reasoning is faithful or correct.",
+      "A practical implication is to validate the evaluator against the decision it will actually support. If the aim is system ranking, inspect agreement at that level; if the aim is identifying factual errors in individual answers, system-level correlation is insufficient. Criteria, model versions, input formats, and human reference judgments all belong in that validation. The survey supports choosing an approach with explicit trade-offs, rather than interpreting the flexibility of natural-language judging as evidence that evaluation has become a solved problem."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Published survey · Sections 2–6",
+      "url": "https://aclanthology.org/2025.cl-2.9.pdf"
+    },
+    {
+      "label": "ACL Anthology record",
+      "url": "https://aclanthology.org/2025.cl-2.9/"
+    }
+  ],
+  "reading_notes": "Read final CL2025 PDF, including changed collaboration taxonomy: human-guided LLM evaluation and LLM-assisted human evaluation. Avoid treating ordinal pros/cons discussion as a measured universal ranking."
+}

@@ -1,0 +1,743 @@
+{
+  "alcuna": {
+    "title": "ALCUNA: Large Language Models Meet New Knowledge",
+    "authors": "Xunjian Yin* , Baizhou Huang*, Xiaojun Wan",
+    "venue": "EMNLP 2023",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2023.emnlp-main.87/"
+      },
+      {
+        "label": "arXiv",
+        "url": "https://arxiv.org/abs/2310.14820"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/arvid-pku/alcuna"
+      }
+    ],
+    "abstract": "With the rapid development of NLP, large-scale language models (LLMs) excel in various benchmarks. However, the existing benchmarks may not adequately measure an LLM's ability to handle new knowledge. In this paper, we address the lack of benchmarks to evaluate LLMs' ability to handle new knowledge, an important issue in the age of information. We propose an approach called KnowGen that generates new knowledge by altering existing entity attributes and relationships, resulting in artificial entities that are absent from LLMs' training data. With KnowGen, we introduce a benchmark named ALCUNA to assess LLMs' abilities in knowledge understanding, differentiation, and association. We benchmark several LLMs and the results reveal that LLM performance in the face of new knowledge is not satisfactory, particularly in reasoning between new and internal knowledge. We also explore the impact of entity similarity and context on LLM understanding of new knowledge.",
+    "citation": "@inproceedings{yin-etal-2023-alcuna,\n    title = \"{ALCUNA}: Large Language Models Meet New Knowledge\",\n    author = \"Yin, Xunjian and Huang, Baizhou and Wan, Xiaojun\",\n    booktitle = \"Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing\",\n    year = \"2023\",\n    url = \"https://aclanthology.org/2023.emnlp-main.87/\",\n    pages = \"1397--1414\"\n}",
+    "figures": [
+      {
+        "src": "https://raw.githubusercontent.com/Arvid-pku/alcuna/main/overview.png",
+        "alt": "ALCUNA Framework Overview: KnowGen generates artificial entities with modified attributes and relationships to test LLM knowledge handling",
+        "caption": "Overview of ALCUNA. KnowGen creates artificial entities by modifying attributes and relationships of existing ones, producing knowledge guaranteed to be absent from any training corpus. The benchmark then probes three dimensions: understanding, differentiation, and association."
+      }
+    ],
+    "original_words": 950
+  },
+  "atomic-to-composite": {
+    "title": "From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning",
+    "authors": "Sitao Cheng, Xunjian Yin , Ruiwen Zhou, Yuxuan Li, Xinyi Wang, Liangming Pan, William Yang Wang, Victor Zhong",
+    "venue": "ArXiv Preprint 2025",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2512.01970"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/sitaocheng/from_atomic_to_composite"
+      }
+    ],
+    "abstract": "A key question about reinforcement learning (RL) is whether it synthesizes new reasoning skills or merely amplifies existing ones. We study this through Complementary Reasoning, a task that requires integrating parametric knowledge (what the model knows) with contextual information (what is provided). Using a controlled synthetic dataset, we decompose this into two atomic skills: Parametric Reasoning (internal knowledge) and Contextual Reasoning (external information). Our experiments reveal the SFT Generalization Paradox: while SFT is sufficient for in-distribution performance, it struggles with O.O.D. generalization, especially in novel compositional settings. Models trained on composite tasks achieve strong in-distribution accuracy but fail on out-of-distribution scenarios due to memorization patterns. Crucially, we demonstrate that RL acts as a reasoning synthesizer rather than a probability amplifier, but requires models to first master independent atomic skills through supervised fine-tuning. Our findings suggest that decoupled atomic training followed by RL offers a scalable path to generalization for complex reasoning tasks.",
+    "citation": "@misc{cheng2025atomiccompositereinforcementlearning,\n    title={From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning},\n    author={Sitao Cheng and Xunjian Yin and Ruiwen Zhou and Yuxuan Li and Xinyi Wang and Liangming Pan and William Yang Wang and Victor Zhong},\n    year={2025},\n    eprint={2512.01970},\n    archivePrefix={arXiv},\n    primaryClass={cs.AI},\n    url={https://arxiv.org/abs/2512.01970}\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2512.01970v1/x1.png",
+        "alt": "The SFT Generalization Paradox overview",
+        "caption": "Figure 1. The SFT Generalization Paradox: Models trained on atomic skills generalize better via RL than models trained directly on the composite task. (a) Example of Complementary Reasoning requiring both Parametric and Contextual Reasoning. (b) Evaluation protocol through three levels of difficulty. (c) RL composes new skills only when the base model has sufficient atomic abilities."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.01970v1/images/figure1_relative_abs.png",
+        "alt": "RL vs SFT performance comparison",
+        "caption": "Figure 2. Comparison of reinforcement learning on different base models across complementary data proportions. The top row shows RL gains; the bottom row shows absolute performance. LLMs generalize to complementary reasoning only from SFT models trained on both parametric and contextual reasoning."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.01970v1/images/four_comparison_bars.png",
+        "alt": "Necessity of atomic skills for RL generalization",
+        "caption": "Figure 3. Necessity of atomic skills for RL generalization. RL with the same composite data from different SFT-trained models: only SFT on both Mem+Ctx generalizes well across all evaluation levels."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.01970v1/images/plot_12800_samples_breakdown.png",
+        "alt": "Performance of different training strategies",
+        "caption": "Figure 4. Performance of training with different strategies over 12.8k composite samples, showing the breakdown across difficulty levels."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.01970v1/images/passk_comparison_combined_figure.png",
+        "alt": "Pass@k comparison",
+        "caption": "Figure 5. Pass@k comparison for SFT on atomics vs. SFT on composite. RL synthesizes new compositional skills only when built on models with sufficient atomic abilities."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.01970v1/images/model_scaling_performance.png",
+        "alt": "Model scaling analysis",
+        "caption": "Figure 6. Model scaling analysis across Qwen 0.5B, 1.5B, and 3B parameters, showing the pattern holds across model sizes."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.01970v1/images/pca_shift_sequential_focused.png",
+        "alt": "PCA analysis of representation shifts",
+        "caption": "Figure 7. PCA analysis of representation shifts during RL training. Scatter points represent layer-wise shifts; large markers show the global centroid shift for each reasoning type, illustrating how RL reorganizes internal representations."
+      }
+    ],
+    "original_words": 1195
+  },
+  "chemagent": {
+    "title": "ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning",
+    "authors": "Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, Xunjian Yin , Siru Ouyang, Wangchunshu Zhou, Pan Lu, Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein",
+    "venue": "ICLR 2025",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://openreview.net/forum?id=VQAW04w08X"
+      },
+      {
+        "label": "arXiv",
+        "url": "https://arxiv.org/abs/2501.06590"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/gersteinlab/chemagent"
+      }
+    ],
+    "abstract": "Chemical reasoning usually involves complex, multi-step processes that demand precise calculations, where even minor errors can lead to cascading failures. Furthermore, large language models (LLMs) encounter difficulties handling domain-specific formulas, executing reasoning steps accurately, and integrating code effectively when tackling chemical reasoning tasks. To address these challenges, we present ChemAgent, a novel framework designed to improve the performance of LLMs through a dynamic, self-updating library. This library is developed by decomposing chemical tasks into sub-tasks and compiling these sub-tasks into a structured collection that can be referenced for future queries. Then, when presented with a new problem, ChemAgent retrieves and refines pertinent information from the library, which we call memory, facilitating effective task decomposition and the generation of solutions. Our method designs three types of memory and a library-enhanced reasoning component, enabling LLMs to improve over time through experience. Experimental results on four chemical reasoning datasets from SciBench demonstrate that ChemAgent achieves performance gains of up to 46% (GPT-4), significantly outperforming existing methods. Our findings suggest substantial potential for future applications, including tasks such as drug discovery and materials science.",
+    "citation": "@inproceedings{tang2025chemagent,\n  title={ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning},\n  author={Tang, Xiangru and Hu, Tianyu and Ye, Muyang and Shao, Yanjun and Yin, Xunjian and Ouyang, Siru and Zhou, Wangchunshu and Lu, Pan and Zhang, Zhuosheng and Zhao, Yilun and Cohan, Arman and Gerstein, Mark},\n  booktitle={International Conference on Learning Representations},\n  year={2025},\n  url={https://openreview.net/forum?id=VQAW04w08X}\n}",
+    "figures": [
+      {
+        "src": "https://raw.githubusercontent.com/gersteinlab/chemagent/main/chemagent.png",
+        "alt": "ChemAgent Framework Overview",
+        "caption": "Overview of the ChemAgent framework. The agent decomposes chemistry problems into sub-tasks, stores successful reasoning patterns in a self-updating library with three types of memory, and retrieves relevant knowledge when encountering new problems."
+      }
+    ],
+    "original_words": 951
+  },
+  "context-aware-evaluation": {
+    "title": "Exploring Context-Aware Evaluation Metrics for Machine Translation",
+    "authors": "Xinyu Hu, Xunjian Yin , Xiaojun Wan",
+    "venue": "EMNLP 2023 Findings",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2023.findings-emnlp.1021/"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/herrxy/Cont-COMET"
+      }
+    ],
+    "abstract": "Previous studies on machine translation evaluation mostly focused on the quality of individual sentences, while overlooking the important role of contextual information. Although WMT Metrics Shared Tasks have introduced context content into the human annotations of translation evaluation since 2019, the relevant metrics and methods still did not take advantage of the corresponding context. In this paper, we propose a context-aware machine translation evaluation metric called Cont-COMET, built upon the effective COMET framework. Our approach simultaneously considers the preceding and subsequent contexts of the sentence to be evaluated and trains our metric to be aligned with the setting during human annotation. We also introduce a content selection method to extract and utilize the most relevant information. The experiments and evaluation of Cont-COMET on the official test framework from WMT show improvements in both system-level and segment-level assessments.",
+    "citation": "@inproceedings{hu-etal-2023-exploring,\n    title = \"Exploring Context-Aware Evaluation Metrics for Machine Translation\",\n    author = \"Hu, Xinyu  and\n      Yin, Xunjian  and\n      Wan, Xiaojun\",\n    booktitle = \"Findings of the Association for Computational Linguistics: EMNLP 2023\",\n    month = dec,\n    year = \"2023\",\n    address = \"Singapore\",\n    publisher = \"Association for Computational Linguistics\",\n    url = \"https://aclanthology.org/2023.findings-emnlp.1021/\",\n    doi = \"10.18653/v1/2023.findings-emnlp.1021\",\n    pages = \"15291--15298\"\n}",
+    "figures": [],
+    "original_words": 905
+  },
+  "contextual-asr": {
+    "title": "Improving Contextual Modeling for Omission and Coreference Resolution in Chinese ASR",
+    "authors": "Xiaoyu Liu, Xunjian Yin , Xiaojun Wan",
+    "venue": "COLING 2024",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2024.lrec-main.1301/"
+      }
+    ],
+    "abstract": "Automatic speech recognition (ASR) systems have achieved remarkable word-level accuracy, yet the resulting transcripts often suffer from discourse-level errors that hinder downstream understanding. In Chinese, two error types are especially pervasive: omission errors, where contextually-implied subjects and objects are dropped due to pro-drop constructions and ellipsis, and coreference errors, where pronouns and references become ambiguous without prosodic cues. We propose contextual modeling approaches that maintain discourse state across utterances, tracking entities as they are introduced, following coreference chains, and identifying semantic gaps caused by ellipsis. Our methods significantly reduce both error types and produce more coherent transcripts that benefit summarization, question answering, and information extraction.",
+    "citation": "@inproceedings{liu-etal-2024-improving,\n    title = \"Improving Contextual Modeling for Omission and Coreference Resolution in Chinese ASR\",\n    author = \"Liu, Xiaoyu and Yin, Xunjian and Wan, Xiaojun\",\n    booktitle = \"Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation\",\n    year = \"2024\",\n    url = \"https://aclanthology.org/2024.lrec-main.1301/\",\n    pages = \"14950--14959\"\n}",
+    "figures": [],
+    "original_words": 862
+  },
+  "contrasolver": {
+    "title": "ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions",
+    "authors": "Xu Zhang*, Xunjian Yin *, Xiaojun Wan",
+    "venue": "ArXiv 2024",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2406.08842"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/Arvid-pku/ContraSolver"
+      }
+    ],
+    "abstract": "Recent alignment methods such as RLHF and DPO have significantly improved the quality of large language model outputs. However, these approaches depend on high-quality preference data, which is expensive to obtain. Self-alignment techniques alleviate this dependency but introduce the challenge of internal contradictions in model-generated preferences. We observe that language models exhibit preference contradictions -- logical inconsistencies where pairwise comparisons violate transitivity. ContraSolver addresses this by modeling preferences as a directed graph, identifying contradictory cycles, and resolving them via maximum spanning tree initialization that preserves high-confidence preferences. Experiments across four generation tasks demonstrate consistent improvements in both alignment quality and preference consistency, all without any human supervision.",
+    "citation": "@misc{zhang2024contrasolverselfalignmentlanguagemodels,\n    title={ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions},\n    author={Xu Zhang and Xunjian Yin and Xiaojun Wan},\n    year={2024},\n    eprint={2406.08842},\n    archivePrefix={arXiv},\n    primaryClass={cs.CL},\n    url={https://arxiv.org/abs/2406.08842}\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2406.08842v1/x1.png",
+        "alt": "ContraSolver Framework Overview",
+        "caption": "ContraSolver traverses a preference graph to identify and resolve contradictions -- edges that violate logical consistency in the model's preferences."
+      },
+      {
+        "src": "https://arxiv.org/html/2406.08842v1/x2.png",
+        "alt": "Data Construction Process",
+        "caption": "The data construction process: we build a preference graph through self-annotation, then identify edges that create contradictory cycles."
+      }
+    ],
+    "original_words": 759
+  },
+  "coral": {
+    "title": "COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement",
+    "authors": "Yuxi Xie, Anirudh Goyal, Xiaobao Wu, Xunjian Yin , Xiao Xu, Min-Yen Kan, Liangming Pan, William Yang Wang",
+    "venue": "ArXiv Preprint 2024",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2410.09675"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/YuxiXie/COrAL"
+      }
+    ],
+    "abstract": "Iterative refinement has emerged as an effective paradigm for enhancing the capabilities of large language models (LLMs) on complex tasks. However, existing approaches face a critical trade-off between output quality and computational efficiency due to their reliance on autoregressive (left-to-right) generation. We introduce COrAL (Context-wise Order-Agnostic Language Modeling), which embeds iterative refinement directly into the language model architecture. Our approach employs sliding blockwise order-agnostic decoding, which performs multi-token forward prediction and backward reconstruction within context windows. On reasoning benchmarks, COrAL achieves absolute accuracy gains of 4.6% on GSM8K and 4.0% on LogiQA, along with inference speedups of up to 3.9x over next-token baselines. However, code generation tasks reveal performance degradation due to output inconsistencies, highlighting inherent quality-speed trade-offs in order-agnostic generation.",
+    "citation": "@misc{xie2024coralorderagnosticlanguagemodeling,\n    title={COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement},\n    author={Yuxi Xie and Anirudh Goyal and Xiaobao Wu and Xunjian Yin and Xiao Xu and Min-Yen Kan and Liangming Pan and William Yang Wang},\n    year={2024},\n    eprint={2410.09675},\n    archivePrefix={arXiv},\n    primaryClass={cs.CL},\n    url={https://arxiv.org/abs/2410.09675}\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2410.09675v1/x1.png",
+        "alt": "COrAL performance scaling on GSM8K",
+        "caption": "Figure 1: Scaling of performance and inference cost on GSM8K with increasing minimum refinement times for each output position. COrAL achieves better performance-efficiency trade-offs compared to traditional autoregressive approaches."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.09675v1/x2.png",
+        "alt": "Sliding Blockwise Order-Agnostic Decoding",
+        "caption": "Figure 2: Sliding Blockwise Order-Agnostic Decoding. COrAL performs multi-token prediction and refinement in a sliding block, enabling parallel iterative refinement through forward prediction and backward reconstruction."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.09675v1/x3.png",
+        "alt": "Context-Wise Order-Agnostic Language Modeling",
+        "caption": "Figure 3: Context-Wise Order-Agnostic Language Modeling. The model captures order-agnostic dependencies within a context window, enabling flexible generation sequences."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.09675v1/x4.png",
+        "alt": "Code generation results on HumanEval",
+        "caption": "Figure 4: Result comparison of pass rates and speed on code generation (HumanEval), revealing quality-speed trade-offs in format-sensitive tasks."
+      }
+    ],
+    "original_words": 858
+  },
+  "damon": {
+    "title": "DAMON: A Dialogue-Aware MCTS Framework for Jailbreaking Large Language Models",
+    "authors": "Xu Zhang, Xunjian Yin , Dinghao Jing, Huixuan Zhang, Xinyu Hu, Xiaojun Wan",
+    "venue": "EMNLP 2025",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2025.emnlp-main.323/"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/pkulcwmzx/DAMON"
+      }
+    ],
+    "abstract": "Red teaming is essential for understanding and improving the safety of large language models. While previous work has shown that multi-turn dialogues can be exploited to jailbreak LLMs, existing multi-turn attack methods rely on predefined patterns, limiting their effectiveness in realistic scenarios where conversations evolve dynamically. In this paper, we propose DAMON, a Dialogue-Aware Monte Carlo Tree Search (MCTS) framework that reconceptualizes multi-turn jailbreaking as a search problem over conversational spaces. DAMON treats each conversation turn as a move in a game tree, systematically exploring and evaluating dialogue paths to identify attack sequences that induce harmful responses. Through adaptive dialogue strategies that respond dynamically to the model's outputs, DAMON efficiently discovers sub-instruction sequences that existing methods cannot find. Comprehensive experiments on five LLMs across three safety datasets demonstrate the effectiveness of our framework, revealing vulnerabilities that inform better defense strategies.",
+    "citation": "@inproceedings{zhang-etal-2025-damon,\n    title = \"{DAMON}: A Dialogue-Aware {MCTS} Framework for Jailbreaking Large Language Models\",\n    author = \"Zhang, Xu and Yin, Xunjian and Jing, Dinghao and Zhang, Huixuan and Hu, Xinyu and Wan, Xiaojun\",\n    booktitle = \"Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing\",\n    year = \"2025\",\n    url = \"https://aclanthology.org/2025.emnlp-main.323/\",\n    pages = \"6361--6377\"\n}",
+    "figures": [],
+    "original_words": 1009
+  },
+  "derl": {
+    "title": "Differentiable Evolutionary Reinforcement Learning",
+    "authors": "Sitao Cheng*, Tianle Li*, Xuhan Huang*, Xunjian Yin , Difan Zou",
+    "venue": "ArXiv Preprint 2025",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2512.13399"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/sitaocheng/DERL"
+      }
+    ],
+    "abstract": "The design of effective reward functions presents a central and often arduous challenge in reinforcement learning (RL), particularly when developing autonomous agents for complex reasoning tasks. While automated reward optimization approaches exist, they typically rely on derivative-free evolutionary heuristics that treat the reward function as a black box, failing to capture the causal relationship between reward structure and task performance. To bridge this gap, we propose Differentiable Evolutionary Reinforcement Learning (DERL), a bi-level framework that enables the autonomous discovery of optimal reward signals. In DERL, a Meta-Optimizer evolves a reward function (i.e., Meta-Reward) by composing structured atomic primitives, guiding the training of an inner-loop policy. Crucially, unlike previous evolution, DERL is differentiable in its meta-optimization: it treats the inner-loop validation performance as a signal to update the Meta-Optimizer via reinforcement learning. This allows DERL to approximate the \"meta-gradient\" of task success, progressively learning to generate denser and more actionable feedback. We validate DERL across three distinct domains: robotic agent (ALFWorld), scientific simulation (ScienceWorld), and mathematical reasoning (GSM8k, MATH). Experimental results show that DERL achieves state-of-the-art performance on ALFWorld and ScienceWorld, significantly outperforming methods relying on heuristic rewards, especially in out-of-distribution scenarios. Analysis of the evolutionary trajectory demonstrates that DERL successfully captures the intrinsic structure of tasks, enabling self-improving agent alignment without human intervention.",
+    "citation": "@misc{cheng2025differentiableevolutionaryreinforcementlearning,\n    title={Differentiable Evolutionary Reinforcement Learning},\n    author={Sitao Cheng and Tianle Li and Xuhan Huang and Xunjian Yin and Difan Zou},\n    year={2025},\n    eprint={2512.13399},\n    archivePrefix={arXiv},\n    primaryClass={cs.AI},\n    url={https://arxiv.org/abs/2512.13399}\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2512.13399v1/x1.png",
+        "alt": "Overview of DERL framework showing Meta-Optimizer generating parameterized Meta-Reward with validation performance feedback, alongside performance comparisons across tasks",
+        "caption": "Figure 1. Overview of DERL. Left: the Meta-Optimizer generates a parameterized Meta-Reward; validation performance feeds back to update it via policy gradients. Right: performance comparisons of outcome reward, average reward, and Meta-Reward across tasks."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.13399v1/x2.png",
+        "alt": "Bi-level evolutionary training structure showing Meta-Optimizer evolution and inner-loop policy training",
+        "caption": "Figure 2. Bi-level optimization structure. The blue block depicts Meta-Optimizer evolution with n generated Meta-Rewards. The green block illustrates inner-loop policy training using GRPO, with validation performance v serving as reward signal for Meta-Optimizer evolution."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.13399v1/x3.png",
+        "alt": "Training trajectories on ALFWorld showing Meta-Optimizer convergence",
+        "caption": "Figure 3. Training trajectories on ALFWorld, GSM8K, and MATH benchmarks showing Meta-Optimizer convergence. Blue and orange lines represent average validation and testing performance, demonstrating stable optimization without overfitting."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.13399v1/x7.png",
+        "alt": "Proportion of stable versus unstable reward structures across training iterations on ALFWorld",
+        "caption": "Figure 4. Evolution dynamics: proportion of stable versus unstable reward structures across outer-loop training on ALFWorld, showing the system's increasing preference for mathematically robust structures."
+      },
+      {
+        "src": "https://arxiv.org/html/2512.13399v1/x8.png",
+        "alt": "Training loop using graph neural networks to represent computational graphs for Meta-Reward",
+        "caption": "Figure 5. Differentiable evolutionary reward training loop using graph neural networks to represent computational graphs. The Meta-Reward is parameterized by twelve learnable weights across computational nodes."
+      }
+    ],
+    "original_words": 1099
+  },
+  "dsgram": {
+    "title": "DSGram: Dynamic Weighting Sub-Metrics for Grammatical Error Correction in the Era of Large Language Models",
+    "authors": "Jinxiang Xie, Yilin Li, Xunjian Yin , Xiaojun Wan",
+    "venue": "AAAI 2025",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://ojs.aaai.org/index.php/AAAI/article/view/34775"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/JamyDon/DSGram"
+      },
+      {
+        "label": "arXiv",
+        "url": "https://arxiv.org/abs/2412.12832"
+      }
+    ],
+    "abstract": "Evaluating the performance of Grammatical Error Correction (GEC) models has become increasingly challenging, as large language model (LLM)-based GEC systems often produce corrections that diverge from provided gold references. This discrepancy undermines the reliability of traditional reference-based evaluation metrics. In this study, we propose a novel evaluation framework for GEC models, DSGram, integrating Semantic Coherence, Edit Level, and Fluency, and utilizing a dynamic weighting mechanism. Our framework employs the Analytic Hierarchy Process (AHP) in conjunction with large language models to ascertain the relative importance of various evaluation criteria. Additionally, we develop a dataset incorporating human annotations and LLM-simulated sentences to validate our algorithms and fine-tune more cost-effective models. Experimental results indicate that our proposed approach enhances the effectiveness of GEC model evaluations.",
+    "citation": "@inproceedings{xie2025dsgram,\n  title={DSGram: Dynamic Weighting Sub-Metrics for Grammatical Error Correction in the Era of Large Language Models},\n  author={Xie, Jinxiang and Yin, Xunjian and Wan, Xiaojun},\n  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},\n  year={2025},\n  url={https://ojs.aaai.org/index.php/AAAI/article/view/34775}\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2412.12832v2/x1.png",
+        "alt": "Running examples showing GEC outputs with over-corrections and poor fluency, highlighting limitations of BLEU and SOME metrics",
+        "caption": "Existing metrics fail on LLM-generated corrections. Over-corrections (blue) and fluency issues (red) are not properly captured by traditional reference-based evaluation."
+      },
+      {
+        "src": "https://arxiv.org/html/2412.12832v2/x2.png",
+        "alt": "DSGram architecture showing workflow from sentence pairs through LLM weight generation, judgment matrix construction, and consistency checks to final scores",
+        "caption": "The DSGram framework: sentence pairs flow through LLM-based weight generation, judgment matrix construction via AHP, consistency verification, and dynamic sub-metric combination to produce final evaluation scores."
+      },
+      {
+        "src": "https://arxiv.org/html/2412.12832v2/x3.png",
+        "alt": "Heat map of SOME sub-metric correlations showing 0.89 between Grammaticality and Fluency",
+        "caption": "SOME's sub-metrics are highly correlated (0.89 between Grammaticality and Fluency), reducing their discriminative power."
+      },
+      {
+        "src": "https://arxiv.org/html/2412.12832v2/x4.png",
+        "alt": "Heat map of DSGram sub-metric correlations showing more even distribution",
+        "caption": "DSGram's sub-metrics exhibit more balanced correlations, capturing distinct quality dimensions."
+      },
+      {
+        "src": "https://arxiv.org/html/2412.12832v2/x5.png",
+        "alt": "DSGram scoring for casual dialogue vs formal text, showing different weight distributions",
+        "caption": "DSGram adapts its weighting to context: casual dialogue emphasizes Fluency, while formal text prioritizes Edit Level assessment, mirroring how humans evaluate corrections differently across domains."
+      }
+    ],
+    "original_words": 911
+  },
+  "eama": {
+    "title": "EAMA: Entity-Aware Multimodal Alignment Based Approach for News Image Captioning",
+    "authors": "Junzhe Zhang, Huixuan Zhang, Xunjian Yin , Xiaojun Wan",
+    "venue": "TOMM 2025",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2402.19404"
+      }
+    ],
+    "abstract": "News image captioning requires a model to generate an informative caption rich in entities, given the news image and the associated news article. Multimodal large language models (MLLMs) have shown remarkable ability across various vision-language tasks. However, their performance in news image captioning remains suboptimal due to challenges in handling entity-rich content across modalities. We propose EAMA, an Entity-Aware Multimodal Alignment approach that aligns MLLMs through entity-aware auxiliary tasks before caption generation. Our method introduces two alignment tasks -- Entity-Aware Sentence Selection and Entity Selection -- that train the model to reason about entities across text and image. During inference, the aligned model self-extracts entity-related information to supplement its input, keeping the pipeline simple and end-to-end. EAMA achieves state-of-the-art results on both GoodNews and NYTimes800k benchmarks, demonstrating superior entity handling without external modules.",
+    "citation": "@misc{zhang2024eamaentityawaremultimodal,\n      title={EAMA : Entity-Aware Multimodal Alignment Based Approach for News Image Captioning},\n      author={Junzhe Zhang and Huixuan Zhang and Xunjian Yin and Xiaojun Wan},\n      year={2024},\n      eprint={2402.19404},\n      archivePrefix={arXiv},\n      primaryClass={cs.CV},\n      url={https://arxiv.org/abs/2402.19404},\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2402.19404/x2.png",
+        "alt": "EAMA framework overview showing alignment training with entity-aware sentence selection, entity selection, and captioning tasks on the left, and self-supplemented generation for inference on the right.",
+        "caption": "Figure 1. Overview of the EAMA framework. Left: alignment training with three tasks -- entity-aware sentence selection, entity selection, and captioning. Right: self-supplemented generation at inference time, where the aligned model extracts its own entity context."
+      },
+      {
+        "src": "https://arxiv.org/html/2402.19404/x1.png",
+        "alt": "Comparison of zero-shot, supervised fine-tuning, and EAMA responses for a news image captioning example.",
+        "caption": "Figure 2. Qualitative comparison. Zero-shot MLLMs produce generic descriptions; supervised fine-tuning captures some entities but hallucinates others. EAMA generates accurate, entity-rich captions grounded in both image and article."
+      },
+      {
+        "src": "https://arxiv.org/html/2402.19404/x3.png",
+        "alt": "Bar chart comparing three MLLMs (LLaVA-v1.5, MiniGPT-v2, InstructBLIP) under zero-shot and OSFT settings across both datasets.",
+        "caption": "Figure 3. Performance comparison of three MLLMs (LLaVA-v1.5, MiniGPT-v2, InstructBLIP) under zero-shot and official supervised fine-tuning (OSFT) settings, showing the entity gap that EAMA addresses."
+      }
+    ],
+    "original_words": 870
+  },
+  "error-robust-retrieval": {
+    "title": "Error-Robust Retrieval for Chinese Spelling Check",
+    "authors": "Xunjian Yin , Xinyu Hu, Xiaojun Wan",
+    "venue": "COLING 2024",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2024.lrec-main.1057/"
+      }
+    ],
+    "abstract": "Retrieval-augmented methods have shown promising results in Chinese Spelling Check (CSC) by finding relevant examples to guide correction. However, existing retrieval approaches suffer from a fundamental limitation: when the query itself contains spelling errors, standard semantic embeddings capture the erroneous meaning rather than the intended one, leading to irrelevant retrievals. We propose error-robust retrieval, a contrastive learning approach that trains text encoders to produce similar representations for both correct and misspelled text. By learning embeddings invariant to common Chinese spelling error patterns -- phonetic confusions, visual similarities, and common typos -- our method retrieves relevant correction examples even from broken queries. Experiments show consistent improvements across multiple CSC approaches including LLM-based, neural, and traditional methods.",
+    "citation": "@inproceedings{yin-etal-2024-error,\n    title = \"Error-Robust Retrieval for Chinese Spelling Check\",\n    author = \"Yin, Xunjian and Hu, Xinyu and Wan, Xiaojun\",\n    booktitle = \"Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation\",\n    year = \"2024\",\n    url = \"https://aclanthology.org/2024.lrec-main.1057/\",\n    pages = \"12086--12096\"\n}",
+    "figures": [],
+    "original_words": 830
+  },
+  "geometry-of-reasoning": {
+    "title": "The Geometry of Reasoning: Flowing Logics in Representation Space",
+    "authors": "Yufa Zhou*, Yixiao Wang*, Xunjian Yin* , Shuyan Zhou, Anru R. Zhang",
+    "venue": "ICLR 2026",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2510.09782"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/MasterZhou1/Reasoning-Flow"
+      }
+    ],
+    "abstract": "We propose a geometric framework for analyzing reasoning in large language models (LLMs) through representation space. By modeling reasoning as flows -- embedding trajectories shaped by logical principles -- we investigate how LLMs process and internalize logical structures. To disentangle logic from semantics, we design experiments that apply identical logical structures with varying semantic content, testing whether LLMs capture logic beyond surface-level patterns. Our theoretical analysis reveals two key insights: (1) LLM reasoning manifests as smooth flows in representation space, and (2) logical statements regulate flow velocities locally. Through carefully controlled experiments using learned representation proxies, we visualize and measure the reasoning flows, validating our theoretical framework. Our findings suggest that next-token prediction training enables LLMs to encode logical patterns as higher-order geometric structures, countering the \"stochastic parrot\" critique and pointing to potentially universal representational principles across architectures.",
+    "citation": "@misc{zhou2025geometryreasoningflowinglogics,\n    title={The Geometry of Reasoning: Flowing Logics in Representation Space},\n    author={Yufa Zhou and Yixiao Wang and Xunjian Yin and Shuyan Zhou and Anru R. Zhang},\n    year={2025},\n    eprint={2510.09782},\n    archivePrefix={arXiv},\n    primaryClass={cs.AI},\n    url={https://arxiv.org/abs/2510.09782}\n}",
+    "figures": [
+      {
+        "src": "../figures/geometry-reasoning.png",
+        "alt": "3D PCA visualization of reasoning flows showing trajectories through representation space",
+        "caption": "Reasoning flows visualized in 3D PCA space. Each trajectory represents the evolution of representations as the model reasons through mathematical problems, revealing the geometric structure of logical deduction."
+      }
+    ],
+    "original_words": 973
+  },
+  "godel-agent": {
+    "title": "Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement",
+    "authors": "Xunjian Yin , Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, William Yang Wang",
+    "venue": "ACL 2025 · Main Conference",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2025.acl-long.1354/"
+      },
+      {
+        "label": "arXiv",
+        "url": "https://arxiv.org/abs/2410.04444"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/Arvid-pku/Godel_Agent"
+      },
+      {
+        "label": "Blog",
+        "url": "https://xunjianyin.github.io/blog-post.html?id=self-referential-agent"
+      }
+    ],
+    "abstract": "The rapid advancement of large language models (LLMs) has significantly enhanced the capabilities of AI-driven agents across various tasks. However, existing agentic systems, whether based on fixed pipeline algorithms or pre-defined meta-learning frameworks, cannot search the whole agent design space due to the restriction of human-designed components, and thus might miss the globally optimal agent design. In this paper, we introduce Gödel Agent, a self-evolving framework inspired by the Gödel machine, enabling agents to recursively improve themselves without relying on predefined routines or fixed optimization algorithms. Gödel Agent leverages LLMs to dynamically modify its own logic and behavior, guided solely by high-level objectives through prompting. Experimental results on mathematical reasoning and complex agent tasks demonstrate that implementation of Gödel Agent can achieve continuous self-improvement, surpassing manually crafted agents in performance, efficiency, and generalizability.",
+    "citation": "@inproceedings{yin-etal-2025-godel,\n    title = {Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement},\n    author = \"Yin, Xunjian and Wang, Xinyi and Pan, Liangming and Lin, Li and Wan, Xiaojun and Wang, William Yang\",\n    booktitle = \"Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics\",\n    year = \"2025\",\n    url = \"https://aclanthology.org/2025.acl-long.1354/\"\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2410.04444v4/x1.png",
+        "alt": "Gödel Agent Framework Overview",
+        "caption": "Modular demonstration of Gödel Agent. Unlike traditional agents, its sensor and executor can read and write all of its own code, enabling true self-referential improvement."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.04444v4/x2.png",
+        "alt": "Evolution of Agent Paradigms",
+        "caption": "The evolution of AI agent paradigms: from fixed human-designed pipelines, through constrained meta-learning, to truly self-referential systems that can escape human-imposed limitations."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.04444v4/x3.png",
+        "alt": "Monkey Patching Implementation",
+        "caption": "An illustration of our implementation of Gödel Agent. It employs monkey patching to directly read and modify its own code in runtime memory, enabling self-awareness and self-modification."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.04444v4/x5.png",
+        "alt": "Game of 24 Results",
+        "caption": "(a) One representative example of Game of 24. (b) Accuracy progression for different initial policies -- Gödel Agent improves from 4% to 78% through successive self-modifications."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.04444v4/x6.png",
+        "alt": "Gödel Agent vs Random Sampling",
+        "caption": "Accuracy progression for Gödel Agent vs. random sampling, showing that the self-referential improvement process is meaningfully directed rather than random exploration."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.04444v4/x4.png",
+        "alt": "Action Efficiency",
+        "caption": "The number of actions taken by Gödel Agent varies across different tasks, demonstrating that the agent learns to become more efficient as it self-improves."
+      }
+    ],
+    "original_words": 1196
+  },
+  "history-matters": {
+    "title": "History Matters: Temporal Knowledge Editing in Large Language Model",
+    "authors": "Xunjian Yin , Jin Jiang, Liming Yang, Xiaojun Wan",
+    "venue": "AAAI 2024",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://ojs.aaai.org/index.php/AAAI/article/view/29912/31594"
+      },
+      {
+        "label": "arXiv",
+        "url": "https://arxiv.org/abs/2312.05497"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/Arvid-pku/ATOKE"
+      }
+    ],
+    "abstract": "The imperative task of revising or updating the knowledge stored within large language models arises from two distinct sources: intrinsic errors inherent in the model which should be corrected and outdated knowledge due to external shifts in the real world which should be updated. Existing knowledge editing methods treat all updates uniformly, but we argue that models should retain recollection of the historical knowledge while integrating the newfound knowledge. We introduce Temporal Knowledge Editing (TKE) as a distinct task and create the AToKe (Assessment of Temporal Knowledge Editing) benchmark with three dataset variants. Our experiments reveal that existing editing approaches cause catastrophic forgetting of historical facts. We propose METO (Multi-Editing with Time Objective), a framework that edits both old and new knowledge simultaneously while optimizing temporal predictions, substantially improving performance on historical knowledge retention.",
+    "citation": "@inproceedings{yin2024history,\n  title={History matters: Temporal knowledge editing in large language model},\n  author={Yin, Xunjian and Jiang, Jin and Yang, Liming and Wan, Xiaojun},\n  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},\n  volume={38},\n  number={17},\n  pages={19413--19421},\n  year={2024}\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2312.05497v3/x1.png",
+        "alt": "Example of catastrophic forgetting in knowledge editing: an edited GPT-J model loses historical knowledge about U.S. presidents",
+        "caption": "An edited GPT-J model loses historical knowledge when using existing editing methods like MEMIT. The editing operation overwrites the current president but destroys the record of who held the position before."
+      },
+      {
+        "src": "https://arxiv.org/html/2312.05497v3/x2.png",
+        "alt": "Presentation of the Temporal Knowledge Editing task with sequential edits preserving history",
+        "caption": "Temporal Knowledge Editing visualized: as new facts are edited into the model, its internal timeline advances while preserving historical knowledge and ensuring temporal ordering."
+      },
+      {
+        "src": "https://arxiv.org/html/2312.05497v3/x3.png",
+        "alt": "METO editing framework diagram",
+        "caption": "The METO framework: the model is first queried for current knowledge, then both historical and current knowledge are used as targets for joint optimization with a time objective."
+      }
+    ],
+    "original_words": 999
+  },
+  "knowledge-boundary": {
+    "title": "Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation",
+    "authors": "Xunjian Yin* , Xu Zhang*, Jie Ruan, Xiaojun Wan",
+    "venue": "ACL 2024 · Main Conference",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2024.acl-long.124/"
+      },
+      {
+        "label": "arXiv",
+        "url": "https://arxiv.org/abs/2402.11493"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/pkulcwmzx/knowledge-boundary"
+      }
+    ],
+    "abstract": "In recent years, substantial advancements have been made in the development of large language models, achieving remarkable performance across diverse tasks. However, evaluating LLMs with fixed questions is unreliable due to prompt sensitivity. We introduce the concept of knowledge boundary to encompass both prompt-agnostic knowledge (accessible regardless of phrasing) and prompt-sensitive knowledge (accessible only with specific wordings). We propose PGDC (projected gradient descent with semantic constraints) to identify optimal prompts for each knowledge piece. Our loss function combines answer generation probability, semantic constraint via L2 distance between hidden representations, and regularization penalizing embeddings far from discrete tokens. Experiments across multiple models and datasets demonstrate that knowledge boundary evaluation provides a more reliable and robust measure of what models truly know, independent of superficial prompt variations.",
+    "citation": "@inproceedings{yin-etal-2024-benchmarking,\n    title = \"Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation\",\n    author = \"Yin, Xunjian and Zhang, Xu and Ruan, Jie and Wan, Xiaojun\",\n    booktitle = \"Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics\",\n    year = \"2024\",\n    url = \"https://aclanthology.org/2024.acl-long.124/\",\n    pages = \"2270--2286\"\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2402.11493v1/x1.png",
+        "alt": "Knowledge Boundary: Three Classes of Knowledge",
+        "caption": "The three classes of knowledge under our framework: Prompt-Agnostic Knowledge (answerable regardless of phrasing), Prompt-Sensitive Knowledge (accessible only with specific wordings), and Unanswerable Knowledge. Knowledge boundary captures both the first two categories."
+      },
+      {
+        "src": "https://arxiv.org/html/2402.11493v1/x2.png",
+        "alt": "PGDC Framework Overview",
+        "caption": "The PGDC framework: starting from labeled prompts, the algorithm performs gradient descent toward target answers while constraining the search to remain within the semantic space of the original question."
+      },
+      {
+        "src": "https://arxiv.org/html/2402.11493v1/x3.png",
+        "alt": "Knowledge Boundaries Across Domains",
+        "caption": "Radar chart showing knowledge boundaries across six domains (natural sciences, medical, computer science, social sciences, humanities, and others) for five models on MMLU, revealing how different models have different knowledge profiles."
+      }
+    ],
+    "original_words": 968
+  },
+  "knowledge-interplay": {
+    "title": "Understanding the Interplay between Parametric and Contextual Knowledge for Large Language Models",
+    "authors": "Sitao Cheng, Liangming Pan, Xunjian Yin , Xinyi Wang, William Yang Wang",
+    "venue": "KnowLM Workshop @ ACL 2025",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2410.08414"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/sitaocheng/Knowledge_Interplay"
+      }
+    ],
+    "abstract": "Large language models (LLMs) encode vast amounts of knowledge during pre-training (parametric knowledge, or PK) and can further be enhanced by incorporating contextual knowledge (CK). Can LLMs effectively integrate their internal PK with external CK to solve complex problems? In this paper, we investigate the dynamic interaction between PK and CK, categorizing their relationships into four types: Supportive, Complementary, Conflicting, and Irrelevant. To support this investigation, we introduce EchoQA, a benchmark spanning scientific, factual, and commonsense knowledge. Our results show that LLMs tend to suppress their PK when contextual information is available, even when it is complementary or irrelevant. While tailored instructions can encourage LLMs to rely more on their PK, they still struggle to fully leverage it. These findings reveal a key vulnerability in LLMs, raising concerns about their reliability in knowledge-intensive tasks.",
+    "citation": "@inproceedings{cheng2025understanding,\n  title={Understanding the Interplay between Parametric and Contextual Knowledge for Large Language Models},\n  author={Sitao Cheng and Liangming Pan and Xunjian Yin and Xinyi Wang and William Yang Wang},\n  booktitle={Knowledgeable Foundation Models at ACL 2025},\n  year={2025},\n  url={https://openreview.net/forum?id=4uisAcagzw}\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2410.08414v1/x1.png",
+        "alt": "EchoQA Benchmark Overview",
+        "caption": "The EchoQA benchmark categorizes knowledge relationships into four types: Supportive (context confirms what the model knows), Complementary (context adds to internal knowledge), Conflicting (context contradicts internal knowledge), and Irrelevant (context provides no useful information)."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.08414v1/x2.png",
+        "alt": "Complementary Reasoning Results",
+        "caption": "Accuracy on Complementary Reasoning tasks: models struggle to effectively combine their internal knowledge with contextual information, even when both are necessary to answer correctly."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.08414v1/x3.png",
+        "alt": "Conflicting Reasoning Results",
+        "caption": "Memorization Ratio for Conflicting Reasoning: how often models stick with their parametric knowledge when context contradicts it. The results reveal inconsistent behavior across different models and scenarios."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.08414v1/x4.png",
+        "alt": "Irrelevant Reasoning Results",
+        "caption": "Accuracy for Irrelevant Reasoning with multiple documents: models are distracted by irrelevant contextual information, leading to degraded performance compared to relying on parametric knowledge alone."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.08414v1/x5.png",
+        "alt": "Memorization Ratio by Entity Popularity",
+        "caption": "Memorization Ratio on ConflictQA by entity popularity categories: models are more likely to retain parametric knowledge for popular entities, suggesting that knowledge frequency during pre-training affects the balance between internal and contextual knowledge."
+      },
+      {
+        "src": "https://arxiv.org/html/2410.08414v1/x6.png",
+        "alt": "Knowledge Fabrication Methods",
+        "caption": "Memorization Ratio for Conflicting Reasoning under different knowledge fabrication methods: the way conflicting information is constructed significantly affects how models balance parametric and contextual knowledge."
+      }
+    ],
+    "original_words": 922
+  },
+  "mc-mke": {
+    "title": "MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",
+    "authors": "Junzhe Zhang, Huixuan Zhang, Xunjian Yin , Baizhou Huang, Xu Zhang, Xinyu Hu, Xiaojun Wan",
+    "venue": "ACL 2025 Findings",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2025.findings-acl.896/"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/reroze/MC-MKE"
+      }
+    ],
+    "abstract": "Multimodal large language models (MLLMs) are prone to generating incorrect information that conflicts with existing knowledge. Knowledge editing has been proposed as an efficient method to update model knowledge without retraining. However, existing multimodal knowledge editing benchmarks lack fine-grained classification of errors made by MLLMs, and do not adequately evaluate whether the edited model maintains consistency of knowledge across modalities. We introduce MC-MKE, a fine-grained Multimodal Knowledge Editing benchmark emphasizing Modality Consistency. MC-MKE categorizes MLLM errors into misreading and misrecognition types and designs evaluation metrics to assess modality consistency after knowledge editing. We evaluate six representative knowledge editing methods on MC-MKE, revealing that current methods have significant room for improvement in maintaining cross-modal knowledge consistency.",
+    "citation": "@inproceedings{zhang-etal-2025-mc,\n    title = \"{MC}-{MKE}: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency\",\n    author = \"Zhang, Junzhe and Zhang, Huixuan and Yin, Xunjian and Huang, Baizhou and Zhang, Xu and Hu, Xinyu and Wan, Xiaojun\",\n    booktitle = \"Findings of the Association for Computational Linguistics: ACL 2025\",\n    year = \"2025\",\n    url = \"https://aclanthology.org/2025.findings-acl.896/\",\n    pages = \"17430--17445\"\n}",
+    "figures": [],
+    "original_words": 816
+  },
+  "nlg-evaluation-survey": {
+    "title": "LLM-based NLG Evaluation: Current Status and Challenges",
+    "authors": "Mingqi Gao, Xinyu Hu, Jie Ruan, Xunjian Yin , Xiaojun Wan",
+    "venue": "Computational Linguistics (CL) 2024",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://direct.mit.edu/coli/article/doi/10.1162/coli_a_00540/124539/LLM-based-NLG-Evaluation-Current-Status-and"
+      },
+      {
+        "label": "arXiv",
+        "url": "https://arxiv.org/abs/2402.01383"
+      }
+    ],
+    "abstract": "Evaluating natural language generation (NLG) is a vital but challenging problem in natural language processing. Traditional evaluation metrics mainly capturing content (e.g. n-gram) overlap between system outputs and references are far from satisfactory, and large language models (LLMs) such as ChatGPT have demonstrated great potential in NLG evaluation in recent years. Various automatic evaluation methods based on LLMs have been proposed, including metrics derived from LLMs, prompting LLMs, fine-tuning LLMs, and human-LLM collaborative evaluation. In this survey, we first give a taxonomy of LLM-based NLG evaluation methods, and discuss their pros and cons, respectively. Lastly, we discuss several open problems in this area and point out future research directions.",
+    "citation": "@article{gao2024llm,\n  title={LLM-based NLG Evaluation: Current Status and Challenges},\n  author={Gao, Mingqi and Hu, Xinyu and Ruan, Jie and Yin, Xunjian and Wan, Xiaojun},\n  journal={Computational Linguistics},\n  pages={1--44},\n  year={2024},\n  publisher={MIT Press},\n  doi={10.1162/coli_a_00540}\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2402.01383v2/x1.png",
+        "alt": "Taxonomy of LLM-based NLG evaluation: four categories including LLM-derived metrics, prompting LLMs, fine-tuning LLMs, and human-LLM collaborative evaluation",
+        "caption": "Figure 1. Taxonomy of LLM-based NLG evaluation methods. The survey organizes approaches into four paradigms: LLM-derived metrics, prompting LLMs, fine-tuning LLMs, and human-LLM collaborative evaluation."
+      },
+      {
+        "src": "https://arxiv.org/html/2402.01383v2/x2.png",
+        "alt": "Example of prompting LLMs to evaluate text summarization consistency, showing prompt structure with role, task instructions, criteria, and LLM-generated results",
+        "caption": "Figure 2. An example of prompting LLMs to evaluate summary consistency, illustrating the structured prompt design with role definition, task instructions, evaluation criteria, and model output."
+      }
+    ],
+    "original_words": 763
+  },
+  "reverse-lm": {
+    "title": "LEDOM: An Open and Fundamental Reverse Language Model",
+    "authors": "Xunjian Yin , Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
+    "venue": "ACL 2026",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2507.01335"
+      },
+      {
+        "label": "Model (7B)",
+        "url": "https://huggingface.co/Corning/Reverse-Model-7B-348B"
+      },
+      {
+        "label": "Model (2B)",
+        "url": "https://huggingface.co/Corning/Reverse-Model-2B-348B"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/Arvid-pku/ReverseModel"
+      }
+    ],
+    "abstract": "What reasoning patterns emerge when a model conditions on future context to predict the past? We investigate this question by training a right-to-left autoregressive language model at the 2B/7B parameter scale on 435 billion tokens. The resulting model develops distinctive capabilities including abductive inference, question synthesis, and natural resolution of the reversal curse. We propose Reverse Reward, which combines forward and reverse probabilities through noisy channel duality to rerank outputs. This approach achieves performance gains of up to 6.6% on AIME 2024 and 15% on AMC 2023 across multiple strong baselines. We release all models, code, and data publicly.",
+    "citation": "@misc{yin2025ledomopenfundamentalreverse,\n    title={LEDOM: An Open and Fundamental Reverse Language Model},\n    author={Xunjian Yin and Sitao Cheng and Yuxi Xie and Xinyu Hu and Li Lin and Xinyi Wang and Liangming Pan and William Yang Wang and Xiaojun Wan},\n    year={2025},\n    eprint={2507.01335},\n    archivePrefix={arXiv},\n    primaryClass={cs.CL},\n    url={https://arxiv.org/abs/2507.01335}\n}",
+    "figures": [
+      {
+        "src": "https://arxiv.org/html/2507.01335v3/x1.png",
+        "alt": "Forward vs. Reverse Language Modeling",
+        "caption": "Forward vs. Reverse Language Modeling. Forward LMs decompose P(x) left-to-right; LEDOM decomposes right-to-left using an identical decoder-only architecture -- same model, opposite direction."
+      },
+      {
+        "src": "https://arxiv.org/html/2507.01335v3/x2.png",
+        "alt": "Reverse Reward Mechanism",
+        "caption": "Verification by Inversion: a forward LM generates candidate solutions, then LEDOM scores each by estimating its posterior probability -- how likely is this reasoning chain to have produced this answer?"
+      },
+      {
+        "src": "https://arxiv.org/html/2507.01335v3/x3.png",
+        "alt": "Performance vs Sampling Size",
+        "caption": "Accuracy improvements with varying sampling sizes (N=1 to 64) on MATH-500 and GSM8K. Reverse Reward consistently improves performance across all sampling budgets."
+      },
+      {
+        "src": "https://arxiv.org/html/2507.01335v3/x4.png",
+        "alt": "Training Loss Curves",
+        "caption": "Training loss curves comparing LEDOM and a forward LM. While reverse modeling converges slightly more slowly, both reach stable optima -- suggesting reverse modeling is equally learnable."
+      }
+    ],
+    "original_words": 1063
+  },
+  "self-generated-documents": {
+    "title": "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models",
+    "authors": "Jiatong Shi*, Xunjian Yin* , Xiaojun Wan",
+    "venue": "NAACL 2025 Findings",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2025.findings-naacl.215/"
+      }
+    ],
+    "abstract": "Retrieval-augmented generation (RAG) has become a standard approach for grounding large language models in external knowledge. Recently, an alternative paradigm has emerged: using LLM-generated documents as context instead of retrieved ones. In this work, we present the first comprehensive evaluation of self-generated documents for RAG. We investigate multiple factors including task type, model capability, document quality, and the interplay between self-generated and retrieved content. Our findings reveal that self-generated documents are more effective for reasoning-intensive tasks but riskier for factual recall, that larger models produce more reliable self-generated content, and that combining self-generated with retrieved documents often yields the best results. We provide practical guidelines for when and how to use self-generated documents in RAG pipelines.",
+    "citation": "@inproceedings{shi-yin-2025-evaluating,\n    title = \"Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models\",\n    author = \"Shi, Jiatong and Yin, Xunjian and Wan, Xiaojun\",\n    booktitle = \"Findings of the Association for Computational Linguistics: NAACL 2025\",\n    year = \"2025\",\n    url = \"https://aclanthology.org/2025.findings-naacl.215/\"\n}",
+    "figures": [],
+    "original_words": 722
+  },
+  "seq2seq-data2text": {
+    "title": "How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?",
+    "authors": "Xunjian Yin , Xiaojun Wan",
+    "venue": "ACL 2022",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2022.acl-long.531.pdf"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/xunjianyin/Seq2SeqOnData2Text"
+      },
+      {
+        "label": "ACL Anthology",
+        "url": "https://aclanthology.org/2022.acl-long.531/"
+      }
+    ],
+    "abstract": "With the development of neural networks, Seq2Seq paradigm has been widely adopted for end-to-end data-to-text generation, achieving good performance on several benchmarks. However, a detailed study of model behavior in terms of generation quality is still lacking. To fill in the gap, we conduct a comprehensive evaluation of representative Seq2Seq models on end-to-end data-to-text generation tasks. We take a fine-grained, multi-dimensional approach and annotate model outputs with eight types of errors based on the Multidimensional Quality Metric (MQM) framework. We find that copy mechanisms help reduce omission and extrinsic inaccuracy errors but increase addition errors. Pre-training is effective in reducing errors and the training strategy matters more than the model architecture. We also investigate the effect of dataset characteristics and model size. Our work provides valuable insights for future research on data-to-text generation.",
+    "citation": "@inproceedings{yin-wan-2022-seq2seq,\n    title = \"How Do {S}eq2{S}eq Models Perform on End-to-End Data-to-Text Generation?\",\n    author = \"Yin, Xunjian and Wan, Xiaojun\",\n    booktitle = \"Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics\",\n    year = \"2022\",\n    url = \"https://aclanthology.org/2022.acl-long.531/\",\n    pages = \"7701--7710\"\n}",
+    "figures": [],
+    "original_words": 1072
+  },
+  "themis": {
+    "title": "Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability",
+    "authors": "Xinyu Hu, Li Lin, Mingqi Gao, Xunjian Yin , Xiaojun Wan",
+    "venue": "EMNLP 2024",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://aclanthology.org/2024.emnlp-main.891/"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/PKU-ONELab/Themis"
+      }
+    ],
+    "abstract": "The evaluation of natural language generation (NLG) tasks is a critical and challenging problem in NLP. While large language models (LLMs) have been employed for automatic evaluation, existing LLM-based metrics lack flexibility and interpretability. In this paper, we introduce Themis, a reference-free NLG evaluation language model built upon a large-scale NLG evaluation corpus NLG-Eval. We also propose two novel training paradigms: multi-perspective consistency verification and rating-oriented preference alignment, to further enhance the evaluation capabilities of Themis. Experiments demonstrate that Themis achieves superior evaluation performance on various NLG tasks, even surpassing GPT-4 in certain scenarios, while exhibiting strong generalization to unseen tasks and providing interpretable evaluation results.",
+    "citation": "@inproceedings{hu-etal-2024-themis,\n    title = \"Themis: A Reference-free {NLG} Evaluation Language Model with Flexibility and Interpretability\",\n    author = \"Hu, Xinyu and Lin, Li and Gao, Mingqi and Yin, Xunjian and Wan, Xiaojun\",\n    booktitle = \"Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing\",\n    year = \"2024\",\n    url = \"https://aclanthology.org/2024.emnlp-main.891/\",\n    pages = \"15924--15951\"\n}",
+    "figures": [],
+    "original_words": 736
+  }
+}

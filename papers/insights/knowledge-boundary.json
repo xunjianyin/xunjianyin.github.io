@@ -1,0 +1,31 @@
+{
+  "story": {
+    "title": "A failed question is not a clean test of ignorance",
+    "paragraphs": [
+      "A factual question can fail because the model lacks the information or because that wording does not elicit it. Conversely, a prompt can produce the desired string without expressing the original question. Measuring a knowledge boundary therefore requires more than increasing answer accuracy. The probe must find accessible knowledge while preserving what was asked and resisting prompts that manufacture apparently correct responses.",
+      "Consider the illustrative pair “Which country contains Canberra?” and “Canberra is located in which country?” If only one works, a single template underestimates accessible knowledge. But replacing the question with an instruction to output the target country would not demonstrate knowledge at all. The research problem lies between those cases: search beyond a fixed template without allowing the search to redefine success."
+    ]
+  },
+  "mechanism": {
+    "title": "Optimize the question under constraints",
+    "paragraphs": [
+      "PGDC searches in the continuous space of token embeddings, where gradients can suggest changes that make an accepted answer more likely. Its target objective allows the answer to appear after some generated text rather than requiring it at the first output position. When several answer aliases are acceptable, the objective can use the easiest valid alias. This avoids treating one surface form as the only evidence of knowing a fact.",
+      "Two additional constraints address the risk of gaming the probe. A semantic loss keeps the candidate close to the original prompt's representation, while another term encourages embeddings to remain near real vocabulary items. During optimization, embeddings sufficiently close to a token are projected back to discrete text. The resulting procedure aims to balance useful search directions with readable, semantically faithful questions.",
+      "The known answer is part of this optimization, and the method requires white-box access. It is therefore an evaluation procedure for eliciting a fact whose truth is already available to the researcher. It is not a general question-answering technique that discovers unknown correct answers. This distinction is necessary when interpreting the resulting score as a capacity estimate."
+    ]
+  },
+  "evidence": {
+    "title": "Success needs a negative control",
+    "paragraphs": [
+      "On PaRaRel with LLaMA2, PGDC reaches 71.36 compared with 34.43 for zero-shot prompting and 66.95 for the paper's paraphrased few-shot baseline. However, the more diagnostic comparison asks whether a probe can also elicit false targets. In the CFACT counterfactual test, AutoPrompt reaches 88.35 for LLaMA2 while PGDC reaches 3.41. Here the smaller number is desirable: the method should not readily force a false fact into the output.",
+      "Semantic preservation is still imperfect. Human assessment of 200 PaRaRel samples reports 83.3% preservation for LLaMA2, so a representation-level constraint cannot certify every rewrite. The reported boundary is an empirical estimate under the available search and validation procedures, not a proof that every knowable fact has been found. The paper's knowledge-focused MMLU evaluation also changes questions into cloze form, so those scores should not be read as standard MMLU scores."
+    ]
+  },
+  "sources": [
+    {
+      "label": "ACL 2024 paper · PGDC objective; Tables 1, 3, and human evaluation",
+      "url": "https://aclanthology.org/2024.acl-long.124/"
+    }
+  ],
+  "reading_notes": "Read formal desiderata, gradient objective/proximal projection, experiments, counterfactual robustness, human study, examples, MMLU conversion, limitations. Source labels verified: Table 1 prompt success, Table 3 CFACT robustness; human preservation reported in Section 4.5. LLaMA2 semantic preservation83.3%. Example Canberra paraphrases are newly authored illustration. Do not portray representation constraints as guaranteed equivalence or answer-aware optimization as an inference-time QA method."
+}

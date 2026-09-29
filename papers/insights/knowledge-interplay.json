@@ -1,0 +1,39 @@
+{
+  "story": {
+    "title": "Knowing both facts is not the same as combining them",
+    "paragraphs": [
+      "A retrieval system often supplies only the missing part of an answer. The model must connect that new evidence with knowledge already available in its parameters. This setting is different from asking whether to trust a retrieved passage that contradicts memory. Both sources can be correct and individually useful, while neither is sufficient alone. EchoQA studies this complementary case alongside conflicting and irrelevant context.",
+      "The recorded case makes a subtle distinction visible. Without context, a model can select the right answer through a biologically plausible shortcut while misidentifying the entity. With complementary context, it may resolve that entity correctly yet fail to recall the next fact. Neither the final answer alone nor the availability of relevant context fully describes whether composition succeeded."
+    ]
+  },
+  "mechanism": {
+    "title": "Separate knowledge availability from knowledge use",
+    "paragraphs": [
+      "The benchmark first checks the underlying parametric fact with a direct question for each model. It then constructs cases where external context supplies a different necessary fact. This filtering makes a failure more informative: the prerequisite was elicitable before the composition task. It also means models can be evaluated on different retained examples, so cross-model comparisons are not always comparisons over an identical set of questions.",
+      "The prompting conditions probe progressively stronger assistance. The neutral instruction already asks the model to combine its knowledge with the context. Other instructions explicitly emphasize internal knowledge or ask the model to recall it before reasoning. A golden-context condition places all needed facts in the prompt. That last comparison asks whether bringing both premises into the same source is easier than connecting memory to context.",
+      "Different relationships require different interpretations. In a conflicting case, following memory may preserve a known true fact against fabricated context. In a complementary case, the model must use both. With irrelevant context, it should avoid treating a distractor as a reason to abandon an answer it previously knew. A single preference for memory or retrieval cannot solve all three."
+    ]
+  },
+  "evidence": {
+    "title": "Abstention can reveal a missing connection",
+    "paragraphs": [
+      "For LLaMA3.1-70B on complementary ALCUNA examples, the unknown-answer rate is 62.72% with the neutral instruction, 23.88% when explicitly encouraged to trust its knowledge, and 0.08% with golden context. These are abstention rates, not accuracy scores. The near-removal of abstention when both facts are written out is evidence that source integration matters; it does not establish that every resulting answer is correct.",
+      "The paper also examines 200 selected failure cases and finds frequent reasoning confined to the supplied context or answer choices. This is diagnostic evidence about those failures, not an estimate of behavior on all questions. Explicit prompting helps, yet requires guidance about source sufficiency that an application may not possess. The study motivates evaluating source composition directly rather than assuming a strong standalone fact score guarantees reliable retrieval-augmented reasoning."
+    ]
+  },
+  "sources": [
+    {
+      "label": "EchoQA paper · complementary knowledge, prompting conditions, and unknown-ratio analysis",
+      "url": "https://arxiv.org/abs/2410.08414"
+    }
+  ],
+  "reading_notes": "Read benchmark filtering, neutral/trust/speak/golden prompt conditions, complementary and irrelevant experiments, failure analysis and discussion. LLaMA3.1-70B ALCUNA unknown ratios62.72/23.88/0.08; keep separate from accuracy and avoid interpreting no-context success as valid composition. Diagram example adapted from Table1's Z-man/Earth/sphere example, uses fictional Zed and qualified Earth shape. No model calls. Concrete demo revision: Table13 first case, LLaMA3.1-70B attribution from AppendixB.5. Display response summaries rather than invented outputs. No-context uses unsupported Myotis lucifugus substitution but selects Noctuidae; contextual response identifies Myotis nattereri then abstains. Published question lists four named choices while recorded response uses Unknown/finalchoice4; keep Unknown as recorded output and do not invent a repaired original option list. Table3 no-context unknown23.89, neutral62.72, trust23.88,golden0.08. Context is abbreviated in source, so label supplied fact excerpt/paraphrase.",
+  "demo": {
+    "type": "evidence-composition",
+    "title": "When the right context leads to an unknown answer",
+    "description": "Compare two published responses to the same question, then inspect how prompting changes uncertainty across the benchmark.",
+    "source_label": "Recorded case: Appendix B.5, Table 13. Aggregate unknown rates: Table 3. Instruction variants: Section 3.2 and Table 17.",
+    "source_url": "https://arxiv.org/abs/2410.08414",
+    "eyebrow": "Recorded case · Tables 3 and 13"
+  }
+}

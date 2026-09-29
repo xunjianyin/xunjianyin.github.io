@@ -143,7 +143,7 @@ const publications = [
     publisher = "Association for Computational Linguistics",
     url = "https://aclanthology.org/2025.emnlp-main.323/",
     doi = "10.18653/v1/2025.emnlp-main.323",
-    pages = "6361--6377",
+    pages = "6350--6366",
     ISBN = "979-8-89176-332-6",
     abstract = "While large language models (LLMs) demonstrate remarkable capabilities across a wide range of tasks, they remain vulnerable to generating outputs that are potentially harmful. Red teaming, which involves crafting adversarial inputs to expose vulnerabilities, is a widely adopted approach for evaluating the robustness of these models. Prior studies have indicated that LLMs are susceptible to vulnerabilities exposed through multi-turn interactions as opposed to single-turn scenarios. Nevertheless, existing methods for multi-turn attacks mainly utilize a predefined dialogue pattern, limiting their effectiveness in realistic situations. Effective attacks require adaptive dialogue strategies that respond dynamically to the initial user prompt and the evolving context of the conversation. To address these limitations, we propose DAMON, a novel multi-turn jailbreak attack method. DAMON leverages Monte Carlo Tree Search (MCTS) to systematically explore multi-turn conversational spaces, efficiently identifying sub-instruction sequences that induce harmful responses. We evaluate DAMON{'}s efficacy across five LLMs and three datasets. Our experimental results show that DAMON can effectively induce undesired behaviors."
 }</code></pre>`,
@@ -152,8 +152,8 @@ const publications = [
     isSelected: false
   },
   {
-    title: "Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement",
-    authors: "<b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Xiaojun Wan, William Yang Wang",
+    title: "Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement",
+    authors: "<b>Xunjian Yin</b>, Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, William Yang Wang",
     venue: "ACL 2025",
     links: [
       { text: "Paper", url: "https://aclanthology.org/2025.acl-long.1354/" },
@@ -289,6 +289,7 @@ url={https://openreview.net/forum?id=4uisAcagzw}
       Wan, Xiaojun",
     journal = "Computational Linguistics",
     volume = "51",
+    number = "2",
     month = jun,
     year = "2025",
     address = "Cambridge, MA",
@@ -303,7 +304,7 @@ url={https://openreview.net/forum?id=4uisAcagzw}
     isSelected: false
   },
   {
-    title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with LLMs",
+    title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models",
     authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
     venue: "NAACL 2025 Findings",
     links: [
@@ -362,7 +363,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     venue: "AAAI 2025",
     links: [
       { text: "Paper", url: "https://ojs.aaai.org/index.php/AAAI/article/view/34746/36901" },
-      { text: "Code", url: "https://github.com/PKU-ONELab/" },
+      { text: "Code", url: "https://github.com/jxtse/GEC-Metrics-DSGram" },
       { text: "Page", url: "papers/dsgram.html" }
     ],
     abstract: "Evaluating the performance of Grammatical Error Correction (GEC) models has become increasingly challenging, as large language model (LLM)-based GEC systems often produce corrections that diverge from provided gold references. This discrepancy undermines the reliability of traditional reference-based evaluation metrics. In this study, we propose a novel evaluation framework for GEC models, DSGram, integrating Semantic Coherence, Edit Level, and Fluency, and utilizing a dynamic weighting mechanism. Our framework employs the Analytic Hierarchy Process (AHP) in conjunction with large language models to ascertain the relative importance of various evaluation criteria. Additionally, we develop a dataset incorporating human annotations and LLM-simulated sentences to validate our algorithms and fine-tune more cost-effective models. Experimental results indicate that our proposed approach enhances the effectiveness of GEC model evaluations.",
@@ -381,20 +382,23 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
   {
     title: "EAMA: Entity-Aware Multimodal Alignment Based Approach for News Image Captioning",
     authors: "Junzhe Zhang, Huixuan Zhang, <b>Xunjian Yin</b>, Xiaojun Wan",
-    venue: "TOMM 2025",
+    venue: "TOMM 2026",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2402.19404" },
+      { text: "Publisher", url: "https://doi.org/10.1145/3801548" },
       { text: "Page", url: "papers/eama.html" }
     ],
     abstract: "Multimodal large language models (MLLMs) have shown great success across various tasks. However, their performance in handling entity information for news image captioning remains suboptimal. In this work, we propose EAMA, an Entity-Aware Multimodal Alignment based approach. We align the MLLM through two auxiliary tasks: Entity-Aware Sentence Selection and Entity Selection, together with the News Image Captioning task. The aligned model is then leveraged to self-extract entity-related information to supplement textual input during caption generation. Our approach achieves superior results on the GoodNews and NYTimes800k datasets compared to all previous methods.",
-    citation: `<pre><code>@misc{zhang2024eamaentityawaremultimodal,
-      title={EAMA : Entity-Aware Multimodal Alignment Based Approach for News Image Captioning},
-      author={Junzhe Zhang and Huixuan Zhang and Xunjian Yin and Xiaojun Wan},
-      year={2024},
-      eprint={2402.19404},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2402.19404},
+    citation: `<pre><code>@article{zhang2026eama,
+      title={EAMA: Entity-Aware Multimodal Alignment Based Approach for News Image Captioning},
+      author={Zhang, Junzhe and Zhang, Huixuan and Yin, Xunjian and Wan, Xiaojun},
+      journal={ACM Transactions on Multimedia Computing, Communications, and Applications},
+      volume={22},
+      number={5},
+      pages={1--19},
+      year={2026},
+      doi={10.1145/3801548},
+      url={https://doi.org/10.1145/3801548},
 }</code></pre>`,
     isPreprint: false,
     isSelected: false
@@ -433,7 +437,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     isSelected: true
   },
   {
-    title: "Benchmarking Knowledge Boundary for Large Language Model: A Different Perspective on Model Evaluation",
+    title: "Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation",
     authors: "<b>Xunjian Yin*</b>, Xu Zhang*, Jie Ruan, Xiaojun Wan",
     venue: "ACL 2024",
     links: [
@@ -489,10 +493,10 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
   {
     title: "Error-Robust Retrieval for Chinese Spelling Check",
     authors: "<b>Xunjian Yin</b>, Xinyu Hu, Jin Jiang, Xiaojun Wan",
-    venue: "COLING 2024",
+    venue: "LREC-COLING 2024",
     links: [
       { text: "Paper", url: "https://aclanthology.org/2024.lrec-main.553/" },
-      { text: "Code", url: "https://github.com/PKU-ONELab/" },
+      { text: "Code", url: "https://github.com/Arvid-pku/RERIC" },
       { text: "Page", url: "papers/error-robust-retrieval.html" }
     ],
     abstract: "Chinese Spelling Check (CSC) aims to detect and correct error tokens in Chinese contexts, which has a wide range of applications. However, it is confronted with the challenges of insufficient annotated data and the issue that previous methods may actually not fully leverage the existing datasets. In this paper, we introduce our plug-and-play retrieval method with error-robust information for Chinese Spelling Check (RERIC), which can be directly applied to existing CSC models. The datastore for retrieval is built completely based on the training data, with elaborate designs according to the characteristics of CSC. Specifically, we employ multimodal representations that fuse phonetic, morphologic, and contextual information in the calculation of query and key during retrieval to enhance robustness against potential errors. Furthermore, in order to better judge the retrieved candidates, the n-gram surrounding the token to be checked is regarded as the value and utilized for specific reranking. The experiment results on the SIGHAN benchmarks demonstrate that our proposed method achieves substantial improvements over existing work.",
@@ -523,7 +527,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
   {
     title: "Contextual Modeling for Document-level ASR Error Correction",
     authors: "Jin Jiang, <b>Xunjian Yin</b>, Xiaojun Wan, Wei Peng, Rongjun Li, Jingyuan Yang, and Yanquan Zhou",
-    venue: "COLING 2024",
+    venue: "LREC-COLING 2024",
     links: [
       { text: "Paper", url: "https://aclanthology.org/2024.lrec-main.341/" },
       { text: "Code", url: "https://github.com/jiangjin1999/context_ASR" },

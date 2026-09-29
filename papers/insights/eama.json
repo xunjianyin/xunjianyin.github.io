@@ -1,0 +1,34 @@
+{
+  "story": {
+    "title": "Naming the scene requires evidence beyond the pixels",
+    "paragraphs": [
+      "An ordinary image caption can say that a person is speaking at a podium. A news caption often needs to identify the person, the event, and the circumstances. Some of those facts are not visually recoverable, while the associated article may mention many people who are not pictured. The task therefore requires selecting the right relationship between visual content and textual entity information, rather than merely producing a more detailed visual description.",
+      "EAMA identifies a second tension: more article text is not automatically more useful. A long article contains names and facts that may help, but also material unrelated to the image. Truncating the article risks removing the needed identity; passing the whole article can bury it. The proposed solution teaches the captioning model to extract a compact set of useful sentences and entities before composing the final caption."
+    ]
+  },
+  "mechanism": {
+    "title": "The auxiliary tasks teach two different kinds of relevance",
+    "paragraphs": [
+      "Entity-aware sentence selection is trained using entities shared with the reference caption. Sentences containing relevant visual entities become positive examples, while sentences from the same article that lack those entities become hard negatives. The distinction between visual and nonvisual information matters: dates are excluded from the visual-entity criterion used for this task. This makes sentence selection more specific to news captioning than generic image–text similarity, which can recognize a scene without resolving the identity needed by its caption.",
+      "Entity selection complements that task by supervising which named entities from the article should be supplied to caption generation. Unlike sentence selection, it includes nonvisual entities that can be inferred from the article context. These two tasks are trained jointly with captioning. At inference, the aligned model first selects information from the article and then supplements its usual textual context with that information. The same model performs extraction and generation. “No extra module” describes this inference pipeline; it does not mean entity information appears without supervision during dataset construction."
+    ]
+  },
+  "evidence": {
+    "title": "The ablation distinguishes learning to select from simply reading more",
+    "paragraphs": [
+      "On NYTimes800k, full caption-only fine-tuning yields 82.70 CIDEr. Training with both alignment tasks raises it to 84.45; the complete method, including self-supplemented generation, reaches 87.00. Giving the caption-only model the full article instead yields 83.17, while simply extending its usual input yields 81.75. The evidence supports selecting useful entity context, rather than treating input length as the main intervention.",
+      "Oracle entity and sentence information reaches 94.27 CIDEr in the same analysis, leaving a substantial gap above the model’s own selection. Moreover, EAMA’s named-entity precision is lower than a compared method on both main datasets, even though recall and overall caption metrics improve. This is an important qualification: the model becomes better at producing informative news captions, but it has not solved factual identification. A caption can mention more correct entities while still introducing an incorrect one."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Paper · Sections 3–4 and Tables 1–4",
+      "url": "https://arxiv.org/html/2402.19404v5"
+    },
+    {
+      "label": "Published article",
+      "url": "https://doi.org/10.1145/3801548"
+    }
+  ],
+  "reading_notes": "Re-read visual-entity sentence-label construction, joint alignment, inference selection, Tables1–2, AppendixC Table4. Preserve distinction between training entity annotation and no extra inference module. All numeric values from v5."
+}

@@ -1,0 +1,98 @@
+{
+  "reverse-lm": {
+    "short_name": "LEDOM",
+    "topic": "Reverse language modeling",
+    "takeaway": "Train a language model to predict the past. Then use its backward probabilities to help forward models choose better answers.",
+    "question": "Most language models predict the next token from earlier context. What can we learn by conditioning on later context and predicting the previous token instead?",
+    "diagram": {
+      "title": "The same language, in the other direction",
+      "steps": [
+        {
+          "label": "Reverse",
+          "text": "Read training sequences in reverse token order."
+        },
+        {
+          "label": "Pretrain",
+          "text": "Learn to reconstruct earlier text from later context."
+        },
+        {
+          "label": "Rerank",
+          "text": "Use backward probabilities to score forward-model answers."
+        }
+      ],
+      "caption": "Reverse factorization changes the context a model can condition on."
+    },
+    "method": [
+      {
+        "title": "Reverse the token order",
+        "text": "Train a standard causal Transformer on reversed sequences. The architecture stays the same; each prediction now depends on text that originally came after it."
+      },
+      {
+        "title": "Learn backward reconstruction",
+        "text": "Given an ending, reconstruct plausible earlier text. The paper illustrates this with abductive reasoning, question synthesis, and inverse relation completion."
+      },
+      {
+        "title": "Score in both directions",
+        "text": "Reverse Reward combines forward P(response | prompt) with reverse P(prompt | response) to rerank candidate answers, without updating the forward model’s weights."
+      }
+    ],
+    "findings": [
+      {
+        "value": "2B / 7B",
+        "label": "Open reverse models",
+        "detail": "Two model scales study right-to-left pretraining with the same architecture and tokenizer as their forward counterparts."
+      },
+      {
+        "value": "435B",
+        "label": "Pretraining tokens",
+        "detail": "A corpus of general text, mathematics, and code supports training a reverse model at foundation-model scale."
+      },
+      {
+        "value": "+6.6 pp",
+        "label": "AIME 2024 · QwenMath",
+        "detail": "Reverse Reward raises accuracy from 16.7% with greedy decoding to 23.3% with candidate reranking in the reported setup."
+      }
+    ],
+    "scope": "These are inference-time reranking results with additional sampling and scoring. LEDOM alone trails forward models on many standard benchmarks; backward generation examples are qualitative.",
+    "results_table": {
+      "caption": "Selected results from Table 4. Accuracy (%); Reverse Reward uses best-of-N sampling. These are not matched-compute comparisons with greedy decoding.",
+      "headings": [
+        "Base model / benchmark",
+        "Greedy",
+        "Reverse Reward",
+        "Change"
+      ],
+      "rows": [
+        [
+          "QwenMath · AIME 2024",
+          "16.7",
+          "23.3",
+          "+6.6 pp"
+        ],
+        [
+          "DeepSeekMath · AMC 2023",
+          "12.5",
+          "27.5",
+          "+15.0 pp"
+        ],
+        [
+          "QwenMath · MATH-500",
+          "78.0",
+          "80.8",
+          "+2.8 pp"
+        ]
+      ],
+      "highlight_columns": [
+        3
+      ]
+    },
+    "figure_local": "assets/reverse-lm-overview.png",
+    "figure_url": "https://arxiv.org/html/2507.01335v3/intro.png",
+    "figure_caption": "Forward and reverse language modeling use complementary factorizations of the same sequence. Original Figure 1 from the paper.",
+    "source_url": "https://arxiv.org/html/2507.01335v3",
+    "source_note": "Verified Sections 2–5 and Table 4 against original arXiv v3 HTML. Corrected old page’s Qwen GSM8K/MATH-500 and DeepSeek AIME figures; those unsupported numbers are not reused. Existing x1.png figure path was invalid; actual source is intro.png. Text explains P(prompt|response), not the old reversed interpretation.",
+    "metadata_override": {
+      "abstract": "LEDOM studies right-to-left autoregressive pretraining at 2B and 7B parameters on 435 billion tokens. It reconstructs earlier text from later context, with qualitative examples of abductive reasoning, question synthesis, and inverse relation completion. Reverse Reward combines forward response likelihood with reverse prompt likelihood to rerank candidate responses. In the reported experiments, this improves mathematical reasoning over greedy baselines, while standalone reverse models remain weaker on many forward-oriented benchmarks. Models, code, and data are released for further research."
+    }
+  }
+}

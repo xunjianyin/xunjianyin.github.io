@@ -4,3 +4,9 @@ store/
 *.log
 *.zip
 test.html
+__pycache__/
+archive/next-prompt-2026-09-29-before-paper-v2.md
+archive/next-prompt-2026-09-29-before-paper-v3.md
+
+archive/next-prompt-2026-09-29-before-paper-v4.md
+archive/next-prompt-2026-09-29-before-paper-v5.md
