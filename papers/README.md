@@ -48,7 +48,10 @@ demo states; `demos/*.js` attach optional controls, and `demos/*.css` style only
 their own widgets. No demo calls a remote model.
 
 Gödel Agent uses a dedicated case study in `scripts/paper_demo_godel.py` and
-`demos/godel.*`. Its Game of 24 solver executes locally with exact fractions;
+`demos/godel.*`. Its six-panel robot strip (`assets/godel-robot-*.svg`) is an original
+illustration drawn by `scripts/godel_illustrations.py`: body parts stand for
+program parts (glasses read feedback, arms solve tasks, the wrench hand edits the
+agent), and the score gauge is schematic. Rerun the script after editing it. Its Game of 24 solver executes locally with exact fractions;
 the chosen card inputs and browser algorithm are explicitly adapted examples.
 `evidence/godel-agent.json` records the full reported result table, confidence
 intervals, ablations, experimental protocol, and case/figure provenance. The

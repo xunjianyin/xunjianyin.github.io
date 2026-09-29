@@ -5,6 +5,7 @@ from html.parser import HTMLParser
 import importlib.util
 import json
 from pathlib import Path
+import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -82,6 +83,22 @@ class PaperFigureTest(unittest.TestCase):
         item['figure_inline'] = False
         self.assertIn('<details', BUILDER.source_figure('godel-agent', item))
 
+
+    def test_godel_illustrations_match_their_generator(self) -> None:
+        spec = importlib.util.spec_from_file_location('godel_illustrations', ROOT / 'scripts/godel_illustrations.py')
+        assert spec and spec.loader
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module  # dataclasses resolve annotations through sys.modules
+        spec.loader.exec_module(module)
+        scenes = module.scenes()
+        self.assertEqual(len(scenes), 6)
+        html = (ROOT / 'papers/godel-agent.html').read_text()
+        for stem, title, body in scenes:
+            with self.subTest(panel=stem):
+                committed = (ROOT / 'papers/assets' / f'{stem}.svg').read_text()
+                self.assertEqual(committed, module.panel(int(stem[-1]), title, body), 'rerun scripts/godel_illustrations.py')
+                self.assertIn(f'assets/{stem}.svg', html)
+                self.assertNotRegex(committed, r'<rect[^>]*\brx=')  # the robot keeps the site's square corners
 
 if __name__ == '__main__':
     unittest.main()

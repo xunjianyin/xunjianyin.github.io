@@ -81,6 +81,20 @@
 .godel-robustness dl > div { border-top: 1px solid var(--line); padding-top: 15px; }
 .godel-robustness dt { font: 32px Georgia, serif; color: var(--accent); }
 .godel-robustness dd { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+/* Six-panel illustration of the self-improvement loop. */
+.godel-strip { margin-top: 34px; }
+.godel-strip-heading { max-width: 780px; }
+.godel-strip-heading h3 { font: 400 24px/1.4 Georgia, serif; margin: 7px 0 10px; }
+.godel-strip-heading p { font-size: 14px; line-height: 1.75; color: var(--muted); }
+.godel-strip-panels { list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 26px; }
+.godel-strip-panels img { display: block; width: 100%; height: auto; border: 1px solid var(--line); background: white; }
+.godel-strip-panels p { margin-top: 9px; font-size: 12.5px; line-height: 1.65; color: #424e47; }
+.godel-strip-panels p span { font: 600 11px ui-monospace, monospace; color: var(--accent); margin-right: 8px; }
+.godel-strip figcaption { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 11px; line-height: 1.8; color: var(--muted); }
+@media (max-width: 700px) {
+  .godel-strip-panels { grid-template-columns: 1fr; gap: 20px; }
+  .godel-strip-heading h3 { font-size: 22px; }
+}
 @media (max-width: 700px) {
   .godel-code-comparison { grid-template-columns: 1fr; gap: 18px; }
   .godel-workbench { padding: 18px 15px; }

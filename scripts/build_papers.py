@@ -199,11 +199,13 @@ def render(slug: str, meta: dict[str, Any], item: dict[str, Any], insight: dict[
     abstract_label = item.get("abstract_label", "Research summary")
     demo, demo_group = paper_demo(slug, insight)
     # Specialized case studies can add source-based material at the relevant section.
-    extra_method, extra_evidence = '', ''
+    extra_overview, extra_method, extra_evidence = '', '', ''
     if demo_group:
         module = importlib.import_module(f'paper_demo_{demo_group}')
         if hasattr(module, 'render_method'):
             extra_method = module.render_method(slug, insight)
+        if hasattr(module, 'render_overview'):
+            extra_overview = module.render_overview(slug, insight)
         if hasattr(module, 'render_evidence'):
             extra_evidence = module.render_evidence(slug, insight)
     demo_assets = (f'<link rel="stylesheet" href="demos/{demo_group}.css">\n  '
@@ -262,7 +264,7 @@ def render(slug: str, meta: dict[str, Any], item: dict[str, Any], insight: dict[
     <section id="overview" class="overview-section" aria-labelledby="overview-title">
       <div class="section-heading"><span class="section-label">01 / The research question</span><h2 id="overview-title">{e(overview_title)}</h2></div>
       <div class="narrative overview-narrative">{overview_text}</div>
-      {visual}
+      {visual}{extra_overview}
     </section>
     {explore}
     <section id="method" class="content-section method-section expanded-method" aria-labelledby="method-title">

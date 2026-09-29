@@ -5,6 +5,33 @@ from pathlib import Path
 
 PAPER = 'https://arxiv.org/html/2410.04444v4'
 
+# Original illustrations drawn by scripts/godel_illustrations.py. Body parts stand for
+# parts of the program; each caption states the mechanism the panel depicts.
+STRIP = [
+    ('Try the tasks', 'The agent runs its current policy on validation tasks and gets back scores and errors.'),
+    ('See its own parts', 'It inspects its own running code: the policy that solves tasks and the routine that edits the agent.'),
+    ('Swap in a stronger arm', 'It writes a new policy and patches it into itself while it keeps running.'),
+    ('Get stronger', 'The revised policy is evaluated on the same tasks.'),
+    ('Survive a bad part', 'Some edits break things. Error handling catches the failure and returns it as feedback.'),
+    ('Upgrade the upgrader', 'The improvement routine is code too, so it can be revised: reported changes include keeping full error traces and optimizing in parallel.'),
+]
+
+
+def render_overview(slug: str, insight: dict) -> str:
+    if slug != 'godel-agent':
+        return ''
+    panels = ''.join(
+        f'<li><img src="assets/godel-robot-{i}.svg" width="360" height="300" loading="lazy" decoding="async" '
+        f'alt="Panel {i}: {escape(title)}. {escape(caption)}"><p><span>{i:02d}</span>{escape(caption)}</p></li>'
+        for i, (title, caption) in enumerate(STRIP, start=1))
+    return f'''<figure class="godel-strip" aria-labelledby="godel-strip-title">
+      <div class="godel-strip-heading"><span class="demo-tag">Illustration · Sections 3–4 and 6.3</span>
+        <h3 id="godel-strip-title">A robot that rebuilds itself</h3>
+        <p>Its glasses stand for how it reads feedback, its arms for how it solves tasks, and its wrench hand for the routine that edits it. That last part is editable too.</p></div>
+      <ol class="godel-strip-panels">{panels}</ol>
+      <figcaption>Original illustration of the mechanism, not a record of one run. The score gauge is schematic; measured results appear in the evidence section.</figcaption>
+    </figure>'''
+
 
 def render_demo(slug: str, insight: dict) -> str:
     if slug != 'godel-agent':
