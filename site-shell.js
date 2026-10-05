@@ -137,7 +137,7 @@
     <footer class="site-footer">
       <div class="footer-social">${socialLinks}
       </div>
-      <p class="footer-copyright">${getFooterCopy()}</p>
+      <p class="footer-copyright">${getFooterCopy()} <button class="easter-egg-footnote" aria-label="Explore the margins" title="A small detour">*</button></p>
     </footer>
   </div>
   <button id="back-to-top" class="back-to-top" aria-label="Back to top">
@@ -156,21 +156,55 @@
       footerMount.innerHTML = buildFooter();
     }
 
-    // Lazy-load the easter egg only after the user starts typing its trigger.
-    // The first key of the sequence is 'y'; load on the first matching keydown.
-    var eeLoaded = false;
-    function loadEasterEgg() {
-      if (eeLoaded) return;
-      eeLoaded = true;
-      document.removeEventListener('keydown', maybeLoad, true);
-      var eeScript = document.createElement('script');
-      eeScript.src = toRootHref('easter-egg.js');
-      document.body.appendChild(eeScript);
+    // Match before loading, so the first attempt also works on a cold cache.
+    let eggLoading = null;
+    let eggReady = false;
+    const footnote = document.querySelector('.easter-egg-footnote');
+    function openEasterEgg() {
+      if (eggReady) { window.SiteEasterEgg.open(); return; }
+      if (eggLoading) return;
+      const script = document.createElement('script');
+      const style = document.createElement('link');
+      script.src = toRootHref('easter-egg.js');
+      style.rel = 'stylesheet';
+      style.href = toRootHref('easter-egg.css');
+      if (footnote) footnote.setAttribute('aria-busy', 'true');
+      eggLoading = Promise.all([script, style].map(asset => new Promise((resolve, reject) => {
+        asset.onload = resolve;
+        asset.onerror = reject;
+        document.head.append(asset);
+      }))).then(() => {
+        if (!window.SiteEasterEgg) throw new Error('Easter egg did not initialize.');
+        eggReady = true;
+        window.SiteEasterEgg.open();
+      }).catch(() => {
+        script.remove();
+        style.remove();
+        if (footnote) footnote.title = 'Could not load. Click to try again.';
+      }).finally(() => {
+        eggLoading = null;
+        if (footnote) footnote.removeAttribute('aria-busy');
+      });
     }
-    function maybeLoad(e) {
-      if (e.code === 'KeyY') loadEasterEgg();
-    }
-    document.addEventListener('keydown', maybeLoad, true);
+    footnote?.addEventListener('click', openEasterEgg);
+    const password = 'yxjgogogo';
+    let sequence = '';
+    let lastKeyAt = 0;
+    document.addEventListener('keydown', event => {
+      const target = event.target;
+      if (event.defaultPrevented || event.isComposing || event.repeat || event.ctrlKey || event.metaKey || event.altKey ||
+          target.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], dialog[open]')) {
+        sequence = '';
+        return;
+      }
+      const now = performance.now();
+      if (now - lastKeyAt > 1800) sequence = '';
+      lastKeyAt = now;
+      const key = event.key?.toLowerCase();
+      sequence += key?.length === 1 ? key : '\0';
+      while (sequence && !password.startsWith(sequence)) sequence = sequence.slice(1);
+      if (sequence === password) { sequence = ''; openEasterEgg(); }
+    });
   }
 
   whenReady(injectSiteShell);

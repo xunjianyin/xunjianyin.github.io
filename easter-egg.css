@@ -1,0 +1,278 @@
+/* A botanical plate in the margins. All styles stay inside the modal. */
+#secret-garden {
+  --garden-paper: #f7f5ef;
+  --garden-ink: #30392f;
+  --garden-muted: #686f62;
+  --garden-gold: #86683f;
+  --garden-rule: #d8d9cb;
+  box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--garden-ink);
+  background: var(--garden-paper);
+  overscroll-behavior: contain;
+  overflow: auto;
+  opacity: 0;
+  transition: opacity 600ms ease;
+  font-family: 'Lato', Helvetica, sans-serif;
+}
+
+#secret-garden.is-visible { opacity: 1; }
+#secret-garden.is-leaving { opacity: 0; transition-duration: 240ms; }
+#secret-garden::backdrop { background: transparent; }
+#secret-garden *, #secret-garden *::before, #secret-garden *::after { box-sizing: border-box; }
+
+#secret-garden .garden-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 28px clamp(24px, 5.2vw, 88px) 22px;
+}
+
+#secret-garden .garden-header,
+#secret-garden .garden-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+#secret-garden .garden-header {
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--garden-rule);
+}
+
+#secret-garden .garden-eyebrow,
+#secret-garden .garden-index {
+  margin: 0;
+  color: var(--garden-muted);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+#secret-garden .garden-eyebrow span { margin-right: 24px; color: var(--garden-gold); }
+
+#secret-garden button {
+  font-family: inherit;
+  font-weight: 400;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#secret-garden .garden-text-button {
+  min-height: 44px;
+  padding: 8px 0 8px 12px;
+  border: 0;
+  color: var(--garden-ink);
+  background: transparent;
+  font-size: 12px;
+  letter-spacing: .02em;
+}
+
+#secret-garden .garden-text-button:hover { color: var(--garden-gold); }
+#secret-garden button:focus { outline: none; }
+#secret-garden button:focus-visible { outline: 1px solid var(--garden-gold); outline-offset: 5px; }
+#secret-garden .garden-escape { margin-left: 12px; color: var(--garden-muted); font-size: 10px; }
+
+#secret-garden .garden-stage {
+  position: relative;
+  flex: 1;
+  min-height: 480px;
+  isolation: isolate;
+}
+
+#secret-garden .garden-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+#secret-garden .garden-copy {
+  position: relative;
+  width: 39%;
+  padding-top: clamp(55px, 11vh, 120px);
+  pointer-events: none;
+}
+
+#secret-garden .garden-kicker {
+  margin: 0 0 20px;
+  color: var(--garden-muted);
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+
+#secret-garden .garden-title {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--garden-ink);
+  font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  font-size: clamp(40px, 4.5vw, 76px);
+  font-weight: 400;
+  letter-spacing: -.045em;
+  line-height: 1.08;
+  text-transform: none;
+}
+
+#secret-garden .garden-title em { color: var(--garden-gold); font-weight: 400; }
+
+#secret-garden .garden-description {
+  max-width: 240px;
+  margin: 25px 0 0;
+  color: var(--garden-muted);
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+#secret-garden .garden-note {
+  position: absolute;
+  bottom: 44px;
+  left: 0;
+  max-width: 290px;
+  min-height: 90px;
+  padding-left: 16px;
+  border-left: 1px solid var(--garden-rule);
+}
+
+#secret-garden .garden-name {
+  margin: 9px 0 5px;
+  color: var(--garden-ink);
+  font-family: 'Iowan Old Style', Palatino, Georgia, serif;
+  font-size: 25px;
+  font-weight: 400;
+  letter-spacing: -.015em;
+  line-height: 1.25;
+}
+
+#secret-garden .garden-note-caption {
+  margin: 0;
+  color: var(--garden-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+#secret-garden .garden-seed {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  border: 0;
+  background: transparent;
+  color: var(--garden-gold);
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+#secret-garden.is-bloomed .garden-seed,
+#secret-garden .garden-seed:focus-visible { opacity: 1; }
+
+#secret-garden .garden-seed::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: var(--garden-paper);
+  transition: transform 250ms ease, background-color 250ms ease;
+}
+
+#secret-garden .garden-seed:hover::before,
+#secret-garden .garden-seed:focus-visible::before,
+#secret-garden .garden-seed[aria-pressed='true']::before {
+  background: currentColor;
+  transform: scale(1.4);
+}
+
+#secret-garden .garden-seed-label {
+  position: absolute;
+  top: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--garden-muted);
+  font-size: 9px;
+  letter-spacing: .08em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+#secret-garden .garden-plate-label {
+  position: absolute;
+  right: 0;
+  bottom: 45px;
+  text-align: right;
+  pointer-events: none;
+}
+
+#secret-garden .garden-plate-label p {
+  margin: 6px 0 0;
+  color: var(--garden-muted);
+  font-family: 'Iowan Old Style', Palatino, Georgia, serif;
+  font-size: 13px;
+  font-style: italic;
+}
+
+#secret-garden .garden-footer {
+  min-height: 58px;
+  padding-top: 12px;
+  border-top: 1px solid var(--garden-rule);
+}
+
+#secret-garden .garden-instruction {
+  margin: 0;
+  color: var(--garden-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+#secret-garden .garden-instruction span { display: block; font-size: 10px; color: var(--garden-gold); }
+#secret-garden .garden-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  #secret-garden .garden-sheet { padding: 12px 24px 12px; }
+  #secret-garden .garden-header { padding-bottom: 8px; gap: 10px; }
+  #secret-garden .garden-eyebrow { font-size: 9px; letter-spacing: .12em; }
+  #secret-garden .garden-eyebrow span { margin-right: 12px; }
+  #secret-garden .garden-escape { display: none; }
+  #secret-garden .garden-stage { min-height: 570px; }
+  #secret-garden .garden-copy { width: 100%; padding-top: 30px; }
+  #secret-garden .garden-kicker { font-size: 10px; margin-bottom: 12px; }
+  #secret-garden .garden-title { font-size: clamp(37px, 10vw, 54px); }
+  #secret-garden .garden-title br { display: none; }
+  #secret-garden .garden-description { max-width: none; margin-top: 12px; font-size: 12px; }
+  #secret-garden .garden-note { bottom: 22px; min-height: 76px; padding-left: 12px; }
+  #secret-garden .garden-name { font-size: 22px; }
+  #secret-garden .garden-plate-label { display: none; }
+  #secret-garden .garden-footer { gap: 12px; }
+  #secret-garden .garden-instruction { font-size: 10px; }
+  #secret-garden .garden-text-button { font-size: 11px; white-space: nowrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #secret-garden, #secret-garden *, #secret-garden *::before { transition: none !important; }
+}
