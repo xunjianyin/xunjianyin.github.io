@@ -122,6 +122,19 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
 #spira .spira-row:first-of-type { margin-top: 6px; }
 #spira .spira-year { color: var(--spira-caption); font-variant-numeric: tabular-nums; }
 #spira .spira-row-links { color: var(--spira-caption); }
+/* Shooting stars: the counter under the hint, and the caught questions in the plate. */
+#spira .spira-count { margin-top: 2px; min-height: 30px; padding: 0; color: var(--spira-caption); font-size: 12px; letter-spacing: 0.02em; }
+#spira .spira-count:hover { color: var(--spira-text); }
+#spira .spira-count.is-pending { visibility: hidden; }
+#spira .spira-wish-list { margin-top: 6px; }
+#spira .spira-wish-row {
+  display: block; width: 100%; min-height: 0; padding: 5px 0; border-top: 1px solid var(--spira-line);
+  color: #d7dde5; font-family: var(--spira-serif); font-style: italic; font-size: 13.5px; line-height: 1.45; letter-spacing: 0;
+  text-align: left; white-space: normal;
+}
+#spira .spira-wish-row:hover { color: #ffe9c7; }
+#spira .spira-release { margin-top: 6px; padding: 0; min-height: 36px; color: var(--spira-text); font-size: 13px; border-bottom: 1px solid rgba(207, 217, 230, 0.38); }
+#spira [data-sound][aria-pressed="false"] { color: var(--spira-caption); }
 #spira .spira-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 #spira .spira-note {
   grid-area: note; align-self: end; max-width: 380px; margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--spira-line);
@@ -210,6 +223,8 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
      line, with no row gap, so the two rows sit close together. */
   #spira .spira-theme { min-height: 0; padding: 7px 0; line-height: 18px; font-size: 12px; gap: 6px; }
   #spira .spira-plate { max-width: none; max-height: 27vh; overflow-y: auto; font-size: 13px; line-height: 1.62; padding-top: 6px; border-top: 1px solid var(--spira-line); }
+  /* Room for the hint's second line (it gains "· Tap a shooting star"), so nothing shifts. */
+  #spira .spira-hint { min-height: 3.3em; }
   #spira .spira-note { max-width: none; margin-top: 6px; padding-top: 6px; }
   #spira .spira-index { top: 48px; left: 0; right: 0; bottom: 0; width: auto; max-height: none; padding: 4px 16px 16px; background: var(--spira-night); border-left: 0; border-top: 1px solid var(--spira-line); }
   #spira .spira-opening { right: 16px; bottom: 10px; gap: 20px; }

@@ -50,13 +50,26 @@
   const SKIP_FADE_MS = 350;
   const REPLAY_FADE_MS = 250;
 
-  // Closing: the bookend. The page rises again from the edges while the galaxy collapses.
-  const CLOSE_UI = [0, 0.25];          // s from the close request: UI blocks fade out
-  const CLOSE_COLLAPSE = [0.1, 1.1];   // galaxy collapses into its origin; the iris closes on it
-  const CLOSE_GLINT = [1.0, 1.3];      // the last point of light glints where the iris closes
-  const CLOSE_TOTAL = 1.3;
+  // Closing as dawn: the exact reverse of the opening. The page reassembles itself on the
+  // canvas, and the page DOM is untouched until the final frame (s from the close request).
+  const DAWN_UI = [0, 0.3];            // UI blocks fade out; meteors stop and fade
+  const DAWN_COLLAPSE = [0, 0.65];     // the galaxy collapses into its nucleus; the camera returns to C
+  const DAWN_BLOOM = [0.5, 1.1];       // the text spiral blooms out of the nucleus to its hero size
+  const DAWN_HOME = 1.0;               // the last page line leaves for home ...
+  const DAWN_SPREAD = 0.9;             // ... line departures spread over this long, the name's line last ...
+  const DAWN_RIPPLE = 0.012;           // ... each word 12 ms after its left neighbour ...
+  const DAWN_FLIGHT = 0.7;             // ... a line's words on one easing: its arc unrolls into the page line
+  const DAWN_IRIS = [1.9, 2.75];       // dawn, as the last lines leave: the night disc shrinks, r = R (1 - easeInCubic(u))
+  const DAWN_EDGE = [0.04, 10, 28];    // its crisp edge clamp(0.04 r, 10, 28) px, inside the disc (no shade on the day side)
+  const DAWN_GLINT = [2.75, 3.0];      // a tiny warm glint where the disc closes
+  const DAWN_GLINT_RGB = [232, 178, 92]; // gold that reads on a white page as well as a dark one
+  const DAWN_END = 3.0;                // the swap: glyphs back, dialog removed, state restored
+  const DAWN_GLINT_FILL = `rgb(${DAWN_GLINT_RGB.join(',')})`;
+  const DAWN_TURNS = 0.6;              // backward spin while the text spiral blooms
+  const DAWN_COLLAPSE_TURNS = 0.35;    // spin while the galaxy collapses
+  const DAWN_BLOOM_FROM = 2;           // px: the text spiral's outer radius as it leaves the nucleus
+  const DAWN_CROSSFADE = 0.4;          // from a later opening phase straight into the flight home
   const CLOSE_DUSK = 0.4;              // during the dusk the iris simply reverses, this fast
-  const CLOSE_TURNS = 0.35;            // extra clockwise turns while the galaxy collapses
 
   // Dusk: an iris of night opening from the viewport centre
   const NIGHT_RGB = [5, 7, 12];
@@ -219,6 +232,79 @@
   const ATLAS_SIZE = 2048;
   const ATLAS_PAD = 2;
 
+  // The next turn: beyond 2026 the radius grows by only FUTURE_GROWTH of the log spiral's
+  // rate, r = 1 + c (g^(phi / 2 pi) - 1), so the whole next turn (where the caught open
+  // questions are pinned) stays within the chart's fit radius (about 1.2 after a full turn).
+  const FUTURE_GROWTH = 0.3;
+  const WISH_ARC = [12, 22];           // deg: a pinned wish draws the next turn fully within 12, fading out by 22
+  const WISH_GLOW = 13;
+  const WISH_GLINT = 22;               // px: the warm four-point glint of a wish star
+  const DRAWN_ALPHA = 0.3;             // the next turn as a soft solid line once all ten are caught
+  const DRAWN_FADE = 1.6;              // s
+
+  // Shooting stars ("wishes"), chart phase only. Times in chart seconds.
+  const METEOR_FIRST = 2.5;
+  const METEOR_GAP = [6, 12];
+  const METEOR_SPEED = [1100, 1500];   // px/s
+  const METEOR_SPEED_NARROW = [800, 1100];
+  const METEOR_ANGLE = [20, 40];       // deg below horizontal
+  const METEOR_TAIL = 260;             // px
+  const METEOR_TAIL_NARROW = 170;
+  const METEOR_SEGMENTS = 6;
+  const METEOR_WIDTH = [2, 0.3];       // tail width at the head and at the end
+  const METEOR_CORE = 2.5;             // px diameter of the warm-white head
+  const METEOR_GLOW = 14;
+  const METEOR_MAX = 16;               // pool size (the shower uses 14)
+  const TAIL_FONT = 10;                // px: the question along the tail
+  const TAIL_TEXT_GAP = 16;            // px between the head and the first letter
+  const TAIL_TEXT_LIFT = 6;            // px the letters ride above the tail line
+  const GLYPH_HALO = 5;                // px night halo baked around each letter (legible over the chart)
+  const CATCH_HEAD = 44;               // px around the head ...
+  const CATCH_TAIL = [24, 120];        // ... or within 24 px of the first 120 px of tail
+  const CATCH_STOP = 0.35;             // s: the caught meteor decelerates to rest
+  const CATCH_RELAY = [0.08, 0.5, 0.3]; // letters re-lay: start, duration each, stagger across the line
+  const CATCH_HOLD = 1.6;              // the readable line holds this long
+  const CATCH_COLLAPSE = 0.35;         // the line collapses to a point ...
+  const CATCH_ARC = 0.8;               // ... that arcs to its place on the next turn
+  const QUESTION_FONT = 18;            // px, serif italic, warm
+  const QUESTION_FONT_NARROW = 15;
+  const QUESTION_MARGIN = 16;          // px kept from the viewport edges
+  const LABEL_UNDER_QUESTION = 0.15;   // canvas labels under the laid-out question fade to this
+  const SHOWER_COUNT = 14;
+  const SHOWER_TIME = 2.2;
+  const GOLDEN_GAP = [15, 25];
+  const STILL_GAP = [10, 16];          // reduced motion: a still wish appears every 10-16 s ...
+  const STILL_LIFE = 8;                // ... and can be caught for 8 s
+  const STILL_RADIUS = 9;
+  const GOLD = '#ffd98a';
+
+  // Sound (Web Audio, synthesized). Gains are linear amplitudes before the master.
+  const AUDIO_MASTER = 0.55;
+  const AUDIO_FADE_IN = 1.2;           // s
+  const AUDIO_TOGGLE = 0.25;           // s ramp when sound is switched on or off
+  const AUDIO_LOOKAHEAD = 0.03;        // s: cues are scheduled at most this far ahead
+  const AUDIO_COMPRESSOR = { threshold: -18, ratio: 4, knee: 12 };
+  const REVERB = { seconds: 3.2, predelay: 0.02, send: 0.35, igniteSend: 0.6 };
+  const PAD = { attack: 2.5, release: 3.5, max: 10, cutoff: 900, lfoHz: 0.07, lfoDepth: 300, detune: 5 };
+  const DRONE_LEVEL = 0.1;
+  const AIR_LEVEL = 0.025;
+  const WIND_LEVEL = 0.09;
+  const HUSH_TIME = 0.12;              // s: everything drops to near silence at T_COLLAPSED
+  const GATHER_NOTE = 0.035;           // harp, every third departing word
+  const HOME_NOTE_GAP = 0.045;         // s: the closing harp (one note per departing line) keeps this far apart
+  const PAPER_NOTE = 0.06;
+  const HOVER_NOTE = 0.045;
+  const HOVER_THROTTLE = 70;           // ms
+  const SELECT_NOTE = 0.08;
+  const ARPEGGIO_STEP = 0.09;          // s between a theme's papers
+  const SPIN_MAX = 0.05;               // spin whoosh gain cap
+  const CHORD_EVERY = 9;               // s; each chord sounds CHORD_EVERY + 4 (4 s overlap)
+  const CHORD_OVERLAP = 4;
+  const CHORD_GAIN = 0.035;
+  const AMBIENT_BELL = [3, 8];         // s between sparse bells
+  const AMBIENT_BELL_GAIN = 0.025;
+  const CORE_MUFFLE = 700;             // Hz: the music bus in core view ("inside the page")
+
   // Type and colour
   const SANS = 'Lato, "Helvetica Neue", Arial, sans-serif';
   const SERIF = '"Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif';
@@ -267,8 +353,35 @@
     year, slug, name, title, venue, theme: THEMES.findIndex(t => t.id === theme)
   }));
 
+  // Open questions, each bridging two themes. A shooting star carries one; caught, it is
+  // pinned on the next turn, midway (the shorter way) between its two themes' sectors.
+  const QUESTIONS = [
+    ['knowledge', 'reasoning', 'How can new knowledge become a new ability?', 'Knowing a fact and using it in an unfamiliar solution are different capabilities.'],
+    ['knowledge', 'evaluation', 'How do we measure what a model could know?', 'A wrong answer can mean missing knowledge, or a failure to draw it out.'],
+    ['knowledge', 'improvement', 'How can an agent change without forgetting?', 'A useful update expands what works without breaking what already did.'],
+    ['knowledge', 'grounding', 'How should a model update when the world changes?', 'Facts expire. A growing model must keep the context in which an older answer was true.'],
+    ['reasoning', 'evaluation', 'Can we tell better reasoning from better-looking answers?', 'A convincing answer is not evidence of a reliable process.'],
+    ['reasoning', 'improvement', 'Can a learner improve how it learns to reason?', 'Improving an answer is one step; improving the procedure that finds answers is another.'],
+    ['reasoning', 'grounding', 'Can an agent predict what its actions will change?', 'A world model would let reasoning plan, intervene and correct itself.'],
+    ['evaluation', 'improvement', 'Who evaluates an agent that can rewrite its evaluator?', 'When the solver and the judge can both change, measuring progress becomes part of the problem.'],
+    ['evaluation', 'grounding', 'What counts as progress outside a benchmark?', 'Useful behaviour has to survive new contexts and new goals.'],
+    ['improvement', 'grounding', 'Can experience become lasting capability?', 'A long-running agent sees more than fits in context. How does experience become part of its machinery?']
+  ].map(([a, b, text, note]) => ({ a: THEMES.findIndex(t => t.id === a), b: THEMES.findIndex(t => t.id === b), text, note }));
+  const NQ = QUESTIONS.length;
+  const WISH_KEY = 'spira-wishes';
+  const SOUND_KEY = 'spira-sound';
+
   const COPY = {
-    stage: 'The research spiral. Drag or use arrow keys to turn it; plus and minus to zoom.',
+    stage: 'The research spiral. Drag or use arrow keys to turn it; plus and minus to zoom. Keys 1 to 5 choose a theme; Space catches a shooting star; M switches the sound.',
+    catchPointer: 'Catch a shooting star',
+    catchTouch: 'Tap a shooting star',
+    counter: 'Open questions caught',
+    release: 'Release them',
+    drawnKicker: 'Ten open questions',
+    drawnTitle: 'The next turn is drawn.',
+    drawnText: 'These are the questions I hope to work on next. Thank you for catching them.',
+    drawnLink: 'Read the research direction →',
+    drawnHref: 'blogs/agents-that-learn-after-deployment.html',
     text: 'A logarithmic spiral keeps its shape as it grows: each turn is the last one, enlarged. Here each turn is a year of my research, passing through the same five questions, a little further out every time. The next turns are not drawn yet.',
     hintPointer: 'Drag to turn · Scroll to move closer · Select a star or the centre',
     hintTouch: 'Drag to turn · Tap a star or the centre',
@@ -297,6 +410,12 @@
   const escapeHTML = text => String(text).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
   const hexRGB = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
   const paperURL = slug => new URL(`papers/${slug}.html`, ROOT).href;
+  // A question's colour is the blend of its two themes' colours.
+  QUESTIONS.forEach(q => {
+    const x = hexRGB(THEMES[q.a].colour); const y = hexRGB(THEMES[q.b].colour);
+    q.rgb = x.map((v, i) => Math.round((v + y[i]) / 2)); q.colour = `rgb(${q.rgb.join(',')})`;
+    q.kicker = `Open question · ${THEMES[q.a].label} × ${THEMES[q.b].label}`;
+  });
   function seeded(seed) {
     return () => {
       seed = (seed + 0x6d2b79f5) | 0;
@@ -340,11 +459,11 @@
     g.fillStyle = grad; g.fillRect(0, 0, 16, 16);
     return c;
   }
-  function glintSprite() {
-    const size = 64; const c = makeCanvas(size, size); const g = c.getContext('2d');
+  function glintSprite(rgb = [255, 255, 255]) {
+    const size = 64; const c = makeCanvas(size, size); const g = c.getContext('2d'); const tone = rgb.join(',');
     for (const horizontal of [true, false]) {
       const grad = horizontal ? g.createLinearGradient(0, 0, size, 0) : g.createLinearGradient(0, 0, 0, size);
-      grad.addColorStop(0, 'rgba(255,255,255,0)'); grad.addColorStop(0.5, 'rgba(255,255,255,0.9)'); grad.addColorStop(1, 'rgba(255,255,255,0)');
+      grad.addColorStop(0, `rgba(${tone},0)`); grad.addColorStop(0.5, `rgba(${tone},0.9)`); grad.addColorStop(1, `rgba(${tone},0)`);
       g.fillStyle = grad;
       if (horizontal) g.fillRect(0, size / 2 - 0.75, size, 1.5); else g.fillRect(size / 2 - 0.75, 0, 1.5, size);
     }
@@ -376,7 +495,11 @@
       themeDots: THEMES.map(t => dotSprite(hexRGB(t.colour))),
       cool: dotSprite([223, 231, 242]),
       warmDot: dotSprite([242, 227, 198]),
-      glint: glintSprite()
+      glint: glintSprite(),
+      glintWarm: glintSprite(hexRGB(WARM)),
+      glintGold: glintSprite(DAWN_GLINT_RGB),
+      blends: QUESTIONS.map(q => glowSprite(q.rgb)),
+      gold: glowSprite(hexRGB(GOLD))
     };
     return shared;
   }
@@ -471,7 +594,8 @@
           const r = range.getBoundingClientRect();
           if (!r.width || !r.height || r.bottom < 0 || r.top > vh || r.right < 0 || r.left > vw) return;
           words.push({ text: transform(node.data.slice(start, end), style.transform, atStart),
-            left: r.left, top: r.top, width: r.width, height: r.height, style, block, cont: !atStart, key: -1 });
+            left: r.left, top: r.top, width: r.width, height: r.height, style, block, cont: !atStart, key: -1,
+            node, start, end });
         };
         for (const match of node.data.matchAll(/\S+/gu)) {
           const from = match.index; const to = from + match[0].length;
@@ -600,7 +724,11 @@
   const TURNS = LAST_YEAR - FIRST_YEAR + 1;
   const THETA_IN = THETA0 - TAU * INNER_TURNS;
   const THETA_END = THETA0 + TAU * TURNS;
-  const radiusAt = theta => Math.pow(GROWTH, (theta - THETA0) / TAU - TURNS);
+  // Written turns follow the log spiral; the next turn grows at FUTURE_GROWTH of its rate
+  // (the same radius and direction at THETA_END, so the curve stays continuous).
+  const radiusAt = theta => (theta <= THETA_END ? Math.pow(GROWTH, (theta - THETA0) / TAU - TURNS)
+    : 1 + FUTURE_GROWTH * (Math.pow(GROWTH, (theta - THETA_END) / TAU) - 1));
+  const THETA_NEXT = THETA_END + TAU;   // the end of the next turn
   const HEAD_SWEEP = THETA_END - THETA_IN;
   /*
    * Head angle. Each turn lasts in proportion to r^0.6, so the angular speed is
@@ -637,7 +765,9 @@
     return (a + b) / 2;
   }
   const D_THETA = TAU / SAMPLES_PER_TURN;
-  const SAMPLE_COUNT = Math.ceil((THETA_STOP - THETA_IN) / D_THETA) + 2;
+  // Samples run to the end of the next turn (the written chart stops at THETA_STOP; the rest
+  // is drawn only where caught questions are pinned).
+  const SAMPLE_COUNT = Math.ceil((THETA_NEXT - THETA_IN) / D_THETA) + 2;
   const SAMPLE_X = new Float64Array(SAMPLE_COUNT);
   const SAMPLE_Y = new Float64Array(SAMPLE_COUNT);
   for (let i = 0; i < SAMPLE_COUNT; i++) {
@@ -646,6 +776,7 @@
   }
   const INDEX_2022 = Math.round((THETA0 - THETA_IN) / D_THETA);
   const INDEX_END = Math.round((THETA_END - THETA_IN) / D_THETA);
+  const INDEX_NEXT = Math.min(SAMPLE_COUNT - 1, Math.round((THETA_NEXT - THETA_IN) / D_THETA));
   const SECTOR = TAU / THEMES.length;
   const sectorCentre = j => THETA0 + (j + 0.5) * SECTOR;
   // Paper angle: k of m papers in a (year, theme) cell sit at (k + 0.5) / m across the padded sector.
@@ -661,10 +792,17 @@
       p.at = timeAtTheta(p.theta);
     });
   })();
-  // Theme labels sit at THEME_LABEL_R unless the unwritten turn passes there first.
-  const THEME_LABEL_RADII = THEMES.map((_, j) => {
-    const future = THETA_END + (j + 0.5) * SECTOR;
-    return future <= THETA_STOP ? Math.max(THEME_LABEL_R, radiusAt(future) + 0.09) : THEME_LABEL_R;
+  // Theme labels sit at THEME_LABEL_R, or just outside the next turn where it passes farther out.
+  const THEME_LABEL_RADII = THEMES.map((_, j) => Math.max(THEME_LABEL_R, radiusAt(THETA_END + (j + 0.5) * SECTOR) + 0.09));
+  // A question's place on the next turn: midway, the shorter way, between its two themes'
+  // sector centres (the ten midpoints fall every 36 degrees).
+  QUESTIONS.forEach(q => {
+    const ca = (q.a + 0.5) * SECTOR; const cb = (q.b + 0.5) * SECTOR;
+    let d = cb - ca; if (d > Math.PI) d -= TAU; else if (d < -Math.PI) d += TAU;
+    // A midpoint at 0 sits at the end of the next turn (2 pi), not on the end of 2026.
+    let phi = (((ca + d / 2) % TAU) + TAU) % TAU; if (phi < 1e-6 || TAU - phi < 1e-6) phi = TAU;
+    q.phi = phi; q.theta = THETA_END + phi; q.r = radiusAt(q.theta);
+    q.x = q.r * Math.cos(q.theta); q.y = q.r * Math.sin(q.theta);
   });
   // Rest footprint of the chart in units of S: a world circle of FIT_RADIUS seen at the
   // rest pitch. At rest the camera distance is exactly CAM_D, whatever S is.
@@ -682,6 +820,422 @@
     const theta = THETA0 + TAU * i;
     return { label: i === TURNS ? 'next' : String(FIRST_YEAR + i), theta, r: radiusAt(theta), at: timeAtTheta(theta) };
   });
+
+  /* ---------------------------------------------------------------------------
+   * Sound. A small synthesizer on any BaseAudioContext, so an OfflineAudioContext
+   * renders exactly the cues the egg plays (the tests measure their peaks):
+   *   voice -> StereoPanner -> dry bus ----------------------------> master
+   *                         \-> reverb send (0.35, or 0.6) -> convolver -/
+   *   master -> tone (the music bus lowpass; 700 Hz in core view) -> compressor -> out
+   * Pitch: D major pentatonic. A theme is a degree (evaluation D, knowledge E, grounding
+   * F#, reasoning A, improvement B); a year is an octave (2022-23: 4, 2024-25: 5, 2026: 6).
+   * When sound is off, or a live context is not running, nothing is scheduled at all.
+   * ------------------------------------------------------------------------- */
+  const PENTATONIC = [0, 2, 4, 7, 9];                     // semitones above D
+  const LADDER = [62, 64, 66, 69, 71, 74, 76, 78, 81, 83, 86]; // D4 ... D6, two pentatonic octaves (MIDI)
+  const CHORDS = [[50, 57, 61, 64, 66], [47, 54, 57, 62, 64], [43, 50, 54, 57, 59], [45, 52, 54, 59, 62]]; // Dmaj9 Bm11 Gmaj9 A6sus
+  const DAWN_CHORD = [62, 66, 69, 76];                    // D4 F#4 A4 E5
+  const AMBIENT_NOTES = [74, 76, 78, 81, 83, 86];         // D5 ... D6
+  const BELL_RATIOS = [1, 2, 2.76, 4.07];
+  const BELL_GAINS = [1, 0.35, 0.22, 0.08];
+  const BELL_DECAYS = [2.4, 1.4, 1.1, 0.7];               // s to near silence
+  const AUDIO_VOICES = 72;                                // one-shot voices beyond this are dropped
+  const midiHz = m => 440 * Math.pow(2, (m - 69) / 12);
+  const yearOctave = year => (year <= 2023 ? 4 : year <= 2025 ? 5 : 6);
+  const themeMidi = (theme, year) => 62 + 12 * (yearOctave(year) - 4) + PENTATONIC[theme];
+  const octaveGain = year => Math.pow(0.8, yearOctave(year) - 4);   // each octave above 4 is 20 % quieter
+  const themeNote = (theme, octave) => 62 + 12 * (octave - 4) + PENTATONIC[theme];
+
+  function createSpiraAudio(context, options = {}) {
+    const offline = typeof OfflineAudioContext !== 'undefined' && context instanceof OfflineAudioContext;
+    const rate = context.sampleRate;
+    const random = seeded(options.seed || 5);
+    const between = (a, b) => a + (b - a) * random();
+    let enabled = true; let closed = false;
+    const audio = { context, offline, scheduled: 0, alive: 0 };
+
+    // Output chain.
+    const compressor = context.createDynamicsCompressor();
+    compressor.threshold.value = AUDIO_COMPRESSOR.threshold; compressor.ratio.value = AUDIO_COMPRESSOR.ratio; compressor.knee.value = AUDIO_COMPRESSOR.knee;
+    compressor.connect(context.destination);
+    const tone = context.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 20000; tone.Q.value = 0;
+    tone.connect(compressor);
+    const master = context.createGain(); master.connect(tone);
+    const start0 = context.currentTime;
+    if (options.fadeIn === false) master.gain.value = AUDIO_MASTER;
+    else { master.gain.setValueAtTime(0, start0); master.gain.linearRampToValueAtTime(AUDIO_MASTER, start0 + AUDIO_FADE_IN); }
+    const dry = context.createGain(); dry.connect(master);
+    const convolver = context.createConvolver(); convolver.connect(master);
+    const send = context.createGain(); send.gain.value = REVERB.send; send.connect(convolver);
+    const sendHigh = context.createGain(); sendHigh.gain.value = REVERB.igniteSend; sendHigh.connect(convolver);
+    // Shared white noise (2 s, looped by every noise voice).
+    const noiseBuffer = context.createBuffer(1, Math.round(2 * rate), rate);
+    { const data = noiseBuffer.getChannelData(0); for (let i = 0; i < data.length; i++) data[i] = random() * 2 - 1; }
+    // Reverb: stereo noise with an exponential decay (-60 dB at 3.2 s) after a 20 ms
+    // pre-delay; a one-pole lowpass closes along the tail, so the highs die first.
+    function buildImpulse() {
+      if (closed) return;
+      const pre = Math.round(REVERB.predelay * rate); const length = pre + Math.round(REVERB.seconds * rate);
+      const ir = context.createBuffer(2, length, rate); const tau = REVERB.seconds / 6.91;
+      for (let ch = 0; ch < 2; ch++) {
+        const data = ir.getChannelData(ch); let low = 0;
+        for (let i = pre; i < length; i++) {
+          const t = (i - pre) / rate;
+          low += (0.75 - 0.6 * Math.min(1, t / REVERB.seconds)) * ((random() * 2 - 1) - low);
+          data[i] = low * Math.exp(-t / tau);
+        }
+      }
+      try { convolver.buffer = ir; } catch (error) { /* a closed context */ }
+    }
+    // A live context builds the impulse just after the opening's first frames, so they never wait.
+    if (offline) buildImpulse(); else setTimeout(buildImpulse, 40);
+    // One slow LFO sweeps every pad's lowpass by +-300 Hz.
+    const lfo = context.createOscillator(); lfo.frequency.value = PAD.lfoHz;
+    const lfoDepth = context.createGain(); lfoDepth.gain.value = PAD.lfoDepth;
+    lfo.connect(lfoDepth); lfo.start(start0);
+
+    const ready = () => enabled && !closed && (offline || context.state === 'running');
+    const roomFor = () => audio.alive < AUDIO_VOICES;
+    const at = t => Math.max(t, context.currentTime);
+    // Every voice ends in a panner that feeds the dry bus and one reverb send (none for null).
+    function out(node, pan, bus) {
+      const panner = context.createStereoPanner(); panner.pan.value = clamp(pan || 0, -1, 1);
+      node.connect(panner); panner.connect(dry);
+      if (bus !== null) panner.connect(bus || send);
+      return panner;
+    }
+    // A source that counts as a voice (scheduled and alive until it ends).
+    function voice(source, t, end) {
+      audio.scheduled++; audio.alive++;
+      source.onended = () => { audio.alive--; };
+      source.start(t); source.stop(end);
+      return source;
+    }
+    function oscillator(type, f, into, detune) {
+      const o = context.createOscillator(); o.type = type; o.frequency.value = f;
+      if (detune) o.detune.value = detune;
+      o.connect(into);
+      return o;
+    }
+    function filter(type, f, q) {
+      const node = context.createBiquadFilter(); node.type = type; node.frequency.value = f; node.Q.value = q;
+      return node;
+    }
+    function noiseSource(t) {
+      const source = context.createBufferSource(); source.buffer = noiseBuffer; source.loop = true;
+      source.loopStart = 0; source.loopEnd = noiseBuffer.duration;
+      return source;
+    }
+
+    /* One-shot voices ------------------------------------------------------- */
+    // bell: four sine partials, 4 ms attack, each decaying exponentially to silence.
+    function bell(f, t, g, pan = 0, bus) {
+      if (!ready() || !roomFor()) return;
+      if (!(g > 0)) return;
+      t = at(t);
+      const sum = context.createGain(); const panner = out(sum, pan, bus);
+      for (let k = 0; k < BELL_RATIOS.length; k++) {
+        const fk = f * BELL_RATIOS[k]; if (fk > rate * 0.45) continue;
+        const amp = context.createGain(); amp.connect(panner);
+        const peak = g * BELL_GAINS[k];
+        amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(peak, t + 0.004);
+        amp.gain.exponentialRampToValueAtTime(peak * 1e-3, t + 0.004 + BELL_DECAYS[k]);
+        const o = oscillator('sine', fk, amp);
+        if (k === 0) voice(o, t, t + BELL_DECAYS[0] + 0.05); else { o.start(t); o.stop(t + BELL_DECAYS[k] + 0.05); }
+      }
+    }
+    // harp: a triangle and a sine through a 2.8 kHz lowpass, 3 ms attack, 0.9 s decay.
+    function harp(f, t, g, pan = 0) {
+      if (!ready() || !roomFor()) return;
+      if (!(g > 0)) return;
+      t = at(t);
+      const lowpass = filter('lowpass', 2800, 0); const env = context.createGain();
+      lowpass.connect(env); out(env, pan);
+      env.gain.setValueAtTime(0, t); env.gain.linearRampToValueAtTime(g, t + 0.003);
+      env.gain.exponentialRampToValueAtTime(g * 1e-3, t + 0.9);
+      const triGain = context.createGain(); triGain.gain.value = 0.7; triGain.connect(lowpass);
+      const sineGain = context.createGain(); sineGain.gain.value = 0.5; sineGain.connect(lowpass);
+      voice(oscillator('triangle', f, triGain), t, t + 0.95);
+      const s = oscillator('sine', f, sineGain); s.start(t); s.stop(t + 0.95);
+    }
+    // pad: per note two triangles at +-5 cents -> lowpass 900 Hz (LFO +-300) -> envelope
+    // (attack, sustain, release) -> a gate that can release it early. At most PAD.max alive.
+    const pads = [];
+    function releasePad(p, t, tau) {
+      try {
+        p.gate.gain.setTargetAtTime(0, t, tau);
+        const end = t + tau * 8;
+        if (end < p.end) { for (const o of p.oscs) o.stop(end); p.end = end; }
+      } catch (error) { /* already stopped */ }
+    }
+    function pad(notes, t, dur, g, attack = PAD.attack, release = PAD.release) {
+      if (!ready()) return;
+      t = at(t);
+      for (let i = pads.length - 1; i >= 0; i--) if (pads[i].end <= context.currentTime) pads.splice(i, 1);
+      attack = Math.min(attack, dur / 2); release = Math.min(release, dur - attack);
+      for (let n = 0; n < notes.length; n++) {
+        if (pads.length >= PAD.max) releasePad(pads.shift(), t, 0.3);
+        const f = midiHz(notes[n]);
+        const lowpass = filter('lowpass', PAD.cutoff, 0); lfoDepth.connect(lowpass.frequency);
+        const env = context.createGain(); const gate = context.createGain();
+        lowpass.connect(env); env.connect(gate);
+        out(gate, notes.length > 1 ? lerp(-0.35, 0.35, n / (notes.length - 1)) : 0);
+        env.gain.setValueAtTime(0, t); env.gain.linearRampToValueAtTime(g, t + attack);
+        env.gain.setValueAtTime(g, t + dur - release); env.gain.linearRampToValueAtTime(0, t + dur);
+        const end = t + dur + 0.05;
+        const a = voice(oscillator('triangle', f, lowpass, -PAD.detune), t, end);
+        const b = oscillator('triangle', f, lowpass, PAD.detune); b.start(t); b.stop(end);
+        // Unhook the pad from the shared LFO when it ends.
+        a.addEventListener('ended', () => { try { lfoDepth.disconnect(lowpass.frequency); } catch (error) { /* gone */ } });
+        pads.push({ gate, oscs: [a, b], end });
+      }
+    }
+    function releasePads(t, tau) { while (pads.length) releasePad(pads.shift(), t, tau); }
+    // noise: shared noise through a filter whose frequency ramps f0 -> f1, with a pan ramp.
+    // Envelopes: 'arc' rises to its peak at 40 % and falls away, 'burst' strikes and decays,
+    // 'swell' rises (reverse) and stops short.
+    function noise(t, dur, f0, f1, q, g, pan0 = 0, pan1 = pan0, shape = 'arc', type = 'bandpass', highpass = 0, bus) {
+      if (!ready() || !roomFor()) return;
+      if (!(g > 0)) return;
+      t = at(t);
+      const source = noiseSource(); let head = source;
+      if (highpass) { const hp = filter('highpass', highpass, 0.5); head.connect(hp); head = hp; }
+      const shaper = filter(type, f0, q);
+      shaper.frequency.setValueAtTime(f0, t); shaper.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      head.connect(shaper);
+      const env = context.createGain(); shaper.connect(env);
+      const panner = out(env, pan0, bus);
+      if (pan1 !== pan0) { panner.pan.setValueAtTime(clamp(pan0, -1, 1), t); panner.pan.linearRampToValueAtTime(clamp(pan1, -1, 1), t + dur); }
+      if (shape === 'burst') {
+        env.gain.setValueAtTime(0, t); env.gain.linearRampToValueAtTime(g, t + 0.005);
+        env.gain.exponentialRampToValueAtTime(g * 1e-3, t + dur);
+      } else if (shape === 'swell') {
+        env.gain.setValueAtTime(g * 1e-3, t); env.gain.exponentialRampToValueAtTime(g, t + dur);
+        env.gain.linearRampToValueAtTime(0, t + dur + 0.03);
+      } else {
+        env.gain.setValueAtTime(0, t); env.gain.linearRampToValueAtTime(g, t + 0.4 * dur);
+        env.gain.linearRampToValueAtTime(0, t + dur);
+      }
+      source.loopStart = 0;
+      audio.scheduled++; audio.alive++;
+      source.onended = () => { audio.alive--; };
+      source.start(t, random() * 1.9); source.stop(t + dur + 0.06);
+    }
+    // thump: a sine falling 120 -> 38 Hz over 0.45 s (kept out of the reverb).
+    function thump(t, g) {
+      if (!ready()) return;
+      if (!(g > 0)) return;
+      t = at(t);
+      const env = context.createGain(); out(env, 0, null);
+      env.gain.setValueAtTime(0, t); env.gain.linearRampToValueAtTime(g, t + 0.006);
+      env.gain.exponentialRampToValueAtTime(g * 1e-3, t + 0.6);
+      const o = oscillator('sine', 120, env);
+      o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(38, t + 0.45);
+      voice(o, t, t + 0.65);
+    }
+
+    /* Continuous layers ----------------------------------------------------- */
+    // Each layer is a set of sources into a level gain that only ever ramps forwards in time.
+    function layer(build, t, level, fade, pan = 0) {
+      const gain = context.createGain(); gain.gain.setValueAtTime(0, t);
+      if (level > 0) gain.gain.linearRampToValueAtTime(level, t + fade);
+      const panner = out(gain, pan);
+      const sources = build(gain, panner);
+      for (const s of sources) { s.start(t); audio.scheduled++; audio.alive++; s.onended = () => { audio.alive--; }; }
+      return { gain, panner, sources, stopped: false };
+    }
+    function stopLayer(l, t, tau) {
+      if (!l || l.stopped) return;
+      l.stopped = true;
+      try { l.gain.gain.setTargetAtTime(0, t, tau); for (const s of l.sources) s.stop(t + tau * 8 + 0.05); } catch (error) { /* already stopped */ }
+    }
+    let drone = null; let air = null; let wind = null; let spin = null; let spinTarget = 0;
+    // drone: sines D2 + A2 and a low triangle D3, through a 400 Hz lowpass.
+    function droneStart(t, level, fade) {
+      if (!ready()) return;
+      t = at(t); stopLayer(drone, t, 0.3);
+      drone = layer(gain => {
+        const lowpass = filter('lowpass', 400, 0); lowpass.connect(gain);
+        const parts = [['sine', 38, 0.5], ['sine', 45, 0.35], ['triangle', 50, 0.25]];
+        return parts.map(([type, m, level]) => { const g = context.createGain(); g.gain.value = level; g.connect(lowpass); return oscillator(type, midiHz(m), g); });
+      }, t, level, fade);
+    }
+    function droneGlide(t, dur, ratio) {
+      if (!drone || drone.stopped) return;
+      t = at(t);
+      for (const o of drone.sources) { const f = o.frequency.value; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * ratio, t + dur); }
+    }
+    function airStart(t, level, fade) {
+      if (!ready()) return;
+      t = at(t); stopLayer(air, t, 0.3);
+      air = layer(gain => { const lowpass = filter('lowpass', 1200, 0.3); lowpass.connect(gain); const s = noiseSource(); s.connect(lowpass); return [s]; }, t, level, fade);
+    }
+    // wind: noise through a bandpass sweeping 250 -> 3500 Hz, easing in, its pan circling.
+    function windStart(t, dur) {
+      if (!ready()) return;
+      t = at(t); stopLayer(wind, t, 0.1);
+      wind = layer((gain, panner) => {
+        const band = filter('bandpass', 250, 1.1); band.connect(gain);
+        band.frequency.setValueAtTime(250, t); band.frequency.exponentialRampToValueAtTime(3500, t + dur);
+        const s = noiseSource(); s.connect(band);
+        const circle = context.createOscillator(); circle.frequency.setValueAtTime(0.5, t); circle.frequency.linearRampToValueAtTime(2.2, t + dur);
+        const depth = context.createGain(); depth.gain.value = 0.75; circle.connect(depth); depth.connect(panner.pan);
+        return [s, circle];
+      }, t, 0, 0);
+      wind.gain.gain.setValueAtTime(WIND_LEVEL * 1e-3, t); wind.gain.gain.exponentialRampToValueAtTime(WIND_LEVEL, t + dur);
+    }
+    // spin: a soft lowpassed wind that follows the chart's yaw velocity.
+    function setSpin(level) {
+      level = clamp(level, 0, SPIN_MAX);
+      if (Math.abs(level - spinTarget) < 0.002 && !(level === 0 && spinTarget > 0)) return;
+      if (!ready()) return;
+      if (!spin || spin.stopped) {
+        if (level <= 0.001) return;
+        spin = layer(gain => { const lowpass = filter('lowpass', 700, 0.4); lowpass.connect(gain); const s = noiseSource(); s.connect(lowpass); return [s]; }, context.currentTime, 0, 0);
+      }
+      spinTarget = level;
+      spin.gain.gain.setTargetAtTime(level, context.currentTime, 0.12);
+    }
+
+    /* Chart ambient: pad chords every 9 s (4 s overlap) and sparse bells ------- */
+    let ambient = null;
+    function ambientStart(t) {
+      if (!ready() || ambient) return;
+      t = at(t);
+      stopLayer(drone, t, 2); stopLayer(air, t, 1); stopLayer(wind, t, 0.3);
+      ambient = { chord: 0, next: t, bell: t + between(AMBIENT_BELL[0], AMBIENT_BELL[1]) };
+      ambientTick();
+    }
+    function ambientTick(horizon = 0.6) {
+      if (!ambient || !ready()) return;
+      const now = context.currentTime;
+      // After a suspension the schedule resumes from now rather than catching up.
+      if (ambient.next < now - 1) ambient.next = now;
+      if (ambient.bell < now - 1) ambient.bell = now + between(1, 3);
+      while (ambient.next < now + horizon) {
+        pad(CHORDS[ambient.chord], ambient.next, CHORD_EVERY + CHORD_OVERLAP, CHORD_GAIN);
+        ambient.chord = (ambient.chord + 1) % CHORDS.length; ambient.next += CHORD_EVERY;
+      }
+      while (ambient.bell < now + horizon) {
+        bell(midiHz(AMBIENT_NOTES[Math.floor(random() * AMBIENT_NOTES.length)]), ambient.bell, AMBIENT_BELL_GAIN, between(-0.6, 0.6));
+        ambient.bell += between(AMBIENT_BELL[0], AMBIENT_BELL[1]);
+      }
+    }
+    function ambientStop(t, tau) { ambient = null; releasePads(at(t), tau); }
+
+    /* Cues: what the egg plays. Times are context seconds. -------------------- */
+    const cue = {
+      dusk(t) { droneStart(t, DRONE_LEVEL, 2); airStart(t, AIR_LEVEL, 2); },
+      // The gather walks a two-octave pentatonic down from D6 (step 10) to D4 (step 0).
+      gather(t, step, pan) { harp(midiHz(LADDER[clamp(step, 0, LADDER.length - 1)]), t, GATHER_NOTE, pan); },
+      glint(t, dur = 0.9) {
+        pad(CHORDS[0], t, 6, 0.05);
+        noise(t, dur, 4000, 9000, 0.8, 0.02, -0.6, 0.6, 'arc');
+      },
+      wind(t, dur) { windStart(t, dur); droneGlide(t, dur, 1.5); },
+      hush(t) {
+        t = at(t); const tau = HUSH_TIME / 4;
+        stopLayer(drone, t, tau); stopLayer(air, t, tau); stopLayer(wind, t, tau); releasePads(t, tau);
+      },
+      inhale(t, dur) { noise(t, Math.max(0.08, dur), 2000, 2400, 0.5, 0.05, 0, 0, 'swell', 'highpass'); },
+      ignite(t) {
+        t = at(t);
+        thump(t, 0.45);
+        [74, 81, 88, 90].forEach((m, i) => bell(midiHz(m), t + [0, 0.012, 0.025, 0.04][i], 0.07, [-0.3, 0.3, -0.15, 0.15][i], sendHigh));
+        noise(t, 0.8, 1500, 400, 0.9, 0.08, 0, 0, 'burst', 'bandpass', 0, sendHigh);
+        droneStart(t + 0.6, DRONE_LEVEL * 0.7, 3);
+      },
+      paper(t, theme, year, pan) { bell(midiHz(themeMidi(theme, year)), t, PAPER_NOTE * octaveGain(year), pan); },
+      ghost(t) { bell(midiHz(74), t, 0.04, -0.2); bell(midiHz(81), t + 0.02, 0.04, 0.2); },
+      ambient(t) { ambientStart(t); },
+      whoosh(t, dur, pan0, pan1, g = 0.06) { noise(t, dur, 6000, 1500, 0.9, g, pan0, pan1, 'arc', 'bandpass', 1200); },
+      // Catch: a rising four-note harp arpeggio, then bells on the question's two theme notes.
+      catch(t, a, b, pan) {
+        const first = 3 + Math.min(a, b);
+        for (let k = 0; k < 4; k++) harp(midiHz(LADDER[first + k]), t + k * 0.04, 0.045, pan);
+        bell(midiHz(themeNote(a, 5)), t + 0.16, 0.05, pan - 0.15); bell(midiHz(themeNote(b, 5)), t + 0.17, 0.05, pan + 0.15);
+      },
+      // Pin: a bell dyad of the two theme notes and a soft noise bloom.
+      pin(t, a, b, pan) {
+        bell(midiHz(themeNote(a, 5)), t, 0.06, pan - 0.1); bell(midiHz(themeNote(b, 5)), t + 0.015, 0.06, pan + 0.1);
+        noise(t, 0.9, 500, 1800, 0.7, 0.03, pan, pan, 'arc', 'bandpass');
+      },
+      sparkle(t, pan) {
+        for (let k = 0; k < 5; k++) harp(midiHz(LADDER[6 + k]), t + k * 0.025, 0.03, pan);
+        noise(t, 0.5, 5000, 10000, 0.8, 0.015, pan - 0.2, pan + 0.2, 'arc');
+      },
+      hover(t, theme, year, pan) { bell(midiHz(themeMidi(theme, year)), t, HOVER_NOTE * octaveGain(year), pan); },
+      dyad(t, a, b, g, pan) { bell(midiHz(themeNote(a, 5)), t, g, pan - 0.1); bell(midiHz(themeNote(b, 5)), t + 0.012, g, pan + 0.1); },
+      select(t, theme, year, pan) {
+        const f = midiHz(themeMidi(theme, year)); const g = SELECT_NOTE * octaveGain(year);
+        bell(f, t, g, pan); bell(f * 2, t + 0.01, g * 0.8, pan);
+      },
+      // The closing harp walks up the ladder (the mirror of the gather); dawn is a soft pad.
+      home(t, step, pan) { harp(midiHz(LADDER[clamp(step, 0, LADDER.length - 1)]), t, GATHER_NOTE, pan); },
+      dawn(t, dur = 1.4) { pad(DAWN_CHORD, t, dur, 0.04, 0.25, 0.6); },   // quick: the master fades out 0.6 s before the swap
+      swell(t) { pad(CHORDS[0], t, 6, 0.07); }
+    };
+
+    /* Control ----------------------------------------------------------------- */
+    function rampMaster(target, t, dur) {
+      const g = master.gain;
+      if (typeof g.cancelAndHoldAtTime === 'function') g.cancelAndHoldAtTime(t);
+      else { g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); }
+      g.linearRampToValueAtTime(target, t + dur);
+    }
+    // (descriptors, so the getters stay live)
+    Object.defineProperties(audio, Object.getOwnPropertyDescriptors({
+      cue, bell, harp, pad, noise, thump, ambientTick, setSpin,
+      get enabled() { return enabled; },
+      get ready() { return ready(); },
+      get state() { return closed ? 'closed' : context.state; },
+      now() { return context.currentTime; },
+      droneStart, droneStop(t, tau) { stopLayer(drone, at(t), tau); },
+      airStop(t, tau) { stopLayer(air, at(t), tau); },
+      windStop(t, tau) { stopLayer(wind, at(t), tau); },
+      ambientStop, get ambient() { return !!ambient; },
+      get drone() { return !!drone && !drone.stopped; },
+      // Core view lowpasses the whole music bus; backing out opens it again.
+      muffle(on, dur) {
+        if (closed) return;
+        const t = context.currentTime; const f = tone.frequency;
+        if (typeof f.cancelAndHoldAtTime === 'function') f.cancelAndHoldAtTime(t); else { f.cancelScheduledValues(t); f.setValueAtTime(f.value, t); }
+        f.exponentialRampToValueAtTime(on ? CORE_MUFFLE : 20000, t + Math.max(0.05, dur));
+      },
+      setEnabled(on) {
+        if (closed) return;
+        enabled = on;
+        const t = context.currentTime;
+        if (on) {
+          if (!offline && context.state === 'suspended') context.resume().catch(() => {});
+          rampMaster(AUDIO_MASTER, t, AUDIO_TOGGLE);
+        } else {
+          rampMaster(0, t, AUDIO_TOGGLE);
+          // Once silent, a live context stops entirely (no voices are kept running).
+          if (!offline) setTimeout(() => { if (!enabled && !closed && context.state === 'running') context.suspend().catch(() => {}); }, AUDIO_TOGGLE * 1000 + 80);
+        }
+      },
+      // The master fades out, ending at `end` (context seconds).
+      fadeOut(end, dur) {
+        if (closed) return;
+        const t = Math.max(context.currentTime, end - dur);
+        rampMaster(0, t, Math.max(0.02, end - t));
+      },
+      // Close the context; a quick fade first if it is still sounding.
+      close(quick) {
+        if (closed) return;
+        closed = true;
+        if (offline) return;
+        try {
+          if (quick && context.state === 'running') {
+            rampMaster(0, context.currentTime, 0.06);
+            setTimeout(() => context.close().catch(() => {}), 120);
+          } else context.close().catch(() => {});
+        } catch (error) { /* already closed */ }
+      }
+    }));
+    return audio;
+  }
 
   /* ---------------------------------------------------------------------------
    * The egg
@@ -702,6 +1256,9 @@
     const scroll = { x: scrollX, y: scrollY };
     const overflow = body.style.getPropertyValue('overflow');
     const overflowPriority = body.style.getPropertyPriority('overflow');
+    // A stable scrollbar gutter, so locking body overflow never shifts the page sideways.
+    const gutter = html.style.getPropertyValue('scrollbar-gutter');
+    const gutterPriority = html.style.getPropertyPriority('scrollbar-gutter');
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     const coarse = matchMedia('(hover: none), (pointer: coarse)').matches;
     const events = new AbortController();
@@ -734,6 +1291,7 @@
           <p class="spira-hint">${escapeHTML(coarse ? COPY.hintTouch : COPY.hintPointer)}</p>
         </div>
         <div class="spira-plate-detail" hidden></div>
+        <button type="button" class="spira-count is-pending" aria-hidden="true"></button>
         <p class="spira-status" role="status" aria-live="polite"></p>
       </section>
       <p class="spira-note">${escapeHTML(COPY.note)}</p>
@@ -742,6 +1300,7 @@
       <div class="spira-actions">
         <button type="button" data-index aria-expanded="false" aria-controls="spira-index">All works</button>
         <button type="button" data-replay>Replay</button>
+        <button type="button" data-sound aria-pressed="true"><span data-sound-label>Sound on</span> <span class="spira-key" aria-hidden="true">m</span></button>
         <button type="button" data-close>Close <span class="spira-key" aria-hidden="true">esc</span></button>
       </div>
       <div class="spira-index" id="spira-index" hidden>${years.map(year => `
@@ -749,6 +1308,7 @@
           `<a class="spira-index-link" href="${escapeHTML(paperURL(p.slug))}" title="${escapeHTML(p.title)}" data-paper="${i}">${escapeHTML(p.name)} <span>— ${escapeHTML(p.venue)}</span></a>`).join('')}</div>`).join('')}
       </div>
       <div class="spira-opening">
+        <button type="button" data-sound aria-pressed="true"><span data-sound-label>Sound on</span> <span class="spira-key" aria-hidden="true">m</span></button>
         <button type="button" data-skip>Skip <span class="spira-key" aria-hidden="true">↵</span></button>
         <button type="button" data-opening-close>Close <span class="spira-key" aria-hidden="true">esc</span></button>
       </div>`;
@@ -772,6 +1332,8 @@
     const replayButton = $('[data-replay]');
     const closeButton = $('[data-close]');
     const skipButton = $('[data-skip]');
+    const soundButtons = [...dialog.querySelectorAll('[data-sound]')];
+    const countButton = $('.spira-count');
     const chartBlocks = [plateEl, noteEl, themesEl, actionsEl];
     const inertBlocks = [stage, centreButton, headEl, plateEl, noteEl, themesEl, actionsEl, indexEl];
     let ctx = null;
@@ -788,10 +1350,13 @@
     let coreX = 0; let coreY = 0; let coreRadius = 1;   // where and how large the core view shows the page
     let apMax = 1;                     // aperture radius when dusk completes
     let skipStart = -1; let remnantT = -1; let replayStart = -1;
-    // Closing: 'dusk' reverses the iris; 'galaxy' collapses everything into its origin.
-    let closeKind = ''; let closeT = 0; let closeFromMode = ''; let closeFromT = 0;
+    // Closing: 'dusk' reverses the iris; 'dawn' runs the opening backwards (closeSource: chart, core, opening).
+    let closeKind = ''; let closeT = 0; let closeFromT = 0;
     let closeX = 0; let closeY = 0; let closeCover = 1; let closeR0 = 0; let closeExtent = 1;
     let closeLift = 0; let liftSprite = null; let collapseOn = false; let collapseK = 1; let collapsePhi = 0;
+    let closeDone = false; let closeSky = 0; let closeE = 0; let closeSource = ''; let collapseDX = 0; let collapseDY = 0; let canvasWords = 0; let sceneStars = true;
+    const closeCam = { x: 0, y: 0, yaw: 0, pitch: 0, scale: 1 };
+    const closeText = { x: 0, y: 0, scale: 1, rot: 0 };
     const closeUIFrom = new Map();
     let wordCount = 0; let atlases = [];
     // Chart state
@@ -804,7 +1369,44 @@
     const coreFrom = { yaw: 0, yawTo: 0, pitch: 0, zoom: 1 };
     const stats = { frames: 0, avgMs: 0, maxMs: 0, byPhase: {} };
     const travelStats = { clockwise: 0, counter: 0 };
-    for (const name of ['dusk', 'gather', 'wind', 'ignite', 'chart', 'core', 'closing']) stats.byPhase[name] = { frames: 0, avgMs: 0, maxMs: 0 };
+    for (const name of ['dusk', 'gather', 'wind', 'ignite', 'chart', 'meteor', 'core', 'closing']) stats.byPhase[name] = { frames: 0, avgMs: 0, maxMs: 0 };
+    // Sound: the synthesizer (adopted or created on a gesture), the preference and the cue log.
+    let audio = null; let soundOn = true; let audioWarned = false; let audioBroken = false; let audioMissed = false; let audioTimer = 0;
+    try { soundOn = localStorage.getItem(SOUND_KEY) !== 'off'; } catch (error) { soundOn = true; }
+    const audioCues = [];                // test hook: { cue, t: timeline s, at: page ms }
+    let cueFrom = -1; let closeCueFrom = -1; let lastGatherNote = -1; let lastHomeNote = -1;
+    let hoverNoteAt = -Infinity; let lastMoveAt = 0;
+    const noteRandom = seeded(33);
+    // Shooting stars: a small pool; one question meteor (or one catch) at a time.
+    let skyT = 0; let nextMeteor = METEOR_FIRST; let discovered = false; let activeMeteors = 0;
+    const mX0 = new Float32Array(METEOR_MAX); const mY0 = new Float32Array(METEOR_MAX);
+    const mDX = new Float32Array(METEOR_MAX); const mDY = new Float32Array(METEOR_MAX);
+    const mSpeed = new Float32Array(METEOR_MAX); const mBorn = new Float32Array(METEOR_MAX); const mLife = new Float32Array(METEOR_MAX);
+    const mTail = new Float32Array(METEOR_MAX); const mFade = new Float32Array(METEOR_MAX);
+    const mQ = new Int8Array(METEOR_MAX); const mKind = new Uint8Array(METEOR_MAX);   // 0 question, 1 shower, 2 golden
+    const mOn = new Uint8Array(METEOR_MAX); const mSounded = new Uint8Array(METEOR_MAX);
+    const meteorRandom = seeded(Date.now() % 100000);
+    // Wishes: caught questions (persisted) and their stars on the next turn.
+    const caught = new Uint8Array(NQ); const wishPinned = new Uint8Array(NQ);
+    const wishAge = new Float32Array(NQ).fill(99); const wishFade = new Float32Array(NQ);
+    const wishSX = new Float32Array(NQ); const wishSY = new Float32Array(NQ); const wishZ = new Float32Array(NQ); const wishVis = new Uint8Array(NQ);
+    const wishLabelWidth = new Float32Array(NQ);
+    let caughtCount = 0; let drawn = false; let drawnFade = 0; let nextDrawnWidth = 0;
+    let hoverWish = -1; let selectedWish = -1; let plateView = '';   // plateView: '' | 'wishes' | 'drawn'
+    // The catch in progress: the meteor decelerates, its letters re-lay into a line, the line
+    // folds into a point that arcs to the next turn.
+    let catchQ = -1; let catchT = 0; let catchX = 0; let catchY = 0; let catchDX = 0; let catchDY = 0; let catchV = 0; let catchTail = 0;
+    let lineCX = 0; let lineCY = 0; let catchFrom = 0;
+    // Glyph strip of the active question: each glyph in its own cell, so letters can move alone.
+    const MAX_CHARS = 72;
+    const glyphCell = new Float32Array(MAX_CHARS); const glyphCellW = new Float32Array(MAX_CHARS);
+    const glyphOff = new Float32Array(MAX_CHARS); const glyphAdv = new Float32Array(MAX_CHARS);
+    const glyphLX = new Float32Array(MAX_CHARS); const glyphLY = new Float32Array(MAX_CHARS); const glyphHide = new Uint8Array(MAX_CHARS);
+    let glyphCanvas = null; let glyphQ = -1; let glyphN = 0; let glyphH = 0; let glyphSize = QUESTION_FONT; let glyphWidth = 0; let glyphDPR = 0;
+    // A golden meteor's sparkle (screen space).
+    let sparkleX = 0; let sparkleY = 0; let sparkleAge = 99;
+    // Reduced motion: a still wish waits at a free spot for a while.
+    let stillQ = -1; let stillX = 0; let stillY = 0; let stillTimer = 0;
     const uiOpacity = new Map();
     const ui = new Float32Array(4 * 8); let uiCount = 0;
     const MAX_PLACED = 48;
@@ -814,6 +1416,7 @@
     /* ---- Typed scratch (allocation-free frame loop) ---------------------- */
     const random = seeded(20220101);
     const NP = PAPERS.length;
+    const paperDim = new Float32Array(NP).fill(1); const paperDelay = new Float32Array(NP);   // dawn: stars dim in reverse order
     // Eased label state (see drawLabels).
     const paperFade = new Float32Array(NP); const paperDone = new Uint8Array(NP);
     const themeFade = new Float32Array(THEMES.length); const themeOffset = new Float32Array(THEMES.length);
@@ -875,7 +1478,7 @@
       sparkTone[i] = i % (THEMES.length + 1); sparkGlitter[i] = random() < SPARK_GLITTER ? 1 : 0;
     }
     const SPARK_STROKES = [...THEMES.map(theme => theme.colour), '#ffffff'];
-    const PS = PAPER_SPARKS * NP;
+    const PS = PAPER_SPARKS * (NP + NQ + 1);   // papers, then wishes, then the golden sparkle
     const pSparkDX = new Float32Array(PS); const pSparkDY = new Float32Array(PS);
     const pSparkSpeed = new Float32Array(PS); const pSparkLife = new Float32Array(PS);
     for (let i = 0; i < PS; i++) {
@@ -886,6 +1489,8 @@
     }
     const DASH_FUTURE = [2, 6]; const DASH_SPOKE = [2, 5]; const DASH_AXIS = [1, 4]; const NO_DASH = [];
     const LABEL_FONT = `11px ${SANS}`;
+    const WISH_FONT = `italic 12px ${SERIF}`;
+    const NEXT_DRAWN = 'next · drawn';
     const YEAR_FONT = `10px ${SANS}`;
     const THEME_FONT = `700 9px ${SANS}`;
     const THEME_LABELS = THEMES.map(theme => theme.label.toUpperCase());
@@ -897,6 +1502,8 @@
     let wHomeX, wHomeY, wHomeR, wHomeA, wAnchorX, wAnchorY, wSpriteW, wSpriteH, wDayX, wDayY, wNightX, wNightY;
     let wDevW, wDevH, wPage, wNightPage, wSize, wSlotR, wSlotA, wSlotS, wSlotRot, wLift, wDur, wTravel, wTurn, wTone, wX, wY;
     let wKey, wWarmPage, wWarmX, wWarmY, wGlintAt; let keyCount = 0;
+    let keptWords = []; let keptDPR = 1;
+    let wLine = new Int32Array(0); let lineFirst = new Int32Array(1); let lineMid = new Int32Array(1); let lineCount = 0; let lineDep = new Float32Array(1);
     // Streak polylines: 4 points per streak (now, and 1/3, 2/3, 3/3 of TRAIL_DT earlier).
     let trailPX = new Float32Array(0); let trailPY = trailPX; let trailTone = new Uint8Array(0); let trailCount = 0;
     let wordTones = []; let dotList = new Int32Array(0); let dotSize = new Float32Array(0); let dotAlpha = new Float32Array(0);
@@ -1008,6 +1615,7 @@
         top = headEl.getBoundingClientRect().bottom + 4; bottom = themesEl.getBoundingClientRect().top - 4;
       }
       const freeW = Math.max(40, right - left); const freeH = Math.max(40, bottom - top);
+      freeL = left; freeR = right; freeT = top; freeB = bottom;   // meteors cross this area
       chartX = (left + right) / 2;
       const target = (restPitch === CAM_PITCH_NARROW ? CHART_SCALE_NARROW : CHART_SCALE) * Math.min(freeW, freeH / 0.72);
       // Centre the radius-1 disk (not the padded footprint) in the free area. At rest a world
@@ -1053,7 +1661,7 @@
       dialog.style.setProperty('--spira-cx', `${Math.round(chartX)}px`); dialog.style.setProperty('--spira-cy', `${Math.round(chartY)}px`);
       // The origin always projects to the chart centre, so its control can stay put.
       centreButton.style.left = `${Math.round(chartX - CORE_HIT)}px`; centreButton.style.top = `${Math.round(chartY - CORE_HIT)}px`;
-      hintEl.textContent = coarse || narrow ? COPY.hintTouch : COPY.hintPointer;
+      updateHint();
       focal = sFit * CAM_D;
       const minSide = Math.min(W, H);
       headRho = HEAD_RADIUS * minSide;
@@ -1071,6 +1679,9 @@
         for (let p = 0; p < NP; p++) { labelWidth[p] = ctx.measureText(PAPERS[p].name).width; focusWidth[p] = ctx.measureText(FOCUS_LABELS[p]).width; }
         ctx.font = YEAR_FONT;
         for (let m = 0; m < YEAR_MARKS.length; m++) yearWidth[m] = ctx.measureText(YEAR_MARKS[m].label).width;
+        nextDrawnWidth = ctx.measureText(NEXT_DRAWN).width;
+        ctx.font = WISH_FONT;
+        for (let q = 0; q < NQ; q++) wishLabelWidth[q] = ctx.measureText(QUESTIONS[q].text).width;
         ctx.font = THEME_FONT;
         if (nativeSpacing) ctx.letterSpacing = '1.6px';
         for (let j = 0; j < THEMES.length; j++) themeWidth[j] = ctx.measureText(THEME_LABELS[j]).width;
@@ -1091,7 +1702,7 @@
       releaseWords();
       keyCount = markKeySentence(captured);
       const built = buildWordSprites(captured, DPR);
-      atlases = built.atlases;
+      atlases = built.atlases; keptDPR = DPR;
       const words = built.words;
       const n = words.length; W_N = n; wordCount = n;
       const f32 = () => new Float32Array(n);
@@ -1104,22 +1715,16 @@
       dotList = new Int32Array(n); dotSize = f32(); dotAlpha = f32(); wX = f32(); wY = f32();
       trailPX = new Float32Array(n * 4); trailPY = new Float32Array(n * 4); trailTone = new Uint8Array(n);
       const tones = new Map();
-      const cx = W / 2; const cy = H / 2;
+      keptWords = words;
+      fillSprites(words);
       for (let i = 0; i < n; i++) {
         const w = words[i];
-        // The local origin of a sprite is its baseline midpoint; at t = 0 it sits on the page baseline.
-        wHomeX[i] = w.left + w.width / 2; wHomeY[i] = w.top + w.ascent;
-        wAnchorX[i] = wHomeX[i] - w.ox / DPR; wAnchorY[i] = wHomeY[i] - w.oy / DPR;
-        wSpriteW[i] = w.sw / DPR; wSpriteH[i] = w.sh / DPR; wDevW[i] = w.sw; wDevH[i] = w.sh;
-        wPage[i] = w.daySpot[0]; wDayX[i] = w.daySpot[1]; wDayY[i] = w.daySpot[2];
-        wNightPage[i] = w.nightSpot[0]; wNightX[i] = w.nightSpot[1]; wNightY[i] = w.nightSpot[2];
-        if (w.warmSpot) { wKey[i] = w.key; wWarmPage[i] = w.warmSpot[0]; wWarmX[i] = w.warmSpot[1]; wWarmY[i] = w.warmSpot[2]; }
+        if (w.warmSpot) wKey[i] = w.key;
         wSize[i] = w.style.size;
         if (!tones.has(w.style.night)) tones.set(w.style.night, tones.size);
         wTone[i] = tones.get(w.style.night);
-        const dx = wHomeX[i] - cx; const dy = wHomeY[i] - cy;
-        wHomeR[i] = Math.max(1, Math.hypot(dx, dy)); wHomeA[i] = Math.atan2(dy, dx);
       }
+      fillPolar();
       wordTones = [...tones.keys()];
       // The glint reaches each key word at a time proportional to the text width before it,
       // so the light moves at an even speed along the sentence.
@@ -1173,6 +1778,26 @@
         if (travel > TRAVEL[1]) travel -= TAU;
         if (travel >= 0) travelStats.clockwise++; else travelStats.counter++;
         wTravel[i] = travel;
+      }
+    }
+    function fillSprites(words) {
+      for (let i = 0; i < words.length; i++) {
+        const w = words[i];
+        // The local origin of a sprite is its baseline midpoint; at t = 0 it sits on the page baseline.
+        wHomeX[i] = w.left + w.width / 2; wHomeY[i] = w.top + w.ascent;
+        wAnchorX[i] = wHomeX[i] - w.ox / DPR; wAnchorY[i] = wHomeY[i] - w.oy / DPR;
+        wSpriteW[i] = w.sw / DPR; wSpriteH[i] = w.sh / DPR; wDevW[i] = w.sw; wDevH[i] = w.sh;
+        wPage[i] = w.daySpot[0]; wDayX[i] = w.daySpot[1]; wDayY[i] = w.daySpot[2];
+        wNightPage[i] = w.nightSpot[0]; wNightX[i] = w.nightSpot[1]; wNightY[i] = w.nightSpot[2];
+        if (w.warmSpot) { wWarmPage[i] = w.warmSpot[0]; wWarmX[i] = w.warmSpot[1]; wWarmY[i] = w.warmSpot[2]; }
+      }
+    }
+    function fillPolar() {
+      // Home in polar form about the viewport centre C, and the home tangent each word unwinds.
+      const cx = W / 2; const cy = H / 2;
+      for (let i = 0; i < W_N; i++) {
+        const dx = wHomeX[i] - cx; const dy = wHomeY[i] - cy;
+        wHomeR[i] = Math.max(1, Math.hypot(dx, dy)); wHomeA[i] = Math.atan2(dy, dx);
         // The word turns from upright to riding its lane's tangent as its radius settles;
         // wTurn is the tangent angle at home, wrapped to (-pi, pi], that is unwound.
         let lock = (((wHomeA[i] + SLOT_TILT) % TAU) + TAU) % TAU;
@@ -1180,6 +1805,62 @@
         wTurn[i] = lock;
       }
     }
+    /**
+     * Before the dawn, re-measure every word from its stored text range. If the page has
+     * moved (a resize while open), rebuild the sprites at the new places, so the final swap
+     * stays pixel-faithful.
+     */
+    function refreshHomes() {
+      if (!W_N) return;
+      const range = document.createRange(); let moved = false;
+      for (const w of keptWords) {
+        try {
+          range.setStart(w.node, w.start); range.setEnd(w.node, w.end);
+          const r = range.getBoundingClientRect();
+          if (Math.abs(r.left - w.left) > 0.25 || Math.abs(r.top - w.top) > 0.25 || Math.abs(r.width - w.width) > 0.25) {
+            w.left = r.left; w.top = r.top; w.width = r.width; w.height = r.height; moved = true;
+          }
+        } catch (error) { /* the node left the page: keep its last place */ }
+      }
+      if (moved || keptDPR !== DPR) {
+        const old = atlases;
+        const built = buildWordSprites(keptWords, DPR);
+        if (built.words.length === W_N) {
+          for (const atlas of old) { atlas.width = 0; atlas.height = 0; }
+          atlases = built.atlases; keptDPR = DPR; fillSprites(keptWords);
+        } else for (const atlas of built.atlases) { atlas.width = 0; atlas.height = 0; }
+      }
+      fillPolar();
+    }
+    /**
+     * Page lines for the dawn: consecutive words of one block whose baselines agree (within
+     * half a font size) form a line. A line flies home as one object, anchored on its middle word.
+     */
+    function groupLines() {
+      wLine = new Int32Array(W_N); lineFirst = new Int32Array(W_N + 1); lineMid = new Int32Array(Math.max(1, W_N)); lineCount = 0;
+      for (let i = 0; i < W_N; i++) {
+        const first = lineCount ? lineFirst[lineCount - 1] : -1;
+        const same = first >= 0 && keptWords[first].block === keptWords[i].block &&
+          Math.abs(wHomeY[i] - wHomeY[first]) < 0.5 * Math.max(wSize[i], wSize[first]);
+        if (!same) lineFirst[lineCount++] = i;
+        wLine[i] = lineCount - 1;
+      }
+      lineFirst[lineCount] = W_N;
+      for (let l = 0; l < lineCount; l++) lineMid[l] = (lineFirst[l] + lineFirst[l + 1] - 1) >> 1;
+      // Departures in reverse reading order (the last line first, the name's line last), spaced
+      // in proportion to how much of each line is legible on the spiral (its width times its
+      // scale there, at least a quarter), so tiny inner lines leave in a quick burst and the
+      // long outer lines, the bio, unroll one after another.
+      lineDep = new Float32Array(lineCount);
+      const weight = new Float32Array(lineCount); let total = 0;
+      for (let l = 0; l < lineCount; l++) {
+        let width = 0; for (let i = lineFirst[l]; i < lineFirst[l + 1]; i++) width += wSpriteW[i];
+        weight[l] = width * clamp(wSlotS[lineMid[l]] / spiralS0, 0.25, 1); total += weight[l];
+      }
+      let before = 0; const span = Math.max(1e-6, total - (lineCount ? weight[0] : 0));
+      for (let l = lineCount - 1; l >= 0; l--) { lineDep[l] = DAWN_HOME + DAWN_SPREAD * Math.min(1, before / span); before += weight[l]; }
+    }
+    const lineDepart = l => lineDep[l];
     function buildGhosts() {
       const g = makeCanvas(1, 1).getContext('2d');
       const font = `italic 12px ${SERIF}`; g.font = font;
@@ -1216,7 +1897,7 @@
      * `cut` it instead keeps what is already drawn only inside the iris (destination-in),
      * which is how the closing lets the page reappear from the edges.
      */
-    function drawAperture(radius, edge, layer, cx = W / 2, cy = H / 2, cut = false) {
+    function drawAperture(radius, edge, layer, cx = W / 2, cy = H / 2, cut = false, rimmed = true) {
       const corner = Math.max(Math.hypot(cx, cy), Math.hypot(W - cx, cy), Math.hypot(cx, H - cy), Math.hypot(W - cx, H - cy));
       ctx.globalCompositeOperation = 'source-over';
       if (radius - edge / 2 >= corner + MASK_CELL) {
@@ -1255,7 +1936,7 @@
         ctx.globalCompositeOperation = 'source-over';
       }
       // A luminous rim: a crisp 1 px line over a faint halo, fading once the iris passes the corners.
-      const rim = 1 - smooth((radius - corner) / (edge + 8));
+      const rim = rimmed ? 1 - smooth((radius - corner) / (edge + 8)) : 0;
       if (rim > 0.01 && radius > 0.5) {
         ctx.beginPath(); ctx.arc(cx, cy, radius, 0, TAU);
         ctx.globalAlpha = layer * rim; ctx.strokeStyle = RIM_HALO; ctx.lineWidth = RIM_HALO_WIDTH; ctx.stroke();
@@ -1593,7 +2274,7 @@
       // In core view (and while flying in or out) only the starfield, the bulge and the text
       // spiral remain: the research layers fade out by the middle of the flight.
       const research = layer * (1 - smooth(coreU / 0.5));
-      drawStars(layer);
+      if (sceneStars) drawStars(layer);
       applyCollapse();
       // Project every sample up to the head.
       const last = Math.min(SAMPLE_COUNT - 1, Math.floor((head - THETA_IN) / D_THETA));
@@ -1707,22 +2388,45 @@
       // The unwritten turn: dashed, fading to nothing where the head comes to rest.
       ctx.lineWidth = 1;
       if (head > THETA_END && research > 0.004) {
+        // In the chart, each pinned wish draws a piece of the whole next turn around its star;
+        // with all ten the dashes give way to a soft solid line.
+        const ring = chart && (wishShown() || drawnFade > 0);
+        const ringShow = smooth(span(time, T_UI));
+        const lastF = ring ? INDEX_NEXT : last;
+        for (let i = last + 1; i <= lastF; i++) {
+          project(SAMPLE_X[i], SAMPLE_Y[i], 0);
+          sampleSX[i] = PX; sampleSY[i] = PY; sampleDepth[i] = depthFactor(PZ);
+        }
         ctx.setLineDash(DASH_FUTURE);
-        const total = THETA_STOP - THETA_END;
-        for (let c = INDEX_END; c <= last; c += 12) {
-          const end = Math.min(c + 12, last); const mid = (c + end) >> 1;
+        const total = THETA_STOP - THETA_END; const chunk = ring ? 4 : 12;
+        for (let c = INDEX_END; c <= lastF; c += chunk) {
+          const end = Math.min(c + chunk, lastF); const mid = (c + end) >> 1;
           const along = (THETA_IN + mid * D_THETA - THETA_END) / total;
-          ctx.globalAlpha = FUTURE_ALPHA * (1 - along) * sampleDepth[mid] * research;
-          ctx.beginPath(); ctx.moveTo(sampleSX[c], sampleSY[c]);
-          for (let i = c + 1; i <= end; i++) ctx.lineTo(sampleSX[i], sampleSY[i]);
-          if (end === last) ctx.lineTo(headX, headY);
-          ctx.stroke();
-          if (end === last) break;
+          let alpha = mid <= last ? FUTURE_ALPHA * (1 - along) : 0;
+          if (ring) alpha = Math.max(alpha, FUTURE_ALPHA * ringShow * wishCover((mid - INDEX_END) * D_THETA)) * (1 - drawnFade);
+          if (alpha > 0.004) {
+            ctx.globalAlpha = alpha * sampleDepth[mid] * research;
+            ctx.beginPath(); ctx.moveTo(sampleSX[c], sampleSY[c]);
+            for (let i = c + 1; i <= end; i++) ctx.lineTo(sampleSX[i], sampleSY[i]);
+            if (end === last && !ring) ctx.lineTo(headX, headY);
+            ctx.stroke();
+          }
+          if (end === lastF) break;
         }
         ctx.setLineDash(NO_DASH);
+        if (ring && drawnFade > 0) {
+          for (let c = INDEX_END; c < INDEX_NEXT; c += 12) {
+            const end = Math.min(c + 12, INDEX_NEXT); const mid = (c + end) >> 1;
+            ctx.globalAlpha = DRAWN_ALPHA * drawnFade * ringShow * sampleDepth[mid] * research;
+            ctx.beginPath(); ctx.moveTo(sampleSX[c], sampleSY[c]);
+            for (let i = c + 1; i <= end; i++) ctx.lineTo(sampleSX[i], sampleSY[i]);
+            ctx.stroke();
+          }
+        }
       }
       if (!chart) drawComet(time, head, headX, headY, layer);
       drawPapers(time, chart, research);
+      if (chart) drawWishes(research * smooth(span(time, T_UI)));
       if (chart && centreHover && coreU <= 0 && project(0, 0, 0)) {
         // The centre is selectable: a quiet ring while it is hovered or focused.
         ctx.globalAlpha = 0.4 * layer; ctx.strokeStyle = CURVE_COLOUR; ctx.lineWidth = 1;
@@ -1817,6 +2521,38 @@
       ctx.globalAlpha = show; ctx.fillStyle = '#ffffff';
       ctx.beginPath(); ctx.arc(x, y, 1.8, 0, TAU); ctx.fill();
     }
+    // A star's ignition at (x, y) and age: a flash, a ring and short tapered sparks (spark
+    // directions from index base). Drawn in 'lighter' mode; analytic in the age, so no state.
+    function drawBurst(x, y, age, sprite, colour, base, sparks, layer) {
+      if (age < PAPER_FLASH.time) {
+        const u = age / PAPER_FLASH.time; const radius = PAPER_FLASH.radius * (0.45 + 0.55 * easeOutCubic(u));
+        ctx.globalAlpha = PAPER_FLASH.alpha * (1 - u) * layer;
+        ctx.drawImage(sprite, x - radius, y - radius, radius * 2, radius * 2);
+        ctx.globalAlpha = 0.6 * (1 - u) * (1 - u) * layer;
+        ctx.drawImage(sprites.white, x - radius * 0.4, y - radius * 0.4, radius * 0.8, radius * 0.8);
+      }
+      if (age < PAPER_RING.time) {
+        const u = age / PAPER_RING.time;
+        ctx.globalAlpha = PAPER_RING.alpha * (1 - u) * (1 - u) * layer; ctx.strokeStyle = colour; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(x, y, Math.max(1, PAPER_RING.radius * easeOutCubic(u)), 0, TAU); ctx.stroke();
+      }
+      if (age < PAPER_SPARK_LIFE[1]) {
+        // A quick sparkle: short tapered trails (two segments) that are gone within 0.6 s.
+        ctx.strokeStyle = colour; ctx.lineCap = 'round';
+        for (let s = 0; s < sparks; s++) {
+          const i = base + s; const life = pSparkLife[i]; if (age >= life) continue;
+          const reach = pSparkSpeed[i] / PAPER_SPARK_DRAG;
+          const d2 = reach * (1 - Math.exp(-PAPER_SPARK_DRAG * age));
+          const d1 = reach * (1 - Math.exp(-PAPER_SPARK_DRAG * Math.max(0, age - PAPER_SPARK_TRAIL / 2)));
+          const d0 = reach * (1 - Math.exp(-PAPER_SPARK_DRAG * Math.max(0, age - PAPER_SPARK_TRAIL)));
+          const fade = 1 - age / life; const a = fade * fade * layer;
+          ctx.globalAlpha = a; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(x + pSparkDX[i] * d1, y + pSparkDY[i] * d1); ctx.lineTo(x + pSparkDX[i] * d2, y + pSparkDY[i] * d2); ctx.stroke();
+          ctx.globalAlpha = a * 0.4; ctx.lineWidth = 0.6;
+          ctx.beginPath(); ctx.moveTo(x + pSparkDX[i] * d0, y + pSparkDY[i] * d0); ctx.lineTo(x + pSparkDX[i] * d1, y + pSparkDY[i] * d1); ctx.stroke();
+        }
+      }
+    }
     function drawPapers(time, chart, layer) {
       const theme = chart ? selectedTheme : -1;
       const sparks = narrow ? PAPER_SPARKS_NARROW : PAPER_SPARKS;
@@ -1830,7 +2566,8 @@
         if (age < 0 || !onScreen) continue;
         const focus = chart && (p === selectedPaper || p === hoverPaper);
         const dim = theme >= 0 && paper.theme !== theme && !focus ? 0.3 : 1;
-        const a = depthFactor(PZ) * dim * layer;
+        const a = depthFactor(PZ) * dim * layer * paperDim[p];
+        if (a <= 0.004) continue;
         const lit = theme === paper.theme ? 1.25 : 1;
         ctx.globalCompositeOperation = 'lighter';
         const glow = focus ? PAPER_GLOW + 6 : PAPER_GLOW;
@@ -1838,34 +2575,7 @@
         ctx.drawImage(sprites.themes[paper.theme], PX - glow, PY - glow, glow * 2, glow * 2);
         ctx.globalAlpha = 0.22 * a; ctx.drawImage(sprites.glint, PX - 8, PY - 8, 16, 16);
         // Ignition: a flash, a ring and sparks, all analytic in the star's age.
-        if (age < PAPER_FLASH.time) {
-          const u = age / PAPER_FLASH.time; const radius = PAPER_FLASH.radius * (0.45 + 0.55 * easeOutCubic(u));
-          ctx.globalAlpha = PAPER_FLASH.alpha * (1 - u) * layer;
-          ctx.drawImage(sprites.themes[paper.theme], PX - radius, PY - radius, radius * 2, radius * 2);
-          ctx.globalAlpha = 0.6 * (1 - u) * (1 - u) * layer;
-          ctx.drawImage(sprites.white, PX - radius * 0.4, PY - radius * 0.4, radius * 0.8, radius * 0.8);
-        }
-        if (age < PAPER_RING.time) {
-          const u = age / PAPER_RING.time;
-          ctx.globalAlpha = PAPER_RING.alpha * (1 - u) * (1 - u) * layer; ctx.strokeStyle = THEME_RGBA[paper.theme]; ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.arc(PX, PY, Math.max(1, PAPER_RING.radius * easeOutCubic(u)), 0, TAU); ctx.stroke();
-        }
-        if (age < PAPER_SPARK_LIFE[1]) {
-          // A quick sparkle: short tapered trails (two segments) that are gone within 0.6 s.
-          ctx.strokeStyle = THEME_RGBA[paper.theme]; ctx.lineCap = 'round';
-          for (let s = 0; s < sparks; s++) {
-            const i = p * PAPER_SPARKS + s; const life = pSparkLife[i]; if (age >= life) continue;
-            const reach = pSparkSpeed[i] / PAPER_SPARK_DRAG;
-            const d2 = reach * (1 - Math.exp(-PAPER_SPARK_DRAG * age));
-            const d1 = reach * (1 - Math.exp(-PAPER_SPARK_DRAG * Math.max(0, age - PAPER_SPARK_TRAIL / 2)));
-            const d0 = reach * (1 - Math.exp(-PAPER_SPARK_DRAG * Math.max(0, age - PAPER_SPARK_TRAIL)));
-            const fade = 1 - age / life; const a = fade * fade * layer;
-            ctx.globalAlpha = a; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(PX + pSparkDX[i] * d1, PY + pSparkDY[i] * d1); ctx.lineTo(PX + pSparkDX[i] * d2, PY + pSparkDY[i] * d2); ctx.stroke();
-            ctx.globalAlpha = a * 0.4; ctx.lineWidth = 0.6;
-            ctx.beginPath(); ctx.moveTo(PX + pSparkDX[i] * d0, PY + pSparkDY[i] * d0); ctx.lineTo(PX + pSparkDX[i] * d1, PY + pSparkDY[i] * d1); ctx.stroke();
-          }
-        }
+        if (age < PAPER_SPARK_LIFE[1]) drawBurst(PX, PY, age, sprites.themes[paper.theme], THEME_RGBA[paper.theme], p * PAPER_SPARKS, sparks, layer);
         ctx.globalCompositeOperation = 'source-over';
         ctx.globalAlpha = Math.min(1, (0.85 + 0.15 * dim) * a + 0.1); ctx.fillStyle = '#f4f7fb';
         ctx.beginPath(); ctx.arc(PX, PY, 1.2, 0, TAU); ctx.fill();
@@ -1896,10 +2606,14 @@
         if (x < placed[i * 4 + 2] && x + w > placed[i * 4] && y < placed[i * 4 + 3] && y + h > placed[i * 4 + 1]) return true;
       }
       if (self < -1) return false;
-      // Paper labels never cover another star.
+      // Paper labels never cover another star (or a wish star).
       for (let p = 0; p < NP; p++) {
         if (p === self || !paperVis[p]) continue;
         if (paperSX[p] > x - 4 && paperSX[p] < x + w + 4 && paperSY[p] > y - 3 && paperSY[p] < y + h + 3) return true;
+      }
+      for (let q = 0; q < NQ; q++) {
+        if (!wishVis[q]) continue;
+        if (wishSX[q] > x - 4 && wishSX[q] < x + w + 4 && wishSY[q] > y - 3 && wishSY[q] < y + h + 3) return true;
       }
       return false;
     }
@@ -1920,7 +2634,7 @@
     }
     function drawPaperLabel(p, alpha) {
       if (alpha <= 0.01) return;
-      ctx.globalAlpha = alpha;
+      ctx.globalAlpha = alpha * dimFor(labelX, labelY, labelX + labelWidth[p] + 2, labelY + 14);
       ctx.fillText(PAPERS[p].name, labelX + 1, paperSY[p]);
     }
     function ghostPose(g, at) {
@@ -1946,6 +2660,8 @@
      */
     function drawLabels(time, chart, head, layer) {
       placedCount = 0;
+      // The laid-out question's box dims labels from the re-lay until the line folds away.
+      labelDim = chart && catchQ >= 0 ? smooth((catchT - CATCH_RELAY[0]) / 0.3) * (1 - smooth((catchT - CATCH_FOLD) / CATCH_COLLAPSE)) : 0;
       // No labels in core view; they fade out early in the flight towards it.
       layer *= 1 - smooth(coreU * 3);
       if (layer <= 0.004) return;
@@ -1963,7 +2679,22 @@
         // A focused star is named with its year: "Short name · year".
         paperLabelBox(p, true);
         addObstacle(labelX - 3, labelY - 1, labelX + focusWidth[p] + 5, labelY + 15);
-        ctx.globalAlpha = layer; ctx.fillText(FOCUS_LABELS[p], labelX + 1, paperSY[p]);
+        ctx.globalAlpha = layer * dimFor(labelX - 3, labelY - 1, labelX + focusWidth[p] + 5, labelY + 15); ctx.fillText(FOCUS_LABELS[p], labelX + 1, paperSY[p]);
+      }
+      // A selected or hovered wish star names its question, in the warm serif, above it.
+      if (chart) {
+        ctx.font = WISH_FONT; ctx.fillStyle = WARM;
+        for (let pass = 0; pass < 2; pass++) {
+          const q = pass === 0 ? selectedWish : hoverWish;
+          if (q < 0 || !wishVis[q] || (pass === 1 && q === selectedWish)) continue;
+          const w = wishLabelWidth[q];
+          let x = wishSX[q] + 11; if (x + w > W - EDGE_INSET) x = wishSX[q] - 11 - w;
+          x = clamp(x, EDGE_INSET, Math.max(EDGE_INSET, W - EDGE_INSET - w));
+          const y = clamp(wishSY[q] - 14, EDGE_INSET + 7, H - EDGE_INSET - 7);
+          addObstacle(x - 3, y - 8, x + w + 3, y + 8);
+          ctx.globalAlpha = layer * dimFor(x - 3, y - 8, x + w + 3, y + 8); ctx.fillText(QUESTIONS[q].text, x, y);
+        }
+        ctx.font = LABEL_FONT; ctx.fillStyle = LABEL_COLOUR;
       }
       // 3. Theme labels, clamped inside the viewport; a blocked label slides along its spoke.
       const themeShow = smooth(span(time, T_THEME_LABELS)) * layer;
@@ -1988,7 +2719,7 @@
           project(r * Math.cos(a), r * Math.sin(a), 0);
           const x = clamp(PX, EDGE_INSET + half, W - EDGE_INSET - half); const y = clamp(PY, EDGE_INSET + 8, H - EDGE_INSET - 8);
           if (placedHere) addObstacle(x - half - 4, y - 8, x + half + 4, y + 8);
-          ctx.globalAlpha = 0.8 * themeShow * fade * (theme < 0 || theme === j ? 1 : 0.3) * depthFactor(PZ);
+          ctx.globalAlpha = 0.8 * themeShow * fade * (theme < 0 || theme === j ? 1 : 0.3) * depthFactor(PZ) * dimFor(x - half, y - 7, x + half, y + 7);
           ctx.fillStyle = THEME_RGBA[j];
           ctx.fillText(THEME_LABELS[j], x, y);
         }
@@ -2003,16 +2734,19 @@
         projectAt(mark.theta - 0.05, 1.1); const tx = PX; const ty = PY;
         projectAt(mark.theta, 1.1); const lx = PX; const ly = PY;
         let ux = tx - lx; let uy = ty - ly; const len = Math.hypot(ux, uy) || 1; ux /= len; uy /= len;
-        const right = ux < 0; const x = lx + ux * 6; const y = ly + uy * 6; const w = yearWidth[m];
+        const nextDrawn = drawn && m === YEAR_MARKS.length - 1;
+        const right = ux < 0; const x = lx + ux * 6; const y = ly + uy * 6; const w = nextDrawn ? nextDrawnWidth : yearWidth[m];
         const x0 = right ? x - w : x;
         const placedHere = !blocked(x0 - 2, y - 7, w + 4, 14, -2);
         const fade = labelPrimary ? (yearFade[m] = easeLabel(yearFade[m], placedHere ? 1 : 0)) : placedHere ? 1 : 0;
         if (placedHere) addObstacle(x0 - 3, y - 7, x0 + w + 3, y + 7);
         if (fade <= 0.01) continue;
         ctx.textAlign = right ? 'right' : 'left';
-        ctx.globalAlpha = 0.85 * seen * fade; ctx.fillStyle = m === YEAR_MARKS.length - 1 ? LABEL_COLOUR : MUTED_COLOUR;
-        ctx.fillText(mark.label, x, y);
+        ctx.globalAlpha = 0.85 * seen * fade * dimFor(x0 - 2, y - 7, x0 + w + 2, y + 7); ctx.fillStyle = m === YEAR_MARKS.length - 1 ? LABEL_COLOUR : MUTED_COLOUR;
+        ctx.fillText(nextDrawn ? NEXT_DRAWN : mark.label, x, y);
       }
+      // Wish stars keep paper labels and ghost words off them (theme and year labels come first).
+      if (chart) for (let q = 0; q < NQ; q++) if (wishVis[q]) addObstacle(wishSX[q] - 6, wishSY[q] - 6, wishSX[q] + 6, wishSY[q] + 6);
       // 5. Paper labels: the selected theme's, else all; nearer stars first (at most 23 sorted).
       ctx.font = LABEL_FONT; ctx.textAlign = 'left'; ctx.fillStyle = LABEL_COLOUR;
       let count = 0;
@@ -2062,7 +2796,7 @@
           if (placedHere) addObstacle(ghostX - ghostW / 2, ghostY - ghostH / 2, ghostX + ghostW / 2, ghostY + ghostH / 2);
           const sprite = ghostSprites[g];
           setLocal(ghostCos, ghostSin, -ghostSin, ghostCos, ghostX, ghostY);
-          ctx.globalAlpha = GHOST_ALPHA * ghostShow * fade * (1 - 0.35 * GHOST_AT[g]);
+          ctx.globalAlpha = GHOST_ALPHA * ghostShow * fade * (1 - 0.35 * GHOST_AT[g]) * dimFor(ghostX - ghostW / 2, ghostY - ghostH / 2, ghostX + ghostW / 2, ghostY + ghostH / 2);
           ctx.drawImage(sprite.canvas, -sprite.w / 2, -sprite.h / 2, sprite.w, sprite.h);
         }
         resetTransform();
@@ -2116,6 +2850,7 @@
       if (u < 1 && remnantT >= 0) { labelPrimary = false; renderOpening(remnantT, 1 - u); labelPrimary = true; }
       if (motion.matches) updatePath(0);
       chartCamera(); drawScene(t, true, u);
+      drawSky(u);
     }
 
     function frame(now) {
@@ -2138,25 +2873,31 @@
         }
         record(performance.now() - began);
       }
+      // The dawn's last frame: glyphs return and the dialog leaves in this same task, one paint.
+      if (closeDone) { cleanup(); return; }
       labelEase = 1; labelSlideEase = 1;   // renders outside the frame loop (on demand) settle labels at once
       schedule();
     }
     function record(ms) {
-      const entry = stats.byPhase[phase === 'chart' && (coreU > 0 || coreTarget) ? 'core' : phase] || stats.byPhase.chart;
+      const name = phase !== 'chart' ? phase : coreU > 0 || coreTarget ? 'core' : activeMeteors > 0 || catchQ >= 0 ? 'meteor' : 'chart';
+      const entry = stats.byPhase[name] || stats.byPhase.chart;
       entry.frames++; entry.avgMs += (ms - entry.avgMs) / entry.frames; entry.maxMs = Math.max(entry.maxMs, ms);
       stats.frames++; stats.avgMs += (ms - stats.avgMs) / stats.frames; stats.maxMs = Math.max(stats.maxMs, ms);
     }
     function step(dt, now) {
       if (mode === 'closing') {
-        closeT += dt * timeScale;
-        const fade = 1 - smooth(span(closeT, CLOSE_UI));
+        closeT += dt * timeScale; closeE += dt * timeScale;
+        closingCues();
+        const fade = 1 - smooth(span(closeE, DAWN_UI));
         for (const [el, from] of closeUIFrom) setOpacity(el, from * fade);
-        if (closeT >= (closeKind === 'dusk' ? CLOSE_DUSK : CLOSE_TOTAL)) cleanup();
+        // The swap happens in the frame that reaches the end (see frame()).
+        if (closeT >= (closeKind === 'dusk' ? CLOSE_DUSK : DAWN_END)) closeDone = true;
         return;
       }
       if (mode === 'opening') {
         t += dt * timeScale;
         setPhase(phaseAt(t));
+        openingCues();
         if (t >= T_DUSK && !dialog.classList.contains('is-night')) dialog.classList.add('is-night');
         // The radial lift of the chart's night arrives with the chart UI, never during the opening.
         if (t >= T_UI[0] && !dialog.classList.contains('is-lift')) dialog.classList.add('is-lift');
@@ -2191,6 +2932,13 @@
         }
       }
       updatePath(dt);
+      stepSky(dt);
+      if (audio && soundOn) {
+        // Spinning the galaxy fast makes a soft wind that follows |yaw velocity|.
+        const held = drag.id >= 0 && performance.now() - lastMoveAt > 90;
+        const level = coreU > 0 || motion.matches || held ? 0 : SPIN_MAX * smooth((Math.abs(vYaw) - 0.6) / 4);
+        try { audio.setSpin(level); } catch (error) { audioFailed(error); }
+      }
       if (coreTarget !== coreU) coreU = motion.matches ? coreTarget : clamp01(coreU + (coreTarget ? 1 : -1) * dt / CORE_FLIGHT);
       if (coreTarget && !motion.matches) coreSpin += CORE_SPIN * dt;
       if (coreU > 0) return;   // the chart camera is held while the core is open
@@ -2242,6 +2990,10 @@
     function beginOpening() {
       mode = 'opening'; t = 0; phase = ''; setPhase('dusk');
       replayStart = -1; skipStart = -1; remnantT = -1;
+      // The sky empties (a catch in progress is pinned at once); the opening's cues start again.
+      finishCatch(); mOn.fill(0); activeMeteors = 0; stillQ = -1; clearTimeout(stillTimer); stillTimer = 0;
+      cueFrom = -1; lastGatherNote = -1;
+      if (audio) { try { audio.ambientStop(audio.now(), 0.4); } catch (error) { audioFailed(error); } }
       dialog.classList.remove('is-fading-replay', 'is-fading-skip', 'is-night', 'is-lift');
       setInert(true);
       openingEl.hidden = false; dialog.setAttribute('data-quiet', '');
@@ -2257,6 +3009,10 @@
       dialog.classList.add('is-night', 'is-lift');
       setInert(false);
       openingEl.hidden = true;
+      // The sky clock starts with the chart; the drone gives way to the ambient.
+      if (wasOpening) { skyT = 0; nextMeteor = METEOR_FIRST; sparkleAge = 99; }
+      cue('ambient', t, a => a.cue.ambient(a.now()));
+      if (motion.matches) scheduleStill();
       if (wasOpening && (!dialog.contains(document.activeElement) || openingEl.contains(document.activeElement) || document.activeElement === dialog)) {
         closeButton.focus({ preventScroll: true });
       }
@@ -2301,47 +3057,79 @@
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
       events.abort();
+      clearTimeout(stillTimer); clearInterval(audioTimer); stillTimer = 0; audioTimer = 0;
+      if (audio) { try { audio.close(!closeDone); } catch (error) { /* already closed */ } audio = null; }
+      // A context primed for an egg that never adopted it is closed too.
+      if (window.__spiraAudioContext) { try { window.__spiraAudioContext.close().catch(() => {}); } catch (error) { /* ignore */ } try { delete window.__spiraAudioContext; } catch (error) { window.__spiraAudioContext = undefined; } }
       html.classList.remove('spira-hide-text');
       releaseWords();
       try { if (dialog.open) dialog.close(); } catch (error) { /* already closed */ }
       dialog.remove();
       if (overflow) body.style.setProperty('overflow', overflow, overflowPriority);
       else body.style.removeProperty('overflow');
+      if (gutter) html.style.setProperty('scrollbar-gutter', gutter, gutterPriority);
+      else html.style.removeProperty('scrollbar-gutter');
       if (previousFocus && previousFocus.isConnected && typeof previousFocus.focus === 'function') previousFocus.focus({ preventScroll: true });
       if (scrollX !== scroll.x || scrollY !== scroll.y) window.scrollTo({ left: scroll.x, top: scroll.y, behavior: 'instant' });
       active = false;
     }
     /**
-     * Close as a bookend: the page's glyphs return first, underneath. From the dusk the iris
-     * simply reverses; later, the UI fades, the galaxy collapses into its origin (an
-     * accelerating scale-down with some spin, as the wind did) while the iris of night closes
-     * on that point, so the page reappears from the edges inward. A second request, a hidden
-     * tab, reduced motion or pagehide finish at once; restoration happens only at the end.
+     * Close as dawn, the exact reverse of the opening. The UI fades and the galaxy collapses
+     * into its nucleus while the camera returns to the opening's pose; the text spiral blooms
+     * out of the nucleus; the words fly home in reverse reading order (the name last); then
+     * the night iris closes from the edges and each word turns from night to day colour as
+     * daylight reaches it. Only on the final frame are the page glyphs restored and the dialog
+     * removed, in one paint. During the dusk the iris simply reverses. A second request, a
+     * hidden tab, a resize, reduced motion or pagehide finish at once.
      */
     function close() {
       if (closed) return;
       if (leaving) { cleanup(); return; }
-      html.classList.remove('spira-hide-text');
       if (motion.matches || !ctx || document.hidden) { cleanup(); return; }
       leaving = true;
       if (drag.id >= 0) endDrag(true);
-      closeT = 0; closeFromMode = mode === 'opening' ? 'opening' : 'chart'; closeFromT = mode === 'replay-out' ? T_SETTLED : t;
-      if (mode === 'opening' && t < T_DUSK) {
+      closeT = 0; closeE = 0; closeFromT = mode === 'replay-out' ? T_SETTLED : t;
+      // The camera's pose now; the starfield eases from it back to the opening's first pose.
+      if (mode === 'opening') openingCamera(t); else chartCamera();
+      closeCam.x = camX; closeCam.y = camY; closeCam.yaw = Math.atan2(sYaw, cYaw); closeCam.pitch = Math.atan2(sPitch, cPitch); closeCam.scale = focal / camDist;
+      if (mode === 'opening' && t < T_DUSK && t < T_DEPART[0]) {
         closeKind = 'dusk'; closeR0 = apertureRadius(t);
       } else {
-        closeKind = 'galaxy';
-        if (closeFromMode === 'opening' && closeFromT < T_IGNITE) { closeX = W / 2; closeY = H / 2; }
-        else {
-          if (closeFromMode === 'opening') openingCamera(closeFromT); else chartCamera();
-          project(0, 0, 0); closeX = PX; closeY = PY;
-        }
-        closeCover = Math.max(Math.hypot(closeX, closeY), Math.hypot(W - closeX, closeY), Math.hypot(closeX, H - closeY), Math.hypot(W - closeX, H - closeY)) + EDGE_MAX;
-        closeExtent = Math.max(W, H);
+        closeKind = 'dawn';
+        refreshHomes(); groupLines();
+        // The disc's soft band lies inside its radius, so it starts with the band past the corners.
+        const corner = Math.hypot(W / 2, H / 2);
+        closeCover = corner + DAWN_EDGE[2] + MASK_CELL + 2;
         closeLift = dialog.classList.contains('is-lift') ? 1 : 0;
         if (closeLift && !liftSprite) liftSprite = buildLift();
+        if (mode === 'opening') {
+          // Later opening phases jump straight to the flight home, crossfading from the frame now.
+          closeSource = 'opening'; closeT = DAWN_HOME;
+        } else if (coreTarget === 1 || coreU >= 0.5) {
+          // From the core view the visible text spiral scales straight to its hero size.
+          closeSource = 'core';
+          project(0, 0, 0); const ox = PX; const oy = PY;
+          project(CORE_WORLD_R, 0, 0);
+          closeText.x = ox; closeText.y = oy;
+          closeText.scale = Math.max(1e-3, Math.hypot(PX - ox, PY - oy) / spiralR0);
+          closeText.rot = Math.atan2(PY - oy, PX - ox) + coreSpin;
+        } else {
+          closeSource = 'chart';
+          project(0, 0, 0); closeX = PX; closeY = PY;
+          closeExtent = Math.max(W, H);
+          // Paper stars dim in reverse spiral order: the latest first.
+          for (let p = 0; p < NP; p++) {
+            let rank = 0; for (let q = 0; q < NP; q++) if (PAPERS[q].theta > PAPERS[p].theta) rank++;
+            paperDelay[p] = rank / Math.max(1, NP - 1) * 0.35;
+          }
+        }
       }
       closeUIFrom.clear();
       for (const el of [headEl, ...chartBlocks, indexEl, openingEl]) closeUIFrom.set(el, uiOpacity.has(el) ? uiOpacity.get(el) : 1);
+      closeSky = mode === 'chart' ? 1 : 0;
+      closeCueFrom = closeT - 1e-6; lastHomeNote = -1;
+      soundClose();
+      clearTimeout(stillTimer); stillTimer = 0;
       mode = 'closing'; setPhase('closing');
       stage.inert = true; centreButton.inert = true;
       // The canvas takes over the night in the same paint as the dialog's background leaves.
@@ -2353,7 +3141,7 @@
     }
     function buildLift() {
       // The CSS lift of the chart's night, painted once at quarter resolution, so the canvas
-      // can stand in for the dialog background while the iris closes.
+      // can stand in for the dialog background while the night recedes.
       const w = Math.max(1, Math.ceil(W / 4)); const h = Math.max(1, Math.ceil(H / 4));
       const c = makeCanvas(w, h); const g = c.getContext('2d');
       const stack = (W < 900 && H >= 560) || W < 600;
@@ -2367,8 +3155,17 @@
     function applyCollapse() {
       if (!collapseOn) return;
       const c = Math.cos(collapsePhi) * collapseK; const sn = Math.sin(collapsePhi) * collapseK;
-      // Scale and turn about the origin's screen position.
-      setBase(c, sn, -sn, c, closeX - (c * closeX - sn * closeY), closeY - (sn * closeX + c * closeY));
+      // Scale and turn about the origin's screen position, carrying it to (collapseDX, collapseDY).
+      setBase(c, sn, -sn, c, collapseDX - (c * closeX - sn * closeY), collapseDY - (sn * closeX + c * closeY));
+    }
+    function heroSpin() { return spinAt(T_WIND); }
+    function closeStep() {
+      if (mode !== 'closing') return '';
+      if (closeKind === 'dusk') return 'dusk';
+      if (closeT < DAWN_BLOOM[0] && closeSource === 'chart') return 'collapse';
+      if (closeT < DAWN_HOME) return 'bloom';
+      if (closeT < DAWN_IRIS[0]) return 'home';
+      return 'dawn';
     }
     function renderClosing() {
       if (closeKind === 'dusk') {
@@ -2377,30 +3174,872 @@
         openingCamera(closeFromT);
         drawAperture(radius, edge, 1);
         drawStars(1, radius, edge);
-        drawWords(closeFromT, 1, radius, edge, true);
+        drawWords(closeFromT, 1, radius, edge);
         return;
       }
-      const u = span(closeT, CLOSE_COLLAPSE); const e = easeInCubic(u);
-      // The canvas stands in for the night: flat night, plus the chart's lift if it was shown.
-      ctx.globalAlpha = 1; ctx.fillStyle = '#05070c'; ctx.fillRect(0, 0, W, H);
-      if (closeLift && liftSprite) ctx.drawImage(liftSprite, 0, 0, W, H);
-      collapseK = Math.exp(-Math.log(closeExtent / 1.5) * e); collapsePhi = CLOSE_TURNS * TAU * e; collapseOn = true;
-      if (closeFromMode === 'opening') renderOpening(closeFromT, 1);
-      else { chartCamera(); drawScene(t, true, 1); }
-      collapseOn = false; setBase(1, 0, 0, 1, 0, 0);
-      ctx.globalCompositeOperation = 'source-over'; ctx.setLineDash(NO_DASH);
-      // The iris closes on the origin: everything outside it is cut back to the page.
-      const radius = lerp(closeCover, -EDGE_MIN, easeInOutSine(u));
-      drawAperture(radius, edgeOf(Math.max(0, radius)), 1, closeX, closeY, true);
-      // The last point of light: a tiny glint where the iris closes.
-      const g = span(closeT, CLOSE_GLINT);
-      if (g > 0 && g < 1) {
-        const a = Math.sin(Math.PI * g);
-        ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a;
-        ctx.drawImage(sprites.glint, closeX - 11, closeY - 11, 22, 22);
-        ctx.drawImage(sprites.white, closeX - 6, closeY - 6, 12, 12);
+      const ct = closeT; const cx = W / 2; const cy = H / 2;
+      // Night: full until the dawn, then a disc shrinking onto C, slowly while it is large and
+      // quickly at the end (r = R (1 - easeInCubic(u))), so a small dark disc lasts an instant.
+      // Its crisp edge band lies inside r: nightAt() is centred on bandR = r - edge / 2.
+      const irisU = span(ct, DAWN_IRIS);
+      const irisR = closeCover * (1 - easeInCubic(irisU));
+      const irisE = clamp(DAWN_EDGE[0] * irisR, DAWN_EDGE[1], DAWN_EDGE[2]);
+      const bandR = irisR - irisE / 2;
+      if (irisR > 0.5) drawAperture(bandR, irisE, 1, cx, cy, false, false);
+      const uc = span(ct, DAWN_COLLAPSE); const e = easeInOutCubic(uc);
+      if (closeLift && liftSprite && uc < 1) { ctx.globalAlpha = 1 - smooth(uc); ctx.drawImage(liftSprite, 0, 0, W, H); }
+      // The starfield eases from the camera's pose at the close back to the opening's first pose.
+      setCamera(lerp(closeCam.x, cx, e), lerp(closeCam.y, cy, e), lerp(closeCam.yaw, yawStart, e),
+        lerp(closeCam.pitch, 0, e), Math.exp(lerp(Math.log(closeCam.scale), Math.log(sMax), e)));
+      if (irisU > 0) { if (irisR > 0.5) drawStars(1, bandR, irisE); } else drawStars(1);
+      if (closeSource === 'chart' && uc < 1) {
+        // The galaxy collapses into its nucleus (easeInOutCubic), turning a little, while its
+        // origin travels to C; paper stars dim in reverse spiral order.
+        collapseK = Math.exp(-Math.log(closeExtent / 1.5) * e); collapsePhi = DAWN_COLLAPSE_TURNS * TAU * e;
+        collapseDX = lerp(closeX, cx, e); collapseDY = lerp(closeY, cy, e);
+        for (let p = 0; p < NP; p++) paperDim[p] = 1 - smooth((uc - paperDelay[p]) / 0.25);
+        collapseOn = true; sceneStars = false;
+        chartCamera(); drawScene(t, true, 1 - smooth((uc - 0.6) / 0.4));
+        collapseOn = false; sceneStars = true; setBase(1, 0, 0, 1, 0, 0);
+        ctx.globalCompositeOperation = 'source-over'; ctx.setLineDash(NO_DASH);
+      }
+      // The nucleus brightens as the galaxy falls in, then gives way to the blooming text.
+      if (closeSource === 'chart') {
+        const glow = smooth(uc) * (1 - smooth(span(ct, [DAWN_BLOOM[0], DAWN_BLOOM[1] + 0.2])));
+        if (glow > 0.01) {
+          const nx = lerp(closeX, cx, e); const ny = lerp(closeY, cy, e);
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.globalAlpha = 0.85 * glow; ctx.drawImage(sprites.bulge, nx - 46, ny - 46, 92, 92);
+          ctx.globalAlpha = 0.7 * glow; ctx.drawImage(sprites.white, nx - 9, ny - 9, 18, 18);
+          ctx.globalCompositeOperation = 'source-over';
+        }
+      }
+      // Meteors and a catch in progress stop where they are and fade with the UI.
+      if (closeSky) { const fade = 1 - smooth(span(closeE, DAWN_UI)); if (fade > 0.004) drawSky(fade); }
+      // From a later opening phase: the frame at the close fades into the flight home.
+      let wordsLayer = 1;
+      if (closeSource === 'opening' && closeE < DAWN_CROSSFADE) {
+        const u = closeE / DAWN_CROSSFADE;
+        labelPrimary = false; renderOpening(closeFromT, 1 - u); labelPrimary = true;
+        setBase(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.setLineDash(NO_DASH);
+        wordsLayer = u;
+      }
+      drawDawnWords(ct, irisU > 0 ? bandR : undefined, irisE, wordsLayer);
+      if (irisU > 0 && irisR > irisE) {
+        // A 1 px luminous rim on the night side of the band (nothing on the day side).
+        const inner = irisR - irisE; const rim = 1 - smooth((inner - Math.hypot(cx, cy)) / 8);
+        if (rim > 0.01) {
+          ctx.beginPath(); ctx.arc(cx, cy, inner, 0, TAU);
+          ctx.globalAlpha = 0.8 * rim; ctx.strokeStyle = RIM_COLOUR; ctx.lineWidth = 1; ctx.stroke();
+        }
+      }
+      if (ct >= DAWN_GLINT[0]) {
+        // Where the disc closes, a tiny warm glint opens and fades.
+        const u = span(ct, DAWN_GLINT); const size = 12 + 26 * easeOutCubic(u);
+        const alpha = smooth(u / 0.2) * (1 - smooth((u - 0.3) / 0.7));
+        ctx.globalCompositeOperation = 'source-over';
+        // Twice, so its hairline arms read on a white page.
+        ctx.globalAlpha = alpha; ctx.drawImage(sprites.glintGold, cx - size / 2, cy - size / 2, size, size);
+        ctx.drawImage(sprites.glintGold, cx - size / 2, cy - size / 2, size, size);
+        ctx.fillStyle = DAWN_GLINT_FILL;
+        ctx.beginPath(); ctx.arc(cx, cy, 1.6 * (1 - u) + 0.5, 0, TAU); ctx.fill();
+      }
+    }
+    /**
+     * Words during the dawn. The text spiral is a 2D similarity of its hero layout (centre,
+     * scale, turn): it blooms from the nucleus (or scales from the core view) to the hero
+     * frame. Then page lines fly home in reverse reading order, line by line, each word of a
+     * line a ripple after its left neighbour on one shared easing, so every arc of the
+     * spiral visibly unrolls into its straight page line. Words land exactly on their page
+     * rects, and turn from night to day colour as the receding night uncovers them.
+     */
+    function drawDawnWords(ct, nightRadius, nightEdge, layer) {
+      const cx = W / 2; const cy = H / 2; const hero = heroSpin();
+      let tx = cx; let ty = cy; let ts = 1; let tr = hero; let show = layer;
+      if (closeSource === 'chart') {
+        const u = span(ct, DAWN_BLOOM); if (u <= 0) { canvasWords = 0; return; }
+        const e = easeOutCubic(u);
+        ts = Math.exp(lerp(Math.log(DAWN_BLOOM_FROM / spiralR0), 0, e));
+        tr = hero + DAWN_TURNS * TAU * (1 - e);
+        show *= smooth(u / 0.25);
+      } else if (closeSource === 'core') {
+        const e = easeInOutCubic(span(ct, [0, DAWN_BLOOM[1]]));
+        // Turn by the shortest way to the hero orientation.
+        let d = ((hero - closeText.rot) % TAU + TAU) % TAU; if (d > Math.PI) d -= TAU;
+        tx = lerp(closeText.x, cx, e); ty = lerp(closeText.y, cy, e);
+        ts = Math.exp(lerp(Math.log(closeText.scale), 0, e)); tr = closeText.rot + d * e;
+      }
+      const dusk = nightRadius !== undefined;
+      let dots = 0; let drawn = 0;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'medium';
+      for (let i = 0; i < W_N; i++) {
+        // On the spiral (current similarity).
+        const rs = wSlotR[i] * ts; const as = wSlotA[i] + tr;
+        let x = tx + rs * Math.cos(as); let y = ty + rs * Math.sin(as);
+        let s = wSlotS[i] * ts; let rot = wSlotRot[i] + tr; let presence = 1;
+        const l = wLine[i]; const m = lineMid[l];
+        const u = (ct - lineDepart(l) - (i - lineFirst[l]) * DAWN_RIPPLE) / DAWN_FLIGHT;
+        let home = false;
+        if (u >= 1) { x = wHomeX[i]; y = wHomeY[i]; s = 1; rot = 0; home = true; }
+        else if (u > 0) {
+          // The line unrolls home as one object. Its middle word is the anchor and rides the
+          // mirrored swirl about C (counter-clockwise inside the TRAVEL window, log radius);
+          // the line turns the short way to level; and each word's offset in the line's frame
+          // eases from its place on the spiral arc to its place in the straight page line.
+          const e = easeInOutCubic(u);
+          const mr = wSlotR[m] * ts; const ma = wSlotA[m] + tr; const th0 = wSlotRot[m] + tr;
+          const ax0 = tx + mr * Math.cos(ma); const ay0 = ty + mr * Math.sin(ma);
+          const r0 = Math.max(1, Math.hypot(ax0 - cx, ay0 - cy)); const a0 = Math.atan2(ay0 - cy, ax0 - cx);
+          let d = (((a0 - wHomeA[m]) % TAU) + TAU) % TAU;
+          if (d > TRAVEL[1]) d -= TAU;
+          const ar = r0 * Math.exp(e * Math.log(wHomeR[m] / r0)); const aa = a0 - d * e;
+          const ax = cx + ar * Math.cos(aa); const ay = cy + ar * Math.sin(aa);
+          let turn = -th0; turn -= TAU * Math.round(turn / TAU);
+          const th = th0 + turn * e;
+          const c0 = Math.cos(th0); const s0 = Math.sin(th0); const vx = x - ax0; const vy = y - ay0;
+          const ox = lerp(vx * c0 + vy * s0, wHomeX[i] - wHomeX[m], e);
+          const oy = lerp(vy * c0 - vx * s0, wHomeY[i] - wHomeY[m], e);
+          const c1 = Math.cos(th); const s1 = Math.sin(th);
+          x = ax + ox * c1 - oy * s1; y = ay + ox * s1 + oy * c1;
+          let local = rot - th0; local -= TAU * Math.round(local / TAU);
+          rot = th + local * (1 - e); s = lerp(s, 1, e);
+          presence = lerp(1, FLIGHT_ALPHA, smooth(u / 0.15));
+        }
+        const dist = Math.hypot(x - cx, y - cy);
+        const night = dusk ? nightAt(dist, nightRadius, nightEdge) : 1;
+        if (home) presence = lerp(1, WAIT_ALPHA, night);
+        else if (u > 0.85) presence = lerp(presence, lerp(1, WAIT_ALPHA, night), smooth((u - 0.85) / 0.15));
+        const alpha = show * presence;
+        wX[i] = x; wY[i] = y; drawn++;
+        const px = wSize[i] * s;
+        const asDot = 1 - clamp01((px - DOT_SWITCH_PX) / DOT_BLEND_PX);
+        if (asDot > 0) { dotList[dots] = i; dotAlpha[dots] = alpha * asDot; dotSize[dots] = 1.2 + 0.4 * clamp01(px / DOT_SWITCH_PX); dots++; }
+        if (asDot >= 1) continue;
+        const sa = alpha * (1 - asDot);
+        const cos = Math.cos(rot) * s; const sin = Math.sin(rot) * s;
+        setLocal(cos, sin, -sin, cos, x, y);
+        if (night < 1) {
+          ctx.globalAlpha = sa * (1 - night);
+          ctx.drawImage(atlases[wPage[i]], wDayX[i], wDayY[i], wDevW[i], wDevH[i], -wAnchorX[i], -wAnchorY[i], wSpriteW[i], wSpriteH[i]);
+        }
+        if (night > 0) {
+          ctx.globalAlpha = sa * night;
+          ctx.drawImage(atlases[wNightPage[i]], wNightX[i], wNightY[i], wDevW[i], wDevH[i], -wAnchorX[i], -wAnchorY[i], wSpriteW[i], wSpriteH[i]);
+        }
+      }
+      resetTransform();
+      for (let tone = 0; tone < wordTones.length; tone++) {
+        ctx.fillStyle = wordTones[tone];
+        for (let d = 0; d < dots; d++) {
+          const i = dotList[d]; if (wTone[i] !== tone) continue;
+          ctx.globalAlpha = dotAlpha[d]; const size = dotSize[d];
+          ctx.fillRect(wX[i] - size / 2, wY[i] - size / 2, size, size);
+        }
+      }
+      canvasWords = drawn;
+    }
+
+    /* ---- Sound ----------------------------------------------------------- */
+    // Any failure falls back to silence, with at most one console warning; visuals never depend on it.
+    function audioFailed(error) {
+      if (!audioWarned) { audioWarned = true; console.warn('The spiral\'s sound is unavailable.', error); }
+      audioBroken = true;
+      const failed = audio; audio = null;
+      if (failed) { try { failed.close(true); } catch (closeError) { /* ignore */ } }
+    }
+    // Adopt the context primed by the site shell (created and resumed in the opening gesture),
+    // or create one; it may stay suspended until the first gesture inside the dialog.
+    function adoptAudio() {
+      if (audio || closed || audioBroken) return;
+      const primed = window.__spiraAudioContext;
+      if (primed !== undefined) { try { delete window.__spiraAudioContext; } catch (error) { window.__spiraAudioContext = undefined; } }
+      if (!soundOn) { if (primed && primed.state !== 'closed') primed.close().catch(() => {}); return; }
+      try {
+        let context = primed && primed.state !== 'closed' ? primed : null;
+        if (!context) {
+          const Context = window.AudioContext || window.webkitAudioContext;
+          if (!Context) return;
+          context = new Context();
+        }
+        audio = createSpiraAudio(context);
+        on(context, 'statechange', () => { if (audio && audio.context === context && context.state === 'running' && audioMissed) resync(); });
+        if (context.state !== 'running' && !document.hidden) context.resume().catch(() => {});
+        if (!audioTimer) audioTimer = setInterval(() => { if (audio && !leaving) { try { audio.ambientTick(); } catch (error) { audioFailed(error); } } }, 250);
+      } catch (error) { audioFailed(error); }
+    }
+    function unlockAudio() {
+      if (!soundOn || closed || leaving) return;
+      if (!audio) { adoptAudio(); return; }
+      if (audio.state === 'suspended' && !document.hidden) audio.context.resume().catch(() => {});
+    }
+    // A cue: logged (test hook) whenever sound is on; played when the context is running.
+    function cue(name, time, play) {
+      if (!soundOn) return;
+      if (audioCues.length < 800) audioCues.push({ cue: name, t: Math.round(time * 1000) / 1000, at: Math.round(performance.now()) });
+      if (!audio || !audio.ready) { audioMissed = true; return; }
+      try { play(audio); } catch (error) { audioFailed(error); }
+    }
+    // Context time for timeline time c, given the timeline now (at most AUDIO_LOOKAHEAD ahead).
+    const audioAt = (a, c, now) => a.now() + Math.max(0, (c - now) / Math.max(timeScale, 1e-3));
+    const panX = x => clamp(x / W * 2 - 1, -1, 1) * 0.8;
+    // When the context starts late (a gesture, or sound switched back on), restore the bed of
+    // the current phase rather than replaying what was missed.
+    function resync() {
+      if (!audio || !audio.ready || closed || leaving) return;
+      audioMissed = false;
+      try {
+        const now = audio.now();
+        if (mode === 'chart') audio.cue.ambient(now);
+        else if (mode === 'opening' && !audio.drone) {
+          if (t < T_COLLAPSED) audio.droneStart(now, DRONE_LEVEL, 1.5);
+          else if (t >= T_IGNITE) audio.droneStart(now, DRONE_LEVEL * 0.7, 2);
+        }
+      } catch (error) { audioFailed(error); }
+    }
+    function renderSoundButtons() {
+      for (const button of soundButtons) {
+        button.setAttribute('aria-pressed', String(soundOn));
+        button.querySelector('[data-sound-label]').textContent = soundOn ? 'Sound on' : 'Sound off';
+      }
+    }
+    function setSound(value) {
+      soundOn = value;
+      try { localStorage.setItem(SOUND_KEY, value ? 'on' : 'off'); } catch (error) { /* storage unavailable */ }
+      renderSoundButtons();
+      if (value) {
+        audioMissed = true;
+        if (!audio) adoptAudio();
+        else { try { audio.setEnabled(true); } catch (error) { audioFailed(error); } }
+        if (audio && audio.ready) resync();
+      } else if (audio) {
+        try { audio.setSpin(0); audio.setEnabled(false); } catch (error) { audioFailed(error); }
+      }
+    }
+    // The span of timeline the current frame schedules: (cueLo, cueHi].
+    let cueLo = 0; let cueHi = 0;
+    const crosses = c => c > cueLo && c <= cueHi;
+    // Opening cues crossed by the timeline this frame (with the lookahead).
+    function openingCues() {
+      cueLo = cueFrom; cueHi = t + AUDIO_LOOKAHEAD * timeScale; cueFrom = cueHi;
+      if (!soundOn) return;
+      const now = t;
+      if (crosses(0)) cue('dusk', 0, a => a.cue.dusk(audioAt(a, 0, now)));
+      // Every third departing word plucks the harp, walking down from D6 to D4 (+-1 step).
+      for (let i = 0; i < W_N; i += 3) {
+        const c = wLift[i];
+        if (!crosses(c) || c - lastGatherNote < 0.03) continue;
+        lastGatherNote = c;
+        const step = clamp(Math.round(10 * (1 - (W_N > 1 ? i / (W_N - 1) : 0))) + Math.floor(noteRandom() * 3) - 1, 0, 10);
+        const pan = panX(wHomeX[i]);
+        cue('gather', c, a => a.cue.gather(audioAt(a, c, now), step, pan));
+      }
+      if (crosses(T_GLINT[0])) cue('glint', T_GLINT[0], a => a.cue.glint(audioAt(a, T_GLINT[0], now), (T_GLINT[1] - T_GLINT[0]) / Math.max(timeScale, 1e-3)));
+      if (crosses(T_WIND)) cue('wind', T_WIND, a => a.cue.wind(audioAt(a, T_WIND, now), (T_COLLAPSED - T_WIND) / Math.max(timeScale, 1e-3)));
+      if (crosses(T_COLLAPSED)) {
+        cue('hush', T_COLLAPSED, a => a.cue.hush(audioAt(a, T_COLLAPSED, now)));
+        cue('inhale', T_COLLAPSED, a => a.cue.inhale(audioAt(a, T_COLLAPSED, now), (T_IGNITE - T_COLLAPSED) / Math.max(timeScale, 1e-3)));
+      }
+      if (crosses(T_IGNITE)) cue('ignite', T_IGNITE, a => a.cue.ignite(audioAt(a, T_IGNITE, now)));
+      for (let p = 0; p < NP; p++) {
+        const paper = PAPERS[p]; const c = paper.at;
+        if (!crosses(c)) continue;
+        const pan = panX(paperSX[p]);
+        cue('paper', c, a => a.cue.paper(audioAt(a, c, now), paper.theme, paper.year, pan));
+      }
+      if (crosses(T_GHOST[0])) cue('ghost', T_GHOST[0], a => a.cue.ghost(audioAt(a, T_GHOST[0], now)));
+    }
+    // Closing cues: the harp walks up as words fly home (the name last); dawn is a soft pad.
+    function closingCues() {
+      cueLo = closeCueFrom; cueHi = closeT + AUDIO_LOOKAHEAD * timeScale; closeCueFrom = cueHi;
+      if (!soundOn || closeKind !== 'dawn') return;
+      const now = closeT;
+      // One note per departing page line (at least HOME_NOTE_GAP apart).
+      for (let l = lineCount - 1; l >= 0; l--) {
+        const c = lineDepart(l);
+        if (!crosses(c) || c - lastHomeNote < HOME_NOTE_GAP) continue;
+        lastHomeNote = c;
+        const step = clamp(Math.round(10 * (c - DAWN_HOME) / DAWN_SPREAD) + Math.floor(noteRandom() * 3) - 1, 0, 10);
+        const pan = panX(wHomeX[lineMid[l]]);
+        cue('home', c, a => a.cue.home(audioAt(a, c, now), step, pan));
+      }
+      if (crosses(DAWN_IRIS[0])) cue('dawn', DAWN_IRIS[0], a => a.cue.dawn(audioAt(a, DAWN_IRIS[0], now)));
+    }
+    // At a close the music releases and the master fades out, ending exactly at the swap.
+    function soundClose() {
+      const end = closeKind === 'dusk' ? CLOSE_DUSK : DAWN_END; const from = closeT;
+      cue('close', closeT, a => {
+        const now = a.now(); const swap = now + Math.max(0, end - from) / Math.max(timeScale, 1e-3);
+        a.ambientStop(now, 0.5); a.droneStop(now, 0.4); a.airStop(now, 0.3); a.windStop(now, 0.1); a.setSpin(0);
+        a.fadeOut(swap, Math.min(0.6, swap - now));
+      });
+    }
+    // The galaxy as an instrument: hovering strums (throttled), selecting rings an octave.
+    function strum() {
+      const now = performance.now();
+      if (now - hoverNoteAt < HOVER_THROTTLE) return false;
+      hoverNoteAt = now; return true;
+    }
+    function playPaper(p, select) {
+      const paper = PAPERS[p]; const pan = panX(paperSX[p]);
+      if (select) cue('select', skyT, a => a.cue.select(a.now(), paper.theme, paper.year, pan));
+      else if (strum()) cue('hover', skyT, a => a.cue.hover(a.now(), paper.theme, paper.year, pan));
+    }
+    function playWish(q) {
+      const Q = QUESTIONS[q]; const pan = panX(wishSX[q]);
+      if (strum()) cue('hover', skyT, a => a.cue.dyad(a.now(), Q.a, Q.b, HOVER_NOTE, pan));
+    }
+    function playTheme(j) {
+      const list = PAPERS.filter(paper => paper.theme === j);   // already chronological
+      cue('theme', skyT, a => {
+        const start = a.now();
+        list.forEach((paper, k) => a.cue.paper(start + k * ARPEGGIO_STEP, paper.theme, paper.year, panX(paperSX[PAPERS.indexOf(paper)])));
+      });
+    }
+
+    /* ---- Wishes: caught open questions on the next turn ------------------- */
+    function loadWishes() {
+      try {
+        const list = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
+        if (Array.isArray(list)) {
+          for (const q of list) {
+            if (!Number.isInteger(q) || q < 0 || q >= NQ || caught[q]) continue;
+            caught[q] = 1; wishPinned[q] = 1; wishFade[q] = 1; caughtCount++;
+          }
+        }
+      } catch (error) { /* storage unavailable or malformed: start empty */ }
+      if (caughtCount) discovered = true;
+      if (caughtCount === NQ) { drawn = true; drawnFade = 1; }
+    }
+    function saveWishes() {
+      try {
+        const list = [];
+        for (let q = 0; q < NQ; q++) if (caught[q]) list.push(q);
+        if (list.length) localStorage.setItem(WISH_KEY, JSON.stringify(list)); else localStorage.removeItem(WISH_KEY);
+      } catch (error) { /* storage unavailable */ }
+    }
+    function updateHint() {
+      const touch = coarse || narrow;
+      const base = touch ? COPY.hintTouch : COPY.hintPointer;
+      const text = discovered ? `${base} · ${touch ? COPY.catchTouch : COPY.catchPointer}` : base;
+      if (hintEl.textContent !== text) hintEl.textContent = text;
+    }
+    function updateCount() {
+      // The counter keeps its place before it appears, so discovery never shifts the layout.
+      countButton.classList.toggle('is-pending', !discovered);
+      countButton.setAttribute('aria-hidden', String(!discovered));
+      countButton.textContent = `${COPY.counter} ${caughtCount} / ${NQ}`;
+    }
+    function discover() {
+      if (discovered) return;
+      discovered = true; updateHint(); updateCount(); measureUI();
+    }
+    function wishShown() {
+      for (let q = 0; q < NQ; q++) if (wishFade[q] > 0.004) return true;
+      return false;
+    }
+    // How much of the next turn at angle phi a pinned wish draws: fully within WISH_ARC[0]
+    // degrees of a star, fading out by WISH_ARC[1] (neighbours, 36 degrees apart, overlap).
+    function wishCover(phi) {
+      let cover = 0;
+      for (let q = 0; q < NQ; q++) {
+        if (wishFade[q] <= 0.004) continue;
+        let d = Math.abs(phi - QUESTIONS[q].phi); if (d > Math.PI) d = TAU - d;
+        const w = (1 - smooth((d * 180 / Math.PI - WISH_ARC[0]) / (WISH_ARC[1] - WISH_ARC[0]))) * wishFade[q];
+        if (w > cover) cover = w;
+      }
+      return cover;
+    }
+    function drawWishes(layer) {
+      for (let q = 0; q < NQ; q++) {
+        wishVis[q] = 0;
+        if (wishFade[q] <= 0.004) continue;
+        const Q = QUESTIONS[q];
+        if (!project(Q.x, Q.y, 0)) continue;
+        wishSX[q] = PX; wishSY[q] = PY; wishZ[q] = PZ;
+        if (PX < -40 || PX > W + 40 || PY < -40 || PY > H + 40) continue;
+        wishVis[q] = wishPinned[q];
+        const focus = q === hoverWish || q === selectedWish;
+        const dim = selectedTheme >= 0 && Q.a !== selectedTheme && Q.b !== selectedTheme && !focus ? 0.35 : 1;
+        const a = depthFactor(PZ) * dim * layer * wishFade[q];
+        if (a <= 0.004) continue;
+        ctx.globalCompositeOperation = 'lighter';
+        const glow = focus ? WISH_GLOW + 6 : WISH_GLOW;
+        ctx.globalAlpha = Math.min(1, 0.8 * a); ctx.drawImage(sprites.blends[q], PX - glow, PY - glow, glow * 2, glow * 2);
+        // A warm four-point glint that breathes slowly (held still under reduced motion).
+        const g = WISH_GLINT * (motion.matches ? 1 : 0.85 + 0.15 * Math.sin(skyT * 1.3 + q * 2.1));
+        ctx.globalAlpha = 0.7 * a; ctx.drawImage(sprites.glintWarm, PX - g / 2, PY - g / 2, g, g);
+        if (wishAge[q] < PAPER_SPARK_LIFE[1]) drawBurst(PX, PY, wishAge[q], sprites.blends[q], Q.colour, (NP + q) * PAPER_SPARKS, narrow ? PAPER_SPARKS_NARROW : PAPER_SPARKS, layer);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = Math.min(1, a + 0.1); ctx.fillStyle = '#fff4e2';
+        ctx.beginPath(); ctx.arc(PX, PY, 1.4, 0, TAU); ctx.fill();
+        if (focus) {
+          ctx.globalAlpha = 0.85 * layer; ctx.strokeStyle = Q.colour; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.arc(PX, PY, 9, 0, TAU); ctx.stroke();
+        }
+      }
+    }
+    function nearestWish(x, y, radius) {
+      let best = -1; let bestD = radius;
+      for (let q = 0; q < NQ; q++) {
+        if (!wishVis[q]) continue;
+        const d = Math.hypot(wishSX[q] - x, wishSY[q] - y);
+        if (d < bestD) { bestD = d; best = q; }
+      }
+      return best;
+    }
+    function setHoverWish(q, sound) {
+      if (hoverWish === q) return;
+      hoverWish = q; stage.classList.toggle('is-over', q >= 0 || hoverPaper >= 0);
+      if (q >= 0 && sound) playWish(q);
+      redraw();
+    }
+    function selectWish(q) {
+      selectedWish = q;
+      if (q >= 0) { selectedPaper = -1; selectedTheme = -1; plateView = ''; }
+      updatePlate();
+    }
+    function showWishList() {
+      if (mode !== 'chart' || coreTarget === 1) return;
+      selectedPaper = -1; selectedTheme = -1; selectedWish = -1; plateView = 'wishes';
+      updatePlate();
+    }
+    // Caught: counted and saved at once (a close mid-flight keeps it); pinned when it arrives.
+    function markCaught(q) {
+      if (caught[q]) return;
+      caught[q] = 1; caughtCount++;
+      saveWishes(); discover(); updateCount();
+      announce(`Open question caught, ${caughtCount} of ${NQ}: ${QUESTIONS[q].text}`);
+    }
+    function pinWish(q, instant) {
+      wishPinned[q] = 1; wishFade[q] = 1; wishAge[q] = instant && motion.matches ? 99 : 0;
+      const Q = QUESTIONS[q]; const pan = panX(wishVis[q] ? wishSX[q] : W / 2);
+      cue('pin', skyT, a => a.cue.pin(a.now(), Q.a, Q.b, pan));
+      if (caughtCount === NQ && !drawn) complete();
+    }
+    function complete() {
+      drawn = true;
+      if (motion.matches) drawnFade = 1;
+      else {
+        // A shower of non-interactive meteors from one side; afterwards, golden meteors.
+        const sign = meteorRandom() < 0.5 ? 1 : -1; const angle = lerp(26, 34, meteorRandom());
+        for (let k = 0; k < SHOWER_COUNT; k++) {
+          spawnMeteor(1, -1, skyT + 0.15 + k * SHOWER_TIME / SHOWER_COUNT + meteorRandom() * 0.08, sign, angle + (meteorRandom() - 0.5) * 6);
+        }
+        nextMeteor = skyT + SHOWER_TIME + lerp(GOLDEN_GAP[0], GOLDEN_GAP[1], meteorRandom());
+      }
+      cue('swell', skyT, a => a.cue.swell(a.now()));
+      selectedPaper = -1; selectedTheme = -1; selectedWish = -1; plateView = 'drawn';
+      updatePlate();
+    }
+    function releaseWishes() {
+      catchQ = -1;
+      for (let q = 0; q < NQ; q++) { caught[q] = 0; wishPinned[q] = 0; if (motion.matches) wishFade[q] = 0; }
+      caughtCount = 0; drawn = false; if (motion.matches) drawnFade = 0;
+      for (let i = 0; i < METEOR_MAX; i++) if (mKind[i] !== 0) mOn[i] = 0;
+      saveWishes(); updateCount();
+      selectedWish = -1; plateView = '';
+      updatePlate();
+      announce('The open questions are released.');
+      nextMeteor = Math.min(nextMeteor, skyT + METEOR_FIRST);
+      if (discovered) countButton.focus({ preventScroll: true });
+      if (motion.matches) scheduleStill();
+      redraw();
+    }
+
+    /* ---- Shooting stars ---------------------------------------------------- */
+    const CATCH_LAID = CATCH_RELAY[0] + CATCH_RELAY[2] + CATCH_RELAY[1];   // every letter is in its line
+    const CATCH_FOLD = CATCH_LAID + CATCH_HOLD;                           // the line folds to a point ...
+    const CATCH_FLY = CATCH_FOLD + CATCH_COLLAPSE;                        // ... that flies ...
+    const CATCH_PIN = CATCH_FLY + CATCH_ARC;                              // ... and is pinned
+    let freeL = 0; let freeR = 1; let freeT = 0; let freeB = 1;
+    function questionBusy(q) {
+      if (catchQ === q || stillQ === q) return true;
+      for (let i = 0; i < METEOR_MAX; i++) if (mOn[i] && mKind[i] === 0 && mQ[i] === q) return true;
+      return false;
+    }
+    function pickQuestion() {
+      let free = 0;
+      for (let q = 0; q < NQ; q++) if (!caught[q] && !questionBusy(q)) free++;
+      if (!free) return -1;
+      let k = Math.floor(meteorRandom() * free);
+      for (let q = 0; q < NQ; q++) if (!caught[q] && !questionBusy(q) && k-- === 0) return q;
+      return -1;
+    }
+    function questionMeteor() {
+      for (let i = 0; i < METEOR_MAX; i++) if (mOn[i] && mKind[i] !== 1) return i;
+      return -1;
+    }
+    /**
+     * A meteor crosses a random point of the chart's free area, heading down at 20-40 degrees
+     * in either direction. Going backwards from that point it enters at the top edge or at
+     * the side it comes from, whichever it meets first; it lives until its tail has left.
+     * With `now`, it is born already at that point (test hook).
+     */
+    function spawnMeteor(kind, q, born, sign, angle, now) {
+      let i = 0; while (i < METEOR_MAX && mOn[i]) i++;
+      if (i >= METEOR_MAX) return -1;
+      const speeds = narrow ? METEOR_SPEED_NARROW : METEOR_SPEED;
+      const speed = lerp(speeds[0], speeds[1], meteorRandom());
+      if (!sign) sign = meteorRandom() < 0.5 ? 1 : -1;
+      const a = (angle === undefined ? lerp(METEOR_ANGLE[0], METEOR_ANGLE[1], meteorRandom()) : angle) * Math.PI / 180;
+      const dx = sign * Math.cos(a); const dy = Math.sin(a);
+      const px = lerp(freeL, freeR, 0.2 + 0.6 * meteorRandom()); const py = lerp(freeT, freeB, 0.15 + 0.5 * meteorRandom());
+      const m = 12;
+      const back = Math.max(0, Math.min((py + m) / dy, sign > 0 ? (px + m) / dx : (px - W - m) / dx));
+      const ahead = Math.max(0, Math.min((H + m - py) / dy, sign > 0 ? (W + m - px) / dx : (-m - px) / dx));
+      const tail = narrow ? METEOR_TAIL_NARROW : METEOR_TAIL;
+      mX0[i] = px - dx * back; mY0[i] = py - dy * back; mDX[i] = dx; mDY[i] = dy; mSpeed[i] = speed;
+      mBorn[i] = now ? skyT - back / speed : born; mLife[i] = (back + ahead + tail) / speed; mTail[i] = tail; mFade[i] = 1;
+      mQ[i] = q; mKind[i] = kind; mOn[i] = 1; mSounded[i] = 0;
+      if (kind === 0 && q >= 0) buildGlyphs(q);
+      return i;
+    }
+    let MX = 0; let MY = 0; let MD = 0;
+    function meteorHeadAt(i) {
+      MD = Math.max(0, skyT - mBorn[i]) * mSpeed[i];
+      MX = mX0[i] + mDX[i] * MD; MY = mY0[i] + mDY[i] * MD;
+    }
+    // A catchable meteor near (x, y): within CATCH_HEAD of the head, or CATCH_TAIL[0] of the
+    // first CATCH_TAIL[1] px of its tail (the positions of the last drawn frame).
+    function meteorAt(x, y) {
+      for (let i = 0; i < METEOR_MAX; i++) {
+        if (!mOn[i] || mKind[i] === 1 || skyT < mBorn[i] || mFade[i] < 1) continue;
+        meteorHeadAt(i);
+        if (Math.hypot(x - MX, y - MY) <= CATCH_HEAD) return i;
+        const reach = Math.min(CATCH_TAIL[1], mTail[i], MD);
+        const along = clamp((MX - x) * mDX[i] + (MY - y) * mDY[i], 0, reach);
+        if (Math.hypot(x - (MX - mDX[i] * along), y - (MY - mDY[i] * along)) <= CATCH_TAIL[0]) return i;
+      }
+      return -1;
+    }
+    function visibleMeteor() {
+      for (let i = 0; i < METEOR_MAX; i++) {
+        if (!mOn[i] || mKind[i] === 1 || skyT < mBorn[i] || mFade[i] < 1) continue;
+        meteorHeadAt(i);
+        if (MX >= 0 && MX <= W && MY >= 0 && MY <= H) return i;
+      }
+      return -1;
+    }
+    function catchMeteor(i) {
+      meteorHeadAt(i);
+      const kind = mKind[i]; const q = mQ[i]; mOn[i] = 0;
+      if (kind === 2) {
+        // A golden meteor only sparkles.
+        sparkleX = MX; sparkleY = MY; sparkleAge = 0;
+        const pan = panX(MX);
+        cue('sparkle', skyT, a => a.cue.sparkle(a.now(), pan));
+        return;
+      }
+      if (q < 0) return;
+      if (catchQ >= 0) finishCatch();
+      buildGlyphs(q);
+      catchQ = q; catchT = 0; catchX = MX; catchY = MY; catchDX = mDX[i]; catchDY = mDY[i]; catchV = mSpeed[i];
+      catchTail = Math.min(mTail[i], MD); catchFrom = skyT;
+      markCaught(q);   // first: the hint and counter may change the plate's size
+      // The readable line, near where the meteor comes to rest and clear of the UI.
+      const rest = catchV * CATCH_STOP / 3;
+      layoutLine(catchX + catchDX * rest, catchY + catchDY * rest);
+      const Q = QUESTIONS[q]; const pan = panX(MX);
+      cue('catch', skyT, a => a.cue.catch(a.now(), Q.a, Q.b, pan));
+      nextMeteor = Math.max(nextMeteor, skyT + CATCH_PIN + 2);
+    }
+    function finishCatch() {
+      if (catchQ < 0) return;
+      const q = catchQ; catchQ = -1;
+      pinWish(q, true);
+    }
+    function tryCatch(x, y) {
+      if (motion.matches) {
+        if (stillQ >= 0 && Math.hypot(x - stillX, y - stillY) <= CATCH_HEAD) { catchStill(); return true; }
+        return false;
+      }
+      const i = meteorAt(x, y);
+      if (i < 0) return false;
+      catchMeteor(i); redraw();
+      return true;
+    }
+    // One question at a time: its glyphs, each in its own cell of a strip, warm serif italic.
+    function buildGlyphs(q) {
+      const size = narrow ? QUESTION_FONT_NARROW : QUESTION_FONT;
+      if (glyphQ === q && glyphSize === size && glyphDPR === DPR && glyphCanvas) return;
+      const text = QUESTIONS[q].text; const n = Math.min(text.length, MAX_CHARS);
+      const font = `italic ${size}px ${SERIF}`;
+      if (!glyphCanvas) glyphCanvas = makeCanvas(1, 1);
+      const g = glyphCanvas.getContext('2d'); g.font = font;
+      // Advances from prefix widths, so the line keeps the font's own spacing.
+      let previous = 0;
+      for (let k = 0; k < n; k++) {
+        const w = g.measureText(text.slice(0, k + 1)).width;
+        glyphOff[k] = previous; glyphAdv[k] = Math.max(0, w - previous); previous = w;
+      }
+      const pad = Math.ceil(size * 0.45); const h = Math.ceil(size * 1.7);
+      let x = 0;
+      for (let k = 0; k < n; k++) { glyphCell[k] = x; glyphCellW[k] = Math.ceil(glyphAdv[k]) + 2 * pad; x += glyphCellW[k] + 2; }
+      glyphCanvas.width = Math.ceil(x * DPR); glyphCanvas.height = Math.ceil(h * DPR);
+      g.setTransform(DPR, 0, 0, DPR, 0, 0); g.font = font; g.fillStyle = WARM; g.textBaseline = 'middle'; g.textAlign = 'left';
+      // A soft night halo first (only the shadow of glyphs drawn far off the strip), then the glyphs.
+      const away = (x + 100) * 4;
+      g.shadowColor = 'rgba(5,7,12,0.9)'; g.shadowBlur = GLYPH_HALO * DPR; g.shadowOffsetX = away * DPR;
+      for (let pass = 0; pass < 2; pass++) for (let k = 0; k < n; k++) if (text[k] !== ' ') g.fillText(text[k], glyphCell[k] + pad - away, h / 2);
+      g.shadowColor = 'rgba(0,0,0,0)'; g.shadowBlur = 0; g.shadowOffsetX = 0;
+      for (let k = 0; k < n; k++) if (text[k] !== ' ') g.fillText(text[k], glyphCell[k] + pad, h / 2);
+      glyphQ = q; glyphN = n; glyphH = h; glyphSize = size; glyphWidth = previous; glyphDPR = DPR; glyphPad = pad;
+    }
+    let glyphPad = 0;
+    // While a caught question is laid out, canvas labels under its box fade to LABEL_UNDER_QUESTION.
+    let dimX0 = 0; let dimY0 = 0; let dimX1 = 0; let dimY1 = 0; let labelDim = 0;
+    const dimFor = (x0, y0, x1, y1) => (labelDim > 0 && x0 < dimX1 && x1 > dimX0 && y0 < dimY1 && y1 > dimY0 ? 1 - (1 - LABEL_UNDER_QUESTION) * labelDim : 1);
+    // The caught question as one centred line (two on narrow screens, broken at the space
+    // nearest the middle), placed near (px, py), inside the margins and clear of the UI.
+    function layoutLine(px, py) {
+      const size = glyphSize; const lineH = Math.round(size * 1.45); const text = QUESTIONS[glyphQ].text;
+      let split = -1;
+      if (glyphWidth > W - 2 * QUESTION_MARGIN) {
+        let best = Infinity;
+        for (let k = 1; k < glyphN - 1; k++) {
+          if (text[k] !== ' ') continue;
+          const d = Math.abs(glyphOff[k] - glyphWidth / 2); if (d < best) { best = d; split = k; }
+        }
+      }
+      const w1 = split > 0 ? glyphOff[split] : glyphWidth;
+      const w2 = split > 0 ? glyphWidth - glyphOff[split] - glyphAdv[split] : 0;
+      const boxW = Math.max(w1, w2) + 16; const boxH = (split > 0 ? 2 : 1) * lineH + 16;
+      const m = QUESTION_MARGIN;
+      const fitX = x => clamp(x, m + boxW / 2, Math.max(m + boxW / 2, W - m - boxW / 2));
+      const fitY = y => clamp(y, m + boxH / 2, Math.max(m + boxH / 2, H - m - boxH / 2));
+      lineCX = fitX((freeL + freeR) / 2); lineCY = fitY((freeT + freeB) / 2);
+      for (let k = 0; k < 13; k++) {
+        const x = fitX(px); const y = fitY(py + (k % 2 ? -1 : 1) * Math.ceil(k / 2) * 44);
+        if (!overlapsUI(x - boxW / 2, y - boxH / 2, boxW, boxH)) { lineCX = x; lineCY = y; break; }
+      }
+      dimX0 = lineCX - boxW / 2; dimX1 = lineCX + boxW / 2; dimY0 = lineCY - boxH / 2; dimY1 = lineCY + boxH / 2;
+      for (let k = 0; k < glyphN; k++) {
+        glyphHide[k] = k === split ? 1 : 0;
+        if (split > 0 && k > split) {
+          glyphLX[k] = lineCX - w2 / 2 + (glyphOff[k] - glyphOff[split] - glyphAdv[split]) + glyphAdv[k] / 2; glyphLY[k] = lineCY + lineH / 2;
+        } else {
+          glyphLX[k] = lineCX - w1 / 2 + glyphOff[k] + glyphAdv[k] / 2; glyphLY[k] = lineCY - (split > 0 ? lineH / 2 : 0);
+        }
+      }
+    }
+    let SX = 0; let SY = 0; let SA = 0; let SALPHA = 0;
+    // Letter k along a tail of length `tail` behind the head (hx, hy), the meteor moving along
+    // (dx, dy). The text reads left to right on screen: it ends just behind the head when the
+    // meteor moves right and starts there when it moves left; it is squeezed to fit the tail.
+    function streakGlyph(k, hx, hy, dx, dy, tail, time) {
+      const scale = TAIL_FONT / glyphSize; const span = glyphWidth * scale;
+      const squeeze = Math.min(1, Math.max(1, tail - TAIL_TEXT_GAP) / span);
+      const centre = (glyphOff[k] + glyphAdv[k] / 2) * scale * squeeze;
+      const dist = dx >= 0 ? TAIL_TEXT_GAP + span * squeeze - centre : TAIL_TEXT_GAP + centre;
+      SA = dx >= 0 ? Math.atan2(dy, dx) : Math.atan2(-dy, -dx);
+      // Along the tail, lifted just above it (the text's own upward normal).
+      SX = hx - dx * dist + Math.sin(SA) * TAIL_TEXT_LIFT; SY = hy - dy * dist - Math.cos(SA) * TAIL_TEXT_LIFT;
+      SALPHA = Math.pow(clamp01(1 - dist / Math.max(1, tail + TAIL_TEXT_GAP)), 1.2) * (0.72 + 0.28 * Math.sin(time * 19 + k * 1.7));
+    }
+    function drawGlyph(k, x, y, scale, angle, alpha) {
+      if (alpha <= 0.004 || glyphHide[k]) return;
+      const c = Math.cos(angle) * scale; const s = Math.sin(angle) * scale;
+      setLocal(c, s, -s, c, x, y);
+      ctx.globalAlpha = alpha;
+      const w = glyphCellW[k];
+      ctx.drawImage(glyphCanvas, glyphCell[k] * DPR, 0, w * DPR, glyphH * DPR, -(glyphPad + glyphAdv[k] / 2), -glyphH / 2, w, glyphH);
+    }
+    // Head: a warm-white core and a glow in the blended theme colour; tail: six tapered segments.
+    function drawMeteorBody(hx, hy, dx, dy, tail, sprite, colour, alpha) {
+      if (alpha <= 0.004) return;
+      ctx.globalCompositeOperation = 'source-over'; ctx.lineCap = 'round'; ctx.strokeStyle = colour;
+      for (let j = 0; j < METEOR_SEGMENTS && tail > 1; j++) {
+        const s0 = tail * j / METEOR_SEGMENTS; const s1 = tail * (j + 1) / METEOR_SEGMENTS; const f = (j + 0.5) / METEOR_SEGMENTS;
+        ctx.globalAlpha = alpha * 0.85 * Math.pow(1 - f, 1.3);
+        ctx.lineWidth = lerp(METEOR_WIDTH[0], METEOR_WIDTH[1], f);
+        ctx.beginPath(); ctx.moveTo(hx - dx * s0, hy - dy * s0); ctx.lineTo(hx - dx * s1, hy - dy * s1); ctx.stroke();
+      }
+      if (tail > 1) {
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.8; ctx.globalAlpha = 0.55 * alpha;
+        ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx - dx * tail * 0.3, hy - dy * tail * 0.3); ctx.stroke();
+      }
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = 0.9 * alpha; ctx.drawImage(sprite, hx - METEOR_GLOW, hy - METEOR_GLOW, METEOR_GLOW * 2, METEOR_GLOW * 2);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = alpha; ctx.fillStyle = '#fff8ee';
+      ctx.beginPath(); ctx.arc(hx, hy, METEOR_CORE / 2, 0, TAU); ctx.fill();
+    }
+    function drawMeteors(layer) {
+      for (let i = 0; i < METEOR_MAX; i++) {
+        if (!mOn[i] || skyT < mBorn[i]) continue;
+        meteorHeadAt(i);
+        const kind = mKind[i]; const q = mQ[i] >= 0 ? mQ[i] : i % NQ;
+        const tail = Math.min(mTail[i], MD);
+        const alpha = layer * mFade[i] * (kind === 1 ? 0.75 : 1);
+        drawMeteorBody(MX, MY, mDX[i], mDY[i], tail, kind === 2 ? sprites.gold : sprites.blends[q], kind === 2 ? GOLD : QUESTIONS[q].colour, alpha);
+        if (kind !== 0 || mQ[i] !== glyphQ || !glyphCanvas) continue;
+        const scale = TAIL_FONT / glyphSize;
+        for (let k = 0; k < glyphN; k++) {
+          streakGlyph(k, MX, MY, mDX[i], mDY[i], tail, skyT);
+          drawGlyph(k, SX, SY, scale, SA, SALPHA * alpha * 0.85);
+        }
+        resetTransform();
+      }
+    }
+    // The catch: deceleration, the letters re-laid as a line, the hold, the fold to a point and
+    // its arc to the next turn (towards the star's current projection).
+    function drawCatch(layer) {
+      if (catchQ < 0 || glyphQ !== catchQ || !glyphCanvas) return;
+      const c = catchT; const Q = QUESTIONS[catchQ];
+      const u = clamp01(c / CATCH_STOP); const left = 1 - u;
+      const travel = catchV * CATCH_STOP / 3 * (1 - left * left * left);
+      const hx = catchX + catchDX * travel; const hy = catchY + catchDY * travel;
+      const tail = catchTail * left * left;
+      drawMeteorBody(hx, hy, catchDX, catchDY, tail, sprites.blends[catchQ], Q.colour, layer * (1 - smooth((c - 0.15) / 0.5)));
+      const fold = clamp01((c - CATCH_FOLD) / CATCH_COLLAPSE); const foldE = easeInCubic(fold);
+      if (fold < 1) {
+        const scale0 = TAIL_FONT / glyphSize;
+        for (let k = 0; k < glyphN; k++) {
+          streakGlyph(k, hx, hy, catchDX, catchDY, tail, catchFrom + c);
+          const start = CATCH_RELAY[0] + CATCH_RELAY[2] * (glyphN > 1 ? k / (glyphN - 1) : 0);
+          const e = easeInOutCubic((c - start) / CATCH_RELAY[1]);
+          let d = -SA; d -= TAU * Math.round(d / TAU);
+          let x = lerp(SX, glyphLX[k], e); let y = lerp(SY, glyphLY[k], e);
+          let scale = lerp(scale0, 1, e); let alpha = lerp(SALPHA * 0.85, 1, e);
+          if (fold > 0) { x = lerp(x, lineCX, foldE); y = lerp(y, lineCY, foldE); scale *= 1 - 0.7 * foldE; alpha *= 1 - foldE; }
+          drawGlyph(k, x, y, scale, SA + d * e, alpha * layer);
+        }
+        resetTransform();
+      }
+      if (fold <= 0) return;
+      // The point of light: it gathers as the line folds, then arcs (a quadratic Bezier that
+      // bows upwards) to the wish's place, leaving a short tapered trail.
+      const fly = clamp01((c - CATCH_FLY) / CATCH_ARC);
+      project(Q.x, Q.y, 0); const tx = PX; const ty = PY;
+      const mx = (lineCX + tx) / 2; const my = (lineCY + ty) / 2; const len = Math.hypot(tx - lineCX, ty - lineCY) || 1;
+      let nx = -(ty - lineCY) / len; let ny = (tx - lineCX) / len; if (ny > 0) { nx = -nx; ny = -ny; }
+      const cx = mx + nx * 0.3 * len; const cy = my + ny * 0.3 * len;
+      const e = easeInOutCubic(fly);
+      const px = bezier(e, lineCX, cx, tx); const py = bezier(e, lineCY, cy, ty);
+      if (fly > 0) {
+        ctx.lineCap = 'round'; ctx.strokeStyle = Q.colour;
+        let ax = px; let ay = py;
+        for (let j = 1; j <= 6; j++) {
+          const ej = Math.max(0, e - j * 0.035); const bx = bezier(ej, lineCX, cx, tx); const by = bezier(ej, lineCY, cy, ty);
+          ctx.globalAlpha = layer * 0.7 * (1 - j / 7); ctx.lineWidth = 2 * (1 - j / 8);
+          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+          ax = bx; ay = by;
+        }
+      }
+      const glow = 10 + 10 * smooth(fold);
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = layer * smooth(fold); ctx.drawImage(sprites.blends[catchQ], px - glow, py - glow, glow * 2, glow * 2);
+      ctx.globalAlpha = layer * 0.8 * smooth(fold); ctx.drawImage(sprites.warm, px - 6, py - 6, 12, 12);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    const bezier = (e, a, c, b) => (1 - e) * (1 - e) * a + 2 * (1 - e) * e * c + e * e * b;
+    function drawSky(layer) {
+      if (layer <= 0.004) return;
+      drawMeteors(layer);
+      drawCatch(layer);
+      if (sparkleAge < PAPER_SPARK_LIFE[1]) {
+        ctx.globalCompositeOperation = 'lighter';
+        drawBurst(sparkleX, sparkleY, sparkleAge, sprites.gold, GOLD, (NP + NQ) * PAPER_SPARKS, PAPER_SPARKS, layer);
         ctx.globalCompositeOperation = 'source-over';
       }
+      if (stillQ >= 0) {
+        // Reduced motion: a still wish with a faint ring.
+        ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.9 * layer;
+        ctx.drawImage(sprites.blends[stillQ], stillX - WISH_GLOW, stillY - WISH_GLOW, WISH_GLOW * 2, WISH_GLOW * 2);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 0.35 * layer; ctx.strokeStyle = QUESTIONS[stillQ].colour; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(stillX, stillY, STILL_RADIUS, 0, TAU); ctx.stroke();
+        ctx.globalAlpha = layer; ctx.fillStyle = '#fff4e2';
+        ctx.beginPath(); ctx.arc(stillX, stillY, 1.4, 0, TAU); ctx.fill();
+      }
+    }
+    // The sky clock runs in the chart (not in core view): spawning, flights, the catch, and
+    // the fades of wishes and of the drawn next turn.
+    function stepSky(dt) {
+      const sky = dt * timeScale;
+      const open = coreTarget === 0 && coreU <= 0 && !motion.matches;
+      activeMeteors = 0;
+      if (!open) {
+        // Meteors fade out within 0.3 s; a catch in progress is pinned at once.
+        for (let i = 0; i < METEOR_MAX; i++) if (mOn[i]) { mFade[i] -= dt / 0.3; if (mFade[i] <= 0) mOn[i] = 0; else activeMeteors++; }
+        if (coreTarget === 1) finishCatch();
+        return;
+      }
+      skyT += sky;
+      for (let q = 0; q < NQ; q++) {
+        if (wishAge[q] < 99) wishAge[q] = Math.min(99, wishAge[q] + sky);
+        if (!wishPinned[q] && wishFade[q] > 0) wishFade[q] = Math.max(0, wishFade[q] - sky / 0.6);
+      }
+      drawnFade = clamp01(drawnFade + (drawn ? 1 : -1) * sky / DRAWN_FADE);
+      if (sparkleAge < 99) sparkleAge += sky;
+      if (skyT >= nextMeteor) {
+        if (catchQ < 0 && questionMeteor() < 0) {
+          if (drawn) { spawnMeteor(2, -1, skyT); nextMeteor = skyT + lerp(GOLDEN_GAP[0], GOLDEN_GAP[1], meteorRandom()); }
+          else {
+            const q = pickQuestion();
+            if (q >= 0) spawnMeteor(0, q, skyT);
+            nextMeteor = skyT + lerp(METEOR_GAP[0], METEOR_GAP[1], meteorRandom());
+          }
+        } else nextMeteor = skyT + 1;
+      }
+      for (let i = 0; i < METEOR_MAX; i++) {
+        if (!mOn[i]) continue;
+        const age = skyT - mBorn[i];
+        if (age < 0) continue;
+        activeMeteors++;
+        if (!mSounded[i]) {
+          // The whoosh sweeps across the meteor's life, panned from its entry to its exit.
+          mSounded[i] = 1;
+          const life = Math.max(0.2, mLife[i] - age) / Math.max(timeScale, 1e-3);
+          const pan0 = panX(mX0[i] + mDX[i] * mSpeed[i] * age); const pan1 = panX(mX0[i] + mDX[i] * mSpeed[i] * mLife[i]);
+          const gain = mKind[i] === 1 ? 0.02 : 0.06;
+          cue('whoosh', skyT, a => a.cue.whoosh(a.now(), life, pan0, pan1, gain));
+        }
+        if (age > mLife[i]) { mOn[i] = 0; if (mKind[i] === 0) discover(); }
+      }
+      if (catchQ >= 0) {
+        catchT += sky;
+        if (catchT >= CATCH_PIN) finishCatch();
+      }
+    }
+
+    /* ---- Reduced motion: still wishes --------------------------------------- */
+    function scheduleStill() {
+      clearTimeout(stillTimer); stillTimer = 0;
+      if (closed || leaving || !ctx || !motion.matches || mode !== 'chart' || stillQ >= 0 || caughtCount >= NQ) return;
+      stillTimer = setTimeout(() => spawnStill(-1), lerp(STILL_GAP[0], STILL_GAP[1], meteorRandom()) * 1000 / Math.max(timeScale, 0.01));
+    }
+    function spawnStill(q) {
+      clearTimeout(stillTimer); stillTimer = 0;
+      if (closed || leaving || !motion.matches || mode !== 'chart') return -1;
+      stillQ = -1;
+      if (!(q >= 0) || caught[q]) q = pickQuestion();
+      if (q < 0) return -1;
+      // A free spot of sky: inside the viewport, clear of the UI, the chart's middle and the stars.
+      let x = (freeL + freeR) / 2; let y = freeT + 48;
+      for (let k = 0; k < 48; k++) {
+        const cx = lerp(48, W - 48, meteorRandom()); const cy = lerp(48, H - 48, meteorRandom());
+        // blocked() also keeps clear of the canvas labels placed in the last frame.
+        if (blocked(cx - 24, cy - 24, 48, 48, -2) || Math.hypot(cx - chartX, cy - chartY) < 0.45 * sFit) continue;
+        let near = false;
+        for (let p = 0; p < NP && !near; p++) near = !!paperVis[p] && Math.hypot(paperSX[p] - cx, paperSY[p] - cy) < 36;
+        if (near) continue;
+        x = cx; y = cy; break;
+      }
+      stillQ = q; stillX = x; stillY = y;
+      stillTimer = setTimeout(() => { stillTimer = 0; stillQ = -1; discover(); redraw(); scheduleStill(); }, STILL_LIFE * 1000 / Math.max(timeScale, 0.01));
+      redraw();
+      return q;
+    }
+    function catchStill() {
+      const q = stillQ; if (q < 0) return;
+      stillQ = -1; clearTimeout(stillTimer); stillTimer = 0;
+      const Q = QUESTIONS[q]; const pan = panX(stillX);
+      cue('catch', skyT, a => a.cue.catch(a.now(), Q.a, Q.b, pan));
+      markCaught(q); pinWish(q, true);
+      if (!drawn) selectWish(q);
+      scheduleStill(); redraw();
     }
 
     /* ---- Plate, themes, index -------------------------------------------- */
@@ -2413,7 +4052,7 @@
     }
     function updatePlate() {
       plateDetail.replaceChildren();
-      const detail = coreTarget === 1 || selectedPaper >= 0 || selectedTheme >= 0;
+      const detail = coreTarget === 1 || selectedPaper >= 0 || selectedWish >= 0 || selectedTheme >= 0 || plateView !== '';
       plateDefault.hidden = detail; plateDetail.hidden = !detail;
       if (coreTarget === 1) {
         const back = element('button', 'spira-back', COPY.backOut); back.type = 'button';
@@ -2427,6 +4066,10 @@
         plateDetail.append(element('p', 'spira-plate-kicker', `${p.year} · ${THEMES[p.theme].label}`),
           element('h3', 'spira-plate-title', p.title), element('p', 'spira-venue', p.venue), link);
         announce(`${p.name}, ${p.year}, ${THEMES[p.theme].label}.`);
+      } else if (selectedWish >= 0) {
+        const q = QUESTIONS[selectedWish];
+        plateDetail.append(element('p', 'spira-plate-kicker', q.kicker), element('h3', 'spira-plate-title', q.text), element('p', 'spira-core-text', q.note));
+        announce(`${q.kicker}. ${q.text}`);
       } else if (selectedTheme >= 0) {
         const theme = THEMES[selectedTheme];
         plateDetail.append(element('p', 'spira-plate-kicker', theme.label), element('h3', 'spira-plate-title', theme.question));
@@ -2443,26 +4086,50 @@
           row.append(list); plateDetail.append(row);
         }
         announce(`${theme.label}. ${theme.question}`);
+      } else if (plateView) {
+        // The caught open questions; once all ten are caught, the next turn is drawn.
+        if (drawn) {
+          const link = element('a', 'spira-link', COPY.drawnLink); link.href = new URL(COPY.drawnHref, ROOT).href;
+          plateDetail.append(element('p', 'spira-plate-kicker', COPY.drawnKicker), element('h3', 'spira-plate-title', COPY.drawnTitle),
+            element('p', 'spira-core-text', COPY.drawnText), link);
+        } else {
+          plateDetail.append(element('p', 'spira-plate-kicker', 'Open questions'), element('h3', 'spira-plate-title', `${caughtCount} of ${NQ} caught.`));
+          if (!caughtCount) plateDetail.append(element('p', 'spira-core-text', 'Catch a shooting star to pin its question on the next turn.'));
+        }
+        if (plateView === 'wishes' && caughtCount) {
+          const list = element('div', 'spira-wish-list');
+          for (let q = 0; q < NQ; q++) {
+            if (!caught[q]) continue;
+            const row = element('button', 'spira-wish-row', QUESTIONS[q].text); row.type = 'button'; row.dataset.wish = String(q);
+            list.append(row);
+          }
+          const release = element('button', 'spira-release', COPY.release); release.type = 'button'; release.dataset.release = '';
+          plateDetail.append(list, release);
+        }
+        announce(drawn ? `${COPY.drawnKicker}. ${COPY.drawnTitle}` : `${caughtCount} of ${NQ} open questions caught.`);
       } else announce('');
       themeButtons.forEach((button, j) => button.setAttribute('aria-pressed', String(j === selectedTheme)));
       measureUI();
       redraw();
     }
     function selectTheme(j) {
-      selectedTheme = selectedTheme === j ? -1 : j; selectedPaper = -1;
+      selectedTheme = selectedTheme === j ? -1 : j; selectedPaper = -1; selectedWish = -1; plateView = '';
+      if (selectedTheme === j) playTheme(j);   // its papers as an arpeggio, in order
       interact(); updatePlate();
     }
     function selectPaper(p) {
-      selectedPaper = p; if (p >= 0) selectedTheme = -1;
+      selectedPaper = p; if (p >= 0) { selectedTheme = -1; selectedWish = -1; plateView = ''; playPaper(p, true); }
       updatePlate();
     }
     function setIndex(open) {
       indexOpen = open; indexEl.hidden = !open; indexButton.setAttribute('aria-expanded', String(open));
       measureUI(); redraw();
     }
-    function setHover(p) {
+    function setHover(p, sound) {
       if (hoverPaper === p) return;
-      hoverPaper = p; stage.classList.toggle('is-over', p >= 0); redraw();
+      hoverPaper = p; stage.classList.toggle('is-over', p >= 0 || hoverWish >= 0);
+      if (p >= 0 && sound) playPaper(p, false);   // brushing across the spiral strums it
+      redraw();
     }
 
     function enterCore() {
@@ -2472,7 +4139,9 @@
       coreFrom.yawTo = yaw - (((yaw % TAU) + TAU + Math.PI) % TAU - Math.PI);
       coreTarget = 1; coreSpin = 0; vYaw = 0; vPitch = 0; zoomTarget = zoom;
       if (drag.id >= 0) endDrag(true);
-      setHover(-1); setIndex(false);
+      setHover(-1); setHoverWish(-1); setIndex(false); selectedWish = -1; plateView = '';
+      finishCatch();
+      if (audio) { try { audio.muffle(true, motion.matches ? 0.05 : CORE_FLIGHT); } catch (error) { audioFailed(error); } }
       centreButton.hidden = true; centreHover = false;
       if (motion.matches) coreU = 1;
       updatePlate();
@@ -2484,6 +4153,7 @@
       if (coreTarget !== 1) return;
       coreTarget = 0;
       if (motion.matches) { coreU = 0; coreSpin = 0; }
+      if (audio) { try { audio.muffle(false, motion.matches ? 0.05 : CORE_FLIGHT); } catch (error) { audioFailed(error); } }
       centreButton.hidden = false;
       updatePlate();
       centreButton.focus({ preventScroll: true });
@@ -2512,19 +4182,28 @@
       if (cancelled || motion.matches || (event && event.timeStamp - drag.at > 80)) { vYaw = 0; vPitch = 0; }
       if (!cancelled && !moved && event) {
         const radius = drag.type === 'mouse' ? HOVER_RADIUS : TAP_RADIUS;
-        const p = nearestPaper(event.clientX, event.clientY, radius);
+        const x = event.clientX; const y = event.clientY;
+        let p = nearestPaper(x, y, radius); const w = nearestWish(x, y, radius);
+        // A wish star wins over a farther paper star.
+        if (w >= 0 && (p < 0 || Math.hypot(wishSX[w] - x, wishSY[w] - y) < Math.hypot(paperSX[p] - x, paperSY[p] - y))) p = -1;
+        const near = p >= 0 ? Math.hypot(paperSX[p] - x, paperSY[p] - y) : w >= 0 ? Math.hypot(wishSX[w] - x, wishSY[w] - y) : Infinity;
         // The centre opens the core, unless a star is nearer to the pointer.
-        const toCentre = Math.hypot(event.clientX - chartX, event.clientY - chartY);
-        if (toCentre < CORE_HIT && (p < 0 || Math.hypot(paperSX[p] - event.clientX, paperSY[p] - event.clientY) > toCentre)) enterCore();
+        const toCentre = Math.hypot(x - chartX, y - chartY);
+        if (toCentre < CORE_HIT && near > toCentre) enterCore();
         else if (p >= 0) selectPaper(p);
+        else if (w >= 0) selectWish(w);
         else if (selectedPaper >= 0) selectPaper(-1);
+        else if (selectedWish >= 0) selectWish(-1);
         else if (selectedTheme >= 0) { selectedTheme = -1; updatePlate(); }
+        else if (plateView) { plateView = ''; updatePlate(); }
       }
       interact(); redraw();
     }
     on(stage, 'pointerdown', event => {
       if (mode !== 'chart' || event.button > 0) return;
       if (coreTarget === 1 || coreU > 0) { coreClick = true; return; }
+      // A shooting star (or a still wish) near the pointer is caught before anything else.
+      if (drag.id < 0 && tryCatch(event.clientX, event.clientY)) { event.preventDefault(); interact(); return; }
       if (drag.id >= 0) {
         if (event.pointerType === 'touch' && pinch.id < 0 && drag.type === 'touch') {
           pinch.id = event.pointerId; pinch.x = event.clientX; pinch.y = event.clientY;
@@ -2549,6 +4228,7 @@
         return;
       }
       if (event.pointerId === drag.id) {
+        lastMoveAt = performance.now();
         const dx = event.clientX - drag.x; const dy = event.clientY - drag.y;
         if (!drag.moved && Math.hypot(event.clientX - drag.x0, event.clientY - drag.y0) > 4) { drag.moved = true; stage.classList.add('is-dragging'); }
         if (drag.moved) {
@@ -2556,12 +4236,18 @@
           const seconds = Math.max(0.008, (event.timeStamp - drag.at) / 1000);
           if (!motion.matches) { vYaw = lerp(vYaw, dx * DRAG_YAW / seconds, 0.5); vPitch = lerp(vPitch, dy * DRAG_PITCH / seconds, 0.5); }
           if (hoverPaper >= 0) setHover(-1);
+          if (hoverWish >= 0) setHoverWish(-1);
         }
         drag.x = event.clientX; drag.y = event.clientY; drag.at = event.timeStamp;
         interact(); redraw();
         return;
       }
-      if (event.pointerType === 'mouse' && drag.id < 0) setHover(nearestPaper(event.clientX, event.clientY, HOVER_RADIUS));
+      if (event.pointerType === 'mouse' && drag.id < 0) {
+        const x = event.clientX; const y = event.clientY;
+        const p = nearestPaper(x, y, HOVER_RADIUS); const w = nearestWish(x, y, HOVER_RADIUS);
+        const wish = w >= 0 && (p < 0 || Math.hypot(wishSX[w] - x, wishSY[w] - y) < Math.hypot(paperSX[p] - x, paperSY[p] - y));
+        setHover(wish ? -1 : p, true); setHoverWish(wish ? w : -1, true);
+      }
     });
     on(stage, 'pointerup', event => {
       // In core view a click on empty space backs out.
@@ -2571,7 +4257,7 @@
     });
     on(stage, 'pointercancel', event => { if (event.pointerId === drag.id || event.pointerId === pinch.id) endDrag(true); });
     on(stage, 'lostpointercapture', event => { if (event.pointerId === drag.id) endDrag(true); });
-    on(stage, 'pointerleave', event => { if (event.pointerType === 'mouse' && drag.id < 0) setHover(-1); });
+    on(stage, 'pointerleave', event => { if (event.pointerType === 'mouse' && drag.id < 0) { setHover(-1); setHoverWish(-1); } });
     on(stage, 'wheel', event => {
       if (mode !== 'chart') return;
       event.preventDefault();
@@ -2604,6 +4290,16 @@
     on(replayButton, 'click', replay);
     on(closeButton, 'click', close);
     on(skipButton, 'click', skip);
+    for (const button of soundButtons) on(button, 'click', () => setSound(!soundOn));
+    // The counter lists the caught questions in the plate when it is focused or clicked.
+    on(countButton, 'click', showWishList);
+    on(countButton, 'focus', () => { if (plateView !== 'wishes') showWishList(); });
+    on(plateDetail, 'click', event => {
+      const target = event.target.closest ? event.target : null; if (!target) return;
+      const row = target.closest('[data-wish]');
+      if (row) { selectWish(Number(row.dataset.wish)); return; }
+      if (target.closest('[data-release]')) releaseWishes();
+    });
     on(centreButton, 'click', enterCore);
     on(centreButton, 'pointerenter', () => { centreHover = true; redraw(); });
     on(centreButton, 'pointerleave', () => { centreHover = false; redraw(); });
@@ -2613,12 +4309,14 @@
     const hoverFromLink = event => {
       const link = event.target.closest && event.target.closest('[data-paper]');
       setHover(link ? Number(link.dataset.paper) : -1);
+      const wish = event.target.closest && event.target.closest('[data-wish]');
+      setHoverWish(wish ? Number(wish.dataset.wish) : -1);
     };
     for (const container of [indexEl, plateDetail]) {
       on(container, 'pointerover', hoverFromLink);
       on(container, 'focusin', hoverFromLink);
-      on(container, 'pointerleave', () => setHover(-1));
-      on(container, 'focusout', () => setHover(-1));
+      on(container, 'pointerleave', () => { setHover(-1); setHoverWish(-1); });
+      on(container, 'focusout', () => { setHover(-1); setHoverWish(-1); });
     }
     on(dialog, 'keydown', event => {
       // Any navigation key reveals the keyboard focus ring that was quiet on open.
@@ -2626,7 +4324,23 @@
       if (mode === 'opening' && event.key === 'Enter' && (event.target === skipButton || !(event.target instanceof HTMLButtonElement))) {
         event.preventDefault(); skip();
       }
+      if (event.altKey || event.ctrlKey || event.metaKey || closed) return;
+      if (event.target.closest && event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
+      // M switches the sound; in the chart, 1-5 choose a theme and Space catches a shooting star.
+      if ((event.key === 'm' || event.key === 'M') && !event.repeat) { setSound(!soundOn); return; }
+      if (mode !== 'chart' || leaving || coreTarget === 1) return;
+      if (event.key >= '1' && event.key <= '5' && event.key.length === 1) { event.preventDefault(); selectTheme(Number(event.key) - 1); return; }
+      if (event.key === ' ' || event.key === 'Spacebar') {
+        // A focused control keeps its own Space; elsewhere Space catches the visible meteor.
+        if (event.target !== stage && event.target.closest && event.target.closest('button, a, summary')) return;
+        if (motion.matches) { if (stillQ >= 0) { event.preventDefault(); catchStill(); } return; }
+        const i = visibleMeteor();
+        if (i >= 0) { event.preventDefault(); catchMeteor(i); redraw(); }
+      }
     });
+    // The first gesture inside the dialog may start (or create) the audio context.
+    on(dialog, 'pointerdown', unlockAudio, { capture: true });
+    on(dialog, 'keydown', unlockAudio, { capture: true });
     // Esc backs out of the core view first; otherwise it closes (a second Esc while closing finishes).
     on(dialog, 'cancel', event => { event.preventDefault(); if (coreTarget === 1 && !leaving) backOut(); else close(); });
     on(dialog, 'close', cleanup);
@@ -2635,16 +4349,26 @@
       if (closed) return;
       if (leaving) { cleanup(); return; }
       if (mode !== 'chart') { remnantT = -2; skip(); }
+      // Meteors and a laid-out question belong to the old layout: pin and clear them.
+      finishCatch(); mOn.fill(0); activeMeteors = 0;
+      if (stillQ >= 0) { stillQ = -1; scheduleStill(); }
       layout(); redraw();
     });
     on(document, 'visibilitychange', () => {
-      if (document.hidden) { if (leaving) { cleanup(); return; } if (raf) cancelAnimationFrame(raf); raf = 0; lastNow = 0; }
-      else { lastNow = 0; redraw(); }
+      if (document.hidden) {
+        if (leaving) { cleanup(); return; }
+        if (raf) cancelAnimationFrame(raf); raf = 0; lastNow = 0;
+        if (audio && !audio.offline && audio.state === 'running') audio.context.suspend().catch(() => {});
+      } else {
+        lastNow = 0; redraw();
+        if (audio && !audio.offline && soundOn && audio.state === 'suspended') audio.context.resume().catch(() => {});
+      }
     });
     on(motion, 'change', () => {
       if (leaving) { cleanup(); return; }
       replayButton.hidden = motion.matches;
-      if (motion.matches) { vYaw = 0; vPitch = 0; zoom = zoomTarget; if (mode !== 'chart') skip(); }
+      if (motion.matches) { vYaw = 0; vPitch = 0; zoom = zoomTarget; if (mode !== 'chart') skip(); finishCatch(); mOn.fill(0); activeMeteors = 0; drawnFade = drawn ? 1 : 0; scheduleStill(); }
+      else { stillQ = -1; clearTimeout(stillTimer); stillTimer = 0; }
       redraw();
     });
 
@@ -2653,17 +4377,50 @@
       get phase() { return phase; },
       get wordCount() { return wordCount; },
       get keyCount() { return keyCount; },
+      get closeStep() { return closeStep(); },
+      get canvasWords() { return canvasWords; },
+      get dawnLines() { return lineCount; },
       get view() { return coreTarget === 1 || coreU > 0 ? 'core' : 'chart'; },
       projectCore() { return { x: chartX, y: chartY }; },
       frameStats: stats,
       projectStar(slug) {
         const p = PAPERS.findIndex(paper => paper.slug === slug);
         return p < 0 ? null : { x: paperSX[p], y: paperSY[p] };
-      }
+      },
+      // Sound: the cue log, the preference, and the voices the synthesizer has scheduled.
+      audioCues,
+      get sound() { return soundOn; },
+      get audioState() { return audio ? audio.state : 'none'; },
+      get voices() { return audio ? audio.scheduled : 0; },
+      // Shooting stars and wishes.
+      get caught() { return caughtCount; },
+      get wishes() { const list = []; for (let q = 0; q < NQ; q++) if (wishPinned[q]) list.push(q); return list; },
+      get drawn() { return drawn; },
+      get catching() { return catchQ; },
+      // Spawn a question meteor now, already inside the viewport (a still wish under reduced
+      // motion); returns its question or -1.
+      spawnMeteor(q) {
+        if (mode !== 'chart' || leaving) return -1;
+        if (motion.matches) return spawnStill(q === undefined ? -1 : q);
+        for (let i = 0; i < METEOR_MAX; i++) if (mOn[i] && mKind[i] !== 1) mOn[i] = 0;
+        if (q === undefined || q < 0 || caught[q]) q = drawn ? -1 : pickQuestion();
+        const i = drawn && q < 0 ? spawnMeteor(2, -1, 0, 0, undefined, true) : q >= 0 ? spawnMeteor(0, q, 0, 0, undefined, true) : -1;
+        redraw();
+        return i < 0 ? -1 : q;
+      },
+      meteorHead() {
+        if (motion.matches) return stillQ >= 0 ? { x: stillX, y: stillY } : null;
+        const i = visibleMeteor();
+        if (i < 0) return null;
+        meteorHeadAt(i); return { x: MX, y: MY };
+      },
+      projectWish(q) { return wishVis[q] ? { x: wishSX[q], y: wishSY[q] } : null; }
     };
 
     /* ---- Open ------------------------------------------------------------ */
+    loadWishes(); updateCount(); renderSoundButtons();
     try {
+      html.style.setProperty('scrollbar-gutter', 'stable');
       body.style.setProperty('overflow', 'hidden', 'important');
       body.append(dialog);
       dialog.showModal();
@@ -2675,6 +4432,7 @@
         // Capture after the scroll lock so positions match the page exactly as it is now drawn.
         prepareWords(captureWords());
         html.classList.add('spira-hide-text');
+        adoptAudio();
         beginOpening();
         // The t = 0 frame is drawn synchronously, so the hidden glyphs and their
         // sprites change in the same paint.
@@ -2688,6 +4446,8 @@
         openingEl.hidden = true; setInert(false);
         closeButton.focus({ preventScroll: true });
         measureUI();
+        adoptAudio(); cue('ambient', t, a => a.cue.ambient(a.now()));
+        scheduleStill();
         if (ctx) { try { render(performance.now()); } catch (error) { console.warn('The spiral could not be drawn.', error); } }
         else canvas.hidden = true;
         schedule();
@@ -2698,5 +4458,6 @@
     }
   }
 
-  window.SiteEasterEgg = { open };
+  // createAudio builds the egg's synthesizer on any BaseAudioContext (tests render it offline).
+  window.SiteEasterEgg = { open, createAudio: (context, options) => createSpiraAudio(context, options) };
 })();

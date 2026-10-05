@@ -1,7 +1,9 @@
 /* Run with agent-browser eval --stdin against a local static preview of the site.
  * Tests the spira easter egg: lazy loading, capture without DOM mutation, the phase
- * sequence, skip, restoration on every exit path, the chart, reduced motion, resize,
- * nested routes and load failure. Prints assertions, failures and frame timing.
+ * sequence, skip, the dawn close and restoration on every exit path, the chart, sound
+ * (offline renders with measured peaks, cue order, the toggle), shooting stars and wishes,
+ * the instrument, reduced motion, resize, nested routes and load failure. Prints
+ * assertions, failures, frame timing and the measured audio peaks.
  */
 (async () => {
   const failures = [];
@@ -17,6 +19,10 @@
   frame.style.cssText = 'position:fixed;inset:0;width:1280px;height:900px;z-index:200000;border:0;background:white';
   document.body.append(frame);
   const storedTheme = localStorage.getItem('theme');
+  // Sound and caught wishes persist in localStorage; the suite starts clean and restores them.
+  const storedSound = localStorage.getItem('spira-sound'); const storedWishes = localStorage.getItem('spira-wishes');
+  localStorage.removeItem('spira-sound'); localStorage.removeItem('spira-wishes');
+  const audioPeaks = {};
   const errors = [];
   const frameStats = {};
   let doc; let win;
@@ -89,7 +95,7 @@
     type();
     await until(() => egg()?.open, 'the password to open the egg');
     check(assets().length === 2, 'The full password loads the script and stylesheet once');
-    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v2')), 'Asset URLs carry v=spira-v2');
+    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v3')), 'Asset URLs carry v=spira-v3');
     check(egg().spira.keyCount === 24, `The key sentence is found in full (${egg().spira.keyCount} of 24 tokens)`);
     await dismiss();
 
@@ -109,6 +115,7 @@
       check(doc.activeElement === focus, `${label}: focus restored`);
       check(doc.documentElement.dataset.theme === 'dark' && localStorage.getItem('theme') === 'dark', `${label}: site theme unchanged`);
       check(main.innerHTML === before.html && identitiesIntact(), `${label}: page markup and text nodes unchanged`);
+      check(!doc.documentElement.style.getPropertyValue('scrollbar-gutter'), `${label}: the scrollbar gutter style is restored`);
       check(pending.size === 0, `${label}: no pending animation frame`);
     };
 
@@ -145,6 +152,15 @@
     const seen = [phase()];
     await until(() => { const now = phase(); if (now && now !== seen[seen.length - 1]) seen.push(now); return now === 'chart'; }, 'the chart phase', 15000);
     check(JSON.stringify(seen) === JSON.stringify(['dusk', 'gather', 'wind', 'ignite', 'chart']), `Phases run dusk > gather > wind > ignite > chart (saw ${seen.join(' > ')})`);
+    // Sound cues follow the timeline: in order, each fired at its own timeline time (at 6x).
+    const cues = egg().spira.audioCues;
+    const order = cues.map(c => c.cue).filter((name, i, all) => name !== all[i - 1]);
+    check(JSON.stringify(order) === JSON.stringify(['dusk', 'gather', 'glint', 'wind', 'hush', 'inhale', 'ignite', 'paper', 'ghost', 'ambient']),
+      `Opening cues fire in order (saw ${order.join(' > ')})`);
+    check(cues.filter(c => c.cue === 'paper').length === 23 && cues.filter(c => c.cue === 'gather').length > 10, 'Each of the 23 papers rings once; the gather plucks a cascade');
+    const cueAt = name => cues.find(c => c.cue === name);
+    const igniteGap = (cueAt('ignite').at - cueAt('dusk').at) * 6 / 1000;
+    check(Math.abs(cueAt('ignite').t - 8.6) < 0.05 && Math.abs(igniteGap - 8.6) < 0.9, `The ignition cue fires at timeline 8.6 s, ${igniteGap.toFixed(2)} s at 6x`);
     check(inertBlocks().every(el => !el.inert), 'Plate, themes and actions are interactive in the chart');
     check(egg().querySelector('.spira-opening').hidden, 'Opening controls are removed from the chart');
     await delay(300);
@@ -195,9 +211,68 @@
     await nextPaint();
     const afterKey = egg().spira.projectStar('godel-agent');
     check(chartCanvas.toDataURL() !== image && Math.hypot(afterKey.x - beforeKey.x, afterKey.y - beforeKey.y) > 5, 'Arrow keys turn the rendered spiral');
+
+    /* The galaxy as an instrument: hovering strums (one note per 70 ms), keys choose themes. */
+    const log = () => egg().spira.audioCues;
+    const count = name => log().filter(c => c.cue === name).length;
+    const move = (x, y) => stage.dispatchEvent(new win.PointerEvent('pointermove', { pointerId: 7, pointerType: 'mouse', clientX: x, clientY: y, bubbles: true }));
+    move(4, 4); await delay(90);
+    const godel = egg().spira.projectStar('godel-agent'); const chem = egg().spira.projectStar('chemagent');
+    const hovers = count('hover');
+    move(godel.x, godel.y); move(chem.x, chem.y);
+    check(count('hover') === hovers + 1, 'Hovering a star rings its bell; a second star within 70 ms is throttled');
+    await delay(90); move(godel.x, godel.y);
+    check(count('hover') === hovers + 2, 'After 70 ms the next star rings again');
+    move(4, 4);
+    pointer('pointerdown', godel.x, godel.y); pointer('pointerup', godel.x, godel.y);
+    check(log()[log().length - 1].cue === 'select', 'Selecting a star rings it with its octave');
+    stage.dispatchEvent(new win.KeyboardEvent('keydown', { key: '4', bubbles: true, cancelable: true }));
+    check(themes[3].getAttribute('aria-pressed') === 'true' && log()[log().length - 1].cue === 'theme', 'Key 4 chooses the fourth theme and plays its papers as an arpeggio');
+    stage.dispatchEvent(new win.KeyboardEvent('keydown', { key: '4', bubbles: true, cancelable: true }));
+    check(stage.getAttribute('aria-label').includes('Keys 1 to 5'), 'The stage label documents the theme keys');
+
+    /* Sound toggle: two text buttons, the M key and a persisted preference. */
+    const soundButtons = [...egg().querySelectorAll('[data-sound]')];
+    check(soundButtons.length === 2 && egg().spira.sound && soundButtons.every(b => b.getAttribute('aria-pressed') === 'true' && b.textContent.includes('Sound on')), 'Sound is on by default, with a toggle in the opening controls and the chart actions');
+    egg().querySelector('.spira-actions [data-sound]').click();
+    check(!egg().spira.sound && localStorage.getItem('spira-sound') === 'off' && soundButtons.every(b => b.getAttribute('aria-pressed') === 'false' && b.textContent.includes('Sound off')), 'The toggle turns sound off, in both buttons, and persists it');
+    const logged = log().length; const voices = egg().spira.voices;
+    themes[0].click(); themes[0].click(); move(godel.x, godel.y); move(4, 4);
+    check(log().length === logged && egg().spira.voices === voices, 'With sound off no cue fires and no voice is scheduled');
     keepStats();
     await dismiss();
     restored('Escape in the chart');
+    await openFast(8);
+    check(!egg().spira.sound && egg().querySelector('[data-sound]').getAttribute('aria-pressed') === 'false', 'The sound preference survives a re-open');
+    egg().dispatchEvent(new win.KeyboardEvent('keydown', { key: 'm', bubbles: true, cancelable: true }));
+    check(egg().spira.sound && localStorage.getItem('spira-sound') === 'on', 'The M key turns sound back on');
+    await dismiss();
+
+    /* Sound renders offline: the same synthesizer on an OfflineAudioContext, measured. */
+    const render = async (seconds, play) => {
+      const rate = 48000; const context = new win.OfflineAudioContext(2, Math.round(rate * seconds), rate);
+      const audio = win.SiteEasterEgg.createAudio(context, { fadeIn: false });
+      play(audio);
+      const scheduled = audio.scheduled; const buffer = await context.startRendering();
+      let peak = 0;
+      for (let c = 0; c < buffer.numberOfChannels; c++) { const data = buffer.getChannelData(c); for (let i = 0; i < data.length; i++) { const v = Math.abs(data[i]); if (v > peak) peak = v; } }
+      return { peak: +peak.toFixed(4), scheduled };
+    };
+    const melody = [[2022, 0], [2023, 0], [2023, 1], [2024, 0], [2024, 0], [2024, 1], [2024, 1], [2024, 2], [2024, 2], [2024, 3], [2025, 0], [2025, 0],
+      [2025, 0], [2025, 1], [2025, 2], [2025, 2], [2025, 3], [2025, 4], [2025, 4], [2025, 4], [2026, 2], [2026, 3], [2026, 3]];
+    const renders = {
+      ignition: await render(3, audio => audio.cue.ignite(0.05)),
+      melody: await render(5.5, audio => melody.forEach(([year, theme], i) => audio.cue.paper(0.05 + i * 0.14, theme, year, (i % 5) / 2.5 - 0.8))),
+      whoosh: await render(1.4, audio => audio.cue.whoosh(0.05, 0.9, -0.7, 0.7)),
+      catch: await render(2.6, audio => audio.cue.catch(0.05, 1, 3, 0.2))
+    };
+    for (const [name, result] of Object.entries(renders)) {
+      audioPeaks[name] = result.peak;
+      check(result.peak > 0.01 && result.peak < 0.9, `Offline ${name}: audible and unclipped (peak ${result.peak})`);
+    }
+    check(renders.melody.scheduled === 23, 'The research melody schedules one bell per paper');
+    const silent = await render(0.5, audio => { audio.setEnabled(false); audio.cue.ignite(0.05); audio.cue.paper(0.1, 0, 2022, 0); });
+    check(silent.scheduled === 0 && silent.peak === 0, 'With sound off the synthesizer schedules no voices');
 
     /* 4. Skip by button and by Enter. */
     await openFast(4);
@@ -214,14 +289,29 @@
     await dismiss();
     restored('Escape after Enter skip');
 
-    /* Closing is a bookend: a 'closing' phase, glyphs back at once, full restoration after. */
-    await openFast(8);
+    /* Closing is a dawn: the page reassembles on the canvas; glyphs and DOM swap on the last frame. */
+    await openFast(4);
     egg().querySelector('[data-skip]').click();
     await delay(150);
-    egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
-    check(phase() === 'closing' && !doc.documentElement.classList.contains('spira-hide-text'), 'Close enters the closing phase with the page glyphs restored first');
-    await until(() => !egg(), 'the closing to finish');
-    restored('After the closing animation');
+    keepStats();
+    const dawn = egg();
+    check(doc.documentElement.style.getPropertyValue('scrollbar-gutter') === 'stable', 'The scrollbar gutter is stable while the egg is open');
+    dawn.dispatchEvent(new win.Event('cancel', { cancelable: true }));
+    check(phase() === 'closing' && doc.documentElement.classList.contains('spira-hide-text'), 'Close enters the closing phase; the page glyphs stay hidden until the swap');
+    const steps = []; const counts = new Set(); let attachedAtDawn = false;
+    await until(() => {
+      if (!dawn.isConnected) return true;
+      const step = dawn.spira.closeStep;
+      if (step && step !== steps[steps.length - 1]) steps.push(step);
+      if (step === 'home' || step === 'dawn') counts.add(dawn.spira.canvasWords);
+      if (step === 'dawn') attachedAtDawn = doc.documentElement.classList.contains('spira-hide-text') && dawn.open;
+      return false;
+    }, 'the dawn to finish', 8000);
+    check(JSON.stringify(steps) === JSON.stringify(['collapse', 'bloom', 'home', 'dawn']), `The dawn runs collapse > bloom > home > dawn (saw ${steps.join(' > ')})`);
+    check(counts.size === 1 && [...counts][0] === dawn.spira.wordCount, `Every word stays on the canvas through the flight home (${[...counts].join(', ')} of ${dawn.spira.wordCount})`);
+    check(dawn.spira.dawnLines > 5 && dawn.spira.dawnLines < dawn.spira.wordCount / 3, `Words fly home as page lines (${dawn.spira.dawnLines} lines for ${dawn.spira.wordCount} words)`);
+    check(attachedAtDawn, 'The dialog and the hidden glyphs remain until the dawn ends');
+    restored('After the dawn');
     await openFast(1);
     egg().querySelector('[data-skip]').click();
     await delay(100);
@@ -260,6 +350,55 @@
     await until(() => !egg(), 'the closing after core view');
     restored('Escape after the core view');
 
+    /* Shooting stars carry open questions: catch, pin, persist, Space, all ten, release. */
+    await openFast(8);
+    egg().querySelector('[data-skip]').click();
+    const sky = egg(); const skyStage = sky.querySelector('.spira-stage');
+    const counter = sky.querySelector('.spira-count');
+    check(counter.classList.contains('is-pending') && !sky.querySelector('.spira-hint').textContent.includes('shooting star'), 'Before any meteor the counter and the catch hint are not shown');
+    await delay(450);
+    const tap = (x, y) => { for (const type of ['pointerdown', 'pointerup']) skyStage.dispatchEvent(new win.PointerEvent(type, { pointerId: 5, pointerType: 'mouse', button: 0, clientX: x, clientY: y, bubbles: true, cancelable: true })); };
+    const first = sky.spira.spawnMeteor();
+    const head = sky.spira.meteorHead();
+    check(first >= 0 && head && head.x >= 0 && head.x <= 1280 && head.y >= 0 && head.y <= 900, 'A spawned meteor carries a question and is in view');
+    tap(head.x + 20, head.y + 20);
+    check(sky.spira.caught === 1 && sky.spira.catching === first, 'Clicking within 44 px of the head catches it');
+    check(!counter.classList.contains('is-pending') && counter.textContent.includes('1 / 10') && sky.querySelector('.spira-hint').textContent.includes('Catch a shooting star'), 'The counter and the catch hint appear');
+    check(sky.querySelector('.spira-status').textContent.includes('caught'), 'The catch is announced politely');
+    await until(() => sky.spira.wishes.includes(first), 'the question to be pinned', 4000);
+    await nextPaint();
+    const wish = sky.spira.projectWish(first);
+    check(!!wish && JSON.parse(localStorage.getItem('spira-wishes')).includes(first), 'The question is pinned on the next turn as a wish star, and saved');
+    tap(wish.x, wish.y);
+    check(sky.querySelector('.spira-plate-kicker')?.textContent.startsWith('Open question ·'), 'Clicking the wish star shows its open question in the plate');
+    const second = sky.spira.spawnMeteor();
+    skyStage.focus();
+    skyStage.dispatchEvent(new win.KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+    check(second >= 0 && sky.spira.caught === 2, 'Space catches the visible meteor');
+    keepStats();
+    await dismiss();
+    await openFast(8);
+    egg().querySelector('[data-skip]').click();
+    await delay(100);
+    check(egg().spira.caught === 2 && egg().spira.wishes.length === 2, 'Caught questions are on the next turn after a re-open');
+    for (let k = 0; k < 8; k++) {
+      egg().spira.spawnMeteor();
+      const at = egg().spira.meteorHead(); const stageNow = egg().querySelector('.spira-stage');
+      for (const type of ['pointerdown', 'pointerup']) stageNow.dispatchEvent(new win.PointerEvent(type, { pointerId: 5, pointerType: 'mouse', button: 0, clientX: at.x, clientY: at.y, bubbles: true, cancelable: true }));
+    }
+    check(egg().spira.caught === 10, 'Ten catches catch all ten questions');
+    await until(() => egg().spira.drawn, 'the next turn to be drawn', 4000);
+    const drawnPlate = egg().querySelector('.spira-plate-detail');
+    check(drawnPlate.textContent.includes('The next turn is drawn.') && drawnPlate.querySelector('a')?.pathname === '/blogs/agents-that-learn-after-deployment.html', 'All ten draw the next turn and link the research direction');
+    check(egg().spira.audioCues.some(c => c.cue === 'swell'), 'Completion swells');
+    await delay(200);
+    keepStats();
+    egg().querySelector('.spira-count').click();
+    check(egg().querySelectorAll('.spira-wish-row').length === 10, 'The counter lists the caught questions');
+    egg().querySelector('[data-release]').click();
+    check(egg().spira.caught === 0 && !egg().spira.drawn && localStorage.getItem('spira-wishes') === null, 'Release them clears the caught questions');
+    await dismiss();
+
     /* 5. Escape during each phase restores everything. */
     for (const target of ['dusk', 'gather', 'wind', 'ignite', 'chart']) {
       await openFast(target === 'dusk' ? 2 : 8);
@@ -291,6 +430,15 @@
     await nextPaint(); await nextPaint();
     check(pending.size === 0, 'Reduced motion leaves no pending animation frame after two frames');
     check(egg().querySelector('[data-replay]').hidden, 'Replay is hidden under reduced motion');
+    const stillQ = egg().spira.spawnMeteor(); const still = egg().spira.meteorHead();
+    check(stillQ >= 0 && !!still, 'Reduced motion: a wish waits as a still star');
+    const rmStill = egg().querySelector('.spira-stage');
+    for (const type of ['pointerdown', 'pointerup']) rmStill.dispatchEvent(new win.PointerEvent(type, { pointerId: 12, pointerType: 'mouse', button: 0, clientX: still.x, clientY: still.y, bubbles: true, cancelable: true }));
+    check(egg().spira.caught === 1 && egg().spira.wishes.includes(stillQ) && !egg().spira.meteorHead() &&
+      egg().querySelector('.spira-plate-kicker')?.textContent.startsWith('Open question ·'), 'Reduced motion: catching the still star pins it at once and shows its question');
+    await nextPaint(); await nextPaint();
+    check(pending.size === 0, 'Reduced motion: a still wish keeps no running loop');
+    localStorage.removeItem('spira-wishes');
     const rmCore = egg().spira.projectCore();
     const rmStage = egg().querySelector('.spira-stage');
     for (const type of ['pointerdown', 'pointerup']) rmStage.dispatchEvent(new win.PointerEvent(type, { pointerId: 11, pointerType: 'mouse', button: 0, clientX: rmCore.x, clientY: rmCore.y, bubbles: true, cancelable: true }));
@@ -359,10 +507,12 @@
   finally {
     frame.remove();
     if (storedTheme === null) localStorage.removeItem('theme'); else localStorage.setItem('theme', storedTheme);
+    if (storedSound === null) localStorage.removeItem('spira-sound'); else localStorage.setItem('spira-sound', storedSound);
+    if (storedWishes === null) localStorage.removeItem('spira-wishes'); else localStorage.setItem('spira-wishes', storedWishes);
   }
   /* 11. No uncaught errors or console.error calls. */
   assertions++;
   if (errors.length) failures.push(`Errors: ${errors.join(' | ')}`);
   mergeStats();
-  return { assertions, failures, frameStats };
+  return { assertions, failures, frameStats, audioPeaks };
 })();

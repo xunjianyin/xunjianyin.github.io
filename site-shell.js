@@ -160,14 +160,28 @@
     let eggLoading = null;
     let eggReady = false;
     const footnote = document.querySelector('.easter-egg-footnote');
+    // Browsers start audio only inside a user gesture, and this runs in the keydown or click
+    // that opens the egg: create and resume an AudioContext now, unless the visitor turned the
+    // sound off. The egg adopts it (and creates its own later if this fails).
+    function primeEggAudio() {
+      try {
+        if (window.__spiraAudioContext || localStorage.getItem('spira-sound') === 'off') return;
+        const Context = window.AudioContext || window.webkitAudioContext;
+        if (!Context) return;
+        const context = new Context();
+        if (context.resume) context.resume().catch(() => {});
+        window.__spiraAudioContext = context;
+      } catch (error) { /* sound is optional */ }
+    }
     function openEasterEgg() {
+      primeEggAudio();
       if (eggReady) { window.SiteEasterEgg.open(); return; }
       if (eggLoading) return;
       const script = document.createElement('script');
       const style = document.createElement('link');
-      script.src = toRootHref('easter-egg.js?v=spira-v2');
+      script.src = toRootHref('easter-egg.js?v=spira-v3');
       style.rel = 'stylesheet';
-      style.href = toRootHref('easter-egg.css?v=spira-v2');
+      style.href = toRootHref('easter-egg.css?v=spira-v3');
       if (footnote) footnote.setAttribute('aria-busy', 'true');
       eggLoading = Promise.all([script, style].map(asset => new Promise((resolve, reject) => {
         asset.onload = resolve;
@@ -180,6 +194,8 @@
       }).catch(() => {
         script.remove();
         style.remove();
+        try { window.__spiraAudioContext?.close().catch(() => {}); } catch (error) { /* already closed */ }
+        window.__spiraAudioContext = undefined;
         if (footnote) footnote.title = 'Could not load. Click to try again.';
       }).finally(() => {
         eggLoading = null;
