@@ -7,7 +7,7 @@
   const check = (condition, label) => { assertions++; if (!condition) failures.push(label); };
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
   const until = async predicate => {
-    for (let i = 0; i < 240; i++) { if (predicate()) return; await delay(25); }
+    for (let i = 0; i < 520; i++) { if (predicate()) return; await delay(25); }
     throw new Error('Timed out waiting for the research atlas.');
   };
   const frame = document.createElement('iframe');
@@ -60,7 +60,7 @@
     const focus = doc.querySelector('#theme-toggle'); focus.focus();
     doc.documentElement.dataset.theme = 'dark'; localStorage.setItem('theme', 'dark');
     doc.body.style.setProperty('overflow', 'auto', 'important');
-    const main = doc.querySelector('#main-content'); const before = main.innerHTML;
+    const main = doc.querySelector('#main-content'); const before = main.innerHTML; const beforeText = main.textContent;
     win.scrollTo({ top: 410, behavior: 'instant' }); const beforeScroll = win.scrollY;
     const pending = new Set();
     const originalRAF = win.requestAnimationFrame.bind(win); const originalCancel = win.cancelAnimationFrame.bind(win);
@@ -70,7 +70,7 @@
     check(assets().length === 2, 'First complete password loads the script and stylesheet once');
     check(atlas().matches(':modal'), 'Native modal prevents interaction with the background');
     check(atlas().contains(doc.activeElement), 'Opening focuses a modal control');
-    check(main.innerHTML === before, 'Opening does not rewrite the live page');
+    check(main.textContent === beforeText, 'Opening preserves the page text while it is lifted');
     check(!/flora|furong|yeye|petal|serendipity/i.test(atlas().textContent), 'Unrelated botanical names are absent');
     await close();
     check(main.innerHTML === before, 'Early dismissal preserves text, styles and disclosure state');
@@ -125,10 +125,10 @@
     await delay(1100); check(pending.size === 0, 'The horizon transition also settles without an idle loop');
     reset(); await delay(1100);
     check(!atlas().classList.contains('is-frontier') && !atlas().dataset.selection && workLinks().length === 23, 'Reset clears selection, horizon, and paper filters');
-    const imageBefore = atlas().querySelector('canvas').toDataURL();
+    const imageBefore = atlas().querySelector('.atlas-stage canvas').toDataURL();
     stage().focus(); stage().dispatchEvent(new win.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
     await nextPaint();
-    check(atlas().querySelector('canvas').toDataURL() !== imageBefore, 'Arrow keys rotate the rendered map');
+    check(atlas().querySelector('.atlas-stage canvas').toDataURL() !== imageBefore, 'Arrow keys rotate the rendered map');
     await delay(80); check(pending.size === 0, 'Keyboard rotation stops after drawing');
     await close(); check(main.innerHTML === before && assets().length === 2, 'Exploration preserves the source page and reuses assets');
     win.requestAnimationFrame = originalRAF; win.cancelAnimationFrame = originalCancel;
@@ -139,7 +139,7 @@
     check(question().includes('actions') && atlas().classList.contains('has-pair'), 'Reduced motion retains the paired-question interaction');
     for (const [width, height] of [[1440, 900], [768, 1024], [700, 800], [390, 844], [320, 568], [844, 390]]) {
       frame.style.width = `${width}px`; frame.style.height = `${height}px`;
-      await until(() => Math.abs(atlas().querySelector('canvas').width - stage().getBoundingClientRect().width * Math.min(win.devicePixelRatio, 2)) < 1);
+      await until(() => Math.abs(atlas().querySelector('.atlas-stage canvas').width - stage().getBoundingClientRect().width * Math.min(win.devicePixelRatio, 2)) < 1);
       await nextPaint();
       check(atlas().scrollWidth <= width + 1, `${width}×${height}: no horizontal overflow`);
       const s = stage().getBoundingClientRect();

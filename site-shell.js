@@ -165,9 +165,9 @@
       if (eggLoading) return;
       const script = document.createElement('script');
       const style = document.createElement('link');
-      script.src = toRootHref('easter-egg.js?v=atlas-v4');
+      script.src = toRootHref('easter-egg.js?v=atlas-v5');
       style.rel = 'stylesheet';
-      style.href = toRootHref('easter-egg.css?v=atlas-v4');
+      style.href = toRootHref('easter-egg.css?v=atlas-v5');
       if (footnote) footnote.setAttribute('aria-busy', 'true');
       eggLoading = Promise.all([script, style].map(asset => new Promise((resolve, reject) => {
         asset.onload = resolve;

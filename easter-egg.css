@@ -1,7 +1,8 @@
 /* A research instrument with room beyond its current evidence. */
 #research-atlas {
-  --atlas-paper: #f7f8f5; --atlas-ink: #283a32; --atlas-muted: #626f67;
-  --atlas-blue: #00599f; --atlas-line: #cbd4cb;
+  --atlas-paper: #070f1b; --atlas-ink: #e4edf7; --atlas-muted: #9cacc0;
+  --atlas-blue: #99d3ff; --atlas-line: #233449;
+  color-scheme: dark;
   position: fixed; inset: 0; box-sizing: border-box;
   width: 100%; max-width: none; height: 100%; height: 100dvh; max-height: none;
   margin: 0; padding: 0; border: 0; overflow: auto; overscroll-behavior: contain;
@@ -17,7 +18,7 @@
 #research-atlas button { border-radius: 0; box-shadow: none; cursor: pointer; }
 #research-atlas :focus { outline: none; }
 #research-atlas :focus-visible { outline: 1px solid var(--atlas-blue); outline-offset: 5px; }
-#research-atlas .atlas-sheet { max-width: 1400px; margin: 0 auto; padding: 22px 56px 22px; }
+#research-atlas .atlas-sheet { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 22px 56px 22px; }
 #research-atlas .atlas-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 13px; border-bottom: 1px solid var(--atlas-line); }
 #research-atlas .atlas-signature { font-size: 13px; font-weight: 700; }
 #research-atlas .atlas-signature span { margin-left: 12px; color: var(--atlas-muted); font-weight: 400; font-size: 11px; }
@@ -34,7 +35,7 @@
 #research-atlas .atlas-stage.is-dragging { cursor: grabbing; }
 #research-atlas .atlas-stage.over-paper { cursor: pointer; }
 #research-atlas canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-#research-atlas .atlas-thread { position: absolute; z-index: 1; display: grid; grid-template-columns: 22px 1fr; align-content: center; min-height: 52px; gap: 5px 7px; padding: 7px 10px; border: 0; background: var(--atlas-paper); color: var(--atlas-ink); text-align: left; }
+#research-atlas .atlas-thread { position: absolute; z-index: 1; display: grid; grid-template-columns: 22px 1fr; align-content: center; min-height: 52px; gap: 5px 7px; padding: 7px 10px; border: 0; background: transparent; color: var(--atlas-ink); text-align: left; }
 #research-atlas .atlas-thread-number { font: 9px ui-monospace, monospace; color: var(--atlas-muted); padding-top: 3px; }
 #research-atlas .atlas-thread-name { font-size: 14px; }
 #research-atlas .atlas-thread-count { grid-column: 2; color: var(--atlas-muted); font-size: 9px; }
@@ -52,7 +53,7 @@
 #research-atlas .atlas-readout .atlas-eyebrow { color: var(--atlas-blue); font-size: 9px; letter-spacing: .08em; }
 #research-atlas #atlas-question { margin: 0; border: 0; padding: 0; font: 400 clamp(23px, 2.15vw, 30px)/1.22 Georgia, serif; letter-spacing: -.02em; color: var(--atlas-ink); }
 #research-atlas .atlas-reading p { margin: 0 0 12px; color: var(--atlas-muted); font-size: 12px; line-height: 1.85; }
-#research-atlas .atlas-reading a { font-size: 11px; color: var(--atlas-blue); text-decoration: none; border-bottom: 1px solid #b5c9d2; padding-bottom: 2px; }
+#research-atlas .atlas-reading a { font-size: 11px; color: var(--atlas-blue); text-decoration: none; border-bottom: 1px solid #365c7d; padding-bottom: 2px; }
 #research-atlas .atlas-works { border-top: 1px solid var(--atlas-line); }
 #research-atlas .atlas-works summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 49px; cursor: pointer; list-style: none; color: var(--atlas-muted); font-size: 11px; }
 #research-atlas .atlas-works summary::-webkit-details-marker { display: none; }
@@ -71,19 +72,20 @@
 #research-atlas .atlas-footer p span { color: var(--atlas-muted); }
 #research-atlas .atlas-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 #research-atlas .atlas-replay { font-size: 10px; min-height: 36px; padding: 6px 0; }
-#research-atlas.is-opening { background: rgb(247 248 245 / var(--atlas-reveal, 0)); overflow: hidden; opacity: 1; transition: none; }
+#research-atlas.is-opening { background: rgb(7 15 27 / var(--atlas-reveal, 0)); overflow: hidden; opacity: 1; transition: none; }
+#research-atlas.is-opening[data-phase='settle'] { background: var(--atlas-paper); }
 #research-atlas.is-opening.is-leaving { opacity: 0; transition: opacity 220ms ease; }
-#research-atlas.is-opening .atlas-sheet { opacity: var(--atlas-reveal, 0); }
+#research-atlas.is-opening .atlas-sheet, #research-atlas.is-opening .atlas-sky { opacity: var(--atlas-reveal, 0); }
 #research-atlas .atlas-opening { --opening-ink: #d0dfec; position: fixed; inset: 0; z-index: 4; overflow: hidden; touch-action: none; }
 #research-atlas .atlas-opening-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-#research-atlas .atlas-opening-controls { position: absolute; inset: 20px 34px auto; display: flex; align-items: center; justify-content: space-between; gap: 18px; color: var(--opening-ink); }
+#research-atlas .atlas-opening-controls { position: absolute; inset: auto 34px 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; color: var(--opening-ink); }
 #research-atlas .atlas-opening-controls > span { font: italic 14px Georgia, serif; }
 #research-atlas .atlas-opening-controls > div { display: flex; align-items: center; gap: 24px; }
 #research-atlas .atlas-opening-controls button { min-height: 44px; border: 0; background: transparent; padding: 8px 0; color: var(--opening-ink); font-size: 11px; }
 #research-atlas .atlas-opening-controls button span { padding-left: 8px; opacity: .6; }
 #research-atlas .atlas-opening-controls :focus-visible { outline-color: var(--opening-ink); }
 @media (max-width: 700px) {
-  #research-atlas .atlas-opening-controls { inset: 12px 22px auto; gap: 12px; }
+  #research-atlas .atlas-opening-controls { inset: auto 22px 12px; gap: 12px; }
   #research-atlas .atlas-opening-controls > div { gap: 18px; }
   #research-atlas .atlas-opening-controls > span { font-size: 12px; }
   #research-atlas .atlas-opening-controls button { font-size: 10px; }
@@ -120,3 +122,8 @@
   #research-atlas .atlas-footer p:last-child { text-align: left; margin-top: 9px; }
 }
 @media (prefers-reduced-motion: reduce) { #research-atlas, #research-atlas * { transition: none !important; } }
+
+#research-atlas canvas.atlas-sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+#research-atlas .atlas-lift { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+#research-atlas .atlas-lift-word { position: absolute; display: block; white-space: pre; transform-origin: center; will-change: transform, opacity; }
+#research-atlas .atlas-opening-controls { z-index: 2; }

@@ -171,27 +171,102 @@
 ];
   let active = false;
 
-  // Capture only visible words. The page itself stays untouched throughout.
+  // Measure the real page typography before temporarily concealing its text nodes.
   function captureWords(root) {
     const words = [];
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     let node; let visited = 0;
-    while ((node = walker.nextNode()) && words.length < 76 && visited++ < 1600) {
+    while ((node = walker.nextNode()) && words.length < 480 && visited++ < 2400) {
       const parent = node.parentElement;
-      if (!parent || parent.closest('script, style, button, [hidden], .atlas-opening')) continue;
+      if (!parent || parent.closest('script, style, button, nav, [hidden], .atlas-opening, .skip-link')) continue;
       const box = parent.getBoundingClientRect();
       if (box.bottom < 0 || box.top > innerHeight || !box.width || !box.height) continue;
       const style = getComputedStyle(parent);
-      if (style.visibility === 'hidden' || style.display === 'none') continue;
-      for (const match of node.textContent.matchAll(/[\p{L}\p{N}][\p{L}\p{N}’'-]{2,17}/gu)) {
-        const range = document.createRange(); range.setStart(node, match.index); range.setEnd(node, match.index + match[0].length);
+      if (style.visibility === 'hidden' || style.display === 'none' || Number(style.opacity) === 0) continue;
+      const capture = (start, end) => {
+        const range = document.createRange(); range.setStart(node, start); range.setEnd(node, end);
         const r = range.getBoundingClientRect();
-        if (r.top < 5 || r.bottom > innerHeight - 8 || r.left < 0 || r.right > innerWidth || !r.width) continue;
-        words.push({ text: match[0], x: r.left, y: r.top + r.height * .79, size: Math.min(24, parseFloat(style.fontSize) || 14), font: style.fontFamily });
-        if (words.length >= 76) break;
+        if (r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth || !r.width) return;
+        words.push({ text: node.textContent.slice(start, end), node, start, end, x: r.left, y: r.top, width: r.width, height: r.height,
+          size: parseFloat(style.fontSize) || 14, font: style.fontFamily, weight: style.fontWeight,
+          fontStyle: style.fontStyle, spacing: style.letterSpacing, transform: style.textTransform, color: style.color });
+      };
+      for (const match of node.textContent.matchAll(/\S+/gu)) {
+        const range = document.createRange(); range.setStart(node, match.index); range.setEnd(node, match.index + match[0].length);
+        const rects = [...range.getClientRects()];
+        if (rects.length <= 1 || rects.every(r => Math.abs(r.top - rects[0].top) < 1)) {
+          capture(match.index, match.index + match[0].length); continue;
+        }
+        // Hyphenated words can wrap. Preserve each visible line's own glyph positions.
+        let start = match.index; let offset = start; let top = null;
+        for (const character of match[0]) {
+          range.setStart(node, offset); range.setEnd(node, offset + character.length);
+          const r = range.getBoundingClientRect();
+          if (top !== null && Math.abs(r.top - top) > 1) { capture(start, offset); start = offset; }
+          top = r.top; offset += character.length;
+        }
+        capture(start, offset);
       }
     }
     return words;
+  }
+
+  function liftWords(layer, words) {
+    const host = document.createElement('div'); host.className = 'atlas-lift'; host.setAttribute('aria-hidden', 'true');
+    const sources = new Map(); const fragments = [];
+    // Each entire Text node is wrapped once, keeping its exact inline layout.
+    // Restoration reuses the original nodes and never rebuilds a parent element.
+    const restore = () => {
+      for (const [node, wrapper] of sources) {
+        if (wrapper.parentNode && node.parentNode === wrapper) wrapper.replaceWith(node);
+      }
+      sources.clear(); host.remove();
+    };
+    try {
+      for (const word of words) {
+        if (!word.node.isConnected) continue;
+        if (!sources.has(word.node)) {
+          const wrapper = document.createElement('span'); wrapper.dataset.atlasSource = '';
+          wrapper.style.setProperty('visibility', 'hidden', 'important');
+          word.node.replaceWith(wrapper); wrapper.append(word.node); sources.set(word.node, wrapper);
+        }
+        const fragment = document.createElement('span'); fragment.className = 'atlas-lift-word'; fragment.textContent = word.text;
+        Object.assign(fragment.style, { left: `${word.x}px`, top: `${word.y}px`, fontFamily: word.font,
+          fontSize: `${word.size}px`, fontWeight: word.weight, fontStyle: word.fontStyle,
+          letterSpacing: word.spacing, textTransform: word.transform, lineHeight: `${word.height}px`, color: word.color });
+        host.append(fragment); fragments.push({ word, fragment });
+      }
+      layer.append(host);
+    } catch (error) { restore(); throw error; }
+    return {
+      restore,
+      render(time, dark, w, h) {
+        const cx = w * .5, cy = h * .43;
+        fragments.forEach(({ word, fragment }, i) => {
+          const delay = .85 + clamp(word.y / h, 0, 1) * .36 + (i % 5) * .055;
+          const p = smooth((time - delay) / 3.35);
+          const dx = cx - word.x - word.width / 2, dy = cy - word.y - word.height / 2;
+          const distance = Math.hypot(dx, dy) || 1;
+          const bend = Math.sin(p * Math.PI) * (40 + (i % 7) * 13) * (i % 2 ? 1 : -1);
+          const x = dx * p - dy / distance * bend, y = dy * p + dx / distance * bend;
+          const scale = 1 - smooth((p - .53) / .47) * .88;
+          const tilt = Math.sin(p * Math.PI) * ((i % 7) - 3) * 2;
+          fragment.style.transform = `translate3d(${x}px,${y}px,0) rotate(${tilt}deg) scale(${scale})`;
+          fragment.style.opacity = String(1 - smooth((p - .87) / .13));
+          fragment.style.color = dark > .56 ? '#d9e9ff' : word.color;
+        });
+      },
+      resize() {
+        fragments.forEach(({ word, fragment }) => {
+          const range = document.createRange(); range.setStart(word.node, word.start); range.setEnd(word.node, word.end);
+          const r = range.getBoundingClientRect();
+          word.x = r.left; word.y = r.top; word.width = r.width; word.height = r.height;
+          fragment.style.left = `${r.left}px`; fragment.style.top = `${r.top}px`;
+          fragment.style.fontSize = getComputedStyle(word.node.parentElement).fontSize;
+          fragment.style.lineHeight = `${r.height}px`;
+        });
+      }
+    };
   }
 
   /** A finite, active-time canvas sequence: gather → bursts → atlas. */
@@ -210,15 +285,18 @@
     layer.querySelector('[data-enter]').onclick = finish;
     layer.querySelector('[data-opening-close]').onclick = close;
     let w = 0; let h = 0; let targets = []; let time = 0;
+    let lifted = null;
+    layer.restoreText = () => { lifted?.restore(); lifted = null; };
+    lifted = liftWords(layer, words);
     let seed = 4173;
     const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) | 0; return (seed >>> 0) / 4294967296; };
     const palette = [[170, 216, 255], [244, 204, 139], [151, 170, 255], [141, 223, 216], [220, 232, 255]];
     const bursts = [
-      { at: 1.05, x: .50, y: .43, scale: 1.14 },
-      { at: 1.62, x: .27, y: .36, scale: .73 },
-      { at: 2.04, x: .74, y: .40, scale: .89 },
-      { at: 2.38, x: .41, y: .27, scale: .64 },
-      { at: 2.67, x: .63, y: .29, scale: .69 }
+      { at: 5.05, x: .50, y: .43, scale: 1.14 },
+      { at: 5.62, x: .27, y: .36, scale: .73 },
+      { at: 6.04, x: .74, y: .40, scale: .89 },
+      { at: 6.38, x: .41, y: .27, scale: .64 },
+      { at: 6.67, x: .63, y: .29, scale: .69 }
     ];
     // Bounded counts and DPR avoid unbounded work on phones and retina screens.
     const sparks = bursts.flatMap((burst, group) => Array.from({ length: innerWidth < 700 ? 85 : 140 }, (_, i) => ({
@@ -233,6 +311,7 @@
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       targets = getTargets();
+      lifted?.resize();
     }
     function location(spark, at) {
       const age = Math.max(0, at - spark.burst.at);
@@ -241,7 +320,7 @@
       const angle = spark.angle + spark.bend * age * .16;
       const x = spark.burst.x * w + Math.cos(angle) * distance;
       const y = spark.burst.y * h + Math.sin(angle) * distance * .87 + age * age * 21;
-      const settle = smooth((at - 3.18) / 1.66);
+      const settle = smooth((at - 7.18) / 1.66);
       const end = targets[spark.destination % targets.length] || { x: w / 2, y: h / 2 };
       const arc = Math.sin(settle * Math.PI);
       return { x: x + (end.x - x) * settle + arc * spark.bend * Math.min(w * .35, 220),
@@ -255,70 +334,47 @@
     }
     function render() {
       ctx.clearRect(0, 0, w, h);
-      const dark = smooth(time / .56);
-      const dawn = smooth((time - 3.82) / 1.28);
-      const vanish = 1 - smooth((time - 4.95) / .25);
+      const dark = smooth((time - .9) / 3.4);
+      const arrival = smooth((time - 7.55) / 1.55);
+      const vanish = 1 - arrival;
       ctx.fillStyle = `rgba(7,15,27,${dark * vanish})`; ctx.fillRect(0, 0, w, h);
-      const reveal = smooth((time - 3.48) / .36);
-      dialog.style.setProperty('--atlas-reveal', reveal);
-      layer.style.setProperty('--opening-ink', dawn > .93 || dark < .5 ? '#334e60' : '#d0dfec');
-      // Open the light page through a soft aperture, avoiding a grey full-screen fade.
-      if (dawn > 0) {
-        const cx = targets.reduce((sum, p) => sum + p.x, 0) / (targets.length || 1);
-        const cy = targets.reduce((sum, p) => sum + p.y, 0) / (targets.length || 1);
-        const reach = Math.hypot(Math.max(cx, w - cx), Math.max(cy, h - cy)) * 1.25;
-        const aperture = Math.max(1, reach * dawn);
-        const g = ctx.createRadialGradient(cx, cy, aperture * .76, cx, cy, aperture);
-        g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = g;
-        ctx.fillRect(0, 0, w, h); ctx.globalCompositeOperation = 'source-over';
-      }
-      const phase = time < 1.05 ? 'gather' : time < 3.18 ? 'burst' : 'settle';
+      dialog.style.setProperty('--atlas-reveal', arrival);
+      const sourceDark = document.documentElement.dataset.theme === 'dark';
+      layer.style.setProperty('--opening-ink', sourceDark || dark > .56 ? '#d0dfec' : '#334e60');
+      const phase = time < 5.05 ? 'gather' : time < 7.18 ? 'burst' : 'settle';
       if (dialog.dataset.phase !== phase) dialog.dataset.phase = phase;
       ctx.globalCompositeOperation = 'lighter';
-      const starlight = smooth((time - .35) / .8) * (1 - dawn) * vanish;
+      const starlight = smooth((time - 2.5) / 1.8) * vanish;
       for (const star of dust) {
         ctx.fillStyle = `rgba(158,191,221,${(.15 + star.a * .35) * starlight})`;
         ctx.beginPath(); ctx.arc(star.x * w, star.y * h - time * (1 + star.a * 2), star.size, 0, TAU); ctx.fill();
       }
-      // Words leave their original screen positions along curved inward paths.
-      if (time < 1.30) {
-        const gather = smooth((time - .08) / .97);
-        const cx = w * .5, cy = h * .43;
-        for (let i = 0; i < words.length; i++) {
-          const word = words[i];
-          const p = smooth((time - (i % 7) * .023) / 1.03);
-          const x = word.x + (cx - word.x) * p;
-          const y = word.y + (cy - word.y) * p - Math.sin(p * Math.PI) * (28 + i % 4 * 16);
-          const alpha = (1 - smooth((time - .8) / .48)) * (.22 + dark * .78);
-          ctx.font = `${word.size * (1 - .7 * p)}px ${word.font}`;
-          ctx.fillStyle = `rgba(194,220,241,${alpha})`; ctx.fillText(word.text, x, y);
-          if (p > .12) {
-            ctx.strokeStyle = `rgba(104,179,235,${alpha * .16})`; ctx.lineWidth = .6;
-            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (word.x - cx) * .035, y + (word.y - cy) * .035); ctx.stroke();
-          }
-        }
-        glow(cx, cy, 25 + gather * 80, '164,209,255', gather * .55 * (1 - smooth((time - 1.05) / .25)));
+      // The page remains legible for the first beat; gathering takes almost five seconds.
+      lifted?.render(time, dark, w, h);
+      if (time > 4.9 && lifted) { lifted.restore(); lifted = null; }
+      if (time > 3.3 && time < 5.4) {
+        const strength = smooth((time - 3.3) / 1.5) * (1 - smooth((time - 5.05) / .35));
+        glow(w * .5, h * .43, 70 + strength * 45, '164,209,255', strength * .5);
       }
-      const sparkFade = 1 - smooth((time - 4.40) / .72);
+      const sparkFade = 1 - smooth((time - 8.40) / .72);
       // Five staggered filament bursts resolve into the 23 actual atlas points.
       for (const spark of sparks) {
         const age = time - spark.burst.at;
         if (age < 0) continue;
         const p = location(spark, time);
-        const color = palette[spark.group].map((v, i) => Math.round(v + ([0, 89, 159][i] - v) * dawn));
+        const color = palette[spark.group].map((v, i) => Math.round(v + ([146, 207, 255][i] - v) * arrival));
         const alpha = Math.min(1, age * 13) * spark.depth * sparkFade * (.45 + .55 * Math.exp(-age * .36));
-        ctx.globalCompositeOperation = dawn < .4 ? 'lighter' : 'source-over';
-        ctx.lineWidth = spark.size * (time > 3.18 ? .65 : .85);
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.lineWidth = spark.size * (time > 7.18 ? .65 : .85);
         ctx.strokeStyle = `rgba(${color},${alpha * .70})`; ctx.beginPath();
         for (let trail = 8; trail >= 0; trail--) {
-          const tail = location(spark, Math.max(spark.burst.at, time - trail * (time > 3.18 ? .022 : .037)));
+          const tail = location(spark, Math.max(spark.burst.at, time - trail * (time > 7.18 ? .022 : .037)));
           if (trail === 8) ctx.moveTo(tail.x, tail.y); else ctx.lineTo(tail.x, tail.y);
         }
         ctx.stroke();
         ctx.fillStyle = `rgba(${color},${alpha})`;
         ctx.beginPath(); ctx.arc(p.x, p.y, spark.size * (.8 + Math.exp(-age * 2)), 0, TAU); ctx.fill();
-        if (spark.destination % 9 === 0 && dawn < .7) glow(p.x, p.y, 7, color.join(','), alpha * .14);
+        if (spark.destination % 9 === 0 && arrival < .7) glow(p.x, p.y, 7, color.join(','), alpha * .14);
       }
       for (let i = 0; i < bursts.length; i++) {
         const burst = bursts[i]; const age = time - burst.at;
@@ -335,9 +391,9 @@
     layer.querySelector('[data-enter]').focus({ preventScroll: true });
     return {
       resize,
-      tick(seconds) { time += seconds; render(); if (time >= 5.2) finish(); },
+      tick(seconds) { time += seconds; render(); if (time >= 9.2) finish(); },
       get time() { return time; },
-      dispose() { layer.remove(); }
+      dispose() { lifted?.restore(); lifted = null; layer.remove(); }
     };
   }
 
@@ -360,6 +416,7 @@
     dialog.setAttribute('aria-labelledby', 'atlas-title');
     dialog.setAttribute('aria-describedby', 'atlas-description');
     dialog.innerHTML = `
+      <canvas class="atlas-sky" aria-hidden="true"></canvas>
       <div class="atlas-sheet">
         <header class="atlas-header">
           <span class="atlas-signature">Xunjian Yin <span>/ an unfinished atlas</span></span>
@@ -390,10 +447,19 @@
       </div>`;
 
     const stage = dialog.querySelector('.atlas-stage');
+    const sky = dialog.querySelector('.atlas-sky');
+    const skyCtx = sky.getContext('2d');
     const canvas = stage.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const buttons = [...dialog.querySelectorAll('[data-thread]')];
+    let view = { x: 0, y: 0 };
+    let viewTarget = { x: 0, y: 0 };
+    let skyWidth = 0, skyHeight = 0;
+    const stars = Array.from({ length: 340 }, (_, i) => ({
+      x: ((i * .61803398875 + .17) % 1), y: ((i * .754877666 + .31) % 1),
+      depth: .15 + (i % 17) / 20, size: i % 37 === 0 ? 1.45 : .35 + (i % 7) * .12
+    }));
     let selected = [];
     let selectedPaper = null;
     let hoverPaper = null;
@@ -474,7 +540,8 @@
       try { opening = createOpening(dialog, words, getTargets, finishOpening, close); }
       catch (error) { console.warn('The atlas opening could not be drawn.', error); }
       if (!opening) {
-        dialog.querySelector('.atlas-opening')?.remove();
+        const abandoned = dialog.querySelector('.atlas-opening');
+        abandoned?.restoreText?.(); abandoned?.remove();
         dialog.classList.remove('is-opening'); dialog.style.removeProperty('--atlas-reveal');
         dialog.dataset.phase = 'atlas'; sheet.inert = false; intro = 1;
         dialog.querySelector('[data-close]').focus({ preventScroll: true });
@@ -551,11 +618,45 @@
       showWorks(); updateReading();
     }
 
+    function resizeSky() {
+      skyWidth = dialog.clientWidth; skyHeight = dialog.clientHeight;
+      if (!skyCtx) return;
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      sky.width = Math.round(skyWidth * dpr); sky.height = Math.round(skyHeight * dpr);
+      skyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function drawSky() {
+      if (!skyCtx) return;
+      skyCtx.clearRect(0, 0, skyWidth, skyHeight);
+      // Broad, low-contrast light gives the stars depth without competing with labels.
+      const haze = (x, y, r, rgb, alpha) => {
+        const g = skyCtx.createRadialGradient(x, y, 0, x, y, r);
+        g.addColorStop(0, `rgba(${rgb},${alpha})`); g.addColorStop(1, `rgba(${rgb},0)`);
+        skyCtx.fillStyle = g; skyCtx.fillRect(x - r, y - r, r * 2, r * 2);
+      };
+      haze(skyWidth * .49 + view.x * 12, skyHeight * .46 + view.y * 8, Math.max(skyWidth, skyHeight) * .43, '32,66,111', .20);
+      haze(skyWidth * .82, skyHeight * .17, skyWidth * .34, '48,44,88', .12);
+      for (let i = 0; i < (skyWidth < 700 ? 170 : stars.length); i++) {
+        const star = stars[i];
+        const x = star.x * skyWidth + view.x * star.depth * 17;
+        const y = star.y * skyHeight + view.y * star.depth * 12;
+        const alpha = .12 + star.depth * .42;
+        skyCtx.fillStyle = i % 13 === 0 ? `rgba(218,199,164,${alpha})` : `rgba(155,189,222,${alpha})`;
+        skyCtx.beginPath(); skyCtx.arc(x, y, star.size, 0, TAU); skyCtx.fill();
+        if (i % 37 === 0) {
+          haze(x, y, 7, '121,180,232', .11);
+          skyCtx.strokeStyle = `rgba(171,205,237,${alpha * .26})`; skyCtx.lineWidth = .5;
+          skyCtx.beginPath(); skyCtx.moveTo(x - 4, y); skyCtx.lineTo(x + 4, y); skyCtx.moveTo(x, y - 4); skyCtx.lineTo(x, y + 4); skyCtx.stroke();
+        }
+      }
+    }
+
     function resize() {
       if (drag && stage.hasPointerCapture(drag.id)) stage.releasePointerCapture(drag.id);
       drag = null;
       stage.classList.remove('is-dragging');
       velocity = { x: 0, y: 0 };
+      resizeSky();
       const rect = stage.getBoundingClientRect();
       width = rect.width; height = rect.height;
       const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -592,7 +693,7 @@
       const zz = point.y * sp + z * cp;
       const scale = 3.9 / (3.9 - zz);
       const r = radius * (1 - expansion * .16);
-      return { x: center.x + x * r * scale, y: center.y + y * r * scale, z: zz, scale };
+      return { x: center.x + x * r * scale + view.x * 10, y: center.y + y * r * scale + view.y * 8, z: zz, scale };
     }
     function ringPoint(group, t, r = 1) {
       const inclination = .38 + group * .54;
@@ -601,7 +702,7 @@
       return { x: (x * Math.cos(rotation) - y * Math.sin(rotation)) * r,
         y: (x * Math.sin(rotation) + y * Math.cos(rotation)) * r, z: z * r };
     }
-    function ink(alpha, blue = false) { return blue ? `rgba(0,89,160,${alpha})` : `rgba(70,90,80,${alpha})`; }
+    function ink(alpha, blue = false) { return blue ? `rgba(146,207,255,${alpha})` : `rgba(158,185,213,${alpha})`; }
     function curve(a, b, amount, blue, dashed = false) {
       ctx.beginPath(); ctx.moveTo(a.x, a.y);
       ctx.bezierCurveTo(a.x, a.y - radius * .40, b.x + (a.x - b.x) * .20, b.y, b.x, b.y);
@@ -610,8 +711,12 @@
     }
 
     function draw() {
+      drawSky();
       ctx.clearRect(0, 0, width, height);
       const reveal = smooth(intro);
+      const glow = ctx.createRadialGradient(center.x, center.y, radius * .08, center.x, center.y, radius * 1.4);
+      glow.addColorStop(0, 'rgba(27,72,121,.16)'); glow.addColorStop(1, 'rgba(27,72,121,0)');
+      ctx.fillStyle = glow; ctx.fillRect(0, 0, width, height);
       const small = width < 620;
       // A finite field of known work and an intentionally unfilled outer boundary.
       const boundary = radius * (1.28 + expansion * .25);
@@ -632,7 +737,7 @@
             const b = project(ringPoint(group, (i + 1) * TAU / 96, r));
             const depth = (a.z + 1.3) / 2.6;
             const dim = selected.length && !chosen ? .34 : 1;
-            ctx.strokeStyle = ink((.13 + depth * .34) * reveal * dim * (r === 1 ? 1 : .36), chosen);
+            ctx.strokeStyle = ink((.10 + depth * .47) * reveal * dim * (r === 1 ? 1 : .36), chosen);
             ctx.lineWidth = chosen && r === 1 ? 1.05 : .75;
             ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
           }
@@ -652,7 +757,13 @@
         const focused = hoverPaper?.slug === point.slug || selectedPaper?.slug === point.slug;
         const dim = selected.length && !chosen && !focused ? .25 : 1;
         const alpha = (.35 + (point.z + 1.2) / 2.4 * .6) * dim;
-        ctx.beginPath(); ctx.arc(point.x, point.y, (focused ? 4 : chosen ? 3 : 2.6) * point.scale, 0, TAU);
+        const depth = clamp((point.z + 1.2) / 2.4, 0, 1);
+        if (depth > .5 || chosen || focused) {
+          const halo = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, focused ? 17 : 11);
+          halo.addColorStop(0, ink((focused ? .40 : .20) * dim, true)); halo.addColorStop(1, ink(0, true));
+          ctx.fillStyle = halo; ctx.fillRect(point.x - 17, point.y - 17, 34, 34);
+        }
+        ctx.beginPath(); ctx.arc(point.x, point.y, (focused ? 4 : chosen ? 3.3 : 2 + depth * 1.35) * point.scale, 0, TAU);
         ctx.fillStyle = ink(alpha, chosen || focused); ctx.fill();
         if (focused) { ctx.beginPath(); ctx.arc(point.x, point.y, 7, 0, TAU); ctx.strokeStyle = ink(.4, true); ctx.stroke(); }
       }
@@ -666,8 +777,8 @@
         const box = { x: clamp(point.x + 10, 4, width - tw - 8), y: point.y - 7, w: tw + 6, h: 17 };
         if (!focused && labelRects.some(r => intersects(box, r))) continue;
         labelRects.push(box);
-        ctx.fillStyle = '#f7f8f5'; ctx.fillRect(box.x - 2, box.y - 1, box.w, box.h);
-        ctx.fillStyle = focused ? '#00599f' : '#3d5448'; ctx.fillText(point.name, box.x, box.y + 11);
+        ctx.fillStyle = '#070f1b'; ctx.fillRect(box.x - 2, box.y - 1, box.w, box.h);
+        ctx.fillStyle = focused ? '#bde5ff' : '#a7bed5'; ctx.fillText(point.name, box.x, box.y + 11);
       }
       const joinAlpha = pairAmount * (1 - expansion);
       if (joinAlpha > .002) {
@@ -703,7 +814,7 @@
         try {
           opening.tick(elapsed / 1000);
           if (opening) {
-            intro = opening.time > 3.7 ? 1 : 0;
+            intro = opening.time > 7.4 ? 1 : 0;
             if (intro > 0) draw();
           }
         }
@@ -714,6 +825,7 @@
       }
       intro = motion.matches ? 1 : Math.min(1, intro + dt / 1700);
       const step = motion.matches ? 1 : 1 - Math.exp(-dt / 140);
+      view.x += (viewTarget.x - view.x) * step; view.y += (viewTarget.y - view.y) * step;
       expansion += ((frontier ? 1 : 0) - expansion) * step;
       pairAmount += ((selected.length === 2 ? 1 : 0) - pairAmount) * step;
       if (!drag && !motion.matches) {
@@ -722,7 +834,7 @@
       }
       dialog.querySelector('.atlas-frontier-label').style.opacity = String(pairAmount * (1 - expansion));
       try { draw(); } catch (error) { cleanup(); console.warn('The research atlas could not be drawn.', error); return; }
-      const moving = intro < 1 || Math.abs(expansion - Number(frontier)) > .002 || Math.abs(pairAmount - Number(selected.length === 2)) > .002 || (!drag && Math.abs(velocity.x) + Math.abs(velocity.y) > .000015);
+      const moving = Math.abs(view.x - viewTarget.x) + Math.abs(view.y - viewTarget.y) > .002 || intro < 1 || Math.abs(expansion - Number(frontier)) > .002 || Math.abs(pairAmount - Number(selected.length === 2)) > .002 || (!drag && Math.abs(velocity.x) + Math.abs(velocity.y) > .000015);
       if (moving) schedule(); else lastFrame = 0;
     }
     function schedule() { if (!raf && !closed && !leaving && !document.hidden) raf = requestAnimationFrame(frame); }
@@ -798,14 +910,20 @@
       showWorks(); updateReading();
     });
     on(dialog.querySelector('[data-close]'), 'click', close);
-    on(dialog.querySelector('[data-replay]'), 'click', () => startOpening(captureWords(sheet)));
-    on(window, 'resize', () => opening?.resize());
+    on(dialog.querySelector('[data-replay]'), 'click', () => startOpening(captureWords(document.querySelector('#main-content') || document.body)));
+    on(window, 'resize', () => { resizeSky(); opening?.resize(); schedule(); });
+    on(dialog, 'pointermove', event => {
+      if (opening || drag || motion.matches || event.pointerType !== 'mouse') return;
+      viewTarget = { x: (event.clientX / innerWidth - .5) * 2, y: (event.clientY / innerHeight - .5) * 2 };
+      schedule();
+    });
+    on(dialog, 'pointerleave', () => { viewTarget = { x: 0, y: 0 }; schedule(); });
     on(dialog, 'cancel', event => { event.preventDefault(); close(); });
     on(dialog, 'close', cleanup); on(window, 'pagehide', cleanup);
     on(document, 'visibilitychange', () => { if (document.hidden) { cancelAnimationFrame(raf); raf = 0; lastFrame = 0; } else schedule(); });
     on(motion, 'change', () => {
       dialog.querySelector('[data-replay]').hidden = motion.matches;
-      if (motion.matches) { velocity = { x: 0, y: 0 }; finishOpening(); }
+      if (motion.matches) { velocity = { x: 0, y: 0 }; view = { x: 0, y: 0 }; viewTarget = { x: 0, y: 0 }; finishOpening(); }
       schedule();
     });
     try {
