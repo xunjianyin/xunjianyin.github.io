@@ -171,9 +171,181 @@
 ];
   let active = false;
 
+  // Capture only visible words. The page itself stays untouched throughout.
+  function captureWords(root) {
+    const words = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node; let visited = 0;
+    while ((node = walker.nextNode()) && words.length < 76 && visited++ < 1600) {
+      const parent = node.parentElement;
+      if (!parent || parent.closest('script, style, button, [hidden], .atlas-opening')) continue;
+      const box = parent.getBoundingClientRect();
+      if (box.bottom < 0 || box.top > innerHeight || !box.width || !box.height) continue;
+      const style = getComputedStyle(parent);
+      if (style.visibility === 'hidden' || style.display === 'none') continue;
+      for (const match of node.textContent.matchAll(/[\p{L}\p{N}][\p{L}\p{N}’'-]{2,17}/gu)) {
+        const range = document.createRange(); range.setStart(node, match.index); range.setEnd(node, match.index + match[0].length);
+        const r = range.getBoundingClientRect();
+        if (r.top < 5 || r.bottom > innerHeight - 8 || r.left < 0 || r.right > innerWidth || !r.width) continue;
+        words.push({ text: match[0], x: r.left, y: r.top + r.height * .79, size: Math.min(24, parseFloat(style.fontSize) || 14), font: style.fontFamily });
+        if (words.length >= 76) break;
+      }
+    }
+    return words;
+  }
+
+  /** A finite, active-time canvas sequence: gather → bursts → atlas. */
+  function createOpening(dialog, words, getTargets, finish, close) {
+    const layer = document.createElement('div');
+    layer.className = 'atlas-opening';
+    layer.innerHTML = `<canvas class="atlas-opening-canvas" aria-hidden="true"></canvas>
+      <div class="atlas-opening-controls"><span aria-hidden="true">You found it.</span><div>
+        <button type="button" data-enter>Enter the atlas <span aria-hidden="true">↗</span></button>
+        <button type="button" data-opening-close aria-label="Close the opening">Close <span aria-hidden="true">esc</span></button>
+      </div></div>`;
+    dialog.append(layer);
+    const canvas = layer.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) { layer.remove(); return null; }
+    layer.querySelector('[data-enter]').onclick = finish;
+    layer.querySelector('[data-opening-close]').onclick = close;
+    let w = 0; let h = 0; let targets = []; let time = 0;
+    let seed = 4173;
+    const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) | 0; return (seed >>> 0) / 4294967296; };
+    const palette = [[170, 216, 255], [244, 204, 139], [151, 170, 255], [141, 223, 216], [220, 232, 255]];
+    const bursts = [
+      { at: 1.05, x: .50, y: .43, scale: 1.14 },
+      { at: 1.62, x: .27, y: .36, scale: .73 },
+      { at: 2.04, x: .74, y: .40, scale: .89 },
+      { at: 2.38, x: .41, y: .27, scale: .64 },
+      { at: 2.67, x: .63, y: .29, scale: .69 }
+    ];
+    // Bounded counts and DPR avoid unbounded work on phones and retina screens.
+    const sparks = bursts.flatMap((burst, group) => Array.from({ length: innerWidth < 700 ? 85 : 140 }, (_, i) => ({
+      burst, group, angle: i * 2.399963 + random() * .10, speed: .40 + random() * .66,
+      bend: random() - .5, size: .55 + random() * 1.3, depth: .6 + random() * .4,
+      destination: i * 5 + group
+    })));
+    const dust = Array.from({ length: innerWidth < 700 ? 44 : 90 }, () => ({ x: random(), y: random(), a: random(), size: .4 + random() }));
+    function resize() {
+      w = dialog.clientWidth; h = dialog.clientHeight;
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      targets = getTargets();
+    }
+    function location(spark, at) {
+      const age = Math.max(0, at - spark.burst.at);
+      const radius = Math.min(w * .55, h * .42) * spark.burst.scale;
+      const distance = radius * spark.speed * (1 - Math.exp(-age * 2.2));
+      const angle = spark.angle + spark.bend * age * .16;
+      const x = spark.burst.x * w + Math.cos(angle) * distance;
+      const y = spark.burst.y * h + Math.sin(angle) * distance * .87 + age * age * 21;
+      const settle = smooth((at - 3.18) / 1.66);
+      const end = targets[spark.destination % targets.length] || { x: w / 2, y: h / 2 };
+      const arc = Math.sin(settle * Math.PI);
+      return { x: x + (end.x - x) * settle + arc * spark.bend * Math.min(w * .35, 220),
+        y: y + (end.y - y) * settle - arc * (70 + spark.speed * 110) };
+    }
+    function glow(x, y, radius, color, alpha) {
+      if (alpha < .002) return;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      g.addColorStop(0, `rgba(${color},${alpha})`); g.addColorStop(.18, `rgba(${color},${alpha * .38})`); g.addColorStop(1, `rgba(${color},0)`);
+      ctx.fillStyle = g; ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    }
+    function render() {
+      ctx.clearRect(0, 0, w, h);
+      const dark = smooth(time / .56);
+      const dawn = smooth((time - 3.82) / 1.28);
+      const vanish = 1 - smooth((time - 4.95) / .25);
+      ctx.fillStyle = `rgba(7,15,27,${dark * vanish})`; ctx.fillRect(0, 0, w, h);
+      const reveal = smooth((time - 3.48) / .36);
+      dialog.style.setProperty('--atlas-reveal', reveal);
+      layer.style.setProperty('--opening-ink', dawn > .93 || dark < .5 ? '#334e60' : '#d0dfec');
+      // Open the light page through a soft aperture, avoiding a grey full-screen fade.
+      if (dawn > 0) {
+        const cx = targets.reduce((sum, p) => sum + p.x, 0) / (targets.length || 1);
+        const cy = targets.reduce((sum, p) => sum + p.y, 0) / (targets.length || 1);
+        const reach = Math.hypot(Math.max(cx, w - cx), Math.max(cy, h - cy)) * 1.25;
+        const aperture = Math.max(1, reach * dawn);
+        const g = ctx.createRadialGradient(cx, cy, aperture * .76, cx, cy, aperture);
+        g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h); ctx.globalCompositeOperation = 'source-over';
+      }
+      const phase = time < 1.05 ? 'gather' : time < 3.18 ? 'burst' : 'settle';
+      if (dialog.dataset.phase !== phase) dialog.dataset.phase = phase;
+      ctx.globalCompositeOperation = 'lighter';
+      const starlight = smooth((time - .35) / .8) * (1 - dawn) * vanish;
+      for (const star of dust) {
+        ctx.fillStyle = `rgba(158,191,221,${(.15 + star.a * .35) * starlight})`;
+        ctx.beginPath(); ctx.arc(star.x * w, star.y * h - time * (1 + star.a * 2), star.size, 0, TAU); ctx.fill();
+      }
+      // Words leave their original screen positions along curved inward paths.
+      if (time < 1.30) {
+        const gather = smooth((time - .08) / .97);
+        const cx = w * .5, cy = h * .43;
+        for (let i = 0; i < words.length; i++) {
+          const word = words[i];
+          const p = smooth((time - (i % 7) * .023) / 1.03);
+          const x = word.x + (cx - word.x) * p;
+          const y = word.y + (cy - word.y) * p - Math.sin(p * Math.PI) * (28 + i % 4 * 16);
+          const alpha = (1 - smooth((time - .8) / .48)) * (.22 + dark * .78);
+          ctx.font = `${word.size * (1 - .7 * p)}px ${word.font}`;
+          ctx.fillStyle = `rgba(194,220,241,${alpha})`; ctx.fillText(word.text, x, y);
+          if (p > .12) {
+            ctx.strokeStyle = `rgba(104,179,235,${alpha * .16})`; ctx.lineWidth = .6;
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (word.x - cx) * .035, y + (word.y - cy) * .035); ctx.stroke();
+          }
+        }
+        glow(cx, cy, 25 + gather * 80, '164,209,255', gather * .55 * (1 - smooth((time - 1.05) / .25)));
+      }
+      const sparkFade = 1 - smooth((time - 4.40) / .72);
+      // Five staggered filament bursts resolve into the 23 actual atlas points.
+      for (const spark of sparks) {
+        const age = time - spark.burst.at;
+        if (age < 0) continue;
+        const p = location(spark, time);
+        const color = palette[spark.group].map((v, i) => Math.round(v + ([0, 89, 159][i] - v) * dawn));
+        const alpha = Math.min(1, age * 13) * spark.depth * sparkFade * (.45 + .55 * Math.exp(-age * .36));
+        ctx.globalCompositeOperation = dawn < .4 ? 'lighter' : 'source-over';
+        ctx.lineWidth = spark.size * (time > 3.18 ? .65 : .85);
+        ctx.strokeStyle = `rgba(${color},${alpha * .70})`; ctx.beginPath();
+        for (let trail = 8; trail >= 0; trail--) {
+          const tail = location(spark, Math.max(spark.burst.at, time - trail * (time > 3.18 ? .022 : .037)));
+          if (trail === 8) ctx.moveTo(tail.x, tail.y); else ctx.lineTo(tail.x, tail.y);
+        }
+        ctx.stroke();
+        ctx.fillStyle = `rgba(${color},${alpha})`;
+        ctx.beginPath(); ctx.arc(p.x, p.y, spark.size * (.8 + Math.exp(-age * 2)), 0, TAU); ctx.fill();
+        if (spark.destination % 9 === 0 && dawn < .7) glow(p.x, p.y, 7, color.join(','), alpha * .14);
+      }
+      for (let i = 0; i < bursts.length; i++) {
+        const burst = bursts[i]; const age = time - burst.at;
+        if (age < 0 || age > .9) continue;
+        ctx.globalCompositeOperation = 'lighter';
+        const a = Math.exp(-age * 7) * .52;
+        glow(w * burst.x, h * burst.y, 85 + age * 140, palette[i].join(','), a);
+        ctx.strokeStyle = `rgba(${palette[i]},${a * .28})`; ctx.lineWidth = .7;
+        ctx.beginPath(); ctx.arc(w * burst.x, h * burst.y, Math.min(w, h) * age * .32 + 2, 0, TAU); ctx.stroke();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    resize();
+    layer.querySelector('[data-enter]').focus({ preventScroll: true });
+    return {
+      resize,
+      tick(seconds) { time += seconds; render(); if (time >= 5.2) finish(); },
+      get time() { return time; },
+      dispose() { layer.remove(); }
+    };
+  }
+
+
   function open() {
     if (active) return;
     const previousFocus = document.activeElement;
+    const openingWords = captureWords(document.body);
     const originalScroll = { x: scrollX, y: scrollY };
     const overflow = document.body.style.getPropertyValue('overflow');
     const overflowPriority = document.body.style.getPropertyPriority('overflow');
@@ -213,12 +385,12 @@
           <div class="atlas-reading"><p data-readout-text>My work spans knowledge, reasoning, evaluation, and self-improving agents. This map asks how those pieces might come together in systems that keep learning in a changing world.</p><a data-readout-link href="${new URL('blogs/agents-that-learn-after-deployment.html', ROOT).href}">Read the research direction <span aria-hidden="true">↗</span></a></div>
         </section>
         <details class="atlas-works" id="atlas-works"><summary><span data-works-summary>The work behind the map</span><span data-works-count>23 papers</span></summary><div class="atlas-work-list"></div></details>
-        <footer class="atlas-footer"><p>A thematic map of my research. Connections are editorial.</p><p>World models · Long-horizon adaptation · Open-ended learning<br><span>Open directions, with room for the next question.</span></p></footer>
+        <footer class="atlas-footer"><div><p>A thematic map of my research. Connections are editorial.</p><button class="atlas-text-button atlas-replay" data-replay>Replay the opening <span aria-hidden="true">↗</span></button></div><p>World models · Long-horizon adaptation · Open-ended learning<br><span>Open directions, with room for the next question.</span></p></footer>
         <p class="atlas-sr-only" role="status" aria-live="polite" data-status></p>
       </div>`;
 
     const stage = dialog.querySelector('.atlas-stage');
-    const canvas = dialog.querySelector('canvas');
+    const canvas = stage.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const buttons = [...dialog.querySelectorAll('[data-thread]')];
@@ -238,6 +410,8 @@
     let lastFrame = 0;
     let closeTimer = 0;
     let observer;
+    let opening = null;
+    const sheet = dialog.querySelector('.atlas-sheet');
     let width = 0;
     let height = 0;
     let radius = 0;
@@ -261,6 +435,7 @@
       cancelAnimationFrame(raf);
       clearTimeout(closeTimer);
       observer?.disconnect(); events.abort();
+      opening?.dispose(); opening = null;
       dialog.close(); dialog.remove();
       if (overflow) document.body.style.setProperty('overflow', overflow, overflowPriority);
       else document.body.style.removeProperty('overflow');
@@ -273,6 +448,38 @@
       leaving = true; cancelAnimationFrame(raf);
       dialog.classList.add('is-leaving');
       if (motion.matches) cleanup(); else closeTimer = setTimeout(cleanup, 240);
+    }
+
+    function finishOpening() {
+      if (!opening || closed || leaving) return;
+      opening.dispose(); opening = null;
+      dialog.classList.remove('is-opening'); dialog.style.removeProperty('--atlas-reveal');
+      dialog.dataset.phase = 'atlas'; sheet.inert = false;
+      intro = 1; lastFrame = 0;
+      dialog.querySelector('[data-close]').focus({ preventScroll: true });
+      announce('The research atlas is ready. Choose two research threads to explore their connection.');
+      schedule();
+    }
+    function startOpening(words) {
+      if (motion.matches || opening || closed || leaving) return;
+      if (drag && stage.hasPointerCapture(drag.id)) stage.releasePointerCapture(drag.id);
+      drag = null; velocity = { x: 0, y: 0 }; stage.classList.remove('is-dragging');
+      dialog.scrollTop = 0; dialog.classList.add('is-opening');
+      dialog.style.setProperty('--atlas-reveal', '0'); sheet.inert = true;
+      dialog.dataset.phase = 'gather'; intro = 0; lastFrame = 0;
+      const getTargets = () => {
+        const r = stage.getBoundingClientRect();
+        return pointSet.map(paper => { const p = project(ringPoint(paper.group, paper.angle)); return { x: r.left + p.x, y: r.top + p.y }; });
+      };
+      try { opening = createOpening(dialog, words, getTargets, finishOpening, close); }
+      catch (error) { console.warn('The atlas opening could not be drawn.', error); }
+      if (!opening) {
+        dialog.querySelector('.atlas-opening')?.remove();
+        dialog.classList.remove('is-opening'); dialog.style.removeProperty('--atlas-reveal');
+        dialog.dataset.phase = 'atlas'; sheet.inert = false; intro = 1;
+        dialog.querySelector('[data-close]').focus({ preventScroll: true });
+      }
+      schedule();
     }
 
     function showWorks() {
@@ -373,6 +580,7 @@
         return point ? { x: clamp(point.x - rect.left, 0, width), y: clamp(point.y - rect.top, -30, height) }
           : { x: width * .5 + (i % 5 - 2) * 48, y: height * .5 + Math.floor(i / 5) * 15 };
       });
+      opening?.resize();
       schedule();
     }
 
@@ -489,7 +697,21 @@
     function frame(now) {
       raf = 0;
       if (closed || leaving || document.hidden) { lastFrame = 0; return; }
-      const dt = lastFrame ? Math.min(40, now - lastFrame) : 16; lastFrame = now;
+      const elapsed = lastFrame ? Math.max(0, now - lastFrame) : 0;
+      const dt = Math.min(40, elapsed || 16); lastFrame = now;
+      if (opening) {
+        try {
+          opening.tick(elapsed / 1000);
+          if (opening) {
+            intro = opening.time > 3.7 ? 1 : 0;
+            if (intro > 0) draw();
+          }
+        }
+        catch (error) { console.warn('The atlas opening was interrupted.', error); finishOpening(); }
+        if (opening) {
+          schedule(); return;
+        }
+      }
       intro = motion.matches ? 1 : Math.min(1, intro + dt / 1700);
       const step = motion.matches ? 1 : 1 - Math.exp(-dt / 140);
       expansion += ((frontier ? 1 : 0) - expansion) * step;
@@ -576,15 +798,25 @@
       showWorks(); updateReading();
     });
     on(dialog.querySelector('[data-close]'), 'click', close);
+    on(dialog.querySelector('[data-replay]'), 'click', () => startOpening(captureWords(sheet)));
+    on(window, 'resize', () => opening?.resize());
     on(dialog, 'cancel', event => { event.preventDefault(); close(); });
     on(dialog, 'close', cleanup); on(window, 'pagehide', cleanup);
     on(document, 'visibilitychange', () => { if (document.hidden) { cancelAnimationFrame(raf); raf = 0; lastFrame = 0; } else schedule(); });
-    on(motion, 'change', () => { if (motion.matches) velocity = { x: 0, y: 0 }; schedule(); });
+    on(motion, 'change', () => {
+      dialog.querySelector('[data-replay]').hidden = motion.matches;
+      if (motion.matches) { velocity = { x: 0, y: 0 }; finishOpening(); }
+      schedule();
+    });
     try {
       active = true; document.body.append(dialog); dialog.showModal();
       document.body.style.setProperty('overflow', 'hidden');
       dialog.querySelector('[data-close]').focus({ preventScroll: true });
       showWorks(); resize(); observer = new ResizeObserver(resize); observer.observe(stage);
+      dialog.dataset.phase = 'atlas';
+      dialog.querySelector('[data-replay]').hidden = motion.matches;
+      if (!motion.matches) startOpening(openingWords);
+      else intro = 1;
       void dialog.offsetWidth; dialog.classList.add('is-visible');
     } catch (error) { cleanup(); console.warn('The research atlas could not open.', error); }
   }

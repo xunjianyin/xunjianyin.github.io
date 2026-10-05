@@ -81,7 +81,8 @@
 
     await open(); win.SiteEasterEgg.open();
     check(doc.querySelectorAll('#research-atlas').length === 1, 'Repeated triggers cannot stack dialogs');
-    await delay(2000);
+    await until(() => atlas().dataset.phase === 'atlas');
+    await delay(80);
     check(pending.size === 0, 'The introduction stops scheduling frames when settled');
     const metadata = await (await fetch('/papers/content/metadata.json')).json();
     const allLinks = workLinks();
