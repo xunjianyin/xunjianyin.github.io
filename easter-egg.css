@@ -109,12 +109,28 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
 #spira .spira-plate::-webkit-scrollbar { display: none; }
 #spira #spira-text { color: #d7dde5; }
 #spira .spira-hint { margin-top: 10px; color: var(--spira-caption); font-size: 12px; letter-spacing: 0.02em; }
+/* "Listen to the spiral →" (and "Stop" while it plays). */
+#spira .spira-listen { margin-top: 4px; min-height: 30px; padding: 0; color: #d7dde5; font-size: 13px; border-bottom: 1px solid rgba(207, 217, 230, 0.32); }
+#spira .spira-listen:hover { color: #ffffff; }
+/* The score: all year blocks share one grid cell (the tallest sets the height), crossfading. */
+#spira .spira-score-stack { display: grid; margin: 4px 0 2px; }
+#spira .spira-score-block { grid-area: 1 / 1; opacity: 0; transition: opacity 300ms ease; }
+#spira .spira-score-block.is-on { opacity: 1; }
+#spira .spira-score-year { margin: 2px 0 4px; color: var(--spira-text); font-family: var(--spira-serif); font-size: 44px; line-height: 1.05; font-variant-numeric: lining-nums; }
+#spira .spira-score-row { color: #c9d2dc; font-size: 13px; line-height: 1.55; opacity: 0; transition: opacity 300ms ease; }
+#spira .spira-score-row.is-on { opacity: 1; }
+#spira .spira-score-row span { color: var(--spira-caption); }
 #spira .spira-plate-kicker { color: var(--spira-muted); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
 #spira .spira-plate-title {
   margin: 8px 0 6px; color: var(--spira-text);
   font-family: var(--spira-serif); font-size: 19px; font-weight: 400; line-height: 1.32; letter-spacing: 0; text-transform: none;
 }
 #spira .spira-venue { color: var(--spira-muted); font-size: 13px; }
+/* A paper's takeaway, between its title and venue: at most four lines (three on phones). */
+#spira .spira-takeaway {
+  margin: 0 0 6px; color: #b4bdc8; font-size: 14px; line-height: 1.6;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden;
+}
 #spira .spira-core-text { color: #d7dde5; }
 #spira .spira-back { margin-top: 6px; padding: 0; color: var(--spira-text); font-size: 13px; border-bottom: 1px solid rgba(207, 217, 230, 0.38); min-height: 44px; }
 #spira .spira-link { display: inline-block; margin-top: 10px; font-size: 13px; border-bottom: 1px solid rgba(207, 217, 230, 0.38); padding-bottom: 1px; }
@@ -167,6 +183,23 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
 #spira .spira-index-link { display: block; padding: 4px 0; font-size: 13px; line-height: 1.45; }
 #spira .spira-index-link span { color: var(--spira-caption); font-size: 12px; }
 
+/* Chrome: the opening controls and the chart actions stay hidden (but focusable) until intent.
+   JS adds .is-chrome while the pointer is in their corner or after a tap on empty sky; keyboard
+   focus within shows them once the keyboard is navigating (data-quiet removed by Tab), so the
+   programmatic focus on Skip at open stays hidden. --spira-fade carries the JS timeline fades. */
+#spira .spira-opening, #spira .spira-actions {
+  opacity: calc(var(--spira-fade, 1) * var(--spira-show, 0)); pointer-events: none; transition: opacity 250ms ease;
+}
+#spira.is-chrome .spira-opening, #spira.is-chrome .spira-actions,
+#spira:not([data-quiet]) .spira-opening:focus-within, #spira:not([data-quiet]) .spira-actions:focus-within { --spira-show: 1; pointer-events: auto; }
+/* The M key's only feedback: a whisper in the controls' corner. */
+#spira .spira-toast {
+  position: absolute; z-index: 4; right: 40px; top: 92px; margin: 0; pointer-events: none;
+  color: var(--spira-muted); font-size: 12px; letter-spacing: 0.02em; opacity: 0; transition: opacity 200ms ease;
+}
+#spira .spira-toast.is-bottom { top: auto; bottom: 78px; }
+#spira .spira-toast.is-shown { opacity: 1; }
+
 /* Opening controls */
 #spira .spira-opening { position: absolute; z-index: 4; right: 40px; bottom: 26px; display: flex; gap: 24px; }
 #spira .spira-opening[hidden] { display: none; }
@@ -195,6 +228,8 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
   #spira .spira-theme { min-height: 32px; line-height: 32px; font-size: 12px; }
   #spira .spira-index { top: 56px; right: 18px; bottom: 10px; max-height: none; width: 300px; }
   #spira .spira-opening { right: 18px; bottom: 8px; }
+  #spira .spira-toast { right: 18px; top: 60px; }
+  #spira .spira-toast.is-bottom { bottom: 56px; }
 }
 
 /* Narrow and portrait screens: motto on top, themes and plate below the chart. */
@@ -222,16 +257,22 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
   /* 32 px hit areas (above the WCAG 2.2 24 px minimum) come from padding around a short
      line, with no row gap, so the two rows sit close together. */
   #spira .spira-theme { min-height: 0; padding: 7px 0; line-height: 18px; font-size: 12px; gap: 6px; }
-  #spira .spira-plate { max-width: none; max-height: 27vh; overflow-y: auto; font-size: 13px; line-height: 1.62; padding-top: 6px; border-top: 1px solid var(--spira-line); }
+  /* A fixed height, so changing what the plate shows never moves the chart above it. */
+  #spira .spira-plate { max-width: none; height: 27vh; max-height: 27vh; overflow-y: auto; font-size: 13px; line-height: 1.62; padding-top: 6px; border-top: 1px solid var(--spira-line); }
+  #spira .spira-score-year { font-size: 34px; }
+  #spira .spira-score-row { font-size: 12px; line-height: 1.5; }
   /* Room for the hint's second line (it gains "· Tap a shooting star"), so nothing shifts. */
   #spira .spira-hint { min-height: 3.3em; }
   #spira .spira-note { max-width: none; margin-top: 6px; padding-top: 6px; }
+  #spira .spira-takeaway { font-size: 13px; -webkit-line-clamp: 3; line-clamp: 3; }
   #spira .spira-index { top: 48px; left: 0; right: 0; bottom: 0; width: auto; max-height: none; padding: 4px 16px 16px; background: var(--spira-night); border-left: 0; border-top: 1px solid var(--spira-line); }
   #spira .spira-opening { right: 16px; bottom: 10px; gap: 20px; }
+  #spira .spira-toast { right: 16px; top: 48px; }
+  #spira .spira-toast.is-bottom { bottom: 58px; }
 }
 @media (max-width: 899px) and (max-height: 700px) and (min-height: 560px), (max-width: 599px) and (max-height: 700px) {
   #spira .spira-note { display: none; }
-  #spira .spira-plate { max-height: 22vh; }
+  #spira .spira-plate { height: 22vh; max-height: 22vh; }
 }
 @media (max-width: 380px) {
   #spira .spira-actions { gap: 12px; }

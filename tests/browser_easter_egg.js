@@ -95,7 +95,7 @@
     type();
     await until(() => egg()?.open, 'the password to open the egg');
     check(assets().length === 2, 'The full password loads the script and stylesheet once');
-    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v3')), 'Asset URLs carry v=spira-v3');
+    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v4')), 'Asset URLs carry v=spira-v4');
     check(egg().spira.keyCount === 24, `The key sentence is found in full (${egg().spira.keyCount} of 24 tokens)`);
     await dismiss();
 
@@ -164,6 +164,10 @@
     check(inertBlocks().every(el => !el.inert), 'Plate, themes and actions are interactive in the chart');
     check(egg().querySelector('.spira-opening').hidden, 'Opening controls are removed from the chart');
     await delay(300);
+    const chartActions = egg().querySelector('.spira-actions');
+    const actionsShown = () => win.getComputedStyle(chartActions).pointerEvents === 'auto';
+    check(!actionsShown() && Number(win.getComputedStyle(chartActions).opacity) === 0 && doc.activeElement === egg().querySelector('.spira-stage'),
+      'In the chart the actions are hidden (opacity 0, no pointer events) and the stage has focus');
     keepStats();
 
     /* 6. The chart: index, themes and star selection. */
@@ -172,12 +176,16 @@
     check(links.length === 23 && new Set(slugs).size === 23, 'The index lists 23 distinct papers');
     const metadata = await (await fetch('/papers/content/metadata.json')).json();
     check(JSON.stringify([...slugs].sort()) === JSON.stringify(Object.keys(metadata).sort()), 'The index covers the complete local paper corpus');
+    const takeawaysMatch = [];
     const pages = await Promise.all(links.map(async a => {
       const response = await fetch(a.href);
       const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+      const slug = new URL(a.href).pathname.split('/').pop().replace('.html', '');
+      takeawaysMatch.push(normalise(page.querySelector('.paper-takeaway')?.textContent || '') === normalise(win.SiteEasterEgg.takeaways[slug] || '-'));
       return response.status === 200 && normalise(page.querySelector('h1')?.textContent || '') === normalise(a.title);
     }));
     check(pages.every(Boolean), 'Every index link returns 200 and its title matches the paper page');
+    check(takeawaysMatch.length === 23 && takeawaysMatch.every(Boolean), 'The takeaway snapshot matches the takeaway on every paper page');
     check(links.every(a => new URL(a.href).pathname.startsWith('/papers/')), 'Index links resolve under /papers/');
     const themes = [...egg().querySelectorAll('.spira-theme')];
     check(themes.length === 5, 'Five theme buttons');
@@ -198,6 +206,7 @@
     check(plate.textContent.includes('2025 · Self-improvement'), 'Clicking the Gödel Agent star shows "2025 · Self-improvement"');
     check(plate.querySelector('.spira-link')?.pathname === '/papers/godel-agent.html', 'The plate links to papers/godel-agent.html');
     check(plate.querySelector('.spira-plate-title')?.textContent.startsWith('Gödel Agent'), 'The plate shows the full paper title');
+    check(plate.querySelector('.spira-takeaway')?.textContent === win.SiteEasterEgg.takeaways['godel-agent'], 'The plate shows the paper\'s takeaway between its title and venue');
     pointer('pointerdown', 4, 4); pointer('pointerup', 4, 4);
     check(!egg().querySelector('#spira-text').closest('[hidden]'), 'Clicking empty space deselects the star');
     const indexButton = egg().querySelector('[data-index]');
@@ -211,6 +220,25 @@
     await nextPaint();
     const afterKey = egg().spira.projectStar('godel-agent');
     check(chartCanvas.toDataURL() !== image && Math.hypot(afterKey.x - beforeKey.x, afterKey.y - beforeKey.y) > 5, 'Arrow keys turn the rendered spiral');
+
+    /* Chrome: revealed by intent only (pointer in its corner, keyboard focus, a tap on empty sky). */
+    const actionsRect = chartActions.getBoundingClientRect();
+    egg().dispatchEvent(new win.PointerEvent('pointermove', { pointerId: 8, pointerType: 'mouse', clientX: actionsRect.right - 10, clientY: 40, bubbles: true }));
+    check(egg().spira.chrome && actionsShown(), 'A pointer in the actions\' corner reveals them');
+    egg().dispatchEvent(new win.PointerEvent('pointermove', { pointerId: 8, pointerType: 'mouse', clientX: 700, clientY: 600, bubbles: true }));
+    check(egg().spira.chrome, 'They stay a moment after the pointer leaves the corner');
+    await until(() => !egg().spira.chrome, 'the actions to hide again', 2000);
+    check(!actionsShown(), 'Then they hide again');
+    for (const type of ['pointerdown', 'pointerup']) stage.dispatchEvent(new win.PointerEvent(type, { pointerId: 13, pointerType: 'touch', button: 0, clientX: 1262, clientY: 884, bubbles: true, cancelable: true }));
+    check(egg().spira.chrome, 'A tap on empty sky reveals them');
+    await until(() => !egg().spira.chrome, 'the tap reveal to end', 2000);
+    egg().dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    egg().querySelector('[data-index]').focus();
+    check(actionsShown(), 'Keyboard focus within reveals them');
+    stage.focus();
+    egg().dispatchEvent(new win.KeyboardEvent('keydown', { key: 'm', bubbles: true, cancelable: true }));
+    check(!egg().spira.sound && egg().querySelector('.spira-toast').textContent === 'Sound off' && !egg().spira.chrome, 'M switches the sound with the chrome hidden; a whisper toast is its feedback');
+    egg().dispatchEvent(new win.KeyboardEvent('keydown', { key: 'm', bubbles: true, cancelable: true }));
 
     /* The galaxy as an instrument: hovering strums (one note per 70 ms), keys choose themes. */
     const log = () => egg().spira.audioCues;
@@ -264,7 +292,13 @@
       ignition: await render(3, audio => audio.cue.ignite(0.05)),
       melody: await render(5.5, audio => melody.forEach(([year, theme], i) => audio.cue.paper(0.05 + i * 0.14, theme, year, (i % 5) / 2.5 - 0.8))),
       whoosh: await render(1.4, audio => audio.cue.whoosh(0.05, 0.9, -0.7, 0.7)),
-      catch: await render(2.6, audio => audio.cue.catch(0.05, 1, 3, 0.2))
+      catch: await render(2.6, audio => audio.cue.catch(0.05, 1, 3, 0.2)),
+      score: await render(4.5, audio => {
+        audio.cue.year(0.05, 2, 3.6);
+        [[2024, 0], [2024, 0], [2024, 1], [2024, 1], [2024, 2], [2024, 2], [2024, 3]].forEach(([year, theme], i) => audio.cue.paper(0.3 + i * 0.4, theme, year, 0));
+        audio.cue.resolve(2.6);
+      }),
+      dive: await render(3, audio => { audio.cue.dive(0.05, 1.8); audio.cue.arrive(1.85); })
     };
     for (const [name, result] of Object.entries(renders)) {
       audioPeaks[name] = result.peak;
@@ -278,19 +312,19 @@
     await openFast(4);
     await until(() => phase() === 'gather', 'gather before skipping');
     egg().querySelector('[data-skip]').click();
-    check(phase() === 'chart' && doc.activeElement === egg().querySelector('[data-close]'), 'Skip button reaches the chart and focuses Close');
+    check(phase() === 'chart' && doc.activeElement === egg().querySelector('.spira-stage'), 'Skip button reaches the chart and focuses the stage');
     await delay(450);
     check(!egg().classList.contains('is-fading-skip'), 'The skip fade finishes');
     keepStats();
     await dismiss();
     await openFast(4);
     egg().dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
-    check(phase() === 'chart' && doc.activeElement === egg().querySelector('[data-close]'), 'Enter skips to the chart and focuses Close');
+    check(phase() === 'chart' && doc.activeElement === egg().querySelector('.spira-stage'), 'Enter skips to the chart and focuses the stage');
     await dismiss();
     restored('Escape after Enter skip');
 
     /* Closing is a dawn: the page reassembles on the canvas; glyphs and DOM swap on the last frame. */
-    await openFast(4);
+    await openFast(6);
     egg().querySelector('[data-skip]').click();
     await delay(150);
     keepStats();
@@ -324,7 +358,7 @@
     /* Core view: the page at the centre of the galaxy. */
     await openFast(8);
     egg().querySelector('[data-skip]').click();
-    await delay(450);
+    await delay(150);   // before the first meteor, which could pass over the centre and take the click
     const core = egg().spira.projectCore();
     const coreStage = egg().querySelector('.spira-stage');
     const press = (x, y) => {
@@ -356,11 +390,13 @@
     const sky = egg(); const skyStage = sky.querySelector('.spira-stage');
     const counter = sky.querySelector('.spira-count');
     check(counter.classList.contains('is-pending') && !sky.querySelector('.spira-hint').textContent.includes('shooting star'), 'Before any meteor the counter and the catch hint are not shown');
-    await delay(450);
+    await delay(150);   // before the first natural meteor (2.5 s of chart time at 8x)
     const tap = (x, y) => { for (const type of ['pointerdown', 'pointerup']) skyStage.dispatchEvent(new win.PointerEvent(type, { pointerId: 5, pointerType: 'mouse', button: 0, clientX: x, clientY: y, bubbles: true, cancelable: true })); };
     const first = sky.spira.spawnMeteor();
     const head = sky.spira.meteorHead();
     check(first >= 0 && head && head.x >= 0 && head.x <= 1280 && head.y >= 0 && head.y <= 900, 'A spawned meteor carries a question and is in view');
+    check(sky.spira.meteorSpeed > 300 && sky.spira.meteorSpeed < 600 && sky.querySelector('.spira-hint').textContent.startsWith('A shooting star: click it'),
+      `The first meteor is a slow invitation (${Math.round(sky.spira.meteorSpeed)} px/s), announced as it appears`);
     tap(head.x + 20, head.y + 20);
     check(sky.spira.caught === 1 && sky.spira.catching === first, 'Clicking within 44 px of the head catches it');
     check(!counter.classList.contains('is-pending') && counter.textContent.includes('1 / 10') && sky.querySelector('.spira-hint').textContent.includes('Catch a shooting star'), 'The counter and the catch hint appear');
@@ -371,8 +407,19 @@
     check(!!wish && JSON.parse(localStorage.getItem('spira-wishes')).includes(first), 'The question is pinned on the next turn as a wish star, and saved');
     tap(wish.x, wish.y);
     check(sky.querySelector('.spira-plate-kicker')?.textContent.startsWith('Open question ·'), 'Clicking the wish star shows its open question in the plate');
+    await delay(200);
+    check(sky.spira.bridge.q === first && sky.spira.bridge.fade > 0.5, 'A selected wish star bridges its two themes');
+    tap(4, 4);
     const second = sky.spira.spawnMeteor();
-    skyStage.focus();
+    const nominal = sky.spira.meteorSpeed;
+    for (let k = 0; k < 2; k++) {
+      const near = sky.spira.meteorHead(); if (!near) break;
+      skyStage.dispatchEvent(new win.PointerEvent('pointermove', { pointerId: 6, pointerType: 'mouse', clientX: near.x + 20, clientY: near.y + 20, bubbles: true }));
+      await nextPaint();
+    }
+    check(nominal >= 1100 && sky.spira.meteorSpeed < 0.7 * nominal, `Bullet time slows a meteor near the pointer (${Math.round(nominal)} > ${Math.round(sky.spira.meteorSpeed)} px/s)`);
+    skyStage.dispatchEvent(new win.PointerEvent('pointerleave', { pointerId: 6, pointerType: 'mouse', bubbles: true }));
+    check(doc.activeElement === skyStage, 'The stage keeps focus, so Space reaches it');
     skyStage.dispatchEvent(new win.KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
     check(second >= 0 && sky.spira.caught === 2, 'Space catches the visible meteor');
     keepStats();
@@ -399,9 +446,51 @@
     check(egg().spira.caught === 0 && !egg().spira.drawn && localStorage.getItem('spira-wishes') === null, 'Release them clears the caught questions');
     await dismiss();
 
+    /* The score: Listen to the spiral (2022 > 2026, then the next turn and a resolving chord). */
+    await openFast(12);
+    egg().querySelector('[data-skip]').click();
+    await delay(100);
+    const listen = egg().querySelector('[data-listen]');
+    listen.click();
+    check(egg().spira.score?.state === 'playing' && egg().querySelector('.spira-score-year') && egg().querySelector('[data-score-stop]'), 'Listen to the spiral starts the score with its plate and a Stop button');
+    const scoreYears = [];
+    await until(() => { const now = egg().spira.score; if (now && now.year > 2000 && now.year !== scoreYears[scoreYears.length - 1]) scoreYears.push(now.year); return !now; }, 'the score to end', 9000);
+    check(JSON.stringify(scoreYears) === JSON.stringify([2022, 2023, 2024, 2025, 2026]), `The score walks 2022 > 2026 (saw ${scoreYears.join(' > ')})`);
+    check(!egg().querySelector('#spira-text').closest('[hidden]') && listen.textContent.startsWith('Listen'), 'After the score the default plate returns');
+    const scoreCues = egg().spira.audioCues;
+    check(scoreCues.filter(c => c.cue === 'ring').length === 23 && scoreCues.filter(c => c.cue === 'year').length === 5 && scoreCues.some(c => c.cue === 'resolve'),
+      'Every paper rings, every year plays its chord, and a final chord resolves');
+    egg().querySelector('.spira-stage').dispatchEvent(new win.KeyboardEvent('keydown', { key: 'l', bubbles: true, cancelable: true }));
+    check(egg().spira.score?.state === 'playing', 'The L key starts the score');
+    egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
+    check(!!egg() && egg().open && egg().spira.score?.state !== 'playing' && !egg().querySelector('#spira-text').closest('[hidden]'), 'Escape stops the score without closing the egg');
+    keepStats();
+    await dismiss();
+
+    /* Strange loop: from the core view the camera dives into the page and finds the galaxy. */
+    await openFast(8);
+    egg().querySelector('[data-skip]').click();
+    await delay(100);
+    egg().querySelector('.spira-centre').click();
+    await delay(300);
+    check(egg().querySelector('.spira-plate-detail').textContent.includes('go deeper'), 'The core plate invites a dive');
+    egg().querySelector('.spira-stage').dispatchEvent(new win.WheelEvent('wheel', { deltaY: -300, bubbles: true, cancelable: true }));
+    check(egg().spira.view === 'dive', 'Scrolling inward in the core view starts a dive');
+    await until(() => egg().spira.view === 'chart', 'the dive to arrive', 3000);
+    check(!egg().querySelector('#spira-text').closest('[hidden]') && !egg().querySelector('.spira-centre').hidden, 'The dive arrives in the chart state');
+    egg().querySelector('.spira-centre').click();
+    await delay(300);
+    const vanishing = egg().spira.projectVanishing();
+    for (const type of ['pointerdown', 'pointerup']) egg().querySelector('.spira-stage').dispatchEvent(new win.PointerEvent(type, { pointerId: 14, pointerType: 'mouse', button: 0, clientX: vanishing.x, clientY: vanishing.y, bubbles: true, cancelable: true }));
+    check(egg().spira.view === 'dive', 'Clicking the vanishing point dives again');
+    await until(() => egg().spira.view === 'chart', 'the second dive', 3000);
+    check(egg().spira.nebula, 'The nebula and the band have rendered');
+    keepStats();
+    await dismiss();
+
     /* 5. Escape during each phase restores everything. */
     for (const target of ['dusk', 'gather', 'wind', 'ignite', 'chart']) {
-      await openFast(target === 'dusk' ? 2 : 8);
+      await openFast(target === 'dusk' ? 2 : 14);
       await until(() => phase() === target, `phase ${target}`, 15000);
       keepStats();
       await dismiss();
@@ -409,7 +498,7 @@
     }
 
     /* Replay restarts the opening from the chart. */
-    await openFast(8);
+    await openFast(12);
     egg().querySelector('[data-skip]').click();
     await delay(400);
     egg().querySelector('[data-replay]').click();
@@ -450,7 +539,7 @@
     egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
     check(!egg(), 'Reduced motion: closing is instant');
     setReduced(false);
-    await openFast(1);
+    await openFast(4);
     await until(() => phase() === 'gather', 'gather before reduced motion');
     setReduced(true);
     check(phase() === 'chart', 'Turning on reduced motion mid-opening skips to the chart');

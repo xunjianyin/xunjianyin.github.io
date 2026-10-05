@@ -48,6 +48,12 @@
   const T_CHART = 12.6;                // phase 'chart'; the UI becomes interactive
   const T_SETTLED = 13.4;              // every opening fade has finished
   const SKIP_FADE_MS = 350;
+  // Chrome (opening controls, chart actions) stays hidden until intent.
+  const CHROME_OPENING = [280, 150];   // px: the bottom-right region that reveals the opening controls
+  const CHROME_CHART = [80, 130];      // px: left of the actions, and the band's height from the top
+  const CHROME_HIDE_MS = 1800;         // hide this long after the pointer leaves the region
+  const CHROME_TAP_MS = 4000;          // a tap on empty sky shows them this long
+  const TOAST_MS = 1200;
   const REPLAY_FADE_MS = 250;
 
   // Closing as dawn: the exact reverse of the opening. The page reassembles itself on the
@@ -185,6 +191,15 @@
   const CORE_SPIN = 0.03;              // rad/s while in core view
   const CORE_HIT = 22;                 // px around the origin that opens the core
   const CORE_REST_ALPHA = 0.3;         // texture alpha of the text spiral at rest (a soft nucleus under the bulge)
+  // Strange loop: from the core view the camera dives into the text spiral's vanishing point,
+  // where the whole galaxy waits, tiny, and grows until it is the chart again.
+  const DIVE_TIME = 1.8;               // s
+  const DIVE_ZOOM = 36;                // total zoom: the galaxy starts at 1/36 of its chart size
+  const DIVE_SPIN = 1.1;               // rad the arriving galaxy turns as it grows
+  const DIVE_WORD_FADE = 3;            // words have faded by the time they reach 3x their size
+  const DIVE_WHEEL = 240;              // px of inward wheel travel that starts a dive
+  const DIVE_PINCH = 1.35;             // a pinch spreading this much starts a dive
+  const DIVE_LABELS = 0.4;             // the arriving galaxy is labelled above this share of its size
 
   // Camera: yaw psi about the disk normal, pitch alpha, perspective distance D
   const CAM_D = 3.4;
@@ -203,6 +218,20 @@
   const FIT_MARGIN = [20, 10];         // px kept clear around UI blocks (x, y)
   const UI_CLEARANCE = 24;             // canvas labels keep this far from UI blocks
   const EDGE_INSET = 8;                // canvas labels stay this far inside the viewport
+
+  // Sky depth: a faint nebula (fbm value noise at 1/4 resolution, smoothly upscaled) and a
+  // Milky Way band of tiny stars along its densest region, behind everything.
+  const NEBULA_CELL = 4;               // CSS px per nebula texel
+  const NEBULA_MARGIN = 48;            // px around the viewport, room for the parallax sway
+  const NEBULA_ALPHA = 0.07;           // overall alpha at the densest point
+  const NEBULA_SWAY = 40;              // px: horizontal sway with sin(yaw) ...
+  const NEBULA_TILT = 30;              // ... and vertical shift per radian of pitch (gentle parallax)
+  const NEBULA_ROWS = 6;               // texel rows generated per frame until it is ready
+  const NEBULA_ANGLE = -0.38;          // rad: the band's tilt
+  const NEBULA_COLOURS = [[86, 128, 220], [148, 110, 228], [236, 186, 140]]; // cool blue, violet, a warm wisp
+  const BAND_COUNT = 900;
+  const BAND_COUNT_NARROW = 400;
+  const BAND_ALPHA = [0.08, 0.14, 0.22, 0.32];
 
   // Starfield and stardust
   const STAR_COUNT = 650;
@@ -241,6 +270,9 @@
   const WISH_GLINT = 22;               // px: the warm four-point glint of a wish star
   const DRAWN_ALPHA = 0.3;             // the next turn as a soft solid line once all ten are caught
   const DRAWN_FADE = 1.6;              // s
+  const BRIDGE_ALPHA = 0.35;           // a wish's two theme spokes light up to this when it is hovered or selected ...
+  const BRIDGE_ARC = [1.22, 0.28];     // ... and a faint arc (world radius, alpha) joins their rim labels
+  const BRIDGE_TAU = 0.1;              // s: the bridge fades in and out (settled in about 0.3 s)
 
   // Shooting stars ("wishes"), chart phase only. Times in chart seconds.
   const METEOR_FIRST = 2.5;
@@ -259,8 +291,12 @@
   const TAIL_TEXT_GAP = 16;            // px between the head and the first letter
   const TAIL_TEXT_LIFT = 6;            // px the letters ride above the tail line
   const GLYPH_HALO = 5;                // px night halo baked around each letter (legible over the chart)
-  const CATCH_HEAD = 44;               // px around the head ...
-  const CATCH_TAIL = [24, 120];        // ... or within 24 px of the first 120 px of tail
+  const CATCH_HEAD = 56;               // px around the head ...
+  const CATCH_TAIL = [32, 160];        // ... or within 32 px of the first 160 px of tail
+  const METEOR_INVITE = [450, 380];    // px/s: the session's first meteor while nothing is caught (desktop, narrow)
+  const BULLET_RADIUS = 150;           // px: a pointer this near a meteor's head ...
+  const BULLET_SPEED = 0.35;           // ... slows it to this share of its speed ...
+  const BULLET_TAU = 0.12;             // ... easing in and out with this time constant (s)
   const CATCH_STOP = 0.35;             // s: the caught meteor decelerates to rest
   const CATCH_RELAY = [0.08, 0.5, 0.3]; // letters re-lay: start, duration each, stagger across the line
   const CATCH_HOLD = 1.6;              // the readable line holds this long
@@ -304,6 +340,17 @@
   const AMBIENT_BELL = [3, 8];         // s between sparse bells
   const AMBIENT_BELL_GAIN = 0.025;
   const CORE_MUFFLE = 700;             // Hz: the music bus in core view ("inside the page")
+
+  // "Listen to the spiral": a comet traces the written spiral, one turn per year.
+  const SCORE_INNER = 0.6;             // s along the faint inner tail before 2022
+  const SCORE_YEARS = [2.4, 3.0, 3.6, 4.4, 3.2]; // s per year 2022-2026, constant angular speed within each
+  const SCORE_NEXT = 1.8;              // s along the dashed next turn (caught wishes chime), fading out
+  const SCORE_OUTRO = 3;               // s the closing words hold before the default plate returns
+  const SCORE_DUCK = 0.3;              // the ambient music's share during the score
+  const SCORE_CHORD = 0.04;            // pad gain per voice for each year's chord
+  const SCORE_SPARKLE = 0.6;           // a rung paper's sparkle relative to the opening's
+  const SCORE_GLOW = 1.6;              // s a rung paper's label stays bright
+  const SCORE_STOP = 0.4;              // s: stopping fades the comet and the chord
 
   // Type and colour
   const SANS = 'Lato, "Helvetica Neue", Arial, sans-serif';
@@ -353,6 +400,33 @@
     year, slug, name, title, venue, theme: THEMES.findIndex(t => t.id === theme)
   }));
 
+  // One-sentence takeaways, a verbatim snapshot of the `takeaway` fields in
+  // papers/content/{evaluation,knowledge,reasoning,ledom}.json (the paper pages show the same text).
+  const TAKEAWAYS = Object.freeze({
+    "alcuna": "ALCUNA creates fictional organisms to test knowledge that models have not memorized, exposing a gap between reading new facts and connecting them to existing knowledge.",
+    "atomic-to-composite": "In a controlled reasoning setting, RL helps models combine internal knowledge with new context when supervised training has first established both component skills.",
+    "chemagent": "ChemAgent turns solved chemistry subproblems into reusable memory, helping an LLM plan, calculate, and refine new solutions with experience retained outside its model weights.",
+    "context-aware-evaluation": "Adding document context to a translation metric only at inference trades sentence-level accuracy for system-level gains. Cont-COMET trains COMET with selected context, as human annotators see it, and largely removes that trade-off.",
+    "contextual-asr": "A transcript can contain clues to its own recognition errors. Retrieving context from the document and related documents helps a correction model use those clues.",
+    "contrasolver": "A model's preferences can contradict each other; ContraSolver finds cycles in those judgments and selects reliable comparisons to improve alignment through DPO.",
+    "coral": "COrAL lets a language model predict and revise several token positions within a local window, making the trade-off between reasoning accuracy and decoding speed explicit.",
+    "damon": "Safety failures can emerge over an evolving conversation; DAMON evaluates this risk with dialogue-aware search, showing why model defenses need testing beyond isolated prompts.",
+    "derl": "DERL learns how to combine simple reward signals: a meta-optimizer proposes rewards, trains a policy with them, and improves from that policy's validation performance.",
+    "dsgram": "Good grammatical correction must preserve meaning, avoid unnecessary edits, and read fluently. DSGram scores these dimensions separately and adapts their importance to each sentence.",
+    "eama": "News captions need names and events that an image alone cannot reveal. EAMA teaches a multimodal LLM, InstructBLIP, to find the relevant sentences and entities in the article before writing the caption.",
+    "error-robust-retrieval": "A misspelled character is a poor retrieval query. RERIC combines pronunciation, shape, and surrounding context to find useful training examples without retraining the correction model.",
+    "geometry-of-reasoning": "When the same logical argument is expressed across topics and languages, changes along its representation trajectory reveal more shared logical structure than embedding positions alone.",
+    "godel-agent": "Gödel Agent can inspect and rewrite its own running code, using task feedback to revise both its problem-solving policy and the procedure that improves it.",
+    "history-matters": "Updating a model with today's facts can erase yesterday's answers; METO edits current and historical knowledge together so that facts remain associated with their time periods.",
+    "knowledge-boundary": "A wrong answer may reflect the prompt rather than missing knowledge; searching for alternative wording reveals facts a model can answer but a fixed benchmark misses.",
+    "knowledge-interplay": "Providing relevant context can make a model less willing to use facts it already knows; EchoQA tests when internal knowledge and external information work together or interfere.",
+    "mc-mke": "Correcting one multimodal answer does not ensure related answers change consistently; MC-MKE checks whether edits agree across image recognition, textual facts, and questions about images.",
+    "nlg-evaluation-survey": "LLMs can evaluate generated text in several distinct ways. This survey organizes the methods and explains the reliability, cost, and control trade-offs behind each choice.",
+    "reverse-lm": "Train a language model to predict the past. Then use its backward probabilities to help forward models choose better answers.",
+    "self-generated-documents": "Documents generated by a model can help retrieval-augmented answers, but their usefulness depends on document style, model capacity, and how they are combined with retrieved evidence.",
+    "seq2seq-data2text": "A high generation score does not explain what a model gets wrong. Fine-grained human annotation reveals how copying, pre-training, and dataset structure affect data-to-text errors.",
+    "themis": "An evaluator should explain its scores and accept the criteria a task needs. Themis trains an open model to provide both, without requiring a reference answer."
+  });
   // Open questions, each bridging two themes. A shooting star carries one; caught, it is
   // pinned on the next turn, midway (the shorter way) between its two themes' sectors.
   const QUESTIONS = [
@@ -372,9 +446,16 @@
   const SOUND_KEY = 'spira-sound';
 
   const COPY = {
-    stage: 'The research spiral. Drag or use arrow keys to turn it; plus and minus to zoom. Keys 1 to 5 choose a theme; Space catches a shooting star; M switches the sound.',
+    stage: 'The research spiral. Drag or use arrow keys to turn it; plus and minus to zoom. Keys 1 to 5 choose a theme; L listens to the spiral; Space catches a shooting star; M switches the sound. At the centre, plus goes deeper.',
     catchPointer: 'Catch a shooting star',
     catchTouch: 'Tap a shooting star',
+    listen: 'Listen to the spiral →',
+    scoreKicker: 'Listen to the spiral',
+    scoreSoundOff: 'Sound is off · m',
+    scoreEndTitle: 'That is the spiral so far.',
+    scoreEndText: 'The next turns are not drawn yet.',
+    invitePointer: 'A shooting star: click it to catch the question it carries',
+    inviteTouch: 'A shooting star: tap it to catch the question it carries',
     counter: 'Open questions caught',
     release: 'Release them',
     drawnKicker: 'Ten open questions',
@@ -390,6 +471,8 @@
     coreKicker: 'At the centre',
     coreTitle: 'The page you came from.',
     coreText: 'Every turn of the spiral starts here.',
+    deeperPointer: 'Scroll inward to go deeper.',
+    deeperTouch: 'Pinch or tap the centre to go deeper.',
     backOut: 'Back out'
   };
 
@@ -502,6 +585,65 @@
       gold: glowSprite(hexRGB(GOLD))
     };
     return shared;
+  }
+
+  /* ---------------------------------------------------------------------------
+   * Sky depth: a nebula texture, built a few rows per frame and cached per layout
+   * ------------------------------------------------------------------------- */
+  // Value noise on a 64 x 64 lattice with quintic interpolation; fbm sums four octaves.
+  const NOISE_N = 64;
+  const noiseTable = (() => { const r = seeded(1729); const t = new Float32Array(NOISE_N * NOISE_N); for (let i = 0; i < t.length; i++) t[i] = r(); return t; })();
+  function valueNoise(x, y) {
+    const xi = Math.floor(x); const yi = Math.floor(y); const fx = x - xi; const fy = y - yi;
+    const ux = fx * fx * fx * (fx * (fx * 6 - 15) + 10); const uy = fy * fy * fy * (fy * (fy * 6 - 15) + 10);
+    const x0 = ((xi % NOISE_N) + NOISE_N) % NOISE_N; const y0 = ((yi % NOISE_N) + NOISE_N) % NOISE_N;
+    const x1 = (x0 + 1) % NOISE_N; const y1 = (y0 + 1) % NOISE_N;
+    const a = noiseTable[y0 * NOISE_N + x0]; const b = noiseTable[y0 * NOISE_N + x1];
+    const c = noiseTable[y1 * NOISE_N + x0]; const d = noiseTable[y1 * NOISE_N + x1];
+    return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
+  }
+  function fbm(x, y) {
+    let sum = 0; let amp = 0.5; let f = 1;
+    for (let o = 0; o < 4; o++) { sum += amp * valueNoise(x * f, y * f); f *= 2; amp *= 0.5; }
+    return sum / 0.9375;
+  }
+  const smoothstep = (a, b, x) => smooth((x - a) / (b - a));
+  let nebulaCache = null;
+  // The nebula for a layout: a cached canvas, or one under construction (row = rows built).
+  function nebulaFor(w, h, bx, by) {
+    const key = `${w}x${h}@${Math.round(bx)},${Math.round(by)}`;
+    if (nebulaCache && nebulaCache.key === key) return nebulaCache;
+    const tw = Math.ceil((w + 2 * NEBULA_MARGIN) / NEBULA_CELL); const th = Math.ceil((h + 2 * NEBULA_MARGIN) / NEBULA_CELL);
+    const canvas = makeCanvas(tw, th); const g = canvas.getContext('2d');
+    nebulaCache = { key, canvas, g, image: g.createImageData(tw, th), tw, th, row: 0, w, h, bx, by };
+    return nebulaCache;
+  }
+  /**
+   * Build `rows` more texel rows. Three soft fields from the theme palette (cool blue, violet,
+   * a faint warm wisp), each a thresholded fbm, concentrated along a tilted band through the
+   * chart centre (Gaussian across it); alpha is normalised to 1 at the densest point.
+   */
+  function nebulaRows(neb, rows) {
+    const { tw, th, image, w, h, bx, by } = neb; const data = image.data;
+    const size = Math.min(w, h); const sa = Math.sin(NEBULA_ANGLE); const ca = Math.cos(NEBULA_ANGLE);
+    const end = Math.min(th, neb.row + rows);
+    for (let j = neb.row; j < end; j++) {
+      const y = j * NEBULA_CELL - NEBULA_MARGIN;
+      for (let i = 0; i < tw; i++) {
+        const x = i * NEBULA_CELL - NEBULA_MARGIN; const u = x / size; const v = y / size;
+        const across = (-(x - bx) * sa + (y - by) * ca) / (0.24 * size); const band = Math.exp(-across * across);
+        const d1 = smoothstep(0.34, 0.86, fbm(u * 1.6 + 3.1, v * 1.6 + 1.7)) * (0.25 + 0.75 * band) * 0.7;
+        const d2 = smoothstep(0.44, 0.9, fbm(u * 2.4 + 9.2, v * 2.4 + 4.4)) * band * 0.55;
+        const d3 = smoothstep(0.6, 0.95, fbm(u * 3.5 + 17.3, v * 3.5 + 11.9)) * band * band * 0.4;
+        const a = Math.min(1, d1 + d2 + d3); const k = (j * tw + i) * 4;
+        if (a <= 0.002) { data[k + 3] = 0; continue; }
+        for (let c = 0; c < 3; c++) data[k + c] = (NEBULA_COLOURS[0][c] * d1 + NEBULA_COLOURS[1][c] * d2 + NEBULA_COLOURS[2][c] * d3) / a;
+        data[k + 3] = a * 255;
+      }
+    }
+    neb.g.putImageData(image, 0, 0, 0, neb.row, tw, end - neb.row);
+    neb.row = end;
+    return neb.row >= th;
   }
 
   /* ---------------------------------------------------------------------------
@@ -804,6 +946,29 @@
     q.phi = phi; q.theta = THETA_END + phi; q.r = radiusAt(q.theta);
     q.x = q.r * Math.cos(q.theta); q.y = q.r * Math.sin(q.theta);
   });
+  // The score's timeline: segment k runs from SCORE_AT[k] to SCORE_AT[k + 1] (s) while the comet
+  // sweeps SCORE_THETA[k] .. SCORE_THETA[k + 1] at constant angular speed: the inner tail,
+  // the five years 2022-2026, then the next turn.
+  const SCORE_DUR = [SCORE_INNER, ...SCORE_YEARS, SCORE_NEXT];
+  const SCORE_THETA = [THETA_IN, ...SCORE_YEARS.map((_, k) => THETA0 + TAU * k), THETA_END, THETA_NEXT];
+  const SCORE_AT = SCORE_DUR.reduce((at, d) => { at.push(at[at.length - 1] + d); return at; }, [0]);
+  const SCORE_TOTAL = SCORE_AT[SCORE_AT.length - 1];
+  function scoreTheta(time) {
+    for (let k = 0; k < SCORE_DUR.length; k++) {
+      if (time <= SCORE_AT[k + 1]) return lerp(SCORE_THETA[k], SCORE_THETA[k + 1], clamp01((time - SCORE_AT[k]) / SCORE_DUR[k]));
+    }
+    return THETA_NEXT;
+  }
+  function scoreTimeAt(theta) {
+    for (let k = 0; k < SCORE_DUR.length; k++) {
+      if (theta <= SCORE_THETA[k + 1]) return SCORE_AT[k] + SCORE_DUR[k] * clamp01((theta - SCORE_THETA[k]) / (SCORE_THETA[k + 1] - SCORE_THETA[k]));
+    }
+    return SCORE_TOTAL;
+  }
+  // Which part of the score a time falls in: 0-4 the years 2022-2026, -1 before them, 5 after.
+  const scoreYearAt = time => (time < SCORE_AT[1] ? -1 : time >= SCORE_AT[6] ? 5 : Math.min(4, SCORE_AT.findIndex(at => at > time) - 2));
+  PAPERS.forEach(p => { p.scoreAt = scoreTimeAt(p.theta); });
+  QUESTIONS.forEach(q => { q.scoreAt = scoreTimeAt(q.theta); });
   // Rest footprint of the chart in units of S: a world circle of FIT_RADIUS seen at the
   // rest pitch. At rest the camera distance is exactly CAM_D, whatever S is.
   const FOOT_N = 72;
@@ -835,6 +1000,7 @@
   const LADDER = [62, 64, 66, 69, 71, 74, 76, 78, 81, 83, 86]; // D4 ... D6, two pentatonic octaves (MIDI)
   const CHORDS = [[50, 57, 61, 64, 66], [47, 54, 57, 62, 64], [43, 50, 54, 57, 59], [45, 52, 54, 59, 62]]; // Dmaj9 Bm11 Gmaj9 A6sus
   const DAWN_CHORD = [62, 66, 69, 76];                    // D4 F#4 A4 E5
+  const RESOLVE_CHORD = [50, 62, 66, 69, 76];             // the score's last chord: D add9
   const AMBIENT_NOTES = [74, 76, 78, 81, 83, 86];         // D5 ... D6
   const BELL_RATIOS = [1, 2, 2.76, 4.07];
   const BELL_GAINS = [1, 0.35, 0.22, 0.08];
@@ -868,6 +1034,9 @@
     const convolver = context.createConvolver(); convolver.connect(master);
     const send = context.createGain(); send.gain.value = REVERB.send; send.connect(convolver);
     const sendHigh = context.createGain(); sendHigh.gain.value = REVERB.igniteSend; sendHigh.connect(convolver);
+    // The chart's ambient music has its own bus, so the score can duck it.
+    const ambientIn = context.createGain(); ambientIn.connect(dry);
+    const ambientSend = context.createGain(); ambientSend.gain.value = REVERB.send; ambientIn.connect(ambientSend); ambientSend.connect(convolver);
     // Shared white noise (2 s, looped by every noise voice).
     const noiseBuffer = context.createBuffer(1, Math.round(2 * rate), rate);
     { const data = noiseBuffer.getChannelData(0); for (let i = 0; i < data.length; i++) data[i] = random() * 2 - 1; }
@@ -900,7 +1069,9 @@
     // Every voice ends in a panner that feeds the dry bus and one reverb send (none for null).
     function out(node, pan, bus) {
       const panner = context.createStereoPanner(); panner.pan.value = clamp(pan || 0, -1, 1);
-      node.connect(panner); panner.connect(dry);
+      node.connect(panner);
+      if (bus === ambientIn) { panner.connect(ambientIn); return panner; }
+      panner.connect(dry);
       if (bus !== null) panner.connect(bus || send);
       return panner;
     }
@@ -968,8 +1139,9 @@
         if (end < p.end) { for (const o of p.oscs) o.stop(end); p.end = end; }
       } catch (error) { /* already stopped */ }
     }
-    function pad(notes, t, dur, g, attack = PAD.attack, release = PAD.release) {
-      if (!ready()) return;
+    function pad(notes, t, dur, g, attack = PAD.attack, release = PAD.release, bus) {
+      if (!ready()) return [];
+      const made = [];
       t = at(t);
       for (let i = pads.length - 1; i >= 0; i--) if (pads[i].end <= context.currentTime) pads.splice(i, 1);
       attack = Math.min(attack, dur / 2); release = Math.min(release, dur - attack);
@@ -979,7 +1151,7 @@
         const lowpass = filter('lowpass', PAD.cutoff, 0); lfoDepth.connect(lowpass.frequency);
         const env = context.createGain(); const gate = context.createGain();
         lowpass.connect(env); env.connect(gate);
-        out(gate, notes.length > 1 ? lerp(-0.35, 0.35, n / (notes.length - 1)) : 0);
+        out(gate, notes.length > 1 ? lerp(-0.35, 0.35, n / (notes.length - 1)) : 0, bus);
         env.gain.setValueAtTime(0, t); env.gain.linearRampToValueAtTime(g, t + attack);
         env.gain.setValueAtTime(g, t + dur - release); env.gain.linearRampToValueAtTime(0, t + dur);
         const end = t + dur + 0.05;
@@ -987,8 +1159,10 @@
         const b = oscillator('triangle', f, lowpass, PAD.detune); b.start(t); b.stop(end);
         // Unhook the pad from the shared LFO when it ends.
         a.addEventListener('ended', () => { try { lfoDepth.disconnect(lowpass.frequency); } catch (error) { /* gone */ } });
-        pads.push({ gate, oscs: [a, b], end });
+        const entry = { gate, oscs: [a, b], end };
+        pads.push(entry); made.push(entry);
       }
+      return made;
     }
     function releasePads(t, tau) { while (pads.length) releasePad(pads.shift(), t, tau); }
     // noise: shared noise through a filter whose frequency ramps f0 -> f1, with a pan ramp.
@@ -1020,6 +1194,38 @@
       audio.scheduled++; audio.alive++;
       source.onended = () => { audio.alive--; };
       source.start(t, random() * 1.9); source.stop(t + dur + 0.06);
+    }
+    // A meteor's whoosh as a held voice the egg steers each frame: the bandpass sweeps 6 k ->
+    // 1.5 kHz with the meteor's progress, the gain follows an arc (peak at 40 %), the pan
+    // follows its x, and bullet time lowpasses it and pitches it down. end() releases it.
+    function meteorVoice(t, pan, g) {
+      if (!ready() || !roomFor() || !(g > 0)) return null;
+      t = at(t);
+      const source = noiseSource(); const hp = filter('highpass', 1200, 0.5); const band = filter('bandpass', 6000, 0.9); const low = filter('lowpass', 20000, 0);
+      source.connect(hp); hp.connect(band); band.connect(low);
+      const env = context.createGain(); low.connect(env); const panner = out(env, pan);
+      env.gain.setValueAtTime(0, t); env.gain.linearRampToValueAtTime(g * 0.3, t + 0.1);
+      audio.scheduled++; audio.alive++; source.onended = () => { audio.alive--; };
+      source.start(t, random() * 1.9); source.stop(t + 30);
+      let last = -1; let ended = false;
+      return {
+        update(progress, p, slow) {
+          if (ended || closed) return;
+          const now = context.currentTime; if (now - last < 0.05) return; last = now;
+          const u = clamp01(progress);
+          band.frequency.setTargetAtTime(6000 * Math.pow(0.25, u), now, 0.06);
+          env.gain.setTargetAtTime(g * (u < 0.4 ? 0.3 + 0.7 * smooth(u / 0.4) : 1 - 0.75 * smooth((u - 0.4) / 0.6)), now, 0.08);
+          panner.pan.setTargetAtTime(clamp(p, -1, 1), now, 0.06);
+          low.frequency.setTargetAtTime(20000 * Math.pow(1200 / 20000, clamp01(slow)), now, 0.08);
+          source.playbackRate.setTargetAtTime(1 - 0.45 * clamp01(slow), now, 0.08);
+        },
+        end(tau = 0.08) {
+          if (ended || closed) return;
+          ended = true;
+          const now = context.currentTime;
+          try { env.gain.setTargetAtTime(0, now, tau); source.stop(now + tau * 8 + 0.05); } catch (error) { /* already stopped */ }
+        }
+      };
     }
     // thump: a sine falling 120 -> 38 Hz over 0.45 s (kept out of the reverb).
     function thump(t, g) {
@@ -1113,11 +1319,11 @@
       if (ambient.next < now - 1) ambient.next = now;
       if (ambient.bell < now - 1) ambient.bell = now + between(1, 3);
       while (ambient.next < now + horizon) {
-        pad(CHORDS[ambient.chord], ambient.next, CHORD_EVERY + CHORD_OVERLAP, CHORD_GAIN);
+        pad(CHORDS[ambient.chord], ambient.next, CHORD_EVERY + CHORD_OVERLAP, CHORD_GAIN, PAD.attack, PAD.release, ambientIn);
         ambient.chord = (ambient.chord + 1) % CHORDS.length; ambient.next += CHORD_EVERY;
       }
       while (ambient.bell < now + horizon) {
-        bell(midiHz(AMBIENT_NOTES[Math.floor(random() * AMBIENT_NOTES.length)]), ambient.bell, AMBIENT_BELL_GAIN, between(-0.6, 0.6));
+        bell(midiHz(AMBIENT_NOTES[Math.floor(random() * AMBIENT_NOTES.length)]), ambient.bell, AMBIENT_BELL_GAIN, between(-0.6, 0.6), ambientIn);
         ambient.bell += between(AMBIENT_BELL[0], AMBIENT_BELL[1]);
       }
     }
@@ -1172,6 +1378,12 @@
       },
       // The closing harp walks up the ladder (the mirror of the gather); dawn is a soft pad.
       home(t, step, pan) { harp(midiHz(LADDER[clamp(step, 0, LADDER.length - 1)]), t, GATHER_NOTE, pan); },
+      // The score: a year's chord (2026 voiced an octave higher), the final D add9 resolving.
+      year(t, k, dur) { return pad(k === 4 ? CHORDS[0].map(m => m + 12) : CHORDS[k], t, dur, SCORE_CHORD, 0.6, 1.2); },
+      resolve(t) { return pad(RESOLVE_CHORD, t, 4.5, SCORE_CHORD * 1.15, 0.25, 3); },
+      // The dive: a descending whoosh, then a soft ignition-style bell cluster on arrival.
+      dive(t, dur) { noise(t, dur, 5000, 600, 0.9, 0.07, 0, 0, 'arc', 'bandpass'); },
+      arrive(t) { [74, 81, 88, 90].forEach((m, i) => bell(midiHz(m), t + [0, 0.012, 0.025, 0.04][i], 0.035, [-0.3, 0.3, -0.15, 0.15][i], sendHigh)); },
       dawn(t, dur = 1.4) { pad(DAWN_CHORD, t, dur, 0.04, 0.25, 0.6); },   // quick: the master fades out 0.6 s before the swap
       swell(t) { pad(CHORDS[0], t, 6, 0.07); }
     };
@@ -1185,7 +1397,7 @@
     }
     // (descriptors, so the getters stay live)
     Object.defineProperties(audio, Object.getOwnPropertyDescriptors({
-      cue, bell, harp, pad, noise, thump, ambientTick, setSpin,
+      cue, bell, harp, pad, noise, thump, ambientTick, setSpin, meteorVoice,
       get enabled() { return enabled; },
       get ready() { return ready(); },
       get state() { return closed ? 'closed' : context.state; },
@@ -1194,6 +1406,15 @@
       airStop(t, tau) { stopLayer(air, at(t), tau); },
       windStop(t, tau) { stopLayer(wind, at(t), tau); },
       ambientStop, get ambient() { return !!ambient; },
+      // Release the given pad voices (the score's) over about 4 tau.
+      release(entries, tau) { const t = context.currentTime; for (const entry of entries || []) releasePad(entry, t, tau); },
+      // The ambient bus ducks (the score) and returns.
+      duck(level, dur) {
+        if (closed) return;
+        const t = context.currentTime; const g = ambientIn.gain;
+        if (typeof g.cancelAndHoldAtTime === 'function') g.cancelAndHoldAtTime(t); else { g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); }
+        g.linearRampToValueAtTime(level, t + Math.max(0.02, dur));
+      },
       get drone() { return !!drone && !drone.stopped; },
       // Core view lowpasses the whole music bus; backing out opens it again.
       muffle(on, dur) {
@@ -1288,6 +1509,7 @@
       <section class="spira-plate" aria-label="Reading">
         <div class="spira-plate-default">
           <p id="spira-text">${escapeHTML(COPY.text)}</p>
+          <button type="button" class="spira-listen" data-listen>${escapeHTML(COPY.listen)}</button>
           <p class="spira-hint">${escapeHTML(coarse ? COPY.hintTouch : COPY.hintPointer)}</p>
         </div>
         <div class="spira-plate-detail" hidden></div>
@@ -1307,6 +1529,7 @@
         <div class="spira-index-year"><p class="spira-index-label">${year}</p>${PAPERS.map((p, i) => p.year !== year ? '' :
           `<a class="spira-index-link" href="${escapeHTML(paperURL(p.slug))}" title="${escapeHTML(p.title)}" data-paper="${i}">${escapeHTML(p.name)} <span>— ${escapeHTML(p.venue)}</span></a>`).join('')}</div>`).join('')}
       </div>
+      <p class="spira-toast" aria-hidden="true"></p>
       <div class="spira-opening">
         <button type="button" data-sound aria-pressed="true"><span data-sound-label>Sound on</span> <span class="spira-key" aria-hidden="true">m</span></button>
         <button type="button" data-skip>Skip <span class="spira-key" aria-hidden="true">↵</span></button>
@@ -1334,6 +1557,8 @@
     const skipButton = $('[data-skip]');
     const soundButtons = [...dialog.querySelectorAll('[data-sound]')];
     const countButton = $('.spira-count');
+    const toastEl = $('.spira-toast');
+    const listenButton = $('[data-listen]');
     const chartBlocks = [plateEl, noteEl, themesEl, actionsEl];
     const inertBlocks = [stage, centreButton, headEl, plateEl, noteEl, themesEl, actionsEl, indexEl];
     let ctx = null;
@@ -1367,9 +1592,11 @@
     // Core view: a camera flight into the origin, where the page's text spiral lies.
     let coreTarget = 0; let coreU = 0; let coreSpin = 0; let centreHover = false;
     const coreFrom = { yaw: 0, yawTo: 0, pitch: 0, zoom: 1 };
+    let dive = 0; let diveU = 0; let diveWheel = 0; let diveWheelAt = 0; let diveLabels = 1;   // the strange-loop dive
+    const corePinch = { a: -1, b: -1, ax: 0, ay: 0, bx: 0, by: 0, start: 0 };
     const stats = { frames: 0, avgMs: 0, maxMs: 0, byPhase: {} };
     const travelStats = { clockwise: 0, counter: 0 };
-    for (const name of ['dusk', 'gather', 'wind', 'ignite', 'chart', 'meteor', 'core', 'closing']) stats.byPhase[name] = { frames: 0, avgMs: 0, maxMs: 0 };
+    for (const name of ['dusk', 'gather', 'wind', 'ignite', 'chart', 'meteor', 'score', 'core', 'dive', 'closing']) stats.byPhase[name] = { frames: 0, avgMs: 0, maxMs: 0 };
     // Sound: the synthesizer (adopted or created on a gesture), the preference and the cue log.
     let audio = null; let soundOn = true; let audioWarned = false; let audioBroken = false; let audioMissed = false; let audioTimer = 0;
     try { soundOn = localStorage.getItem(SOUND_KEY) !== 'off'; } catch (error) { soundOn = true; }
@@ -1381,10 +1608,17 @@
     let skyT = 0; let nextMeteor = METEOR_FIRST; let discovered = false; let activeMeteors = 0;
     const mX0 = new Float32Array(METEOR_MAX); const mY0 = new Float32Array(METEOR_MAX);
     const mDX = new Float32Array(METEOR_MAX); const mDY = new Float32Array(METEOR_MAX);
-    const mSpeed = new Float32Array(METEOR_MAX); const mBorn = new Float32Array(METEOR_MAX); const mLife = new Float32Array(METEOR_MAX);
+    // Birth times are Float64: they are compared with the sky clock itself.
+    const mSpeed = new Float32Array(METEOR_MAX); const mBorn = new Float64Array(METEOR_MAX); const mPath = new Float32Array(METEOR_MAX);
     const mTail = new Float32Array(METEOR_MAX); const mFade = new Float32Array(METEOR_MAX);
     const mQ = new Int8Array(METEOR_MAX); const mKind = new Uint8Array(METEOR_MAX);   // 0 question, 1 shower, 2 golden
     const mOn = new Uint8Array(METEOR_MAX); const mSounded = new Uint8Array(METEOR_MAX);
+    // Travelled distance (integrated, so bullet time can slow a meteor), its speed share, the
+    // length it crosses inside the viewport, the invitation flag and its held whoosh voice.
+    const mDist = new Float32Array(METEOR_MAX); const mSlow = new Float32Array(METEOR_MAX).fill(1);
+    const mCross = new Float32Array(METEOR_MAX); const mInvite = new Uint8Array(METEOR_MAX); const mVoice = new Array(METEOR_MAX).fill(null);
+    let invited = false; let hintOverride = '';
+    let pointerX = 0; let pointerY = 0; let pointerIn = false; let overMeteor = false;
     const meteorRandom = seeded(Date.now() % 100000);
     // Wishes: caught questions (persisted) and their stars on the next turn.
     const caught = new Uint8Array(NQ); const wishPinned = new Uint8Array(NQ);
@@ -1392,7 +1626,8 @@
     const wishSX = new Float32Array(NQ); const wishSY = new Float32Array(NQ); const wishZ = new Float32Array(NQ); const wishVis = new Uint8Array(NQ);
     const wishLabelWidth = new Float32Array(NQ);
     let caughtCount = 0; let drawn = false; let drawnFade = 0; let nextDrawnWidth = 0;
-    let hoverWish = -1; let selectedWish = -1; let plateView = '';   // plateView: '' | 'wishes' | 'drawn'
+    let hoverWish = -1; let selectedWish = -1; let plateView = '';
+    let bridgeQ = -1; let bridgeFade = 0;   // the wish whose two themes are bridged (kept while fading out)   // plateView: '' | 'wishes' | 'drawn'
     // The catch in progress: the meteor decelerates, its letters re-lay into a line, the line
     // folds into a point that arcs to the next turn.
     let catchQ = -1; let catchT = 0; let catchX = 0; let catchY = 0; let catchDX = 0; let catchDY = 0; let catchV = 0; let catchTail = 0;
@@ -1405,6 +1640,10 @@
     let glyphCanvas = null; let glyphQ = -1; let glyphN = 0; let glyphH = 0; let glyphSize = QUESTION_FONT; let glyphWidth = 0; let glyphDPR = 0;
     // A golden meteor's sparkle (screen space).
     let sparkleX = 0; let sparkleY = 0; let sparkleAge = 99;
+    // The score ("Listen to the spiral"): 0 off, 1 playing, 2 the closing words, 3 stopping.
+    let score = 0; let scoreT = 0; let scoreCueFrom = -1; let scoreYear = -2; let scoreFade = 0; let scorePads = [];
+    let scoreTimer = 0; let scoreLast = 0; let scoreLatest = -1;
+    let scoreKicker = null; let scoreBlocks = []; let scoreRows = [];
     // Reduced motion: a still wish waits at a free spot for a while.
     let stillQ = -1; let stillX = 0; let stillY = 0; let stillTimer = 0;
     const uiOpacity = new Map();
@@ -1416,6 +1655,13 @@
     /* ---- Typed scratch (allocation-free frame loop) ---------------------- */
     const random = seeded(20220101);
     const NP = PAPERS.length;
+    // Sky depth: the nebula for this layout (built a few rows per frame) and the band's stars,
+    // stored bucket by bucket (BAND_ALPHA) so each bucket is one filled path.
+    let nebula = null; let nebulaReady = false; let skyDepth = 0;
+    const bandX = new Float32Array(BAND_COUNT); const bandY = new Float32Array(BAND_COUNT); const bandS = new Float32Array(BAND_COUNT);
+    const bandStart = new Int32Array(BAND_ALPHA.length + 1);
+    const paperRing = new Float32Array(NP).fill(-99);   // score time at which each paper rang
+    const yearGlow = new Float32Array(YEAR_MARKS.length);
     const paperDim = new Float32Array(NP).fill(1); const paperDelay = new Float32Array(NP);   // dawn: stars dim in reverse order
     // Eased label state (see drawLabels).
     const paperFade = new Float32Array(NP); const paperDone = new Uint8Array(NP);
@@ -1581,8 +1827,10 @@
     }
 
     /* ---- Layout ---------------------------------------------------------- */
+    let chromeLeft = 0;
     function measureUI() {
       uiCount = 0;
+      chromeLeft = actionsEl.getBoundingClientRect().left;
       const blocks = indexOpen ? [headEl, plateEl, noteEl, themesEl, actionsEl, indexEl] : [headEl, plateEl, noteEl, themesEl, actionsEl];
       for (const el of blocks) {
         const r = el.getBoundingClientRect();
@@ -1667,6 +1915,7 @@
       headRho = HEAD_RADIUS * minSide;
       sMax = Math.max(sFit * 1.05, HEAD_START_RADIUS * minSide / radiusAt(THETA_IN));
       placeNearStars();
+      placeSkyDepth();
       // The aperture is fully open when its soft edge has passed the farthest corner.
       const corner = Math.hypot(W / 2, H / 2);
       apMax = corner + EDGE_MAX; for (let i = 0; i < 6; i++) apMax = corner + edgeOf(apMax);
@@ -1979,6 +2228,40 @@
         ctx.drawImage(sprites.cool, PX - size / 2, PY - size / 2, size, size);
       }
     }
+    // The nebula and the band follow the chart centre (behind the galaxy). Under reduced motion
+    // (no frame loop) the nebula is built at once; otherwise a few rows per frame.
+    function placeSkyDepth() {
+      nebula = nebulaFor(W, H, chartX, chartY); nebulaReady = nebula.row >= nebula.th;
+      if (!nebulaReady && motion.matches) nebulaReady = nebulaRows(nebula, nebula.th);
+      if (nebulaReady && motion.matches) skyDepth = 1;
+      const n = narrow ? BAND_COUNT_NARROW : BAND_COUNT; const r = seeded(4242);
+      const size = Math.min(W, H); const reach = Math.hypot(W, H) / 2 + NEBULA_MARGIN;
+      const sa = Math.sin(NEBULA_ANGLE); const ca = Math.cos(NEBULA_ANGLE);
+      for (let b = 0; b <= BAND_ALPHA.length; b++) bandStart[b] = Math.round(b * n / BAND_ALPHA.length);
+      for (let i = 0; i < n; i++) {
+        // Along the band uniformly; across it Gaussian (a few strays twice as wide).
+        const along = (r() * 2 - 1) * reach; const across = gaussian(r) * 0.08 * size * (r() < 0.15 ? 2 : 1);
+        bandX[i] = chartX + along * ca - across * sa; bandY[i] = chartY + along * sa + across * ca; bandS[i] = 0.6 + 0.7 * r();
+      }
+    }
+    // The nebula and band, one drawImage plus one path per alpha bucket, swaying gently with the
+    // camera (sin of its yaw, and its pitch): a fraction of the stars' parallax.
+    function drawNebula(alpha, atop) {
+      if (!nebula || !nebulaReady || alpha <= 0.004) return;
+      const offX = NEBULA_SWAY * sYaw; const offY = NEBULA_TILT * (Math.atan2(sPitch, cPitch) - restPitch);
+      ctx.globalCompositeOperation = atop ? 'source-atop' : 'source-over'; ctx.imageSmoothingEnabled = true;
+      ctx.globalAlpha = NEBULA_ALPHA * alpha * skyDepth;
+      ctx.drawImage(nebula.canvas, offX - NEBULA_MARGIN, offY - NEBULA_MARGIN, nebula.tw * NEBULA_CELL, nebula.th * NEBULA_CELL);
+      ctx.fillStyle = '#dfe7f2';
+      for (let b = 0; b < BAND_ALPHA.length; b++) {
+        ctx.globalAlpha = BAND_ALPHA[b] * alpha * skyDepth; ctx.beginPath();
+        for (let i = bandStart[b]; i < bandStart[b + 1]; i++) ctx.rect(bandX[i] + offX, bandY[i] + offY, bandS[i], bandS[i]);
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    // In the opening the sky deepens after the dusk.
+    const skyIn = time => smooth((time - T_DUSK) / 1.0);
     function placeNearStars() {
       // Depth runs from just in front of the disk towards the camera's closest approach.
       // Each star is then pushed back towards the disk until its depth stays above 0.35
@@ -2274,7 +2557,7 @@
       // In core view (and while flying in or out) only the starfield, the bulge and the text
       // spiral remain: the research layers fade out by the middle of the flight.
       const research = layer * (1 - smooth(coreU / 0.5));
-      if (sceneStars) drawStars(layer);
+      if (sceneStars) { drawNebula(layer * (chart ? 1 : skyIn(time))); drawStars(layer); }
       applyCollapse();
       // Project every sample up to the head.
       const last = Math.min(SAMPLE_COUNT - 1, Math.floor((head - THETA_IN) / D_THETA));
@@ -2334,7 +2617,8 @@
       if (spokes > 0 && research > 0.004) {
         ctx.setLineDash(DASH_SPOKE);
         for (let j = 0; j < THEMES.length; j++) {
-          const a = sectorCentre(j); const emphasis = theme < 0 ? 0.2 : theme === j ? 0.55 : 0.06;
+          const a = sectorCentre(j); let emphasis = theme < 0 ? 0.2 : theme === j ? 0.55 : 0.06;
+          if (chart && bridgeQ >= 0 && (QUESTIONS[bridgeQ].a === j || QUESTIONS[bridgeQ].b === j)) emphasis = Math.max(emphasis, BRIDGE_ALPHA * bridgeFade);
           ctx.strokeStyle = THEME_RGBA[j]; ctx.globalAlpha = emphasis * spokes * research;
           ctx.beginPath();
           project(SPOKE_RADII[0] * Math.cos(a), SPOKE_RADII[0] * Math.sin(a), 0); ctx.moveTo(PX, PY);
@@ -2426,7 +2710,9 @@
       }
       if (!chart) drawComet(time, head, headX, headY, layer);
       drawPapers(time, chart, research);
+      if (chart) drawBridge(research);
       if (chart) drawWishes(research * smooth(span(time, T_UI)));
+      if (chart) drawScoreComet(research);
       if (chart && centreHover && coreU <= 0 && project(0, 0, 0)) {
         // The centre is selectable: a quiet ring while it is hovered or focused.
         ctx.globalAlpha = 0.4 * layer; ctx.strokeStyle = CURVE_COLOUR; ctx.lineWidth = 1;
@@ -2501,6 +2787,9 @@
     function drawComet(time, head, x, y, layer) {
       const show = (1 - smooth(span(time, T_HEAD_FADE))) * layer;
       if (show <= 0 || time < T_HEAD[0]) return;
+      drawCometBody(head, x, y, show);
+    }
+    function drawCometBody(head, x, y, show) {
       // A tapered luminous trail along the last COMET_TRAIL rad of curve: alpha and width
       // fall off towards the tail; then a bright core with a soft glow.
       const steps = 18;
@@ -2576,10 +2865,16 @@
         ctx.globalAlpha = 0.22 * a; ctx.drawImage(sprites.glint, PX - 8, PY - 8, 16, 16);
         // Ignition: a flash, a ring and sparks, all analytic in the star's age.
         if (age < PAPER_SPARK_LIFE[1]) drawBurst(PX, PY, age, sprites.themes[paper.theme], THEME_RGBA[paper.theme], p * PAPER_SPARKS, sparks, layer);
+        // The score rings it again, with a smaller sparkle.
+        const rung = chart && score && !motion.matches ? scoreT - paperRing[p] : -1;
+        if (rung >= 0 && rung < PAPER_SPARK_LIFE[1]) {
+          drawBurst(PX, PY, rung, sprites.themes[paper.theme], THEME_RGBA[paper.theme], p * PAPER_SPARKS, Math.round(sparks * SCORE_SPARKLE), layer * SCORE_SPARKLE);
+        }
         ctx.globalCompositeOperation = 'source-over';
         ctx.globalAlpha = Math.min(1, (0.85 + 0.15 * dim) * a + 0.1); ctx.fillStyle = '#f4f7fb';
         ctx.beginPath(); ctx.arc(PX, PY, 1.2, 0, TAU); ctx.fill();
-        if (focus) {
+        // Reduced motion: the score highlights each paper in place as it rings.
+        if (focus || (chart && score && motion.matches && p === scoreLatest)) {
           ctx.globalAlpha = 0.85 * layer; ctx.strokeStyle = THEME_RGBA[paper.theme]; ctx.lineWidth = 1;
           ctx.beginPath(); ctx.arc(PX, PY, 9, 0, TAU); ctx.stroke();
         }
@@ -2662,8 +2957,9 @@
       placedCount = 0;
       // The laid-out question's box dims labels from the re-lay until the line folds away.
       labelDim = chart && catchQ >= 0 ? smooth((catchT - CATCH_RELAY[0]) / 0.3) * (1 - smooth((catchT - CATCH_FOLD) / CATCH_COLLAPSE)) : 0;
-      // No labels in core view; they fade out early in the flight towards it.
-      layer *= 1 - smooth(coreU * 3);
+      // No labels in core view; they fade out early in the flight towards it (and appear in a
+      // dive's arriving galaxy only once it is large enough).
+      layer *= (1 - smooth(coreU * 3)) * diveLabels;
       if (layer <= 0.004) return;
       // Fades run on time in the chart as well (t keeps counting to T_SETTLED), so the
       // hand-over at T_CHART cannot snap.
@@ -2680,6 +2976,20 @@
         paperLabelBox(p, true);
         addObstacle(labelX - 3, labelY - 1, labelX + focusWidth[p] + 5, labelY + 15);
         ctx.globalAlpha = layer * dimFor(labelX - 3, labelY - 1, labelX + focusWidth[p] + 5, labelY + 15); ctx.fillText(FOCUS_LABELS[p], labelX + 1, paperSY[p]);
+      }
+      // 2b. Papers the score has just rung are named brightly (they fade back after SCORE_GLOW s).
+      if (chart && score) {
+        ctx.fillStyle = '#f4f7fb';
+        for (let p = 0; p < NP; p++) {
+          const boost = scoreBoost(p);
+          if (boost <= 0.02 || !paperVis[p] || paperDone[p]) continue;
+          paperLabelBox(p);
+          if (blocked(labelX, labelY, labelWidth[p] + 2, 14, p)) continue;
+          paperDone[p] = 1; if (labelPrimary) paperFade[p] = 1;
+          addObstacle(labelX - 3, labelY - 1, labelX + labelWidth[p] + 5, labelY + 15);
+          drawPaperLabel(p, layer * lerp(0.75, 1, boost));
+        }
+        ctx.fillStyle = LABEL_COLOUR;
       }
       // A selected or hovered wish star names its question, in the warm serif, above it.
       if (chart) {
@@ -2744,6 +3054,9 @@
         ctx.textAlign = right ? 'right' : 'left';
         ctx.globalAlpha = 0.85 * seen * fade * dimFor(x0 - 2, y - 7, x0 + w + 2, y + 7); ctx.fillStyle = m === YEAR_MARKS.length - 1 ? LABEL_COLOUR : MUTED_COLOUR;
         ctx.fillText(nextDrawn ? NEXT_DRAWN : mark.label, x, y);
+        // The score's current year glows warm.
+        if (labelPrimary) yearGlow[m] = easeLabel(yearGlow[m], chart && score === 1 && scoreYear === m ? 1 : 0);
+        if (yearGlow[m] > 0.01) { ctx.globalAlpha = yearGlow[m] * seen * fade; ctx.fillStyle = WARM; ctx.fillText(mark.label, x, y); }
       }
       // Wish stars keep paper labels and ghost words off them (theme and year labels come first).
       if (chart) for (let q = 0; q < NQ; q++) if (wishVis[q]) addObstacle(wishSX[q] - 6, wishSY[q] - 6, wishSX[q] + 6, wishSY[q] + 6);
@@ -2815,7 +3128,8 @@
       value = Math.round(clamp01(value) * 1000) / 1000;
       if (uiOpacity.get(el) === value) return;
       uiOpacity.set(el, value);
-      if (value >= 1) el.style.removeProperty('opacity'); else el.style.opacity = String(value);
+      if (el === openingEl || el === actionsEl) { if (value >= 1) el.style.removeProperty('--spira-fade'); else el.style.setProperty('--spira-fade', String(value)); }
+      else if (value >= 1) el.style.removeProperty('opacity'); else el.style.opacity = String(value);
     }
     function renderOpening(time, layer) {
       const dusk = time < T_DUSK;
@@ -2823,6 +3137,7 @@
       openingCamera(time);
       if (dusk) drawAperture(radius, edge, layer);
       if (time < T_IGNITE) {
+        if (!dusk) drawNebula(layer * skyIn(time));
         if (dusk) drawStars(layer, radius, edge); else drawStars(layer);
         applyCollapse();
         drawSpiralDots(time, layer);
@@ -2849,6 +3164,7 @@
       const u = skipStart >= 0 ? clamp01((now - skipStart) / SKIP_FADE_MS) : 1;
       if (u < 1 && remnantT >= 0) { labelPrimary = false; renderOpening(remnantT, 1 - u); labelPrimary = true; }
       if (motion.matches) updatePath(0);
+      if (dive) { renderDive(now); return; }
       chartCamera(); drawScene(t, true, u);
       drawSky(u);
     }
@@ -2860,6 +3176,8 @@
       const real = lastNow ? Math.max(0, now - lastNow) / 1000 : 0;
       lastNow = now;
       const dt = Math.min(real, 1 / 30);
+      if (nebula && !nebulaReady) nebulaReady = nebulaRows(nebula, NEBULA_ROWS);
+      if (nebulaReady && skyDepth < 1) skyDepth = Math.min(1, skyDepth + dt);
       step(dt, now);
       labelEase = motion.matches ? 1 : 1 - Math.exp(-dt / LABEL_TAU);
       labelSlideEase = motion.matches ? 1 : 1 - Math.exp(-dt / LABEL_SLIDE_TAU);
@@ -2879,7 +3197,7 @@
       schedule();
     }
     function record(ms) {
-      const name = phase !== 'chart' ? phase : coreU > 0 || coreTarget ? 'core' : activeMeteors > 0 || catchQ >= 0 ? 'meteor' : 'chart';
+      const name = phase !== 'chart' ? phase : dive ? 'dive' : coreU > 0 || coreTarget ? 'core' : score === 1 ? 'score' : activeMeteors > 0 || catchQ >= 0 ? 'meteor' : 'chart';
       const entry = stats.byPhase[name] || stats.byPhase.chart;
       entry.frames++; entry.avgMs += (ms - entry.avgMs) / entry.frames; entry.maxMs = Math.max(entry.maxMs, ms);
       stats.frames++; stats.avgMs += (ms - stats.avgMs) / stats.frames; stats.maxMs = Math.max(stats.maxMs, ms);
@@ -2932,6 +3250,9 @@
         }
       }
       updatePath(dt);
+      stepBridge(dt);
+      if (dive) { stepDive(dt); return; }
+      if (!motion.matches) stepScore(dt);
       stepSky(dt);
       if (audio && soundOn) {
         // Spinning the galaxy fast makes a soft wind that follows |yaw velocity|.
@@ -2939,7 +3260,7 @@
         const level = coreU > 0 || motion.matches || held ? 0 : SPIN_MAX * smooth((Math.abs(vYaw) - 0.6) / 4);
         try { audio.setSpin(level); } catch (error) { audioFailed(error); }
       }
-      if (coreTarget !== coreU) coreU = motion.matches ? coreTarget : clamp01(coreU + (coreTarget ? 1 : -1) * dt / CORE_FLIGHT);
+      if (coreTarget !== coreU) coreU = motion.matches ? coreTarget : clamp01(coreU + (coreTarget ? 1 : -1) * dt * timeScale / CORE_FLIGHT);
       if (coreTarget && !motion.matches) coreSpin += CORE_SPIN * dt;
       if (coreU > 0) return;   // the chart camera is held while the core is open
       if (!motion.matches) {
@@ -2948,7 +3269,7 @@
           const decay = Math.exp(-dt / INERTIA_TAU); vYaw *= decay; vPitch *= decay;
           if (Math.abs(vYaw) < 1e-3 && Math.abs(vPitch) < 1e-3) { vYaw = 0; vPitch = 0; }
         }
-        if (performance.now() - lastInteraction > IDLE_DELAY_MS) yaw += DRIFT * dt;
+        if (performance.now() - lastInteraction > IDLE_DELAY_MS && !score) yaw += DRIFT * dt;   // the drift pauses for the score
         zoom += (zoomTarget - zoom) * (1 - Math.exp(-dt / ZOOM_TAU));
         if (Math.abs(zoom - zoomTarget) < 1e-4) zoom = zoomTarget;
       } else zoom = zoomTarget;
@@ -2991,7 +3312,7 @@
       mode = 'opening'; t = 0; phase = ''; setPhase('dusk');
       replayStart = -1; skipStart = -1; remnantT = -1;
       // The sky empties (a catch in progress is pinned at once); the opening's cues start again.
-      finishCatch(); mOn.fill(0); activeMeteors = 0; stillQ = -1; clearTimeout(stillTimer); stillTimer = 0;
+      finishCatch(); clearMeteors(); stillQ = -1; clearTimeout(stillTimer); stillTimer = 0;
       cueFrom = -1; lastGatherNote = -1;
       if (audio) { try { audio.ambientStop(audio.now(), 0.4); } catch (error) { audioFailed(error); } }
       dialog.classList.remove('is-fading-replay', 'is-fading-skip', 'is-night', 'is-lift');
@@ -3014,7 +3335,7 @@
       cue('ambient', t, a => a.cue.ambient(a.now()));
       if (motion.matches) scheduleStill();
       if (wasOpening && (!dialog.contains(document.activeElement) || openingEl.contains(document.activeElement) || document.activeElement === dialog)) {
-        closeButton.focus({ preventScroll: true });
+        stage.focus({ preventScroll: true });
       }
       measureUI();
     }
@@ -3033,12 +3354,13 @@
         skipStart = performance.now();
         dialog.classList.add('is-fading-skip');
       }
-      closeButton.focus({ preventScroll: true });
+      stage.focus({ preventScroll: true });   // Space then catches meteors; Close keeps its own Space
       announce('The research spiral is ready.');
       if (instant) redraw(); else schedule();
     }
     function replay() {
       if (mode !== 'chart' || motion.matches || !ctx || closed || leaving) return;
+      stopScore(); score = 0;
       let captured = [];
       try { captured = captureWords(); prepareWords(captured); } catch (error) { console.warn('The page could not be gathered again.', error); releaseWords(); }
       html.classList.add('spira-hide-text');
@@ -3057,7 +3379,7 @@
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
       events.abort();
-      clearTimeout(stillTimer); clearInterval(audioTimer); stillTimer = 0; audioTimer = 0;
+      clearTimeout(stillTimer); clearInterval(audioTimer); clearTimeout(chromeTimer); clearTimeout(toastTimer); clearInterval(scoreTimer); stillTimer = 0; audioTimer = 0; scoreTimer = 0;
       if (audio) { try { audio.close(!closeDone); } catch (error) { /* already closed */ } audio = null; }
       // A context primed for an egg that never adopted it is closed too.
       if (window.__spiraAudioContext) { try { window.__spiraAudioContext.close().catch(() => {}); } catch (error) { /* ignore */ } try { delete window.__spiraAudioContext; } catch (error) { window.__spiraAudioContext = undefined; } }
@@ -3127,6 +3449,8 @@
       closeUIFrom.clear();
       for (const el of [headEl, ...chartBlocks, indexEl, openingEl]) closeUIFrom.set(el, uiOpacity.has(el) ? uiOpacity.get(el) : 1);
       closeSky = mode === 'chart' ? 1 : 0;
+      clearInterval(scoreTimer); scoreTimer = 0; scorePads = [];
+      for (let i = 0; i < METEOR_MAX; i++) if (mVoice[i]) { try { mVoice[i].end(0.2); } catch (error) { /* closing */ } mVoice[i] = null; }
       closeCueFrom = closeT - 1e-6; lastHomeNote = -1;
       soundClose();
       clearTimeout(stillTimer); stillTimer = 0;
@@ -3186,6 +3510,7 @@
       const irisE = clamp(DAWN_EDGE[0] * irisR, DAWN_EDGE[1], DAWN_EDGE[2]);
       const bandR = irisR - irisE / 2;
       if (irisR > 0.5) drawAperture(bandR, irisE, 1, cx, cy, false, false);
+      if (irisR > 0.5) drawNebula(1 - smooth(irisU * 2.5), true);
       const uc = span(ct, DAWN_COLLAPSE); const e = easeInOutCubic(uc);
       if (closeLift && liftSprite && uc < 1) { ctx.globalAlpha = 1 - smooth(uc); ctx.drawImage(liftSprite, 0, 0, W, H); }
       // The starfield eases from the camera's pose at the close back to the opening's first pose.
@@ -3407,6 +3732,7 @@
       soundOn = value;
       try { localStorage.setItem(SOUND_KEY, value ? 'on' : 'off'); } catch (error) { /* storage unavailable */ }
       renderSoundButtons();
+      if (scoreKicker && plateView === 'score') scoreKicker.textContent = value ? COPY.scoreKicker : `${COPY.scoreKicker} · ${COPY.scoreSoundOff}`;
       if (value) {
         audioMissed = true;
         if (!audio) adoptAudio();
@@ -3521,7 +3847,7 @@
     function updateHint() {
       const touch = coarse || narrow;
       const base = touch ? COPY.hintTouch : COPY.hintPointer;
-      const text = discovered ? `${base} · ${touch ? COPY.catchTouch : COPY.catchPointer}` : base;
+      const text = hintOverride || (discovered ? `${base} · ${touch ? COPY.catchTouch : COPY.catchPointer}` : base);
       if (hintEl.textContent !== text) hintEl.textContent = text;
     }
     function updateCount() {
@@ -3579,6 +3905,31 @@
         }
       }
     }
+    // Hovering or selecting a wish star bridges its two themes: their spokes light up and a faint
+    // arc joins their rim labels, through the wish's own angle (the shorter way).
+    function stepBridge(dt) {
+      const target = hoverWish >= 0 ? hoverWish : selectedWish;
+      if (target >= 0) bridgeQ = target;
+      const goal = target >= 0 ? 1 : 0;
+      bridgeFade = motion.matches ? goal : bridgeFade + (goal - bridgeFade) * (1 - Math.exp(-dt / BRIDGE_TAU));
+      if (bridgeFade < 0.002 && goal === 0) { bridgeFade = 0; bridgeQ = -1; }
+    }
+    function drawBridge(layer) {
+      if (bridgeQ < 0 || bridgeFade <= 0.004 || layer <= 0.004) return;
+      const Q = QUESTIONS[bridgeQ];
+      const a = sectorCentre(Q.a); let d = sectorCentre(Q.b) - a; d -= TAU * Math.round(d / TAU);
+      const r = BRIDGE_ARC[0]; const steps = 32;
+      ctx.setLineDash(NO_DASH); ctx.lineWidth = 1; ctx.lineCap = 'round';
+      for (let half = 0; half < 2; half++) {
+        ctx.strokeStyle = THEME_RGBA[half ? Q.b : Q.a]; ctx.globalAlpha = BRIDGE_ARC[1] * bridgeFade * layer;
+        ctx.beginPath();
+        for (let k = half * steps / 2; k <= (half + 1) * steps / 2; k++) {
+          const th = a + d * k / steps; project(r * Math.cos(th), r * Math.sin(th), 0);
+          if (k === half * steps / 2) ctx.moveTo(PX, PY); else ctx.lineTo(PX, PY);
+        }
+        ctx.stroke();
+      }
+    }
     function nearestWish(x, y, radius) {
       let best = -1; let bestD = radius;
       for (let q = 0; q < NQ; q++) {
@@ -3588,19 +3939,22 @@
       }
       return best;
     }
+    function updateCursor() { stage.classList.toggle('is-over', hoverPaper >= 0 || hoverWish >= 0 || overMeteor); }
     function setHoverWish(q, sound) {
       if (hoverWish === q) return;
-      hoverWish = q; stage.classList.toggle('is-over', q >= 0 || hoverPaper >= 0);
+      hoverWish = q; updateCursor(); if (motion.matches) stepBridge(0);
       if (q >= 0 && sound) playWish(q);
       redraw();
     }
     function selectWish(q) {
-      selectedWish = q;
+      if (q >= 0) stopScore();
+      selectedWish = q; if (motion.matches) stepBridge(0);
       if (q >= 0) { selectedPaper = -1; selectedTheme = -1; plateView = ''; }
       updatePlate();
     }
     function showWishList() {
       if (mode !== 'chart' || coreTarget === 1) return;
+      stopScore();
       selectedPaper = -1; selectedTheme = -1; selectedWish = -1; plateView = 'wishes';
       updatePlate();
     }
@@ -3636,7 +3990,7 @@
       catchQ = -1;
       for (let q = 0; q < NQ; q++) { caught[q] = 0; wishPinned[q] = 0; if (motion.matches) wishFade[q] = 0; }
       caughtCount = 0; drawn = false; if (motion.matches) drawnFade = 0;
-      for (let i = 0; i < METEOR_MAX; i++) if (mKind[i] !== 0) mOn[i] = 0;
+      for (let i = 0; i < METEOR_MAX; i++) if (mOn[i] && mKind[i] !== 0) dropMeteor(i, 0.1);
       saveWishes(); updateCount();
       selectedWish = -1; plateView = '';
       updatePlate();
@@ -3680,7 +4034,9 @@
       let i = 0; while (i < METEOR_MAX && mOn[i]) i++;
       if (i >= METEOR_MAX) return -1;
       const speeds = narrow ? METEOR_SPEED_NARROW : METEOR_SPEED;
-      const speed = lerp(speeds[0], speeds[1], meteorRandom());
+      // The session's first question meteor, while nothing is caught, is a slow invitation.
+      const invite = kind === 0 && !invited && caughtCount === 0;
+      const speed = invite ? METEOR_INVITE[narrow ? 1 : 0] : lerp(speeds[0], speeds[1], meteorRandom());
       if (!sign) sign = meteorRandom() < 0.5 ? 1 : -1;
       const a = (angle === undefined ? lerp(METEOR_ANGLE[0], METEOR_ANGLE[1], meteorRandom()) : angle) * Math.PI / 180;
       const dx = sign * Math.cos(a); const dy = Math.sin(a);
@@ -3690,14 +4046,27 @@
       const ahead = Math.max(0, Math.min((H + m - py) / dy, sign > 0 ? (W + m - px) / dx : (-m - px) / dx));
       const tail = narrow ? METEOR_TAIL_NARROW : METEOR_TAIL;
       mX0[i] = px - dx * back; mY0[i] = py - dy * back; mDX[i] = dx; mDY[i] = dy; mSpeed[i] = speed;
-      mBorn[i] = now ? skyT - back / speed : born; mLife[i] = (back + ahead + tail) / speed; mTail[i] = tail; mFade[i] = 1;
-      mQ[i] = q; mKind[i] = kind; mOn[i] = 1; mSounded[i] = 0;
+      mBorn[i] = now ? skyT : born; mDist[i] = now ? back : 0; mSlow[i] = 1;
+      mCross[i] = back + ahead; mPath[i] = back + ahead + tail; mTail[i] = tail; mFade[i] = 1;
+      mQ[i] = q; mKind[i] = kind; mOn[i] = 1; mSounded[i] = 0; mInvite[i] = invite ? 1 : 0;
       if (kind === 0 && q >= 0) buildGlyphs(q);
+      if (invite) {
+        // It announces itself as it appears.
+        invited = true; hintOverride = coarse || narrow ? COPY.inviteTouch : COPY.invitePointer;
+        discover(); updateHint();
+      }
       return i;
     }
+    // A meteor leaves the sky: its whoosh is released, and an invitation hands the hint back.
+    function dropMeteor(i, tau) {
+      if (mVoice[i]) { try { mVoice[i].end(tau); } catch (error) { audioFailed(error); } mVoice[i] = null; }
+      if (mOn[i] && mInvite[i]) { mInvite[i] = 0; hintOverride = ''; updateHint(); }
+      mOn[i] = 0;
+    }
+    function clearMeteors() { for (let i = 0; i < METEOR_MAX; i++) if (mOn[i]) dropMeteor(i, 0.08); activeMeteors = 0; }
     let MX = 0; let MY = 0; let MD = 0;
     function meteorHeadAt(i) {
-      MD = Math.max(0, skyT - mBorn[i]) * mSpeed[i];
+      MD = mDist[i];
       MX = mX0[i] + mDX[i] * MD; MY = mY0[i] + mDY[i] * MD;
     }
     // A catchable meteor near (x, y): within CATCH_HEAD of the head, or CATCH_TAIL[0] of the
@@ -3723,7 +4092,7 @@
     }
     function catchMeteor(i) {
       meteorHeadAt(i);
-      const kind = mKind[i]; const q = mQ[i]; mOn[i] = 0;
+      const kind = mKind[i]; const q = mQ[i]; dropMeteor(i, 0.15);
       if (kind === 2) {
         // A golden meteor only sparkles.
         sparkleX = MX; sparkleY = MY; sparkleAge = 0;
@@ -3962,7 +4331,11 @@
       activeMeteors = 0;
       if (!open) {
         // Meteors fade out within 0.3 s; a catch in progress is pinned at once.
-        for (let i = 0; i < METEOR_MAX; i++) if (mOn[i]) { mFade[i] -= dt / 0.3; if (mFade[i] <= 0) mOn[i] = 0; else activeMeteors++; }
+        for (let i = 0; i < METEOR_MAX; i++) {
+          if (!mOn[i]) continue;
+          if (mVoice[i]) { try { mVoice[i].end(0.1); } catch (error) { audioFailed(error); } mVoice[i] = null; }
+          mFade[i] -= dt / 0.3; if (mFade[i] <= 0) dropMeteor(i, 0.1); else activeMeteors++;
+        }
         if (coreTarget === 1) finishCatch();
         return;
       }
@@ -3974,7 +4347,7 @@
       drawnFade = clamp01(drawnFade + (drawn ? 1 : -1) * sky / DRAWN_FADE);
       if (sparkleAge < 99) sparkleAge += sky;
       if (skyT >= nextMeteor) {
-        if (catchQ < 0 && questionMeteor() < 0) {
+        if (catchQ < 0 && questionMeteor() < 0 && !score) {
           if (drawn) { spawnMeteor(2, -1, skyT); nextMeteor = skyT + lerp(GOLDEN_GAP[0], GOLDEN_GAP[1], meteorRandom()); }
           else {
             const q = pickQuestion();
@@ -3983,21 +4356,33 @@
           }
         } else nextMeteor = skyT + 1;
       }
+      const ease = 1 - Math.exp(-sky / BULLET_TAU);
       for (let i = 0; i < METEOR_MAX; i++) {
-        if (!mOn[i]) continue;
-        const age = skyT - mBorn[i];
-        if (age < 0) continue;
+        if (!mOn[i] || skyT < mBorn[i]) continue;
         activeMeteors++;
+        meteorHeadAt(i);
+        // Bullet time: a pointer near the head of a catchable meteor slows it to 35 %.
+        const near = pointerIn && mKind[i] !== 1 && Math.hypot(pointerX - MX, pointerY - MY) < BULLET_RADIUS;
+        mSlow[i] += ((near ? BULLET_SPEED : 1) - mSlow[i]) * ease;
+        mDist[i] += mSpeed[i] * mSlow[i] * sky;
+        meteorHeadAt(i);
         if (!mSounded[i]) {
-          // The whoosh sweeps across the meteor's life, panned from its entry to its exit.
           mSounded[i] = 1;
-          const life = Math.max(0.2, mLife[i] - age) / Math.max(timeScale, 1e-3);
-          const pan0 = panX(mX0[i] + mDX[i] * mSpeed[i] * age); const pan1 = panX(mX0[i] + mDX[i] * mSpeed[i] * mLife[i]);
-          const gain = mKind[i] === 1 ? 0.02 : 0.06;
-          cue('whoosh', skyT, a => a.cue.whoosh(a.now(), life, pan0, pan1, gain));
+          const pan0 = panX(MX); const exitX = mX0[i] + mDX[i] * mCross[i];
+          if (mKind[i] === 1) {
+            // Shower meteors: a fixed, ducked whoosh across their crossing.
+            const life = Math.max(0.2, (mPath[i] - MD) / mSpeed[i]) / Math.max(timeScale, 1e-3); const pan1 = panX(exitX);
+            cue('whoosh', skyT, a => a.cue.whoosh(a.now(), life, pan0, pan1, 0.02));
+          } else cue('whoosh', skyT, a => { mVoice[i] = a.meteorVoice(a.now(), pan0, 0.06); });
         }
-        if (age > mLife[i]) { mOn[i] = 0; if (mKind[i] === 0) discover(); }
+        if (mVoice[i]) {
+          try { mVoice[i].update(MD / Math.max(1, mCross[i]), panX(MX), (1 - mSlow[i]) / (1 - BULLET_SPEED)); } catch (error) { audioFailed(error); }
+        }
+        if (MD > mPath[i]) { const passed = mKind[i] === 0; dropMeteor(i, 0.08); if (passed) discover(); }
       }
+      // The cursor is a pointer over a catchable meteor.
+      const over = pointerIn && meteorAt(pointerX, pointerY) >= 0;
+      if (over !== overMeteor) { overMeteor = over; updateCursor(); }
       if (catchQ >= 0) {
         catchT += sky;
         if (catchT >= CATCH_PIN) finishCatch();
@@ -4042,6 +4427,116 @@
       scheduleStill(); redraw();
     }
 
+    /* ---- The score: "Listen to the spiral" -------------------------------- */
+    // About 19 s: a comet traces the spiral from its inner start through 2022-2026 (one year
+    // per turn, at constant angular speed within each year). Each paper it passes rings and
+    // sparkles, each year plays its chord and glows, and the plate shows the year with its
+    // papers appearing as they ring. Then the comet runs on along the next turn, caught wishes
+    // chime, and a final chord resolves.
+    function startScore() {
+      if (mode !== 'chart' || leaving || coreTarget === 1 || coreU > 0 || score === 1 || score === 2) return;
+      selectedPaper = -1; selectedTheme = -1; selectedWish = -1; setIndex(false); finishCatch();
+      score = 1; scoreT = 0; scoreCueFrom = -1; scoreYear = -2; scoreFade = 1; scoreLatest = -1; paperRing.fill(-99);
+      vYaw = 0; vPitch = 0; plateView = 'score';
+      updatePlate();
+      listenButton.textContent = 'Stop';
+      cue('score', 0, a => a.duck(SCORE_DUCK, 0.6));
+      announce(`${COPY.scoreKicker}.`);
+      if (motion.matches) {
+        // No moving comet: a timer steps through the papers with the same timing, redrawing in place.
+        scoreLast = performance.now();
+        scoreTimer = setInterval(() => { const now = performance.now(); stepScore((now - scoreLast) / 1000); scoreLast = now; redraw(); }, 50);
+      }
+      interact(); redraw();
+    }
+    function stopScore() {
+      if (score !== 1 && score !== 2) return;
+      score = motion.matches ? 0 : 3; scoreFade = 1;
+      clearInterval(scoreTimer); scoreTimer = 0;
+      if (audio) { try { audio.release(scorePads, SCORE_STOP / 4); audio.duck(1, 0.8); } catch (error) { audioFailed(error); } }
+      scorePads = [];
+      listenButton.textContent = COPY.listen;
+      if (plateView === 'score') { plateView = ''; updatePlate(); }
+      redraw();
+    }
+    function endScore() {
+      score = 0; clearInterval(scoreTimer); scoreTimer = 0; scorePads = [];
+      if (audio) { try { audio.duck(1, 1.2); } catch (error) { audioFailed(error); } }
+      listenButton.textContent = COPY.listen;
+      if (plateView === 'score') { plateView = ''; updatePlate(); }
+    }
+    // The score plate: a kicker, then all year blocks (and the closing words) stacked in one grid
+    // cell, so the tallest sets the height and swapping years never moves the layout.
+    function buildScorePlate() {
+      scoreKicker = element('p', 'spira-plate-kicker', soundOn ? COPY.scoreKicker : `${COPY.scoreKicker} · ${COPY.scoreSoundOff}`);
+      const stack = element('div', 'spira-score-stack'); scoreBlocks = []; scoreRows = new Array(NP).fill(null);
+      for (let k = 0; k < SCORE_YEARS.length; k++) {
+        const block = element('div', 'spira-score-block');
+        block.append(element('p', 'spira-score-year', String(FIRST_YEAR + k)));
+        PAPERS.forEach((p, i) => {
+          if (p.year !== FIRST_YEAR + k) return;
+          const row = element('p', 'spira-score-row', p.name); row.append(element('span', '', ` · ${p.venue}`));
+          scoreRows[i] = row; block.append(row);
+        });
+        scoreBlocks.push(block); stack.append(block);
+      }
+      const end = element('div', 'spira-score-block');
+      end.append(element('h3', 'spira-plate-title', COPY.scoreEndTitle), element('p', 'spira-core-text', COPY.scoreEndText));
+      scoreBlocks.push(end); stack.append(end);
+      const stop = element('button', 'spira-listen', 'Stop'); stop.type = 'button'; stop.dataset.scoreStop = '';
+      plateDetail.append(scoreKicker, stack, stop);
+      showScoreBlock(scoreYear);
+      for (let p = 0; p < NP; p++) if (paperRing[p] > -99 && scoreRows[p]) scoreRows[p].classList.add('is-on');
+    }
+    function showScoreBlock(y) {
+      const shown = y < 0 ? 0 : y > 4 ? 5 : y;
+      scoreBlocks.forEach((block, k) => block.classList.toggle('is-on', k === shown));
+    }
+    function scoreCues() {
+      cueLo = scoreCueFrom; cueHi = scoreT + AUDIO_LOOKAHEAD * timeScale; scoreCueFrom = cueHi;
+      const now = scoreT; const scale = 1 / Math.max(timeScale, 1e-3);
+      for (let k = 0; k < SCORE_YEARS.length; k++) {
+        const c = SCORE_AT[k + 1]; if (!crosses(c)) continue;
+        const dur = (SCORE_YEARS[k] + 1.2) * scale;
+        cue('year', c, a => { scorePads.push(...a.cue.year(audioAt(a, c, now), k, dur)); });
+      }
+      for (let p = 0; p < NP; p++) {
+        const paper = PAPERS[p]; const c = paper.scoreAt; if (!crosses(c)) continue;
+        paperRing[p] = c; scoreLatest = p;
+        if (scoreRows[p]) scoreRows[p].classList.add('is-on');
+        const pan = panX(paperSX[p]);
+        cue('ring', c, a => a.cue.paper(audioAt(a, c, now), paper.theme, paper.year, pan));
+      }
+      for (let q = 0; q < NQ; q++) {
+        if (!wishPinned[q]) continue;
+        const Q = QUESTIONS[q]; const c = Q.scoreAt; if (!crosses(c)) continue;
+        const pan = panX(wishSX[q]);
+        cue('chime', c, a => a.cue.dyad(audioAt(a, c, now), Q.a, Q.b, 0.05, pan));
+      }
+      const resolve = SCORE_TOTAL;   // after the last chime
+      if (crosses(resolve)) cue('resolve', resolve, a => { scorePads.push(...a.cue.resolve(audioAt(a, resolve, now))); });
+    }
+    function stepScore(dt) {
+      if (!score) return;
+      if (score === 3) { scoreFade -= dt / SCORE_STOP; if (scoreFade <= 0) { score = 0; scoreFade = 0; } return; }
+      scoreT += dt * timeScale;
+      scoreCues();
+      const y = scoreYearAt(scoreT);
+      if (y !== scoreYear) { scoreYear = y; showScoreBlock(y); }
+      if (score === 1 && scoreT >= SCORE_TOTAL) score = 2;
+      if (score === 2 && scoreT >= SCORE_TOTAL + SCORE_OUTRO) endScore();
+    }
+    // A rung paper's label stays bright for SCORE_GLOW s.
+    const scoreBoost = p => (score && paperRing[p] > -99 && scoreT >= paperRing[p] ? 1 - smooth((scoreT - paperRing[p] - (SCORE_GLOW - 0.5)) / 0.5) : 0);
+    function drawScoreComet(layer) {
+      if (!score || motion.matches || scoreT > SCORE_TOTAL) return;
+      const show = (score === 3 ? scoreFade : 1) * (1 - smooth((scoreT - (SCORE_TOTAL - 0.6)) / 0.6)) * layer;
+      if (show <= 0.004) return;
+      const head = scoreTheta(scoreT);
+      projectAt(head, 1);
+      drawCometBody(head, PX, PY, show);
+    }
+
     /* ---- Plate, themes, index -------------------------------------------- */
     function announce(text) { statusEl.textContent = text; }
     function element(tag, className, text) {
@@ -4058,13 +4553,14 @@
         const back = element('button', 'spira-back', COPY.backOut); back.type = 'button';
         on(back, 'click', backOut);
         plateDetail.append(element('p', 'spira-plate-kicker', COPY.coreKicker), element('h3', 'spira-plate-title', COPY.coreTitle),
-          element('p', 'spira-core-text', COPY.coreText), back);
+          element('p', 'spira-core-text', COPY.coreText), element('p', 'spira-hint', coarse || narrow ? COPY.deeperTouch : COPY.deeperPointer), back);
         announce(`${COPY.coreKicker}. ${COPY.coreTitle}`);
       } else if (selectedPaper >= 0) {
         const p = PAPERS[selectedPaper];
         const link = element('a', 'spira-link', 'Read the paper page →'); link.href = paperURL(p.slug);
-        plateDetail.append(element('p', 'spira-plate-kicker', `${p.year} · ${THEMES[p.theme].label}`),
-          element('h3', 'spira-plate-title', p.title), element('p', 'spira-venue', p.venue), link);
+        plateDetail.append(element('p', 'spira-plate-kicker', `${p.year} · ${THEMES[p.theme].label}`), element('h3', 'spira-plate-title', p.title));
+        if (TAKEAWAYS[p.slug]) plateDetail.append(element('p', 'spira-takeaway', TAKEAWAYS[p.slug]));
+        plateDetail.append(element('p', 'spira-venue', p.venue), link);
         announce(`${p.name}, ${p.year}, ${THEMES[p.theme].label}.`);
       } else if (selectedWish >= 0) {
         const q = QUESTIONS[selectedWish];
@@ -4086,6 +4582,8 @@
           row.append(list); plateDetail.append(row);
         }
         announce(`${theme.label}. ${theme.question}`);
+      } else if (plateView === 'score') {
+        buildScorePlate();
       } else if (plateView) {
         // The caught open questions; once all ten are caught, the next turn is drawn.
         if (drawn) {
@@ -4113,11 +4611,13 @@
       redraw();
     }
     function selectTheme(j) {
+      stopScore();
       selectedTheme = selectedTheme === j ? -1 : j; selectedPaper = -1; selectedWish = -1; plateView = '';
       if (selectedTheme === j) playTheme(j);   // its papers as an arpeggio, in order
       interact(); updatePlate();
     }
     function selectPaper(p) {
+      if (p >= 0) stopScore();
       selectedPaper = p; if (p >= 0) { selectedTheme = -1; selectedWish = -1; plateView = ''; playPaper(p, true); }
       updatePlate();
     }
@@ -4127,13 +4627,14 @@
     }
     function setHover(p, sound) {
       if (hoverPaper === p) return;
-      hoverPaper = p; stage.classList.toggle('is-over', p >= 0 || hoverWish >= 0);
+      hoverPaper = p; updateCursor();
       if (p >= 0 && sound) playPaper(p, false);   // brushing across the spiral strums it
       redraw();
     }
 
     function enterCore() {
       if (mode !== 'chart' || coreTarget === 1 || leaving) return;
+      stopScore();
       // Remember the chart camera; the flight back returns to it exactly.
       coreFrom.yaw = yaw; coreFrom.pitch = pitch; coreFrom.zoom = zoom;
       coreFrom.yawTo = yaw - (((yaw % TAU) + TAU + Math.PI) % TAU - Math.PI);
@@ -4150,7 +4651,7 @@
       interact(); redraw();
     }
     function backOut() {
-      if (coreTarget !== 1) return;
+      if (coreTarget !== 1 || dive) return;
       coreTarget = 0;
       if (motion.matches) { coreU = 0; coreSpin = 0; }
       if (audio) { try { audio.muffle(false, motion.matches ? 0.05 : CORE_FLIGHT); } catch (error) { audioFailed(error); } }
@@ -4159,6 +4660,60 @@
       centreButton.focus({ preventScroll: true });
       interact(); redraw();
     }
+    /* ---- Strange loop: dive from the page into the galaxy ------------------ */
+    // From the core view the camera keeps zooming into the text spiral's vanishing point. The
+    // words stream outward and fade; at the centre the whole galaxy appears, tiny and turning,
+    // and grows (log scale, easeInOutCubic: a constant perceptual zoom speed) until it is
+    // exactly the chart view the core was entered from. Repeatable without limit.
+    function startDive() {
+      if (dive || mode !== 'chart' || leaving || coreTarget !== 1 || coreU < 0.98) return;
+      dive = 1; diveU = 0; diveWheel = 0; corePinch.a = -1; corePinch.b = -1;
+      const dur = DIVE_TIME / Math.max(timeScale, 1e-3);
+      cue('dive', 0, a => { a.cue.dive(a.now(), dur); a.muffle(false, dur); });
+      announce('Going deeper: the galaxy again.');
+      if (motion.matches) finishDive(); else { interact(); schedule(); }
+    }
+    function finishDive() {
+      dive = 0; diveU = 0;
+      coreTarget = 0; coreU = 0; coreSpin = 0;
+      yaw = coreFrom.yaw; pitch = coreFrom.pitch; zoom = coreFrom.zoom; zoomTarget = zoom; vYaw = 0; vPitch = 0;
+      centreButton.hidden = false;
+      updatePlate();
+      stage.focus({ preventScroll: true });
+      cue('arrive', 0, a => { a.cue.arrive(a.now()); a.muffle(false, 0.05); });
+      interact(); redraw();
+    }
+    function renderDive(now) {
+      const e = easeInOutCubic(diveU); const z = Math.exp(e * Math.log(DIVE_ZOOM));
+      const keepU = coreU;
+      drawNebula(1);
+      // Outside: the core view, zoomed z times about the text spiral's centre (the vanishing point).
+      const words = 1 - smooth((z - 1) / (DIVE_WORD_FADE - 1));
+      const sky = 1 - smooth(e / 0.45);
+      if (words > 0.004 || sky > 0.004) {
+        setBase(z, 0, 0, z, coreX * (1 - z), coreY * (1 - z));
+        coreU = 1; chartCamera();
+        if (sky > 0.004) drawStars(sky);
+        if (words > 0.004) drawCoreText(T_SETTLED, words);
+        setBase(1, 0, 0, 1, 0, 0);
+      }
+      // Inside: the galaxy at the centre, z / DIVE_ZOOM of its chart size, turning back to rest
+      // while its centre travels to the chart's and its pitch rises from face-on.
+      const scale = sFit * coreFrom.zoom * z / DIVE_ZOOM;
+      coreU = 0;
+      setCamera(lerp(coreX, chartX, e), lerp(coreY, chartY, e), coreFrom.yaw + DIVE_SPIN * (1 - e), coreFrom.pitch * e, scale);
+      diveLabels = smooth((scale / (sFit * coreFrom.zoom) - DIVE_LABELS) / 0.2);
+      // Its own starfield fades in only once it is large enough not to read as a patch.
+      sceneStars = false;
+      drawStars(smooth((z / DIVE_ZOOM - 0.25) / 0.5));
+      drawScene(T_SETTLED, true, smooth(e / 0.15));
+      sceneStars = true; diveLabels = 1; coreU = keepU;
+    }
+    function stepDive(dt) {
+      diveU = clamp01(diveU + dt * timeScale / DIVE_TIME);
+      if (diveU >= 1) finishDive();
+    }
+
     /* ---- Pointer, wheel and keyboard on the stage ------------------------ */
     const drag = { id: -1, x0: 0, y0: 0, x: 0, y: 0, moved: false, at: 0, type: '' };
     const pinch = { id: -1, x: 0, y: 0, distance: 0 };
@@ -4196,12 +4751,25 @@
         else if (selectedWish >= 0) selectWish(-1);
         else if (selectedTheme >= 0) { selectedTheme = -1; updatePlate(); }
         else if (plateView) { plateView = ''; updatePlate(); }
+        // A tap on empty sky also brings the hidden chrome back for a moment.
+        if (drag.type === 'touch' && p < 0 && w < 0 && !(toCentre < CORE_HIT && near > toCentre)) showChrome(CHROME_TAP_MS);
       }
       interact(); redraw();
     }
     on(stage, 'pointerdown', event => {
-      if (mode !== 'chart' || event.button > 0) return;
-      if (coreTarget === 1 || coreU > 0) { coreClick = true; return; }
+      if (mode !== 'chart' || event.button > 0 || dive) return;
+      if (coreTarget === 1 || coreU > 0) {
+        // In core view a click backs out (or, on the vanishing point, dives); two touches may pinch.
+        if (event.pointerType === 'touch' && coreTarget === 1) {
+          if (corePinch.a < 0) { corePinch.a = event.pointerId; corePinch.ax = event.clientX; corePinch.ay = event.clientY; }
+          else if (corePinch.b < 0 && event.pointerId !== corePinch.a) {
+            corePinch.b = event.pointerId; corePinch.bx = event.clientX; corePinch.by = event.clientY;
+            corePinch.start = Math.hypot(corePinch.bx - corePinch.ax, corePinch.by - corePinch.ay) || 1; coreClick = false; return;
+          }
+        }
+        coreClick = corePinch.b < 0; return;
+      }
+      if (score === 1 || score === 2) { stopScore(); return; }
       // A shooting star (or a still wish) near the pointer is caught before anything else.
       if (drag.id < 0 && tryCatch(event.clientX, event.clientY)) { event.preventDefault(); interact(); return; }
       if (drag.id >= 0) {
@@ -4218,7 +4786,12 @@
       try { stage.setPointerCapture(event.pointerId); } catch (error) { /* synthetic pointer */ }
     });
     on(stage, 'pointermove', event => {
-      if (mode !== 'chart' || coreU > 0 || coreTarget) return;
+      if (coreTarget === 1 && corePinch.b >= 0 && (event.pointerId === corePinch.a || event.pointerId === corePinch.b)) {
+        if (event.pointerId === corePinch.a) { corePinch.ax = event.clientX; corePinch.ay = event.clientY; } else { corePinch.bx = event.clientX; corePinch.by = event.clientY; }
+        if (Math.hypot(corePinch.bx - corePinch.ax, corePinch.by - corePinch.ay) / corePinch.start > DIVE_PINCH) startDive();
+        return;
+      }
+      if (mode !== 'chart' || coreU > 0 || coreTarget || dive) return;
       if (event.pointerId === pinch.id || (pinch.id >= 0 && event.pointerId === drag.id)) {
         if (event.pointerId === pinch.id) { pinch.x = event.clientX; pinch.y = event.clientY; } else { drag.x = event.clientX; drag.y = event.clientY; }
         const distance = Math.hypot(pinch.x - drag.x, pinch.y - drag.y) || 1;
@@ -4242,6 +4815,7 @@
         interact(); redraw();
         return;
       }
+      if (event.pointerType !== 'touch') { pointerX = event.clientX; pointerY = event.clientY; pointerIn = true; }
       if (event.pointerType === 'mouse' && drag.id < 0) {
         const x = event.clientX; const y = event.clientY;
         const p = nearestPaper(x, y, HOVER_RADIUS); const w = nearestWish(x, y, HOVER_RADIUS);
@@ -4250,26 +4824,47 @@
       }
     });
     on(stage, 'pointerup', event => {
-      // In core view a click on empty space backs out.
-      if (coreClick) { coreClick = false; if (coreTarget === 1) backOut(); return; }
+      if (event.pointerId === corePinch.a || event.pointerId === corePinch.b) {
+        if (event.pointerId === corePinch.a) corePinch.a = -1; else corePinch.b = -1;
+        if (corePinch.b >= 0 && corePinch.a < 0) { corePinch.a = corePinch.b; corePinch.ax = corePinch.bx; corePinch.ay = corePinch.by; corePinch.b = -1; }
+      }
+      // In core view a click on the text spiral's vanishing point dives; elsewhere it backs out.
+      if (coreClick) {
+        coreClick = false;
+        if (coreTarget !== 1 || dive) return;
+        if (Math.hypot(event.clientX - coreX, event.clientY - coreY) < CORE_HIT) startDive(); else backOut();
+        return;
+      }
       if (event.pointerId === pinch.id) { pinch.id = -1; return; }
       if (event.pointerId === drag.id) endDrag(false, event);
     });
     on(stage, 'pointercancel', event => { if (event.pointerId === drag.id || event.pointerId === pinch.id) endDrag(true); });
     on(stage, 'lostpointercapture', event => { if (event.pointerId === drag.id) endDrag(true); });
-    on(stage, 'pointerleave', event => { if (event.pointerType === 'mouse' && drag.id < 0) { setHover(-1); setHoverWish(-1); } });
+    on(stage, 'pointerleave', event => {
+      if (event.pointerType !== 'touch') { pointerIn = false; if (overMeteor) { overMeteor = false; updateCursor(); } }
+      if (event.pointerType === 'mouse' && drag.id < 0) { setHover(-1); setHoverWish(-1); }
+    });
     on(stage, 'wheel', event => {
       if (mode !== 'chart') return;
       event.preventDefault();
-      // In core view, scrolling outward backs out.
-      if (coreTarget === 1 || coreU > 0) { if (event.deltaY > 0 && coreTarget === 1) backOut(); return; }
+      if (dive) return;
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? H : 1;
+      // In core view, scrolling outward backs out; scrolling inward past DIVE_WHEEL dives.
+      if (coreTarget === 1 || coreU > 0) {
+        if (coreTarget !== 1) return;
+        if (event.deltaY > 0) { diveWheel = 0; backOut(); return; }
+        const nowMs = performance.now(); if (nowMs - diveWheelAt > 600) diveWheel = 0; diveWheelAt = nowMs;
+        diveWheel -= event.deltaY * unit;
+        if (diveWheel > DIVE_WHEEL) startDive();
+        return;
+      }
       zoomTarget = clamp(zoomTarget * Math.exp(-event.deltaY * unit * (event.ctrlKey ? 0.01 : 0.0015)), ZOOM_RANGE[0], ZOOM_RANGE[1]);
       if (motion.matches) zoom = zoomTarget;
       interact(); redraw();
     }, { passive: false });
     on(stage, 'keydown', event => {
-      if (mode !== 'chart' || coreTarget || coreU > 0 || event.target !== stage || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (mode === 'chart' && coreTarget === 1 && !dive && event.target === stage && (event.key === '+' || event.key === '=')) { event.preventDefault(); startDive(); return; }
+      if (mode !== 'chart' || coreTarget || coreU > 0 || dive || event.target !== stage || event.altKey || event.ctrlKey || event.metaKey) return;
       switch (event.key) {
         case 'ArrowLeft': yaw -= 0.15; break;
         case 'ArrowRight': yaw += 0.15; break;
@@ -4284,6 +4879,37 @@
       interact(); redraw();
     });
 
+    /* ---- Chrome: hidden until intent ------------------------------------- */
+    // Opening controls and chart actions show while the pointer is in their corner (and for
+    // CHROME_HIDE_MS after it leaves), while focus is within them (CSS), or for CHROME_TAP_MS
+    // after a tap on empty sky. A whisper toast is the only feedback for the M key.
+    let chromeTimer = 0; let chromeIn = false; let toastTimer = 0;
+    function showChrome(ms) {
+      dialog.classList.add('is-chrome');
+      clearTimeout(chromeTimer); chromeTimer = ms > 0 ? setTimeout(hideChrome, ms / Math.max(timeScale, 0.01)) : 0;
+    }
+    function hideChrome() { clearTimeout(chromeTimer); chromeTimer = 0; dialog.classList.remove('is-chrome'); }
+    function inChromeRegion(x, y) {
+      if (mode === 'chart') return x >= chromeLeft - CHROME_CHART[0] && y <= CHROME_CHART[1];
+      if (mode === 'opening' || mode === 'replay-out') return x >= W - CHROME_OPENING[0] && y >= H - CHROME_OPENING[1];
+      return false;
+    }
+    function toast(text) {
+      toastEl.textContent = text; toastEl.classList.toggle('is-bottom', mode !== 'chart'); toastEl.classList.add('is-shown');
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('is-shown'), TOAST_MS);
+    }
+    on(dialog, 'pointermove', event => {
+      if (event.pointerType === 'touch' || closed || leaving) return;
+      const inside = inChromeRegion(event.clientX, event.clientY);
+      if (inside && !chromeIn) { chromeIn = true; showChrome(0); }
+      else if (!inside && chromeIn) { chromeIn = false; showChrome(CHROME_HIDE_MS); }
+    });
+    on(dialog, 'pointerleave', event => { if (event.pointerType !== 'touch' && chromeIn) { chromeIn = false; showChrome(CHROME_HIDE_MS); } });
+    // During the opening the stage is inert: a tap lands on the dialog and only reveals the chrome.
+    on(dialog, 'pointerup', event => {
+      if (event.pointerType === 'touch' && mode !== 'chart' && !leaving && (event.target === dialog || event.target === stage)) showChrome(CHROME_TAP_MS);
+    });
+
     /* ---- Controls -------------------------------------------------------- */
     themeButtons.forEach((button, j) => on(button, 'click', () => selectTheme(j)));
     on(indexButton, 'click', () => { setIndex(!indexOpen); interact(); });
@@ -4291,11 +4917,13 @@
     on(closeButton, 'click', close);
     on(skipButton, 'click', skip);
     for (const button of soundButtons) on(button, 'click', () => setSound(!soundOn));
+    on(listenButton, 'click', () => { if (score === 1 || score === 2) stopScore(); else startScore(); });
     // The counter lists the caught questions in the plate when it is focused or clicked.
     on(countButton, 'click', showWishList);
     on(countButton, 'focus', () => { if (plateView !== 'wishes') showWishList(); });
     on(plateDetail, 'click', event => {
       const target = event.target.closest ? event.target : null; if (!target) return;
+      if (target.closest('[data-score-stop]')) { stopScore(); return; }
       const row = target.closest('[data-wish]');
       if (row) { selectWish(Number(row.dataset.wish)); return; }
       if (target.closest('[data-release]')) releaseWishes();
@@ -4320,15 +4948,19 @@
     }
     on(dialog, 'keydown', event => {
       // Any navigation key reveals the keyboard focus ring that was quiet on open.
-      if (event.key === 'Tab' || event.key.startsWith('Arrow')) dialog.removeAttribute('data-quiet');
+      if (event.key === 'Tab' || (event.key.startsWith('Arrow') && event.target !== stage)) dialog.removeAttribute('data-quiet');
       if (mode === 'opening' && event.key === 'Enter' && (event.target === skipButton || !(event.target instanceof HTMLButtonElement))) {
         event.preventDefault(); skip();
       }
       if (event.altKey || event.ctrlKey || event.metaKey || closed) return;
       if (event.target.closest && event.target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
       // M switches the sound; in the chart, 1-5 choose a theme and Space catches a shooting star.
-      if ((event.key === 'm' || event.key === 'M') && !event.repeat) { setSound(!soundOn); return; }
+      if ((event.key === 'm' || event.key === 'M') && !event.repeat) {
+        setSound(!soundOn); toast(soundOn ? 'Sound on' : 'Sound off'); announce(soundOn ? 'Sound on' : 'Sound off');
+        return;
+      }
       if (mode !== 'chart' || leaving || coreTarget === 1) return;
+      if ((event.key === 'l' || event.key === 'L') && !event.repeat) { if (score === 1 || score === 2) stopScore(); else startScore(); return; }
       if (event.key >= '1' && event.key <= '5' && event.key.length === 1) { event.preventDefault(); selectTheme(Number(event.key) - 1); return; }
       if (event.key === ' ' || event.key === 'Spacebar') {
         // A focused control keeps its own Space; elsewhere Space catches the visible meteor.
@@ -4342,7 +4974,13 @@
     on(dialog, 'pointerdown', unlockAudio, { capture: true });
     on(dialog, 'keydown', unlockAudio, { capture: true });
     // Esc backs out of the core view first; otherwise it closes (a second Esc while closing finishes).
-    on(dialog, 'cancel', event => { event.preventDefault(); if (coreTarget === 1 && !leaving) backOut(); else close(); });
+    on(dialog, 'cancel', event => {
+      event.preventDefault();
+      if (dive && !leaving) finishDive();
+      else if ((score === 1 || score === 2) && !leaving) stopScore();
+      else if (coreTarget === 1 && !leaving) backOut();
+      else close();
+    });
     on(dialog, 'close', cleanup);
     on(window, 'pagehide', cleanup);
     on(window, 'resize', () => {
@@ -4350,7 +4988,7 @@
       if (leaving) { cleanup(); return; }
       if (mode !== 'chart') { remnantT = -2; skip(); }
       // Meteors and a laid-out question belong to the old layout: pin and clear them.
-      finishCatch(); mOn.fill(0); activeMeteors = 0;
+      finishCatch(); clearMeteors();
       if (stillQ >= 0) { stillQ = -1; scheduleStill(); }
       layout(); redraw();
     });
@@ -4367,7 +5005,7 @@
     on(motion, 'change', () => {
       if (leaving) { cleanup(); return; }
       replayButton.hidden = motion.matches;
-      if (motion.matches) { vYaw = 0; vPitch = 0; zoom = zoomTarget; if (mode !== 'chart') skip(); finishCatch(); mOn.fill(0); activeMeteors = 0; drawnFade = drawn ? 1 : 0; scheduleStill(); }
+      if (motion.matches) { vYaw = 0; vPitch = 0; zoom = zoomTarget; if (mode !== 'chart') skip(); finishCatch(); clearMeteors(); drawnFade = drawn ? 1 : 0; scheduleStill(); }
       else { stillQ = -1; clearTimeout(stillTimer); stillTimer = 0; }
       redraw();
     });
@@ -4380,8 +5018,11 @@
       get closeStep() { return closeStep(); },
       get canvasWords() { return canvasWords; },
       get dawnLines() { return lineCount; },
-      get view() { return coreTarget === 1 || coreU > 0 ? 'core' : 'chart'; },
+      get view() { return dive ? 'dive' : coreTarget === 1 || coreU > 0 ? 'core' : 'chart'; },
+      get diveProgress() { return dive ? diveU : -1; },
       projectCore() { return { x: chartX, y: chartY }; },
+      projectVanishing() { return { x: coreX, y: coreY }; },
+      get nebula() { return nebulaReady; },
       frameStats: stats,
       projectStar(slug) {
         const p = PAPERS.findIndex(paper => paper.slug === slug);
@@ -4396,18 +5037,24 @@
       get caught() { return caughtCount; },
       get wishes() { const list = []; for (let q = 0; q < NQ; q++) if (wishPinned[q]) list.push(q); return list; },
       get drawn() { return drawn; },
+      get bridge() { return { q: bridgeQ, fade: bridgeFade }; },
+      get chrome() { return dialog.classList.contains('is-chrome'); },
       get catching() { return catchQ; },
+      // The score: null when off, else its state, clock and current year (2022-2026; 0 before, 1 after).
+      get score() { return score ? { state: ['', 'playing', 'outro', 'stopping'][score], t: scoreT, year: scoreYear < 0 ? 0 : scoreYear > 4 ? 1 : FIRST_YEAR + scoreYear } : null; },
       // Spawn a question meteor now, already inside the viewport (a still wish under reduced
       // motion); returns its question or -1.
       spawnMeteor(q) {
         if (mode !== 'chart' || leaving) return -1;
         if (motion.matches) return spawnStill(q === undefined ? -1 : q);
-        for (let i = 0; i < METEOR_MAX; i++) if (mOn[i] && mKind[i] !== 1) mOn[i] = 0;
+        for (let i = 0; i < METEOR_MAX; i++) if (mOn[i] && mKind[i] !== 1) dropMeteor(i, 0.08);
         if (q === undefined || q < 0 || caught[q]) q = drawn ? -1 : pickQuestion();
         const i = drawn && q < 0 ? spawnMeteor(2, -1, 0, 0, undefined, true) : q >= 0 ? spawnMeteor(0, q, 0, 0, undefined, true) : -1;
         redraw();
         return i < 0 ? -1 : q;
       },
+      // The visible catchable meteor's current speed in px/s (bullet time included).
+      get meteorSpeed() { const i = visibleMeteor(); return i < 0 ? 0 : mSpeed[i] * mSlow[i]; },
       meteorHead() {
         if (motion.matches) return stillQ >= 0 ? { x: stillX, y: stillY } : null;
         const i = visibleMeteor();
@@ -4444,7 +5091,7 @@
         if (ctx) { try { prepareWords(captureWords()); } catch (error) { releaseWords(); } }
         dialog.classList.add('is-night', 'is-lift');
         openingEl.hidden = true; setInert(false);
-        closeButton.focus({ preventScroll: true });
+        stage.focus({ preventScroll: true });
         measureUI();
         adoptAudio(); cue('ambient', t, a => a.cue.ambient(a.now()));
         scheduleStill();
@@ -4459,5 +5106,5 @@
   }
 
   // createAudio builds the egg's synthesizer on any BaseAudioContext (tests render it offline).
-  window.SiteEasterEgg = { open, createAudio: (context, options) => createSpiraAudio(context, options) };
+  window.SiteEasterEgg = { open, createAudio: (context, options) => createSpiraAudio(context, options), takeaways: TAKEAWAYS };
 })();
