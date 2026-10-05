@@ -91,6 +91,28 @@ const publications = [
   },
   // Publications
   {
+    title: "Constructing Challenging Browser-Use Tasks by Controlled Environment Interventions",
+    authors: "<b>Xunjian Yin*</b>, Tianchen Guan*, Jinao Wang, Weili Cao, Daisy Xinlei Lin, Royce Cheng-Yue, Keagan Long, Kyle Wong, Bhuwan Dhingra, Xiangjun Wang, Shuyan Zhou",
+    venue: "NeurIPS 2026",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2609.35814" },
+      { text: "Project", url: "https://www.breakingweb.app" }
+    ],
+    abstract: "As browser-use agents improve, benchmarks keep pace by collecting new tasks, websites, and applications, often making tasks longer or more novel. This makes difficulty expensive to refresh and difficult to control: when many aspects change at once, it is unclear what actually makes a task challenging. We instead construct challenging instances from tasks agents already solve, turning difficulty into a programmable property of the environment. BreakingWeb pairs every base task with an intervention condition that preserves the user instruction, latent target, and backend success criterion while changing the environment at different web stack layers. Each intervention is deterministic, detectable, and recoverable, and is annotated with the cognitive primitive it primarily loads. The benchmark contains 519 clean/intervention task pairs across seven self-hosted websites and 29 intervention families, all graded against outcomes. We evaluate six strong browser-use agents, three GUI-only agents that see only screenshots, and humans. The construction is effective: interventions cut agent pass rate by 22.9% on average and overturn nearly half of the tasks each agent solves cleanly, whereas humans lose 10.0% on a first attempt and 5.7% after one familiarisation attempt. The dominant failure is belief failure: 75% of the six agents' failures end with a declared success although the required change never happened. Our code, data and environment are publicly available at www.breakingweb.app.",
+    citation: `<pre><code>@misc{yin2026constructingchallengingbrowserusetasks,
+      title={Constructing Challenging Browser-Use Tasks by Controlled Environment Interventions},
+      author={Xunjian Yin and Tianchen Guan and Jinao Wang and Weili Cao and Daisy Xinlei Lin and Royce Cheng-Yue and Keagan Long and Kyle Wong and Bhuwan Dhingra and Xiangjun Wang and Shuyan Zhou},
+      year={2026},
+      eprint={2609.35814},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2609.35814},
+}</code></pre>`,
+    isNew: true,
+    isPreprint: false,
+    isSelected: true
+  },
+  {
     title: "LEDOM: Reverse Language Model",
     authors: "<b>Xunjian Yin</b>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
     venue: "ACL 2026",
