@@ -4,9 +4,15 @@ Every demo renders a complete, readable state without JavaScript. The
 ContraSolver state is computed here with the same procedure that
 papers/demos/reasoning.js runs in the browser, so the no-script page shows the
 algorithm's real output for the example inputs rather than hand-written text.
+
+Each paper gets two blocks (a dict return): the interactive mechanism inside
+"Inside the method" and the measured chart inside "Reading the evidence".
+Reader-started Play / Pause / Step / Reset controls replay the mechanism; the
+page never animates on its own and the static state is the completed run.
 """
 from __future__ import annotations
 
+import json
 import math
 from dataclasses import dataclass, field
 from html import escape
@@ -265,7 +271,7 @@ def _svg(edges: tuple[tuple[str, str, float], ...], result: SolverResult) -> str
     markers = ''.join(
         f'<marker id="cs-arrow-{name}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" '
         f'markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" class="cs-arrowhead is-{name}"/></marker>'
-        for name in ("heuristic", "kept", "contradictory", "implied"))
+        for name in ("heuristic", "kept", "contradictory", "implied", "pending"))
     lines, labels = [], []
     # Draw emphasised edges last so they sit above crossing diagonals.
     ranking = {"implied": 0, "kept": 1, "contradictory": 2, "heuristic": 3}
@@ -336,14 +342,28 @@ def _table4() -> str:
     groups = ''.join(
         f'<div class="rd-dumbbell-group"><h5>{escape(model)}</h5>{_dumbbell_rows([(d, b, a) for d, b, a in rows], 35, 2)}</div>'
         for model, rows in TABLE4)
-    return f'''<figure class="rd-measured cs-measured">
-      <figcaption><span class="rd-small-label">Measured · Table 4</span>
-        <h4>How often a prompt’s self-judged preference graph contains a cycle</h4>
-        <p>Share of training prompts with at least one contradiction, before and after DPO on ContraSolver-selected pairs. The graph nodes are the same sampled responses used for data construction.</p></figcaption>
+    return f'''<figure class="rd-measured cs-measured" data-demo-state="cs-table4">
+      <figcaption class="rd-visually-hidden">Table 4: share of training prompts with a cyclic preference graph, without and with ContraSolver.</figcaption>
       <p class="rd-dumbbell-legend" aria-hidden="true"><span><i class="rd-dot is-before"></i>Without ContraSolver</span><span><i class="rd-dot is-after"></i>With ContraSolver</span></p>
       {groups}{_axis([0, 10, 20, 30], 35)}
       <p class="rd-footnote">Values from <a href="{CS_SOURCE}#S5.T4">Table 4</a>. Cycles decrease on all eight model–dataset pairs but remain in 10.40–26.60% of prompts; the measurement uses training prompts, not new responses.</p>
     </figure>'''
+
+
+def _player(prefix: str, label: str) -> str:
+    """Reader-started replay controls, hidden until the script attaches them.
+
+    Play starts or resumes, Pause holds the current frame, Step advances one
+    frame and Reset returns to the completed static state. The status line is
+    the animation's polite live region.
+    """
+    return (f'<div class="rd-controls rd-player" role="group" aria-label="{escape(label, quote=True)}" hidden>'
+            f'<button type="button" data-demo-action="{prefix}-play" aria-pressed="false">Play</button>'
+            f'<button type="button" data-demo-action="{prefix}-pause" disabled>Pause</button>'
+            f'<button type="button" data-demo-action="{prefix}-step">Step</button>'
+            f'<button type="button" data-demo-action="{prefix}-reset">Reset</button>'
+            f'<span class="rd-player-count" data-player-count="{prefix}" aria-hidden="true"></span></div>'
+            f'<p class="rd-player-status" role="status" aria-live="polite" data-player-status="{prefix}" hidden></p>')
 
 
 def _contrasolver_demo() -> str:
@@ -356,7 +376,7 @@ def _contrasolver_demo() -> str:
     contra = ", ".join(_judgment(edges[i]) for i, s in sorted(result.stage.items()) if s == "contradictory") or "none"
     legend = ''.join(f'<span class="is-{k}"><i aria-hidden="true"></i>{t}</span>' for k, t in (
         ("heuristic", "Heuristic edge: DPO pair"), ("kept", "Kept, not trained"),
-        ("contradictory", "Contradictory"), ("implied", "Implied, skipped")))
+        ("contradictory", "Contradictory"), ("implied", "Implied, skipped"), ("pending", "Not yet examined")))
     return f'''
     <div class="cs-prompt">
       <p class="rd-small-label">One prompt, five sampled continuations · illustrative</p>
@@ -366,6 +386,7 @@ def _contrasolver_demo() -> str:
     </div>
     <div class="cs-workspace">
       <div class="cs-figure-column">
+        {_player("cs-run", "Replay Algorithm 1 on the current graph")}
         <figure class="cs-figure">{_svg(edges, result)}
           <figcaption class="cs-legend">{legend}<span class="cs-legend-note">Arrow: preferred → less preferred.</span></figcaption>
         </figure>
@@ -388,8 +409,7 @@ def _contrasolver_demo() -> str:
       <h4>What the algorithm did</h4>
       <ol class="cs-log" data-demo-state="cs-log">{log}</ol>
     </div>
-    <p class="rd-footnote">Confidences are illustrative inputs; the graph computation is the paper’s <a href="{CS_SOURCE}#alg1">Algorithm 1</a> (<a href="{CS_SOURCE}#S3.SS3">Section 3.3</a>), run in your browser. Only heuristic edges become DPO pairs, so kept edges that lie on no cycle, such as the tree edge A ≻ E, are not trained on, and a fully consistent graph contributes no pairs. The resolved order is the kept graph with contradictory edges reversed (Property 2). Every confidence stays above the paper’s filter δ = {DELTA}; equal confidences are ordered by list position, which the paper does not specify. No model is queried or trained.</p>
-    {_table4()}'''
+    <p class="rd-footnote">Confidences are illustrative inputs; the graph computation is the paper’s <a href="{CS_SOURCE}#alg1">Algorithm 1</a> (<a href="{CS_SOURCE}#S3.SS3">Section 3.3</a>), run in your browser. Play replays the same run one decision at a time: Kruskal’s tree edges strongest first, then in each pass the reverse loop weakest first and the forward loop strongest first. Only heuristic edges become DPO pairs, so kept edges that lie on no cycle, such as the tree edge A ≻ E, are not trained on, and a fully consistent graph contributes no pairs. The resolved order is the kept graph with contradictory edges reversed (Property 2). Every confidence stays above the paper’s filter δ = {DELTA}; equal confidences are ordered by list position, which the paper does not specify. No model is queried or trained.</p>'''
 
 
 # --------------------------------------------------------------------------
@@ -398,7 +418,9 @@ def _contrasolver_demo() -> str:
 
 AC_SOURCE = "https://arxiv.org/html/2512.01970v1"
 
-# Figure 1(a): the paper's three task types for one entity.
+# Figure 1(a): the paper's three task types for one entity. Each hop names the
+# fact that supplies it: (source, head, relation, tail, index into that source).
+# The browser reads this same data from a JSON attribute, so text is not duplicated.
 ATOMIC_TASKS: dict[str, dict[str, object]] = {
     "memory": {
         "label": "Parametric task",
@@ -406,9 +428,10 @@ ATOMIC_TASKS: dict[str, dict[str, object]] = {
         "question": "What is the occupation of the business partner of Amina Khan?",
         "context": [],
         "memory": ["Ben Carter is a business partner with Amina Khan.", "Ben Carter is a Research Analyst."],
-        "trace": [("Memory", "Amina Khan", "business partner", "Ben Carter"),
-                  ("Memory", "Ben Carter", "occupation", "Research Analyst")],
+        "trace": [("Memory", "Amina Khan", "business partner", "Ben Carter", 0),
+                  ("Memory", "Ben Carter", "occupation", "Research Analyst", 1)],
         "answer": "Research Analyst",
+        "status": "Two hops, both from parametric memory. No document is supplied.",
     },
     "context": {
         "label": "Context task",
@@ -417,9 +440,10 @@ ATOMIC_TASKS: dict[str, dict[str, object]] = {
         "context": ["‘Global View’ magazine announces the appointment of Amina Khan as its editor-in-chief.",
                     "Amina Khan’s best friend is Chloe Davis."],
         "memory": [],
-        "trace": [("Context", "Global View", "chief editor", "Amina Khan"),
-                  ("Context", "Amina Khan", "best friend", "Chloe Davis")],
+        "trace": [("Context", "Global View", "chief editor", "Amina Khan", 0),
+                  ("Context", "Amina Khan", "best friend", "Chloe Davis", 1)],
         "answer": "Chloe Davis",
+        "status": "Two hops, both read from the document. No stored fact is needed.",
     },
     "combined": {
         "label": "Complementary task",
@@ -427,10 +451,11 @@ ATOMIC_TASKS: dict[str, dict[str, object]] = {
         "question": "What is the occupation of the business partner of Global View’s new Chief Editor?",
         "context": ["‘Global View’ magazine announces the appointment of Amina Khan as its editor-in-chief."],
         "memory": ["Ben Carter is a business partner with Amina Khan.", "Ben Carter’s job is as a Research Analyst."],
-        "trace": [("Context", "Global View", "chief editor", "Amina Khan"),
-                  ("Memory", "Amina Khan", "business partner", "Ben Carter"),
-                  ("Memory", "Ben Carter", "occupation", "Research Analyst")],
+        "trace": [("Context", "Global View", "chief editor", "Amina Khan", 0),
+                  ("Memory", "Amina Khan", "business partner", "Ben Carter", 0),
+                  ("Memory", "Ben Carter", "occupation", "Research Analyst", 1)],
         "answer": "Research Analyst",
+        "status": "Three hops: the document supplies the first, parametric memory the other two.",
     },
 }
 
@@ -450,17 +475,21 @@ ERROR_ANALYSIS: tuple[tuple[str, float, float, float, float], ...] = (
 
 
 def _atomic_sources(task: dict[str, object], key: str, empty: str) -> str:
+    """Each fact is its own span, so a replayed hop can point at the fact it uses."""
     facts = task[key]
     assert isinstance(facts, list)
-    return ' '.join(escape(f) for f in facts) if facts else f'<span class="ac-empty">{escape(empty)}</span>'
+    if not facts:
+        return f'<span class="ac-empty">{escape(empty)}</span>'
+    return ' '.join(f'<span class="ac-fact" data-fact="{key}-{i}">{escape(f)}</span>' for i, f in enumerate(facts))
 
 
 def _atomic_trace(task: dict[str, object]) -> str:
     trace = task["trace"]
     assert isinstance(trace, list)
-    return ''.join(f'<li data-source="{source.lower()}"><span class="ac-source">{source}</span>'
+    source_key = {"Context": "context", "Memory": "memory"}
+    return ''.join(f'<li data-source="{source.lower()}" data-hop="{k}" data-fact="{source_key[source]}-{index}"><span class="ac-source">{source}</span>'
                    f'<span class="ac-hop">{escape(head)} <span class="ac-relation">{escape(rel)}</span> → {escape(tail)}</span></li>'
-                   for source, head, rel, tail in trace)
+                   for k, (source, head, rel, tail, index) in enumerate(trace))
 
 
 def _atomic_bars() -> str:
@@ -497,24 +526,31 @@ def _atomic_demo() -> str:
     buttons = ''.join(f'<button type="button" data-demo-action="atomic-task" data-task="{key}" '
                       f'aria-pressed="{str(key == "combined").lower()}">{escape(str(item["label"]))}</button>'
                       for key, item in ATOMIC_TASKS.items())
+    # The browser renders the other two tasks from this exact data.
+    tasks_json = escape(json.dumps(ATOMIC_TASKS, ensure_ascii=False), quote=True)
     return f'''
     <div class="rd-controls" hidden>
       <fieldset class="rd-choice-group"><legend>Task type in Figure 1(a)</legend>{buttons}</fieldset>
     </div>
-    <div class="ac-task" data-demo-state="atomic-task" data-task="combined">
+    {_player("atomic-run", "Follow the path hop by hop")}
+    <div class="ac-task" data-demo-state="atomic-task" data-task="combined" data-atomic-tasks="{tasks_json}">
       <p class="rd-small-label" data-atomic-kind>{escape(str(task["kind"]))}</p>
       <p class="ac-question" data-atomic-question>{escape(str(task["question"]))}</p>
       <div class="ac-sources">
-        <div><h5>Supplied document</h5><p data-atomic-context>{_atomic_sources(task, "context", "None: the question is asked directly.")}</p></div>
-        <div><h5>Stored in the model’s parameters</h5><p data-atomic-memory>{_atomic_sources(task, "memory", "Not needed for this question.")}</p></div>
+        <div data-source-panel="context"><h5>Supplied document</h5><p data-atomic-context>{_atomic_sources(task, "context", "None: the question is asked directly.")}</p></div>
+        <div data-source-panel="memory"><h5>Stored in the model’s parameters</h5><p data-atomic-memory>{_atomic_sources(task, "memory", "Not needed for this question.")}</p></div>
       </div>
       <h5 class="ac-trace-title">Required path</h5>
       <ol class="ac-trace" data-atomic-trace>{_atomic_trace(task)}</ol>
       <p class="ac-answer"><span>Answer</span> <strong data-atomic-answer>{escape(str(task["answer"]))}</strong></p>
     </div>
-    <p class="rd-status" role="status" aria-live="polite" data-demo-state="status" data-atomic-status>Three hops: the document supplies the first, parametric memory the other two.</p>
-    <p class="rd-footnote">Questions, facts and answers from <a href="{AC_SOURCE}#S1.F1">Figure 1(a)</a>; hop labels follow the paper’s split into parametric (Mem) and contextual (Ctx) relations. This is the paper’s worked example, not a model output.</p>
-    <figure class="rd-measured ac-results">
+    <p class="rd-status" role="status" aria-live="polite" data-demo-state="status" data-atomic-status>{escape(str(task["status"]))}</p>
+    <p class="rd-footnote">Questions, facts and answers from <a href="{AC_SOURCE}#S1.F1">Figure 1(a)</a>; hop labels follow the paper’s split into parametric (Mem) and contextual (Ctx) relations. Play follows the path one hop at a time and marks the fact each hop reads. This is the paper’s worked example, not a model output.</p>'''
+
+
+def _atomic_evidence() -> str:
+    return f'''
+    <figure class="rd-measured ac-results" data-demo-state="atomic-results">
       <figcaption><span class="rd-small-label">Measured · Table 1<span class="rd-keep-case">(b)</span></span>
         <h4>SFT alone: accuracy on complementary questions, by what is new at test time</h4>
         <p>Atomic SFT trains on parametric and contextual questions separately (88,031 + 2,651); composite SFT trains on complementary questions directly (180,919). Training-set sizes from Table 1(a).</p></figcaption>
@@ -525,23 +561,31 @@ def _atomic_demo() -> str:
     {_atomic_errors()}'''
 
 
-def render_demo(slug: str, insight: dict) -> str:
-    """Render an accessible static example; JavaScript reveals optional controls."""
+def _section(slug: str, kind: str, part: str, labels: dict, fallback_eyebrow: str, body: str) -> str:
+    """One demo block: eyebrow naming the evidence, Georgia h3, caption, body."""
+    safe_slug = escape(slug, quote=True)
+    heading_id = f"{safe_slug}-{part}-title"
+    classes = "reasoning-demo" + (" rd-evidence" if part == "evidence" else "")
+    return f'''<section class="{classes}" data-paper-demo="{safe_slug}" data-reasoning-demo="{escape(kind, quote=True)}" aria-labelledby="{heading_id}">
+      <header class="rd-heading"><p class="rd-small-label rd-eyebrow">{escape(labels.get("eyebrow", fallback_eyebrow))}</p><h3 id="{heading_id}">{escape(labels.get("title", "Explore the mechanism"))}</h3><p>{escape(labels.get("caption", "Illustrative example."))}</p></header>
+      {body}
+    </section>'''
+
+
+def render_demo(slug: str, insight: dict) -> dict[str, str] | str:
+    """Mechanism block for "method", measured block for "evidence"; '' for other pages."""
     if slug not in {"atomic-to-composite", "contrasolver"}:
         return ""
     demo = insight.get("demo", {})
     kind = demo.get("kind")
     renderers = {
-        "atomic-trace": _atomic_demo,
-        "preference-graph": _contrasolver_demo,
+        "atomic-trace": (_atomic_demo, _atomic_evidence, "atomic-evidence"),
+        "preference-graph": (_contrasolver_demo, _table4, "contrasolver-evidence"),
     }
-    renderer = renderers.get(kind)
-    if renderer is None:
+    if kind not in renderers:
         return ""
-    safe_slug = escape(slug, quote=True)
-    title = escape(demo.get("title", "Explore the mechanism"))
-    caption = escape(demo.get("caption", "Illustrative example."))
-    return f'''<section class="reasoning-demo" data-paper-demo="{safe_slug}" data-reasoning-demo="{escape(kind, quote=True)}" aria-labelledby="{safe_slug}-demo-title">
-      <header class="rd-heading"><p class="rd-small-label rd-eyebrow">{escape(demo.get("eyebrow", "Explore the mechanism"))}</p><h3 id="{safe_slug}-demo-title">{title}</h3><p>{caption}</p></header>
-      {renderer()}
-    </section>'''
+    method, evidence, evidence_kind = renderers[kind]
+    return {
+        "method": _section(slug, kind, "demo", demo, "Explore the mechanism", method()),
+        "evidence": _section(slug, evidence_kind, "evidence", demo.get("evidence", {}), "Measured", evidence()),
+    }

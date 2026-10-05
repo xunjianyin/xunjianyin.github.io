@@ -1,4 +1,6 @@
-/* Reasoning demos: flat, sharp-cornered, page palette. No motion, shadows or gradients. */
+/* Reasoning demos: flat, sharp-cornered, page palette. No shadows or gradients.
+ * Motion only during a reader-started replay: short colour and opacity
+ * transitions (at most 300 ms), removed under prefers-reduced-motion. */
 .reasoning-demo {
   --rd-warm: #9a5a3c;
   --rd-kept: #56615b;
@@ -177,3 +179,48 @@
 
 /* Top-level eyebrow matches the other demo families. */
 .reasoning-demo .rd-heading .rd-eyebrow { color: var(--accent); font-size: 10px; letter-spacing: .1em; }
+
+/* Visually hidden text for assistive technology. */
+.reasoning-demo .rd-visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* Evidence blocks: the measured chart starts directly under the heading. */
+.reasoning-demo.rd-evidence > .rd-measured:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
+
+/* Reader-started replay: Play, Pause, Step, Reset and a one-line status. */
+.reasoning-demo .rd-player { gap: 6px; margin: 0 0 8px; }
+.reasoning-demo .rd-player button { min-width: 64px; }
+.reasoning-demo .rd-player-status { min-height: 1.7em; margin: 0 0 14px; color: var(--ink); font-size: 13px; line-height: 1.55; }
+.reasoning-demo .rd-player-status:empty { margin-bottom: 6px; }
+
+/* ContraSolver replay: unexamined edges, the decision being made, the log sentence. */
+.reasoning-demo .cs-edge.is-pending .cs-line { stroke: #c9d0cb; stroke-width: 1.2; stroke-dasharray: 1 5; }
+.reasoning-demo .cs-arrowhead.is-pending { fill: #c9d0cb; }
+.reasoning-demo .cs-label.is-pending text { fill: #9aa39e; }
+.reasoning-demo .cs-edge.is-current .cs-line { stroke-width: 4.2; }
+.reasoning-demo .cs-edge.is-current.is-pending .cs-line { stroke: var(--ink); stroke-dasharray: none; stroke-width: 2.4; }
+.reasoning-demo .cs-label.is-current rect { stroke: var(--ink); stroke-width: 1.2; }
+.reasoning-demo .cs-label.is-current text { fill: var(--ink); font-weight: 700; }
+.reasoning-demo .cs-row.is-pending .cs-outcome { color: #8c958f; font-style: italic; }
+.reasoning-demo .cs-row.is-pending .cs-swatch, .reasoning-demo .cs-legend .is-pending > i { border-top: 2px dotted #c9d0cb; }
+/* The legend names unexamined edges only while a replay shows them. */
+.reasoning-demo:not(.is-replaying) .cs-legend .is-pending { display: none; }
+.reasoning-demo .cs-row.is-current { background: var(--wash); }
+.reasoning-demo .cs-result-region.is-partial dd { color: var(--muted); }
+.reasoning-demo .cs-log span.is-current { background: var(--wash); box-shadow: none; outline: 1px solid var(--line); }
+.reasoning-demo .cs-log .is-future { color: #a3aba6; }
+.reasoning-demo .cs-line, .reasoning-demo .cs-label text, .reasoning-demo .cs-row, .reasoning-demo .cs-log span { transition: stroke .25s ease, stroke-width .25s ease, fill .25s ease, color .25s ease, background-color .25s ease; }
+
+/* Atomic replay: the fact each hop reads, hops not reached yet, the pending answer. */
+.reasoning-demo .ac-fact { transition: background-color .25s ease, color .25s ease; }
+.reasoning-demo .ac-fact.is-used { color: var(--ink); text-decoration: underline; text-decoration-color: #b9c4bd; text-underline-offset: 3px; }
+.reasoning-demo .ac-fact.is-current { background: var(--wash); color: var(--ink); outline: 1px solid var(--accent); text-decoration: none; }
+.reasoning-demo [data-source-panel] { transition: border-color .25s ease; }
+.reasoning-demo [data-source-panel].is-current { border-left-color: var(--accent); }
+.reasoning-demo .ac-trace li { transition: background-color .25s ease, opacity .25s ease; }
+.reasoning-demo .ac-trace li.is-future > span { visibility: hidden; }
+.reasoning-demo .ac-trace li.is-current { background: var(--wash); }
+.reasoning-demo .ac-answer strong.is-pending { color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reasoning-demo *, .reasoning-demo *::before, .reasoning-demo *::after { transition: none !important; }
+}

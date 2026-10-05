@@ -2,23 +2,23 @@
   "story": {
     "title": "An update should not erase the past",
     "paragraphs": [
-      "Correcting a false fact and updating a once-true fact are different operations. If a leader changes, both the old and new answers may be correct, depending on the date. Yet an editor can score well on the new answer, its paraphrases, and unrelated questions while silently destroying the earlier fact. The history is related to the edit, so ordinary locality tests do not necessarily protect it.",
-      "A released AToKe record makes the distinction concrete: Billy Wrigglesworth plays for Manchester United from 1937 to 1947, and an edit adds Southampton for 1947 to 1948. After the edit, a question about 1947–1948 should return Southampton, while a question about 1937–1947 should still return Manchester United. The benchmark also asks relative questions, such as which club he used to play for, which require an ordered history rather than an isolated date–answer pair."
+      "Correcting a false fact and updating a once-true fact are different operations: when a leader changes, the old and new answers are both correct for different dates. The paper calls the second case Temporal Knowledge Editing (TKE). An editor can pass tests on the new answer, its paraphrases, and unrelated facts while erasing the earlier one, because locality tests do not check the edited fact's history.",
+      "The new benchmark, AToKe (Assessment of TempOral Knowledge Editing), asks explicit-time questions, such as who held a position in a given span, and relative-time questions, such as who held it previously. The latter require an ordered history rather than isolated date–answer pairs."
     ]
   },
   "mechanism": {
-    "title": "Preserve the fact that is becoming history",
+    "title": "METO edits the outgoing fact and its time span",
     "paragraphs": [
-      "METO first identifies which point on a known timeline matches the model's current knowledge. It then edits that current fact together with the newer facts. The important transition is the formerly current fact becoming historical: its time interval must close, and its wording must reflect the past. The method does not simply replay every older fact; it assumes facts that were already historical should remain represented.",
-      "A second editing objective reverses the usual question. Instead of only training the model to supply an entity for a dated relation, it also asks for the time span during which a specified fact was true. This makes temporal information an explicit prediction target. METO adds these examples and objectives to existing editors, so the comparison asks how temporal supervision changes an editor's behavior rather than introducing a wholly separate model architecture.",
-      "The evaluation distinguishes a single update, several successive updates, and an extension of an existing fact's validity. Baseline edit prompts also contain timestamps. Their historical failures therefore cannot be dismissed as simply forgetting to mention the date in the instruction. The benchmark tests whether dated editing actually preserves the answers implied by a timeline."
+      "METO (Multi-Editing with Time Objective) first queries the model for the fact it currently holds, then edits that fact together with the newer ones, closing its time span and moving its wording to the past. Older facts are not replayed; the authors assume the model already treats them as history.",
+      "A second objective reverses the usual query: besides supplying the object for a dated relation, the model is edited to predict the time span of a given fact. METO runs both objectives through an existing editor, constrained fine-tuning (CFT), MEND, ROME, or MEMIT, so each comparison holds the editor fixed.",
+      "AToKe has three subsets: a single edit (SE), multiple successive edits of the same fact (ME), and an extending edit (EE) that prolongs a fact's validity. Scores cover current and historical facts under explicit-time questions (CES, HES), relative-time questions (CRS, HRS), and paraphrased current questions (CES-P); HES* asks every historical question after the last edit. Baseline prompts carry timestamps too, so their failures are not due to a missing date."
     ]
   },
   "evidence": {
-    "title": "Better retention still leaves a trade-off",
+    "title": "METO recovers some history at a cost to current accuracy",
     "paragraphs": [
-      "On GPT-J with MEMIT, METO raises single-edit historical explicit-question accuracy from 2.22% to 30.31%, while current explicit-question accuracy decreases from 99.66% to 86.4%. After multiple edits, the final historical score rises from 0.27% to 21.93%. These are substantial improvements over near-erasure, but the remaining errors matter: temporal editing is not solved, and retention is not free.",
-      "The timeline uses year-level intervals, filtered knowledge chains, and synthetic extensions, with experiments on GPT-J and four editing methods. Relative-time questions and repeated updates are harder than checking one new fact. The practical lesson is to assess current accuracy and historical preservation together, with the time resolution and update sequence stated explicitly. The interactive example pairs each question form of one released record with the measured GPT-J accuracy for that form."
+      "Without METO, every editor nearly erases history: single-edit HES is at most 2.41%, and HES* after multiple edits at most 0.27%. With METO, HES* exceeds 15% for every editor except CFT. Retention is not free: under single edits, METO lowers paraphrased (CES-P) and relative-time (CRS) current accuracy for all four editors.",
+      "Two difficulty patterns hold with and without METO: relative-time questions are harder than explicit-time ones, likely because they require ordering facts rather than recalling dates, and repeated edits are harder than a single one."
     ]
   },
   "sources": [
@@ -30,8 +30,14 @@
   "reading_notes": "Read benchmark construction, metrics, METO objective (Figure 3), Tables 2–3 and discussion in arXiv v3. Table 3 MEMIT single-edit CES 99.66 to 86.4 and HES 2.22 to 30.31; multiple-edit HES* 0.27 to 21.93. v5 demo uses AToKe-ME case_id 3 from the released dataset documentation and all 44 GPT-J cells of Tables 2–3; METO's per-record targets are written in Figure 3 notation and labeled as constructed. Do not claim all historical knowledge is replayed or current performance preserved.",
   "demo": {
     "type": "temporal-editing",
-    "title": "Which questions survive a timestamped edit?",
-    "description": "One released AToKe record gives the exact probe behind each score. Choose a question form, an edit sequence, and an editor to compare GPT-J's measured accuracy with and without METO.",
+    "eyebrow": "Released AToKe record · METO targets built from the Methodology",
+    "title": "Two timestamped edits, one question at a time",
+    "description": "Play the record's two edits in order. Each question form's probe and expected answer follow from the record, and the request panel shows what an existing editor and METO are asked to learn at that edit.",
+    "evidence": {
+      "eyebrow": "Measured · Tables 2–3, GPT-J 6B",
+      "title": "Which question forms does METO recover?",
+      "description": "Choose an edit sequence, a question form, and an editor to compare measured accuracy without METO (Table 2) and with it (Table 3). All four editors stay visible for the chosen form."
+    },
     "record": {
       "label": "AToKe-ME record, case_id 3",
       "subject": "Billy Wrigglesworth",
@@ -47,43 +53,164 @@
           "object": "Southampton F.C.",
           "since": 1947,
           "until": 1948,
-          "role": "Edit 1"
+          "role": "Edit 1",
+          "edit_prompt": "From 1947 to 1948, Billy Wrigglesworth is a player of"
         },
         {
           "object": "Arsenal F.C.",
           "since": 1948,
           "until": 1953,
-          "role": "Edit 2, multiple edits only"
+          "role": "Edit 2 (multiple edits only)",
+          "edit_prompt": "From 1948 to 1953, Billy Wrigglesworth is a player of"
         }
       ]
     },
-    "requests": {
-      "plain": [
-        {
-          "input": "From 1947 to 1948, Billy Wrigglesworth is a player of",
-          "target": "Southampton F.C."
-        }
-      ],
-      "meto_object": [
-        {
-          "input": "(Billy Wrigglesworth, playsFor, ?, 1937, 1947)",
-          "target": "Manchester United F.C."
+    "steps": [
+      {
+        "label": "Before editing",
+        "short": "Before"
+      },
+      {
+        "label": "Edit 1 applied",
+        "short": "Edit 1"
+      },
+      {
+        "label": "Edit 2 applied",
+        "short": "Edit 2"
+      }
+    ],
+    "probes": {
+      "1": {
+        "CES": {
+          "when": "After edit 1",
+          "items": [
+            {
+              "prompt": "From 1947 to 1948, Billy Wrigglesworth is a player of",
+              "question": "Which club does Billy Wrigglesworth affiliate with from 1947 to 1948?",
+              "answer": "Southampton F.C.",
+              "link": 1
+            }
+          ]
         },
-        {
-          "input": "(Billy Wrigglesworth, playsFor, ?, 1947, 1948)",
-          "target": "Southampton F.C."
-        }
-      ],
-      "meto_time": [
-        {
-          "input": "(Billy Wrigglesworth, playsFor, Manchester United F.C., ?, ?)",
-          "target": "1937 to 1947"
+        "CES-P": {
+          "when": "After edit 1",
+          "items": [
+            {
+              "prompt": "From 1947 to 1948, Billy Wrigglesworth plays for",
+              "question": null,
+              "answer": "Southampton F.C.",
+              "link": 1
+            }
+          ]
         },
-        {
-          "input": "(Billy Wrigglesworth, playsFor, Southampton F.C., ?, ?)",
-          "target": "1947 to 1948"
+        "CRS": {
+          "when": "After edit 1",
+          "items": [
+            {
+              "prompt": "Billy Wrigglesworth's team is",
+              "question": "Which club does Billy Wrigglesworth play for?",
+              "answer": "Southampton F.C.",
+              "link": 1
+            }
+          ]
+        },
+        "HES": {
+          "when": "After edit 1",
+          "items": [
+            {
+              "prompt": "From 1937 to 1947, Billy Wrigglesworth's team was",
+              "question": "Which club did Billy Wrigglesworth play for from 1937 to 1947?",
+              "answer": "Manchester United F.C.",
+              "link": 0
+            }
+          ]
+        },
+        "HRS": {
+          "when": "After edit 1",
+          "items": [
+            {
+              "prompt": "Billy Wrigglesworth used to play for",
+              "question": "Which team did Billy Wrigglesworth play for before?",
+              "answer": "Manchester United F.C.",
+              "link": 0
+            }
+          ]
         }
-      ]
+      },
+      "2": {
+        "CES": {
+          "when": "After edit 2",
+          "items": [
+            {
+              "prompt": "From 1948 to 1953, Billy Wrigglesworth is a player of",
+              "question": "Which club does Billy Wrigglesworth affiliate with from 1948 to 1953?",
+              "answer": "Arsenal F.C.",
+              "link": 2
+            }
+          ]
+        },
+        "CES-P": {
+          "when": "After edit 2",
+          "items": [
+            {
+              "prompt": "From 1948 to 1953, Billy Wrigglesworth plays for",
+              "question": null,
+              "answer": "Arsenal F.C.",
+              "link": 2
+            }
+          ]
+        },
+        "CRS": {
+          "when": "After edit 2",
+          "items": [
+            {
+              "prompt": "Billy Wrigglesworth's team is",
+              "question": "Which club does Billy Wrigglesworth play for?",
+              "answer": "Arsenal F.C.",
+              "link": 2
+            }
+          ]
+        },
+        "HES": {
+          "when": "After edit 2",
+          "items": [
+            {
+              "prompt": "From 1947 to 1948, Billy Wrigglesworth's team was",
+              "question": "Which club did Billy Wrigglesworth play for from 1947 to 1948?",
+              "answer": "Southampton F.C.",
+              "link": 1
+            }
+          ]
+        },
+        "HRS": {
+          "when": "After edit 2",
+          "items": [
+            {
+              "prompt": "Billy Wrigglesworth used to play for",
+              "question": "Which team did Billy Wrigglesworth play for before?",
+              "answer": "Southampton F.C.",
+              "link": 1
+            }
+          ]
+        },
+        "HES*": {
+          "when": "Once, after the final edit",
+          "items": [
+            {
+              "prompt": "From 1937 to 1947, Billy Wrigglesworth's team was",
+              "question": null,
+              "answer": "Manchester United F.C.",
+              "link": 0
+            },
+            {
+              "prompt": "From 1947 to 1948, Billy Wrigglesworth's team was",
+              "question": null,
+              "answer": "Southampton F.C.",
+              "link": 1
+            }
+          ]
+        }
+      }
     },
     "settings": {
       "se": {
@@ -144,150 +271,6 @@
       "ROME",
       "MEMIT"
     ],
-    "probes": {
-      "se": {
-        "CES": {
-          "when": "After edit 1",
-          "items": [
-            {
-              "prompt": "From 1947 to 1948, Billy Wrigglesworth is a player of",
-              "question": "Which club does Billy Wrigglesworth affiliate with from 1947 to 1948?",
-              "answer": "Southampton F.C.",
-              "link": 1
-            }
-          ],
-          "note": "Identical to the edit prompt, so this form measures the requested edit itself."
-        },
-        "CES-P": {
-          "when": "After edit 1",
-          "items": [
-            {
-              "prompt": "From 1947 to 1948, Billy Wrigglesworth plays for",
-              "question": null,
-              "answer": "Southampton F.C.",
-              "link": 1
-            }
-          ],
-          "note": "Same time span as the edit, but the edit prompt is not repeated."
-        },
-        "CRS": {
-          "when": "After edit 1",
-          "items": [
-            {
-              "prompt": "Billy Wrigglesworth's team is",
-              "question": "Which club does Billy Wrigglesworth play for?",
-              "answer": "Southampton F.C.",
-              "link": 1
-            }
-          ],
-          "note": "No date is given: the model must treat the edited fact as the current one."
-        },
-        "HES": {
-          "when": "After edit 1",
-          "items": [
-            {
-              "prompt": "From 1937 to 1947, Billy Wrigglesworth's team was",
-              "question": "Which club did Billy Wrigglesworth play for from 1937 to 1947?",
-              "answer": "Manchester United F.C.",
-              "link": 0
-            }
-          ],
-          "note": "Asks for the fact that the edit turned into history."
-        },
-        "HRS": {
-          "when": "After edit 1",
-          "items": [
-            {
-              "prompt": "Billy Wrigglesworth used to play for",
-              "question": "Which team did Billy Wrigglesworth play for before?",
-              "answer": "Manchester United F.C.",
-              "link": 0
-            }
-          ],
-          "note": "No date is given: the model must know the order of the two facts."
-        }
-      },
-      "me": {
-        "CES": {
-          "when": "After edit 2",
-          "items": [
-            {
-              "prompt": "From 1948 to 1953, Billy Wrigglesworth is a player of",
-              "question": "Which club does Billy Wrigglesworth affiliate with from 1948 to 1953?",
-              "answer": "Arsenal F.C.",
-              "link": 2
-            }
-          ],
-          "note": "Identical to the prompt of edit 2. The multiple-edit score averages this probe over every edit in the chain."
-        },
-        "CES-P": {
-          "when": "After edit 2",
-          "items": [
-            {
-              "prompt": "From 1948 to 1953, Billy Wrigglesworth plays for",
-              "question": null,
-              "answer": "Arsenal F.C.",
-              "link": 2
-            }
-          ],
-          "note": "Same span as edit 2, different wording. The score averages over every edit in the chain."
-        },
-        "CRS": {
-          "when": "After edit 2",
-          "items": [
-            {
-              "prompt": "Billy Wrigglesworth's team is",
-              "question": "Which club does Billy Wrigglesworth play for?",
-              "answer": "Arsenal F.C.",
-              "link": 2
-            }
-          ],
-          "note": "The wording is unchanged from edit 1, but the correct answer has moved to the newest fact."
-        },
-        "HES": {
-          "when": "After edit 2",
-          "items": [
-            {
-              "prompt": "From 1947 to 1948, Billy Wrigglesworth's team was",
-              "question": "Which club did Billy Wrigglesworth play for from 1947 to 1948?",
-              "answer": "Southampton F.C.",
-              "link": 1
-            }
-          ],
-          "note": "The span that edit 1 wrote as current is now historical."
-        },
-        "HRS": {
-          "when": "After edit 2",
-          "items": [
-            {
-              "prompt": "Billy Wrigglesworth used to play for",
-              "question": "Which team did Billy Wrigglesworth play for before?",
-              "answer": "Southampton F.C.",
-              "link": 1
-            }
-          ],
-          "note": "Same wording as after edit 1, but the previous team is now Southampton F.C."
-        },
-        "HES*": {
-          "when": "Once, after the final edit",
-          "items": [
-            {
-              "prompt": "From 1937 to 1947, Billy Wrigglesworth's team was",
-              "question": null,
-              "answer": "Manchester United F.C.",
-              "link": 0
-            },
-            {
-              "prompt": "From 1947 to 1948, Billy Wrigglesworth's team was",
-              "question": null,
-              "answer": "Southampton F.C.",
-              "link": 1
-            }
-          ],
-          "note": "Every historical span is asked again after the whole sequence, including the fact GPT-J knew before editing."
-        }
-      }
-    },
     "results": {
       "se": {
         "CES": {
@@ -537,13 +520,12 @@
       }
     },
     "initial": {
-      "setting": "se",
-      "form": "HES",
+      "setting": "me",
+      "form": "HES*",
       "editor": "MEMIT"
     },
     "record_url": "https://github.com/Arvid-pku/ATOKE#data-format",
     "source_label": "arXiv 2312.05497v3: Tables 2 and 3, Figure 3, and the METO section",
-    "source_url": "https://arxiv.org/abs/2312.05497v3",
-    "eyebrow": "Released record · Tables 2–3"
+    "source_url": "https://arxiv.org/abs/2312.05497v3"
   }
 }

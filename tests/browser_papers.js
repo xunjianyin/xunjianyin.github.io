@@ -19,6 +19,10 @@
       const doc = frame.contentDocument;
       const win = frame.contentWindow;
       if (doc.documentElement.scrollWidth > width + 1) failures.push(`${slug} at ${width}: horizontal overflow`);
+      // Result-first layout: the overview visual follows the header and starts on the first desktop screen.
+      const lead = doc.querySelector('.lead-visual');
+      if (lead && !(lead.compareDocumentPosition(doc.querySelector('#overview')) & Node.DOCUMENT_POSITION_FOLLOWING)) failures.push(`${slug}: lead visual after section 01`);
+      if (lead && width === 1440 && lead.getBoundingClientRect().top >= 900) failures.push(`${slug}: lead visual below the first screen`);
       const visibleWords = doc.body.innerText.trim().split(/\s+/).length;
       // Hidden figures must also load when the native disclosure is opened.
       doc.querySelectorAll('details').forEach(details => { details.open = true; });
@@ -27,7 +31,7 @@
         try { await image.decode(); } catch { failures.push(`${slug}: broken image ${image.src}`); }
       }
       if (doc.documentElement.scrollWidth > width + 1) failures.push(`${slug} at ${width}: disclosure overflow`);
-      const longElements = [...doc.querySelectorAll('h1,h2,h3,p,.token-sequence')].filter(el => el.scrollWidth > el.clientWidth + 2);
+      const longElements = [...doc.querySelectorAll('h1,h2,h3,p,dt,dd,.token-sequence')].filter(el => el.scrollWidth > el.clientWidth + 2);
       for (const el of longElements) failures.push(`${slug} at ${width}: clipped text ${el.className || el.tagName}`);
       if (slug === 'reverse-lm') {
         const forward = doc.querySelector('[data-direction="forward"]');

@@ -88,6 +88,14 @@ class VenueAndThreadTest(unittest.TestCase):
                     self.assertNotIn(f'href="{slug}.html"', block.group(0))
         self.assertEqual(sorted(s for slugs in BUILDER.RESEARCH_THREADS.values() for s in slugs), sorted(content))
 
+    def test_damon_belongs_to_evaluation_and_red_teaming(self) -> None:
+        threads = BUILDER.RESEARCH_THREADS
+        self.assertNotIn('Evaluating generated text', threads)
+        self.assertEqual(threads['Evaluation and red-teaming'][-1], 'damon')
+        self.assertNotIn('damon', threads['Language modeling and decoding'])
+        html = (ROOT / 'papers/damon.html').read_text()
+        self.assertIn('<p class="related-thread">Evaluation and red-teaming</p>', html)
+
 
 if __name__ == '__main__':
     unittest.main()

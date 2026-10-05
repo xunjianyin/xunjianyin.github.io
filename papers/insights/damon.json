@@ -1,24 +1,31 @@
 {
+  "demo": {
+    "kind": "mcts",
+    "placement": "method",
+    "eyebrow": "Algorithm 1 · illustrative judge scores",
+    "title": "Run the search one iteration at a time",
+    "caption": "An abstract search tree: nodes are dialogue states and the three decomposition strategy names, with no request content. Rewards are illustrative judge scores you can adjust; the UCT values and visit counts are computed live with the paper’s formulas. Step through selection, expansion, simulation and backpropagation."
+  },
   "story": {
     "title": "Conversation history belongs in the safety test",
     "paragraphs": [
-      "A model that handles an isolated unsafe request appropriately may behave differently when that request appears within a conversation. Earlier turns change the interpretation of later ones, and evaluating only the final message can miss that dependence. DAMON treats conversation as the unit of robustness testing. Its research value lies in measuring whether safety behavior remains reliable as dialogue context accumulates.",
-      "The comparison with predefined dialogue patterns is important. A fixed pattern tests one route through a conversation, whereas an adaptive evaluation can expose failures that depend on earlier model responses. At a high level, DAMON uses tree search to organize alternative dialogue trajectories. The assessment has to track both whether a response violates the intended safety boundary and whether it still addresses the original test objective."
+      "A model that refuses a harmful request in one turn may still answer its parts across several, because earlier turns change how later ones are read. DAMON (Dialogue-Aware MONte Carlo Tree Search Attack) is a red-teaming method that searches for a sequence of sub-instructions that hides a refused request's intent yet still elicits a harmful response.",
+      "The paper names two requirements: query-aware decomposition, because requests need different splits, and strategy-aware refinement, because the plan must change when the victim model refuses part of it."
     ]
   },
   "mechanism": {
-    "title": "Distinguish harmfulness from task completion",
+    "title": "Tree search chooses how to decompose each refused turn",
     "paragraphs": [
-      "The paper evaluates five model configurations on AdvBench, MaliciousInstruct, and HarmBench, comparing against six prior methods. AdvBench is reduced to 50 representative, nonduplicate instructions. Automated evaluation uses a GPT-4o judge with a five-level harmfulness scale, counting success only at the highest level. These choices define what the reported attack success rate measures; it is a benchmark outcome under a specific adversarial protocol.",
-      "Human assessment adds a second check. Three annotators independently evaluate a random sample of 20 HarmBench instances using GPT-4o as the tested model, with majority voting. A response must both contain harmful content rather than a refusal and address the original objective rather than drift to an unrelated topic. This is a small validation set, but the two-part criterion guards against rewarding irrelevant content merely because it contains concerning language.",
-      "A separate context experiment re-evaluates generated test messages with no preceding history, unrelated history, or their original history. As an illustrative measurement question, hold the final message fixed and change only what came before it: does the safety judgment change? This comparison helps reveal a dependency that a collection of independent single-turn tests would conceal, without requiring the website to reproduce unsafe prompts or trajectories."
+      "Each tree node is an attack state: the answered part of the dialogue, the sub-instructions still refused, an evaluation score, and a visit count. An action is one of three hand-designed decomposition strategies (progressive inquiry, step-by-step questioning, or story-driven imagination), applied by an attack LLM to the first refused sub-instruction.",
+      "Each iteration runs the four MCTS stages. Selection descends the tree by UCT (Upper Confidence bounds applied to Trees), adding an exploration bonus for rarely visited children to each child's mean score. Expansion decomposes the selected node with every strategy. Simulation sends the remaining sub-instructions to the victim, a GPT-4o reward model scores the dialogue for harm, and turns before the first new refusal join the stored dialogue. Backpropagation updates mean scores and visit counts up to the root.",
+      "Refusal pruning skips states in which every sub-instruction was answered: further splitting rarely restores the original objective once the dialogue has drifted. The attacker needs only black-box access to the victim's outputs and the reward scores."
     ]
   },
   "evidence": {
-    "title": "A stress test, not an everyday failure probability",
+    "title": "Adaptive search outperforms fixed-pattern attacks in most settings",
     "paragraphs": [
-      "The original conversation context produces substantially more failures than removing it, and unrelated context can also increase failures. The study additionally tests perplexity filtering, paraphrasing, and a moderation guardrail. These defenses reduce success unevenly; none resolves the measured problem across all tested models. Such results support evaluating dialogue-aware defenses, but they do not establish that any one defense is ineffective in every deployment configuration.",
-      "The figures are conditional on deliberately adversarial benchmark objectives, tested model versions, search resources, and an automated judge. They cannot be read as the likelihood that an ordinary user conversation causes harm. The authors also acknowledge manually specified objectives and hand-designed strategy families. Their suggestion that a mismatch between pretraining and safety alignment contributes to the vulnerability is a hypothesis, not a causal conclusion established by the experiments. Broader coverage and larger independent human assessments remain necessary."
+      "Across 15 model–dataset pairs (five victim models on AdvBench, MaliciousInstruct, and HarmBench), DAMON has the highest attack success rate in 14; the exception is GPT-4o on HarmBench. A small human check agrees: on 20 HarmBench instances with GPT-4o, three annotators judge 85.0% of DAMON's responses harmful and on-task, versus 75.0% for ActorAttack.",
+      "Context matters: replaying DAMON's sub-instructions with no preceding dialogue lowers success substantially, and even random unrelated context raises it above the no-context level. Among defenses, a moderation guardrail barely changes success, perplexity filtering lowers it modestly, and paraphrasing works best, yet average success under paraphrasing is still 71%. The authors hypothesize that a gap between pretraining data and safety-alignment data underlies such failures."
     ]
   },
   "sources": [

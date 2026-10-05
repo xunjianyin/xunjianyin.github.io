@@ -206,8 +206,7 @@
         const highlight = word && omission && word.type === 'Inaccuracy Intrinsic' ? `${word.severity}-${omission.severity}` : '';
         const head = Object.entries(config.severity).map(([name, value]) => `<th scope="col">${name} (${value})</th>`).join('');
         const grid = Object.entries(config.severity).map(([rowName, rowAlpha]) => `<tr><th scope="row">${rowName} (${rowAlpha})</th>${Object.entries(config.severity).map(([colName, colAlpha]) => `<td${highlight === `${rowName}-${colName}` ? ' class="is-active"' : ''} data-eval-grid="${rowName}-${colName}">${fmt((1 - (rowAlpha + colAlpha) / config.wordcount) * 100, 1)}</td>`).join('')}</tr>`).join('');
-        const table6 = config.table6.map(([name, value]) => `<tr><th scope="row">${escapeHTML(name)}</th><td>${value.toFixed(2)}</td></tr>`).join('');
-        html += `<div class="eval-block" data-eval-paper><h4>The paper’s annotation of this output</h4><div class="eval-table-wrap" tabindex="0" role="region" aria-label="Paper annotation"><table class="eval-annotation"><thead><tr><th scope="col">Segment</th><th scope="col">Type</th><th scope="col">Severity</th><th scope="col">L</th><th scope="col">Your mark</th></tr></thead><tbody><tr><th scope="row">Georgetown</th><td>Inaccuracy Intrinsic</td><td>not reported</td><td>1</td><td>${escapeHTML(wordNote)}</td></tr><tr><th scope="row">county Seat relation (missing)</th><td>Omission</td><td>not reported</td><td>1 (fixed)</td><td>${escapeHTML(omissionNote)}</td></tr></tbody></table></div><p class="eval-caption">${tag('adapted', 'Table 2 caption')} Georgetown is the county seat, not the largest city (Inaccuracy Intrinsic); the county seat is never mentioned (Omission). You marked ${extra} further segment${extra === 1 ? '' : 's'} that the paper does not list. Severities are not reported, so the paper’s annotation scores:</p><div class="eval-table-wrap" tabindex="0" role="region" aria-label="Score of the paper annotation by severity"><table class="eval-grid"><thead><tr><th scope="col">Inaccuracy Intrinsic ↓ · Omission →</th>${head}</tr></thead><tbody>${grid}</tbody></table></div><p class="eval-caption">${tag('computed', 'Equation 2')} for one output of ${config.wordcount} words${highlight ? '; the outlined cell uses your severities' : ''}.</p></div><div class="eval-block"><h4>Across the whole study</h4><div class="eval-table-wrap" tabindex="0" role="region" aria-label="Table 6 average error scores"><table class="eval-table6"><thead><tr><th scope="col">Error type</th><th scope="col">Average error score ↓</th></tr></thead><tbody>${table6}</tbody></table></div><p class="eval-caption">${tag('measured', 'Table 6')} average error score of each type across all models and datasets. The two error types in this example carry the largest average penalties.</p></div>`;
+        html += `<div class="eval-block" data-eval-paper><h4>The paper’s annotation of this output</h4><div class="eval-table-wrap" tabindex="0" role="region" aria-label="Paper annotation"><table class="eval-annotation"><thead><tr><th scope="col">Segment</th><th scope="col">Type</th><th scope="col">Severity</th><th scope="col">L</th><th scope="col">Your mark</th></tr></thead><tbody><tr><th scope="row">Georgetown</th><td>Inaccuracy Intrinsic</td><td>not reported</td><td>1</td><td>${escapeHTML(wordNote)}</td></tr><tr><th scope="row">county Seat relation (missing)</th><td>Omission</td><td>not reported</td><td>1 (fixed)</td><td>${escapeHTML(omissionNote)}</td></tr></tbody></table></div><p class="eval-caption">${tag('adapted', 'Table 2 caption')} Georgetown is the county seat, not the largest city (Inaccuracy Intrinsic); the county seat is never mentioned (Omission). You marked ${extra} further segment${extra === 1 ? '' : 's'} that the paper does not list. Severities are not reported, so the paper’s annotation scores:</p><div class="eval-table-wrap" tabindex="0" role="region" aria-label="Score of the paper annotation by severity"><table class="eval-grid"><thead><tr><th scope="col">Inaccuracy Intrinsic ↓ · Omission →</th>${head}</tr></thead><tbody>${grid}</tbody></table></div><p class="eval-caption">${tag('computed', 'Equation 2')} for one output of ${config.wordcount} words${highlight ? '; the outlined cell uses your severities' : ''}.</p></div>`;
       }
       results.innerHTML = html;
       let text = all.length
@@ -238,15 +237,29 @@
   }
 
   /* ---------------- Cont-COMET: similarity x alpha^distance context selection ---------------- */
+  // Sentence ids in document order, e.g. "−3 and +1".
+  const joinIds = (ids) => (ids.length < 3 ? ids.join(' and ') : `${ids.slice(0, -1).join(', ')} and ${ids[ids.length - 1]}`);
+
   function initializeContext(root, config) {
     const {results, verdict} = parts(root);
     let direction = 'both';
+    const cosineInputs = config.sentences.map((_, index) => root.querySelector(`[data-demo-range="cos-${index}"]`));
+    // Invalid or out-of-range cosines fall back to the illustrative default and are flagged.
+    const readCosine = (input, fallback) => {
+      const value = Number(input.value);
+      const valid = input.value !== '' && Number.isFinite(value) && value >= 0 && value <= 1;
+      input.setAttribute('aria-invalid', String(!valid));
+      return valid ? value : fallback;
+    };
     function render() {
       const budget = readRange(root, 'budget');
       const decay = readRange(root, 'decay') / 100;
       labelRange(root, 'budget', String(budget));
       labelRange(root, 'decay', decay.toFixed(2));
-      const scored = config.sentences.map((sentence) => ({...sentence, score: sentence.similarity * decay ** sentence.distance, eligible: direction === 'both' || sentence.side === 'previous'}));
+      const scored = config.sentences.map((sentence, index) => {
+        const similarity = readCosine(cosineInputs[index], sentence.similarity);
+        return {...sentence, similarity, score: similarity * decay ** sentence.distance, eligible: direction === 'both' || sentence.side === 'previous'};
+      });
       const eligible = scored.filter((sentence) => sentence.eligible);
       const selected = new Set([...eligible].sort((a, b) => b.score - a.score).slice(0, budget).map((sentence) => sentence.id));
       // An adjacent window of the same size: nearest first, the previous sentence first on a tie.
@@ -258,10 +271,12 @@
       };
       const before = scored.filter((sentence) => sentence.side === 'previous');
       const after = scored.filter((sentence) => sentence.side === 'following');
-      results.innerHTML = `<p class="eval-formula">Sim(R<sub>i</sub>, R<sub>j</sub>) = cos(r<sub>i</sub>, r<sub>j</sub>) · α<sup>|i−j|</sup></p><ol class="eval-context-list">${before.map(row).join('')}<li class="eval-context-target"><span>Current reference</span><strong>${escapeHTML(config.target)}</strong></li>${after.map(row).join('')}</ol><p class="eval-caption">${tag('illustrative')} document and cosine values; α is not reported in the paper. ${tag('adapted', 'Section 2.2')} selection rule; selection also stops before the 512-token encoder limit, which this short document never reaches.</p>`;
+      results.innerHTML = `<p class="eval-formula">Sim(R<sub>i</sub>, R<sub>j</sub>) = cos(r<sub>i</sub>, r<sub>j</sub>) · α<sup>|i−j|</sup></p><ol class="eval-context-list">${before.map(row).join('')}<li class="eval-context-target"><span>Current reference</span><strong>${escapeHTML(config.target)}</strong><small>“bank” is ambiguous: a river bank or a financial bank. Only the context can tell the evaluator which one the translation must preserve.</small></li>${after.map(row).join('')}</ol><p class="eval-caption">${tag('illustrative')} document and cosine values (editable above); α is not reported in the paper. ${tag('adapted', 'Section 2.2')} selection rule; selection also stops before the 512-token encoder limit, which this short document never reaches.</p>`;
+      const inOrder = (keep) => scored.filter((s) => keep.has(s.id)).map((s) => s.id);
       const chain = [...before.filter((s) => selected.has(s.id)).map((s) => s.id), 'current', ...after.filter((s) => selected.has(s.id)).map((s) => s.id)].join(' → ');
-      const differs = [...selected].filter((id) => !window.has(id)).length;
-      const windowText = differs ? `An adjacent window of the same size would swap ${differs} sentence${differs > 1 ? 's' : ''}.` : 'It matches an adjacent window of the same size.';
+      const onlyWindow = new Set([...window].filter((id) => !selected.has(id)));
+      const onlySelected = new Set([...selected].filter((id) => !window.has(id)));
+      const windowText = onlySelected.size ? `An adjacent window of the same size would use ${joinIds(inOrder(onlyWindow))} instead of ${joinIds(inOrder(onlySelected))}.` : 'It matches an adjacent window of the same size.';
       verdict.textContent = `${selected.size} context sentence${selected.size === 1 ? '' : 's'} selected, in document order: ${chain}. ${windowText}`;
       setPressed(root.querySelectorAll('[data-demo-action]'), (button) => button.dataset.demoAction === direction);
     }
@@ -271,9 +286,12 @@
   }
 
   /* ---------------- RERIC: Equation 11 overlap reranking ---------------- */
+  // 'weights' divides the matched weight by the sum of the weights (a full match gives alpha = 1);
+  // 'printed' divides by n = 3 as Equation 11 is printed.
   function initializeReric(root, config) {
     const {results, verdict} = parts(root);
     let rerank = true;
+    let normalization = 'weights';
     const neighbor = root.querySelector('[data-demo-range="neighbor"]');
     const center = root.querySelector('[data-demo-range="center"]');
     const distanceInputs = config.candidates.map((_, index) => root.querySelector(`[data-demo-range="distance-${index}"]`));
@@ -288,8 +306,11 @@
       labelRange(root, 'neighbor', weights[0].toFixed(2));
       labelRange(root, 'center', weights[1].toFixed(2));
       const distances = distanceInputs.map((input, index) => readDistance(input, config.candidates[index].distance));
+      const sum = weights.reduce((a, b) => a + b, 0);
+      const denominator = normalization === 'weights' ? sum : config.n;
       const ranked = config.candidates.map((candidate, index) => {
-        const overlap = candidate.tokens.reduce((sum, token, i) => sum + (token === config.query[i] ? weights[i] : 0), 0) / 3;
+        const matched = candidate.tokens.reduce((total, token, i) => total + (token === config.query[i] ? weights[i] : 0), 0);
+        const overlap = denominator > 0 ? matched / denominator : 0;
         return {index, overlap, distance: distances[index], adjusted: rerank ? (1 - overlap) * distances[index] : distances[index]};
       }).sort((a, b) => a.adjusted - b.adjusted);
       const rows = ranked.map((row, rank) => {
@@ -297,7 +318,9 @@
         const tokens = candidate.tokens.map((token, i) => `<span class="eval-character${token === config.query[i] ? ' is-match' : ''}${i === 1 ? ' is-center' : ''}">${escapeHTML(token)}</span>`).join('');
         return `<tr${rank === 0 ? ' class="is-winner"' : ''}><th scope="row"><span class="eval-rank">${rank + 1}</span><span lang="zh">${tokens}</span><small>${escapeHTML(candidate.gloss)}</small></th><td>${fmt(row.distance)}</td><td>${fmt(row.overlap)}</td><td><strong>${fmt(row.adjusted)}</strong></td></tr>`;
       }).join('');
-      results.innerHTML = `<p class="eval-query">Input window <span lang="zh">这<mark>以</mark>个</span><small>from “这以个重大发…”, Figure 1; 以 should be 一 (yī, as in 这一个 “this one”)</small></p><p class="eval-formula">α = Σ<sub>i</sub> 1[v(i) = g(i)] · w<sub>i</sub> / 3;  d′ = (1 − α) · d;  w = (${weights.map((w) => w.toFixed(2)).join(', ')})</p><div class="eval-table-wrap" tabindex="0" role="region" aria-label="Candidate reranking"><table><thead><tr><th scope="col">Rank · retrieved 3-gram</th><th scope="col">Distance d</th><th scope="col">Overlap α</th><th scope="col">${rerank ? 'Adjusted d′' : 'Ranking distance'} ↓</th></tr></thead><tbody>${rows}</tbody></table></div><p class="eval-caption">${tag('adapted', 'Figure 1')} input and candidates. ${tag('adapted', 'Table 3')} weights w = (1.68, 0.68, 1.68), n = 3. ${tag('illustrative')} l2 distances in Figure 1’s retrieval order; the paper does not print them.</p>`;
+      const formula = `α = Σ<sub>i</sub> 1[v(i) = g(i)] · w<sub>i</sub> / ${normalization === 'weights' ? `Σ<sub>i</sub> w<sub>i</sub> = ${sum.toFixed(2)}` : '3'};  d′ = (1 − α) · d;  w = (${weights.map((w) => w.toFixed(2)).join(', ')})`;
+      const rule = normalization === 'weights' ? ' α divided by Σw, so a full match gives α = 1.' : ' as printed: α divided by n = 3.';
+      results.innerHTML = `<p class="eval-query">Input window <span lang="zh">这<mark>以</mark>个</span><small>from “这以个重大发…”, Figure 1; 以 is a misspelling, corrected as in 这一个 (“this one”)</small></p><p class="eval-formula" data-eval-formula>${formula}</p><div class="eval-table-wrap" tabindex="0" role="region" aria-label="Candidate reranking"><table><thead><tr><th scope="col">Rank · retrieved 3-gram</th><th scope="col">Distance d</th><th scope="col">Overlap α</th><th scope="col">${rerank ? 'Adjusted d′' : 'Ranking distance'} ↓</th></tr></thead><tbody>${rows}</tbody></table></div><p class="eval-caption">${tag('adapted', 'Figure 1')} input and candidates. ${tag('adapted', 'Equation 11')}${escapeHTML(rule)} ${tag('adapted', 'Table 3')} weights w = (1.68, 0.68, 1.68), n = 3. ${tag('illustrative')} l2 distances in Figure 1’s retrieval order; the paper does not print them.</p>`;
       const top = config.candidates[ranked[0].index];
       const name = top.tokens.join('');
       let text;
@@ -309,16 +332,21 @@
         if (top.tokens[1] === config.query[1]) text += 'A match on the uncertain center still earns enough overlap to keep the input error.';
         else if (negative.length) {
           text += `α exceeds 1 for ${negative.map((row) => config.candidates[row.index].tokens.join('')).join(' and ')}, so (1 − α) is negative and a larger retrieval distance gives a smaller adjusted distance.`;
-          if (top.tokens[1] !== '一') text += ' Figure 1 instead shows 这一个 (“this one”) as the most probable correction.';
-        } else text += 'Matching both correct neighbors outweighs matching the uncertain center.';
+          if (name !== config.figureTop) text += ` Figure 1 instead shows ${config.figureTop} (“this one”) as the most probable correction.`;
+        } else {
+          text += 'Matching both correct neighbors outweighs matching the uncertain center.';
+          if (name === config.figureTop) text += ' This is Figure 1’s ranking: 这一个 (“this one”) is the most probable correction.';
+        }
       }
       verdict.textContent = text;
       setPressed(root.querySelectorAll('[data-demo-action="raw"],[data-demo-action="rerank"]'), (button) => (button.dataset.demoAction === 'rerank') === rerank);
+      setPressed(root.querySelectorAll('[data-demo-action^="norm-"]'), (button) => button.dataset.demoAction === `norm-${normalization}`);
       const paper = config.paperWeights;
       setPressed([root.querySelector('[data-demo-action="weights-paper"]')], () => Math.abs(weights[0] - paper[0]) < 1e-9 && Math.abs(weights[1] - paper[1]) < 1e-9);
       setPressed([root.querySelector('[data-demo-action="weights-equal"]')], () => weights[0] === 1 && weights[1] === 1);
     }
     root.querySelectorAll('[data-demo-action="raw"],[data-demo-action="rerank"]').forEach((button) => button.addEventListener('click', () => { rerank = button.dataset.demoAction === 'rerank'; render(); }));
+    root.querySelectorAll('[data-demo-action^="norm-"]').forEach((button) => button.addEventListener('click', () => { normalization = button.dataset.demoAction.slice(5); render(); }));
     root.querySelector('[data-demo-action="weights-paper"]').addEventListener('click', () => { neighbor.value = Math.round(config.paperWeights[0] * 100); center.value = Math.round(config.paperWeights[1] * 100); render(); });
     root.querySelector('[data-demo-action="weights-equal"]').addEventListener('click', () => { neighbor.value = 100; center.value = 100; render(); });
     root.querySelectorAll('[data-demo-range]').forEach((input) => input.addEventListener('input', render));

@@ -2,23 +2,23 @@
   "story": {
     "title": "A collection of plausible judgments can be inconsistent",
     "paragraphs": [
-      "Preference training commonly treats responses as if each had a single underlying quality score. That implies a coherent ordering for a fixed prompt. Yet a model judging pairs separately can prefer A to B, B to C, and C to A. Each local decision may look plausible, while the collection supplies conflicting supervision.",
-      "Confidence-only selection does not ask where a comparison sits in this structure. It may retain redundant preferences and miss comparisons that explain a contradiction elsewhere. ContraSolver instead makes the response set a directed graph. An arrow records a preference; a directed cycle exposes a conflict that cannot be represented by one consistent ranking."
+      "DPO (direct preference optimization) assumes that each response has one latent reward, which implies a strict ordering of the responses to a prompt. Yet a model judging pairs separately can prefer A to B, B to C and C to A; each judgment looks plausible, but together they conflict.",
+      "Selecting pairs by confidence alone ignores where a comparison sits in this structure, keeping redundant preferences and missing those that explain a contradiction. ContraSolver treats the responses as a directed graph whose edges are preferences, so a directed cycle exposes a conflict that no single ranking can represent."
     ]
   },
   "mechanism": {
     "title": "Train on the evidence surrounding a contradiction",
     "paragraphs": [
-      "The algorithm first constructs a maximum spanning tree, preserving a connected set of strong comparisons. A reverse pass examines remaining edges from lower to higher confidence. When an edge closes a directed cycle, it is marked contradictory, while the existing edges along that cycle become candidate training evidence. A forward pass then considers stronger remaining edges, adding a new ordering relationship and skipping relationships already implied by a path.",
-      "An important detail is the final DPO dataset: it contains the supporting, or heuristic, edges selected around contradictions. The algorithm does not simply flip every suspicious label and train on the rewritten graph. Its intended effect is that learning the more reliable supporting comparisons will also change weaker inconsistent judgments.",
-      "The demo runs Algorithm 1 on five responses and ten illustrative judgments. Raising one confidence can move a wrong judgment into the kept structure, so that a correct comparison is flagged as contradictory and the wrong one becomes a DPO pair. This makes the assumption visible: higher confidence is treated as stronger evidence, so the procedure can produce a consistent ordering that is still factually wrong."
+      "The algorithm first builds a maximum spanning tree of the strongest comparisons. A reverse pass examines the remaining edges from low to high confidence: an edge that closes a directed cycle is marked contradictory, and the edges on that cycle become candidate training pairs. A forward pass adds stronger edges that give a new ordering and skips those already implied by a path.",
+      "DPO then trains on these supporting (heuristic) edges, not on flipped contradictory ones, in the expectation that learning the reliable comparisons also corrects the weaker, inconsistent judgments.",
+      "Higher confidence is thus treated as stronger evidence. A confidently wrong judgment can enter the spanning tree, flag a correct comparison as contradictory and become a training pair, giving an order that is consistent but wrong."
     ]
   },
   "evidence": {
     "title": "Consistency improves, but it is not fully solved",
     "paragraphs": [
-      "The data-selection baselines use the same number of preference pairs, making their comparison informative about which pairs are chosen. On positive-sentiment generation, Llama-2-7b-chat reaches 87.2%, compared with 80.3% for maximum-confidence selection and 79.5% for random selection. The safety analysis also includes human assessment on 100 sampled AdvBench prompts; its reported harmless rate is 91% for ContraSolver and 86% for confidence-only selection.",
-      "Graph analysis provides a different outcome from task accuracy. For Llama-2-7b-chat on SafeEdit, the share of training inputs with a contradictory preference graph decreases from 13.3% to 10.4%. Contradictions therefore remain after model training, even though the graph-processing algorithm has a consistency property. These measurements use the original response nodes on training prompts, so they do not establish contradiction-free behavior on arbitrary new responses. Ties and confidence calibration remain limitations."
+      "Random and Max-Confidence selection (keep the most confident pairs) use as many pairs as ContraSolver, so the comparison isolates which pairs are chosen. On positive-sentiment generation, Llama-2-7b-chat reaches 87.2% with ContraSolver, 80.3% with Max-Confidence and 79.5% with random selection.",
+      "The graph analysis measures consistency directly: for both models and all four datasets, fewer training prompts have a cyclic preference graph after self-alignment, but many cycles remain. The analysis reuses the original responses on training prompts, so it does not test new responses."
     ]
   },
   "sources": [
@@ -35,7 +35,12 @@
   "demo": {
     "kind": "preference-graph",
     "title": "Which of the model’s own judgments become training pairs?",
-    "caption": "Five responses to one prompt and ten pairwise judgments. Flip a judgment or change its illustrative confidence: the paper’s graph algorithm reruns and reports the spanning tree, the contradictions, the resulting order, and the pairs it would use for DPO.",
-    "eyebrow": "Algorithm 1 · illustrative judgments"
+    "caption": "Five responses to one prompt and ten pairwise judgments. Flip a judgment or change its illustrative confidence: the paper’s graph algorithm reruns and reports the spanning tree, the contradictions, the resulting order, and the pairs it would use for DPO. Play replays the run on the current graph one decision at a time.",
+    "eyebrow": "Algorithm 1 · illustrative judgments",
+    "evidence": {
+      "eyebrow": "Measured · Table 4",
+      "title": "How often a prompt’s self-judged preference graph contains a cycle",
+      "caption": "Share of training prompts with at least one contradiction, before and after DPO on ContraSolver-selected pairs. The graph nodes are the same sampled responses used for data construction."
+    }
   }
 }

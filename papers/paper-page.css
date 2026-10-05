@@ -831,9 +831,9 @@ summary span {
 .demo-controls input[type="range"] { accent-color: var(--accent); flex: 1; min-width: 120px; max-width: 360px; }
 .demo-options { display: flex; flex-wrap: wrap; gap: 7px; }
 .demo-provenance { margin-top: 23px; padding-top: 15px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); line-height: 1.8; }
-/* Keep the four demo families aligned with the shared paper typography. */
-.explore-section [data-paper-demo] > header h3 { font: 400 25px/1.3 Georgia, serif; letter-spacing: -.02em; }
-.explore-section [data-paper-demo] > header > p:last-child { font-size: 14px; line-height: 1.75; color: var(--muted); }
+/* Keep the demo families aligned with the shared paper typography wherever a demo is placed. */
+:is(.explore-section, .section-demo, .lead-visual) [data-paper-demo] > header h3 { font: 400 25px/1.3 Georgia, serif; letter-spacing: -.02em; }
+:is(.explore-section, .section-demo, .lead-visual) [data-paper-demo] > header > p:last-child { font-size: 14px; line-height: 1.75; color: var(--muted); }
 @media (max-width: 700px) {
   .narrative { font-size: 14px; }
   .method-reading { grid-template-columns: 1fr; gap: 25px; }
@@ -842,8 +842,8 @@ summary span {
   .demo-heading h3 { font-size: 23px; }
   .demo-heading p { font-size: 13px; }
   .demo-controls { gap: 8px; }
-  .explore-section [data-paper-demo] > header h3 { font-size: 23px; }
-  .explore-section [data-paper-demo] > header > p:last-child { font-size: 13px; }
+  :is(.explore-section, .section-demo, .lead-visual) [data-paper-demo] > header h3 { font-size: 23px; }
+  :is(.explore-section, .section-demo, .lead-visual) [data-paper-demo] > header > p:last-child { font-size: 13px; }
 }
 
 /* Results tables: numeric columns align on digits; the paper's own method is marked. */
@@ -885,4 +885,41 @@ summary span {
 @media (max-width: 700px) {
   .related-research li { grid-template-columns: 1fr; }
   .related-name { display: block; margin: 0 0 2px; }
+}
+
+/* Result-first header: affiliations, an at-a-glance summary, then the lead visual. */
+.paper-authors sup, .author-legend sup { font-size: .72em; line-height: 0; }
+.paper-authors sup { margin-left: 1px; }
+/* A name and its marks never break across lines. */
+.paper-authors .author { white-space: nowrap; }
+.author-legend { max-width: 800px; margin: 2px auto 0; font-size: 12px; line-height: 1.75; color: var(--muted); overflow-wrap: anywhere; }
+.paper-glance { max-width: 720px; margin: 24px auto 0; padding-top: 10px; border-top: 1px solid var(--line); text-align: left; }
+.paper-glance > div { display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 20px; padding: 4px 0; }
+/* Keep the lead visual on the first screen when the glance block is present: less padding, same text sizes. */
+.paper-header:has(.paper-glance) { padding-top: 44px; padding-bottom: 32px; }
+.paper-glance dt { padding-top: 4px; color: var(--accent); font-size: 11px; font-weight: 600; letter-spacing: .1em; line-height: 1.6; text-transform: uppercase; }
+.paper-glance dd { margin: 0; font-size: 15px; line-height: 1.65; color: var(--ink); text-wrap: pretty; overflow-wrap: anywhere; }
+/* The lead visual follows the header directly; demo roots drop their own top margin. */
+.lead-visual > :first-child, .section-demo > :first-child { margin-top: 0; }
+.lead-visual + .overview-section { margin-top: 48px; }
+/* Closest prior work closes section 01 inside the narrative column. */
+.prior-work { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
+.prior-work h3 { margin-bottom: 6px; font-size: 13px; font-weight: 600; line-height: 1.5; color: var(--ink); }
+/* Demos placed in Method or Evidence span the full content width. */
+.section-demo { margin-top: 28px; min-width: 0; }
+.method-lead { margin-top: 25px; }
+.method-demo + .method-reading { margin-top: 32px; }
+.method-reading > .method-list:only-child { grid-column: 1 / -1; border-left: none; padding-left: 0; }
+.evidence-demo { margin-top: 32px; }
+@media (max-width: 700px) {
+  .author-legend { font-size: 11px; }
+  /* Phones: labels stay above values; smaller text and tighter rows keep the block short. */
+  .paper-glance { margin-top: 18px; padding-top: 6px; }
+  .paper-glance > div { grid-template-columns: 1fr; gap: 0; padding: 4px 0; }
+  .paper-header:has(.paper-glance) { padding-top: 40px; padding-bottom: 28px; }
+  .paper-glance dt { padding-top: 0; font-size: 10px; line-height: 1.5; }
+  .paper-glance dd { font-size: 14px; line-height: 1.6; }
+  .lead-visual + .overview-section { margin-top: 34px; }
+  .section-demo { margin-top: 24px; }
+  .method-demo + .method-reading { margin-top: 26px; }
 }

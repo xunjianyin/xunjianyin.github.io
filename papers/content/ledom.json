@@ -38,22 +38,17 @@
     ],
     "findings": [
       {
-        "value": "2B / 7B",
-        "label": "Open reverse models",
-        "detail": "Two model scales study right-to-left pretraining with the same architecture and tokenizer as their forward counterparts."
+        "value": "23.3 vs 16.7",
+        "label": "AIME 2024 accuracy (%) · QwenMath, Reverse Reward vs greedy",
+        "detail": "Random selection from the same samples scores 11.3. Reverse Reward Best-of-N exceeds greedy decoding in 11 of 12 model–benchmark pairs and ties in one."
       },
       {
-        "value": "435B",
-        "label": "Pretraining tokens",
-        "detail": "A corpus of general text, mathematics, and code supports training a reverse model at foundation-model scale."
-      },
-      {
-        "value": "+6.6 pp",
-        "label": "AIME 2024 · QwenMath",
-        "detail": "Reverse Reward raises accuracy from 16.7% with greedy decoding to 23.3% with candidate reranking in the reported setup."
+        "value": "19.82 vs 40.22",
+        "label": "TriviaQA accuracy (%) · LEDOM-2B vs matched forward model",
+        "detail": "As a standalone model, LEDOM trails its forward counterpart on forward-causal tasks such as factual retrieval and code (HumanEval 2.44 vs 8.54)."
       }
     ],
-    "scope": "These are inference-time reranking results with additional sampling and scoring. LEDOM alone trails forward models on many standard benchmarks; backward generation examples are qualitative.",
+    "scope": "The backward-generation examples are qualitative, and the reasoning gains are limited to mathematics, with a reverse scorer fine-tuned on mathematical data.",
     "results_table": {
       "caption": "Selected results from Table 4. Accuracy (%); Reverse Reward uses best-of-N sampling. These are not matched-compute comparisons with greedy decoding.",
       "headings": [
@@ -92,7 +87,106 @@
     "source_url": "https://arxiv.org/html/2507.01335v3",
     "source_note": "Verified Sections 2–5 and Table 4 against original arXiv v3 HTML. Corrected old page’s Qwen GSM8K/MATH-500 and DeepSeek AIME figures; those unsupported numbers are not reused. Existing x1.png figure path was invalid; actual source is intro.png. Text explains P(prompt|response), not the old reversed interpretation.",
     "metadata_override": {
-      "abstract": "LEDOM studies right-to-left autoregressive pretraining at 2B and 7B parameters on 435 billion tokens. It reconstructs earlier text from later context, with qualitative examples of abductive reasoning, question synthesis, and inverse relation completion. Reverse Reward combines forward response likelihood with reverse prompt likelihood to rerank candidate responses. In the reported experiments, this improves mathematical reasoning over greedy baselines, while standalone reverse models remain weaker on many forward-oriented benchmarks. Models, code, and data are released for further research."
-    }
+      "abstract": "LEDOM studies right-to-left autoregressive pretraining at 2B and 7B parameters on 435 billion tokens. It reconstructs earlier text from later context, with qualitative examples of abductive reasoning, question synthesis, and inverse relation completion. Reverse Reward combines forward response likelihood with reverse prompt likelihood to rerank candidate responses. In the reported experiments, this improves mathematical reasoning over greedy baselines, while standalone reverse models remain weaker on many forward-oriented benchmarks. Models, code, and data are released for further research.",
+      "citation": "@inproceedings{yin-etal-2026-ledom,\n    title = \"{LEDOM}: Reverse Language Model\",\n    author = \"Yin, Xunjian  and\n      Cheng, Sitao  and\n      Xie, Yuxi  and\n      Hu, Xinyu  and\n      Lin, Li  and\n      Wang, Xinyi  and\n      Pan, Liangming  and\n      Wang, William Yang  and\n      Wan, Xiaojun\",\n    editor = \"Liakata, Maria  and\n      Moreira, Viviane P.  and\n      Zhang, Jiajun  and\n      Jurgens, David\",\n    booktitle = \"Proceedings of the 64th Annual Meeting of the {A}ssociation for {C}omputational {L}inguistics (Volume 1: Long Papers)\",\n    month = jul,\n    year = \"2026\",\n    address = \"San Diego, California, United States\",\n    publisher = \"Association for Computational Linguistics\",\n    url = \"https://aclanthology.org/2026.acl-long.975/\",\n    doi = \"10.18653/v1/2026.acl-long.975\",\n    pages = \"21306--21326\",\n    ISBN = \"979-8-89176-390-6\"\n}",
+      "links": [
+        {
+          "label": "Paper",
+          "url": "https://aclanthology.org/2026.acl-long.975/"
+        },
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2507.01335"
+        },
+        {
+          "label": "Model (7B, preliminary)",
+          "url": "https://huggingface.co/Corning/Reverse-Model-7B-348B"
+        },
+        {
+          "label": "Code",
+          "url": "https://github.com/Arvid-pku/LEDOM"
+        }
+      ],
+      "title": "LEDOM: Reverse Language Model"
+    },
+    "affiliations": [
+      "Peking University",
+      "Princeton University",
+      "University of Waterloo",
+      "University of California, Santa Barbara",
+      "National University of Singapore"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Sitao Cheng",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Yuxi Xie",
+        "affiliations": [
+          5
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xinyu Hu",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Li Lin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xinyi Wang",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Liangming Pan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "William Yang Wang",
+        "affiliations": [
+          4
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "With QwenMath on AIME 2024, Reverse Reward reranking reaches 23.3% vs 16.7% for greedy decoding and 11.3% for random selection among the same samples.",
+      "prior": "TRLM reranks forward outputs with a small reverse model, and Golovneva et al. train forward then reverse; this work pretrains a purely reverse 2B/7B model and uses it as a posterior scorer.",
+      "limitation": "Reverse Reward is compared only with greedy decoding and random selection, not with learned outcome or process reward models."
+    },
+    "prior_work": "Earlier reverse-generation work regularized forward models with forward-backward agreement (Serdyuk et al., 2017; Zhang et al., 2019), trained small reverse models to find worst-case inputs (Pfau et al., 2023), or trained forward then reverse to mitigate the reversal curse (Golovneva et al., 2024). Closest to its application, TRLM (Varun et al., 2025) uses a small reverse model for unsupervised feedback and best-of-N reranking. LEDOM pretrains a purely reverse model at 2B and 7B scale, matched to forward models, and extends reranking with a noisy-channel analysis and step-level verification.",
+    "remove_results_table": true
   }
 }

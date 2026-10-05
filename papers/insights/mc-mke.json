@@ -2,23 +2,23 @@
   "story": {
     "title": "One edited answer can hide a contradiction",
     "paragraphs": [
-      "A multimodal model may recognize a person in an image, know which club that person plays for, and answer a club question about the image. These are three related behaviors, not interchangeable copies of one fact. An edit can repair the requested answer while leaving the other two inconsistent. MC-MKE makes their relationship part of the evaluation instead of counting the edited response alone.",
-      "The paper’s own example shows why the scenarios differ. A photograph of Messi is misrecognized as Mac Allister, so the model answers that the pictured player plays for Liverpool. Correcting the recognition should also change the image-based club answer to Miami FC, because the textual fact about Messi already supplies it. If instead the club itself changed through a transfer, the recognition should stay fixed while both club answers change. The two interventions can produce the same surface answer for different reasons."
+      "A multimodal model may recognize a person in an image, know which club that person plays for, and answer a club question about the image. These are three linked pieces of knowledge, and an edit can repair the requested answer while leaving a linked one unchanged. MC-MKE scores that relationship, not only the edited response.",
+      "The same new answer can have different causes. Correcting a misrecognized player changes which entity is recognized in the image; a transfer changes the player's club. Both alter the image-based club answer, but each implies a different set of answers that must change with it."
     ]
   },
   "mechanism": {
     "title": "The reason for an edit determines its consequences",
     "paragraphs": [
-      "The benchmark decomposes multimodal knowledge into an image-to-entity association and an entity–relation–object fact. Their composition produces the image–relation–object answer. It then defines three editing settings: change recognition, change a textual fact, or directly change the multimodal answer. Each setting specifies a different related answer that must be checked for consistency after editing.",
-      "The third setting contains an ambiguity: a changed image answer could come from recognizing a different entity or updating a fact about the original one. MC-MKE supplies a reason for the edit, such as a club transfer. In its constructed dataset, this setting is restricted to the textual-fact interpretation. That is a deliberate experimental choice, not a claim that every real multimodal correction has a unique explanation.",
-      "Before creating edits, the authors retain source examples only when all three knowledge questions are correctly answered by the three tested multimodal models. Otherwise, a failed consistency check could reflect a missing prerequisite rather than damage from editing. Evaluation then separates reliability on the requested change, consistency of related answers, locality of unrelated knowledge, and generality across alternate images or paraphrases."
+      "The benchmark decomposes multimodal knowledge into visual knowledge, an image–entity pair, and textual knowledge, an entity–relation–object triplet; composing them gives the image-based fact. Three edit scenarios follow: IE_edit changes recognition, SRO_edit changes a textual fact, and IRO_edit changes the image-based answer directly. Each scenario names a different linked answer to check for consistency.",
+      "IRO_edit is ambiguous: a new image-based answer could come from a different recognized entity or from a changed fact about the same one. Because many entities could satisfy the first reading, the dataset attaches a generated reason, such as a transfer, and uses only the textual-fact reading.",
+      "Facts come from MQuAKE. An example is kept only if all three questions are answered correctly by all three filtering models, LLaVA-v1.5, InstructBLIP, and MiniGPT-v2; otherwise a failed consistency check could reflect a missing prerequisite rather than editing damage. Evaluation separates reliability on the requested change, consistency of linked answers, locality on unrelated knowledge, and generality to other images or paraphrases."
     ]
   },
   "evidence": {
-    "title": "Consistency must be read alongside locality",
+    "title": "High reliability does not bring consistency",
     "paragraphs": [
-      "The experiments compare fine-tuning, MEND, IKE, and SERAC on InstructBLIP and MiniGPT-v2; LLaVA-v1.5 is used only when selecting the source examples. Strong edit reliability does not reliably imply strong cross-modal consistency. The component being changed also matters: editing visual components is more suitable for some recognition changes, whereas changes to textual facts benefit from access to language components. These are empirical patterns in the tested architectures, not a universal map of where every fact resides.",
-      "A second trap is a method that repeatedly outputs the new target. It can appear consistent simply because every related prompt receives the same answer, while unrelated knowledge is damaged. This is why the paper reports several dimensions rather than declaring a winner from one score. The interactive comparison places every method’s measured reliability against its consistency for each scenario and model, using Tables 9–11."
+      "Editing experiments apply fine-tuning (FT), MEND (a hypernetwork that maps edits to weight changes), IKE (in-context editing), and SERAC (an edit memory with a classifier and a counterfactual model) to InstructBLIP and MiniGPT-v2, editing the vision or the language (LLM) component where applicable. High reliability does not imply consistency, especially for recognition edits.",
+      "In SRO_edit and IRO_edit the consistency target equals the edit target, so a method that outputs the new answer to every related prompt can look consistent while damaging unrelated knowledge. The authors therefore read consistency together with locality and trust it only when it holds across all three scenarios."
     ]
   },
   "sources": [
@@ -30,77 +30,85 @@
   "reading_notes": "Read formal factorization IE/SRO/IRO definitions, construction/filtering, reliability/consistency/locality/generality metrics, discussion, result interpretation. IRO dataset specifically assumes implicit SRO edit via reasons; not ambiguous identity selection. v5 demo describes the Figure 2 Messi / Mac Allister example in text (no photo) and plots measured Tables 9–11 for InstructBLIP and MiniGPT-v2. Editing experiments use InstructBLIP and MiniGPT-v2; LLaVA-v1.5 is used only for data selection.",
   "demo": {
     "type": "multimodal-consistency",
-    "title": "Does the linked answer follow the edit?",
-    "description": "The paper's Figure 2 example shows which answer must change in each editing scenario. Choose a scenario, a model, and a method to compare measured reliability with consistency on the full benchmark.",
+    "eyebrow": "Published example · Figure 2 and Eq. (2)",
+    "title": "Which answer must change with the edit?",
+    "description": "Choose an editing scenario and play the edit on the paper's Figure 2 example. The linked answer is recomputed from the composition (i, e) ×e=s (s, r, o) = (i, r, o), so each scenario names a different answer that must follow.",
+    "evidence": {
+      "eyebrow": "Measured · Appendix E, Tables 9–11",
+      "title": "Does the linked answer follow on the benchmark?",
+      "description": "Choose a scenario, a model, and a method to compare measured reliability with consistency. Every method is plotted for the chosen model and scenario."
+    },
+    "example": {
+      "relation": "plays for",
+      "templates": {
+        "ie": "The player in the image is {e}.",
+        "sro": "{s} plays for {o}.",
+        "iro": "The player in the image plays for {o}.",
+        "iro_reason": "Due to the player's transfer, the player in the image plays for {o}."
+      },
+      "scenarios": {
+        "ie": {
+          "edit": "ie",
+          "check": "iro",
+          "entity": "Mac Allister",
+          "new_entity": "Messi",
+          "facts": [
+            [
+              "Mac Allister",
+              "Liverpool"
+            ],
+            [
+              "Messi",
+              "Miami FC"
+            ]
+          ]
+        },
+        "sro": {
+          "edit": "sro",
+          "check": "iro",
+          "entity": "Messi",
+          "new_object": "Miami FC",
+          "facts": [
+            [
+              "Messi",
+              "Liverpool"
+            ]
+          ]
+        },
+        "iro": {
+          "edit": "iro",
+          "check": "sro",
+          "entity": "Messi",
+          "new_object": "Miami FC",
+          "facts": [
+            [
+              "Messi",
+              "Liverpool"
+            ]
+          ]
+        }
+      },
+      "steps": [
+        "Before the edit",
+        "Edit applied",
+        "Linked answer recomputed"
+      ]
+    },
     "scenarios": {
       "ie": {
         "label": "IE_edit",
         "name": "recognition edit",
-        "table": "Table 9",
-        "rows": {
-          "ie": {
-            "text": "The player in the image is Messi.",
-            "was": "Mac Allister",
-            "role": "Edited: reliability probe"
-          },
-          "sro": {
-            "text": "Messi plays for Miami FC.",
-            "was": null,
-            "role": "Unchanged, but required for the composition"
-          },
-          "iro": {
-            "text": "The player in the image plays for Miami FC.",
-            "was": "Liverpool",
-            "role": "Must follow: consistency probe"
-          }
-        },
-        "answers": "Edit target: Messi. Consistency target: Miami FC. The two answers differ, so repeating the edit target cannot pass the consistency probe."
+        "table": "Table 9"
       },
       "sro": {
         "label": "SRO_edit",
         "name": "textual fact edit",
-        "table": "Table 10",
-        "rows": {
-          "ie": {
-            "text": "The player in the image is Messi.",
-            "was": null,
-            "role": "Unchanged"
-          },
-          "sro": {
-            "text": "Messi plays for Miami FC.",
-            "was": "Liverpool",
-            "role": "Edited: reliability probe (with a black image)"
-          },
-          "iro": {
-            "text": "The player in the image plays for Miami FC.",
-            "was": "Liverpool",
-            "role": "Must follow: consistency probe"
-          }
-        },
-        "answers": "Edit target and consistency target are both Miami FC; only the input changes from the name to the image. An editor that answers Miami FC to every related prompt also passes, so locality must be read alongside."
+        "table": "Table 10"
       },
       "iro": {
         "label": "IRO_edit",
         "name": "image-based answer edit",
-        "table": "Table 11",
-        "rows": {
-          "ie": {
-            "text": "The player in the image is Messi.",
-            "was": null,
-            "role": "Unchanged: the stated reason rules out a new identity"
-          },
-          "sro": {
-            "text": "Messi plays for Miami FC.",
-            "was": "Liverpool",
-            "role": "Must follow: consistency probe"
-          },
-          "iro": {
-            "text": "Due to the player's transfer, the player in the image plays for Miami FC.",
-            "was": "Liverpool",
-            "role": "Edited with a reason: reliability probe"
-          }
-        },
-        "answers": "Edit target and consistency target are both Miami FC; the consistency probe asks about Messi by name instead of through the image."
+        "table": "Table 11"
       }
     },
     "models": {
@@ -397,7 +405,6 @@
       "method": "FT(LLM)"
     },
     "source_label": "ACL 2025 Findings: Figure 2 and Section 3.3; Appendix E, Tables 9–11",
-    "source_url": "https://aclanthology.org/2025.findings-acl.896.pdf",
-    "eyebrow": "Published example · Tables 9–11"
+    "source_url": "https://aclanthology.org/2025.findings-acl.896.pdf"
   }
 }

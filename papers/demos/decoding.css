@@ -1,6 +1,8 @@
-/* Decoding demos: COrAL small multiples, LEDOM published outputs, Table 4 dot plot.
- * Flat, square-cornered, no motion. Marks are SVG shapes placed in percent
- * coordinates so labels keep their CSS size at every width.
+/* Decoding demos: COrAL Figure 2 replay and small multiples, LEDOM published
+ * outputs, Table 4 dot plot. Flat and square-cornered. The only motion is the
+ * reader-started COrAL replay (block slide and arrow fade, under 600 ms), which
+ * is removed under prefers-reduced-motion. Marks are SVG shapes placed in
+ * percent coordinates so labels keep their CSS size at every width.
  */
 .decode-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .decode-status { margin-top: 16px; font-size: 13px; line-height: 1.7; color: var(--ink); max-width: 760px; }
@@ -20,7 +22,69 @@
 .coral-control-label { font-size: 11px; color: var(--muted); min-width: 64px; }
 .demo-controls button { display: inline-flex; align-items: center; gap: 6px; }
 
-/* COrAL */
+/* Shared transport controls (Play / Step / Reset). */
+.decode-transport button { min-width: 64px; justify-content: center; }
+
+/* COrAL: Figure 2 replay. One muted warm marks the decoding block and backward
+ * dependencies; the accent marks fixed tokens and forward dependencies. */
+.cr-replay { --cr-warm: #96682f; --cr-warm-tint: #f6ecd8; --cr-fixed: #dbe9e0; --cr-prompt: #e8eae6; }
+.cr-controls { flex-direction: column; align-items: flex-start; gap: 10px; }
+.cr-chips button { min-width: 46px; justify-content: center; }
+.cr-scroll { overflow-x: auto; margin-top: 4px; padding-bottom: 4px; }
+.cr-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cr-stage { display: grid; grid-template-columns: 62px minmax(0, 1fr); column-gap: 10px; min-width: 760px; }
+.cr-row { position: relative; display: grid; grid-template-columns: var(--cr-columns); min-height: 34px; }
+.cr-row-label { align-self: center; margin: 0; font-size: 11px; line-height: 1.3; color: var(--muted); text-align: right; }
+.cr-cell { display: flex; align-items: center; justify-content: center; min-width: 0; padding: 0 1px; border-left: 2px solid #fff;
+  font-size: 12px; line-height: 1; white-space: nowrap; overflow: hidden; color: var(--ink); background: transparent;
+  transition: background-color .3s, color .3s; }
+.cr-cell.is-prompt { background: var(--cr-prompt); font-weight: 600; }
+.cr-cell.is-fixed { background: var(--cr-fixed); }
+.cr-cell.is-block { background: var(--cr-warm-tint); }
+.cr-cell.is-accepted { box-shadow: inset 0 -2px 0 var(--accent); }
+.cr-cell.is-revised { box-shadow: inset 0 -3px 0 var(--cr-warm); font-weight: 600; }
+.cr-cell.is-draft { color: #a88a63; font-style: italic; }
+.cr-cell.is-pending { color: transparent; }
+.cr-block { position: absolute; top: -3px; bottom: -3px; border: 2px solid var(--cr-warm); pointer-events: none;
+  transition: left .45s ease, width .45s ease; }
+.cr-link { position: relative; height: 54px; }
+.cr-arrows { display: block; overflow: visible; }
+.cr-forward { stroke: var(--accent); stroke-width: 1.4; }
+.cr-backward { stroke: var(--cr-warm); stroke-width: 1.6; stroke-dasharray: 4 2.5; }
+.cr-head-forward path { fill: var(--accent); }
+.cr-head-backward path { fill: var(--cr-warm); }
+.cr-replay.is-enhanced [data-cr-arrows] { opacity: 0; transition: opacity .35s; }
+.cr-replay.is-enhanced [data-cr-arrows].is-shown { opacity: 1; }
+.cr-gap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0;
+  font-size: 12px; letter-spacing: .04em; color: var(--muted); }
+.cr-gap[hidden] { display: none; }
+.cr-index { min-height: 0; margin-top: 5px; }
+.cr-index span { font-size: 10px; line-height: 1; color: #8a948d; text-align: center; font-variant-numeric: tabular-nums; }
+.cr-index-label { font-size: 10px; align-self: start; margin-top: 4px; }
+.cr-key { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 14px; font-size: 11px; color: var(--muted); }
+.cr-key > span { display: inline-flex; align-items: center; gap: 6px; }
+.cr-swatch { display: inline-block; width: 14px; height: 12px; background: var(--cr-prompt); }
+.cr-swatch.is-fixed { background: var(--cr-fixed); }
+.cr-swatch.is-block { background: var(--cr-warm-tint); }
+.cr-swatch.is-revised { background: var(--cr-warm-tint); box-shadow: inset 0 -3px 0 var(--cr-warm); }
+.cr-line { display: inline-block; width: 20px; border-top: 1.5px solid var(--accent); }
+.cr-line.is-backward { border-top: 1.6px dashed var(--cr-warm); }
+.cr-status { min-height: 4.5em; }
+.cr-log-details { margin-top: 18px; }
+.cr-log-details summary { padding: 12px 0; font-size: 13px; }
+.cr-log-details .table-scroll { margin-bottom: 14px; }
+.cr-log-details .decode-caption { margin-top: 10px; }
+.cr-log td, .cr-log th { white-space: normal; vertical-align: top; }
+.cr-log th[scope="row"] { white-space: nowrap; }
+.cr-log td:nth-child(2) { min-width: 150px; }
+.cr-log td:nth-child(5) { min-width: 210px; }
+.cr-log tr.is-current { background: #f8f1e3; }
+.cr-log tr.is-current th { font-weight: 600; }
+@media (prefers-reduced-motion: reduce) {
+  .cr-cell, .cr-block, .cr-replay.is-enhanced [data-cr-arrows] { transition: none; }
+}
+
+/* COrAL: measured small multiples */
 .coral-swatch use { fill: #fff; stroke: var(--ink); stroke-width: 1.3; }
 .demo-controls button[aria-pressed="true"] .coral-swatch use { fill: #fff; stroke: #fff; }
 .coral-key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; font-size: 11px; color: var(--muted); }
@@ -64,7 +128,6 @@
 .rv-range { display: flex; align-items: center; gap: 10px; flex: 1 1 280px; font-size: 12px; }
 .rv-range input { flex: 1; min-width: 100px; accent-color: var(--accent); }
 .rv-range output { min-width: 64px; font-variant-numeric: tabular-nums; color: var(--muted); }
-.rv-help { width: 100%; font-size: 11px; color: var(--muted); }
 .rv-examples { display: grid; gap: 30px; }
 .rv-example { min-width: 0; }
 .ledom-examples:not(.is-enhanced) .rv-example + .rv-example { border-top: 1px solid var(--line); padding-top: 26px; }
@@ -117,6 +180,12 @@
 .rr-table .is-best { font-weight: 700; }
 
 @media (max-width: 700px) {
+  .cr-chips { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; padding-bottom: 2px; }
+  .cr-chips button { flex: none; }
+  .cr-stage { grid-template-columns: 48px minmax(0, 1fr); column-gap: 6px; min-width: 780px; }
+  .cr-cell { font-size: 11px; }
+  .cr-link { height: 46px; }
+  .cr-status { min-height: 0; }
   .coral-grid-panels { gap: 22px 14px; }
   .rv-text { font-size: 16px; }
   .rv-row { padding: 12px 13px 13px; }

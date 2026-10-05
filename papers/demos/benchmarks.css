@@ -1,0 +1,179 @@
+/* Benchmark demos (ALCUNA, knowledge boundary, self-generated documents).
+ * Same shell as the other demo families: serif heading, green eyebrow, 1px rules,
+ * square corners. Boxes are used only for structured data. */
+.benchmarks-demo {
+  --bm-ink: var(--ink, #202a26);
+  --bm-muted: var(--muted, #626b66);
+  --bm-accent: var(--accent, #2b6151);
+  --bm-line: var(--line, #dce2dc);
+  --bm-wash: var(--wash, #f0f4ee);
+  --bm-tint: #f7f9f6;
+  --bm-warm: #9a5a3c;
+  --bm-warm-wash: #f6ede8;
+  --bm-mark: #dfe9e1;
+  margin-block: 28px;
+  padding: 28px;
+  border: 1px solid var(--bm-line);
+  background: #fff;
+  color: var(--bm-ink);
+  font-size: 14px;
+  line-height: 1.65;
+  min-width: 0;
+}
+.benchmarks-demo [hidden] { display: none !important; }
+.benchmarks-demo p { margin: 0; }
+.benchmarks-demo :focus-visible { outline: 2px solid var(--bm-accent); outline-offset: 3px; }
+.benchmarks-demo .bm-heading { margin-bottom: 24px; }
+.benchmarks-demo .bm-eyebrow { margin: 0 0 7px; color: var(--bm-accent); font-size: 10px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; }
+.benchmarks-demo h3 { margin: 0 0 10px; font: 400 25px/1.3 Georgia, "Times New Roman", serif; letter-spacing: -.02em; }
+.benchmarks-demo .bm-heading > p:last-child { max-width: 75ch; color: var(--bm-muted); font-size: 14px; line-height: 1.75; }
+.benchmarks-demo h4 { margin: 0 0 10px; font-size: 13px; font-weight: 650; line-height: 1.45; }
+.benchmarks-demo h4 small { margin-left: 6px; color: var(--bm-muted); font-size: 11.5px; font-weight: 400; }
+.benchmarks-demo .bm-label { display: block; margin: 0 0 6px; color: var(--bm-muted); font-size: 10.5px; font-weight: 600; letter-spacing: .07em; line-height: 1.5; text-transform: uppercase; }
+.benchmarks-demo .bm-small { color: var(--bm-muted); font-size: 12px; line-height: 1.65; }
+.benchmarks-demo .bm-provenance { margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--bm-line); color: var(--bm-muted); font-size: 11.5px; line-height: 1.7; }
+.benchmarks-demo .bm-provenance a { color: var(--bm-accent); }
+.benchmarks-demo table { border-collapse: collapse; }
+.benchmarks-demo thead th { color: var(--bm-muted); font-size: 11.5px; font-weight: 600; vertical-align: bottom; }
+.benchmarks-demo .bm-table-wrap { position: relative; max-width: 100%; overflow-x: auto; }
+
+/* Controls. */
+.benchmarks-demo .bm-controls { display: flex; flex-wrap: wrap; gap: 14px 30px; margin: 0 0 18px; padding-top: 18px; border-top: 1px solid var(--bm-line); }
+.benchmarks-demo .bm-controls fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.benchmarks-demo .bm-controls legend { margin-bottom: 7px; padding: 0; font-size: 12px; font-weight: 600; }
+.benchmarks-demo .bm-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.benchmarks-demo .bm-buttons button { min-height: 38px; padding: 7px 12px; border: 1px solid #b8c5bc; border-radius: 0; background: #fff; color: var(--bm-ink); font: inherit; font-size: 12.5px; line-height: 1.4; text-align: left; cursor: pointer; }
+.benchmarks-demo .bm-buttons button:hover { border-color: var(--bm-accent); }
+.benchmarks-demo .bm-buttons button[aria-pressed="true"] { border-color: var(--bm-accent); background: var(--bm-wash); color: var(--bm-accent); font-weight: 600; }
+.benchmarks-demo .bm-buttons button:disabled { border-color: var(--bm-line); color: #9aa39d; cursor: default; }
+.benchmarks-demo .bm-player { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px; margin: 0 0 12px; }
+.benchmarks-demo .bm-transport button { min-width: 68px; text-align: center; }
+.benchmarks-demo .bm-transport button[aria-pressed="true"] { border-color: var(--bm-accent); background: var(--bm-accent); color: #fff; }
+.benchmarks-demo .bm-steps button { min-height: 32px; padding: 4px 10px; font-size: 12px; }
+.benchmarks-demo .bm-step-status { min-height: 3.4em; margin: 0 0 18px; padding: 10px 0; border-block: 1px solid var(--bm-line); font-size: 13.5px; line-height: 1.65; }
+.benchmarks-demo .bm-readout { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--bm-line); }
+.benchmarks-demo .bm-status { max-width: 86ch; font-size: 13.5px; line-height: 1.7; }
+
+/* A changed element is marked once (≤ 450 ms) after Play or Step; never on load. */
+.benchmarks-demo .is-entering { animation: bm-mark 450ms ease-out; }
+@keyframes bm-mark { from { background-color: var(--bm-mark); } }
+@media (prefers-reduced-motion: reduce) {
+  .benchmarks-demo *, .benchmarks-demo .is-entering { animation: none !important; transition: none !important; }
+}
+.benchmarks-demo[data-motion="reduce"] *, .benchmarks-demo[data-motion="reduce"] .is-entering { animation: none !important; transition: none !important; }
+
+/* ALCUNA: KnowGen. */
+.benchmarks-demo .bm-kg { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.benchmarks-demo .bm-kg-existing { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--bm-line); }
+.benchmarks-demo .bm-kg-existing .bm-kg-card { border: 0; border-left: 1px solid var(--bm-line); }
+.benchmarks-demo .bm-kg-existing .bm-kg-card:first-child { border-left: 0; }
+.benchmarks-demo .bm-kg-card { min-width: 0; padding: 12px 14px; border: 1px solid var(--bm-line); }
+.benchmarks-demo .bm-kg-card h4 { margin-bottom: 6px; font: 400 19px/1.3 Georgia, "Times New Roman", serif; }
+.benchmarks-demo .bm-kg-card ul { margin: 0; padding: 0; list-style: none; font-size: 12.5px; line-height: 1.5; }
+.benchmarks-demo .bm-kg-card li { padding: 3px 4px; overflow-wrap: anywhere; transition: background-color 300ms ease; }
+.benchmarks-demo .bm-kg-card li.is-source { background: var(--bm-wash); color: var(--bm-accent); font-weight: 600; }
+.benchmarks-demo .bm-sub { color: var(--bm-muted); }
+.benchmarks-demo .bm-kg-new { border-color: var(--bm-accent); }
+.benchmarks-demo .bm-kg-new h4 { font-size: 22px; }
+.benchmarks-demo .bm-kg-new [data-kg-props] { margin: 8px 0; font-size: 13px; }
+.benchmarks-demo .bm-op { color: var(--bm-muted); font-size: 11.5px; }
+.benchmarks-demo .bm-op[data-op="variation"], .benchmarks-demo .bm-op[data-op="extension"] { color: var(--bm-accent); }
+.benchmarks-demo .bm-op[data-op="dropout"] { color: var(--bm-warm); }
+.benchmarks-demo .bm-kg-new s { color: var(--bm-muted); }
+.benchmarks-demo .bm-kg-questions { margin-top: 22px; }
+.benchmarks-demo .bm-q-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--bm-line); }
+.benchmarks-demo .bm-q { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bm-line); }
+.benchmarks-demo .bm-q-set { padding-top: 2px; color: var(--bm-accent); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+.benchmarks-demo .bm-q[data-kg-set="KD"] .bm-q-set { color: var(--bm-warm); }
+.benchmarks-demo .bm-q-text { font: 400 16px/1.45 Georgia, "Times New Roman", serif; }
+.benchmarks-demo .bm-q-answer { margin-top: 2px; font-size: 13px; }
+.benchmarks-demo .bm-q-meta { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-top: 3px; color: var(--bm-muted); font-size: 11.5px; }
+.benchmarks-demo .bm-q-source[data-source="Derived"] { color: var(--bm-warm); }
+.benchmarks-demo .bm-q.is-none .bm-q-text { color: #8b938e; text-decoration: line-through; text-decoration-color: #c3cac5; }
+.benchmarks-demo .bm-q.is-none .bm-q-set { color: #8b938e; }
+.benchmarks-demo .bm-ops { margin: 14px 0 0; padding: 0; list-style: none; color: var(--bm-muted); font-size: 12px; line-height: 1.6; }
+.benchmarks-demo .bm-ops strong { color: var(--bm-ink); font-weight: 600; }
+
+/* Knowledge boundary: one panel per backbone. */
+.benchmarks-demo .bm-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; }
+.benchmarks-demo .bm-panel { min-width: 0; }
+.benchmarks-demo .bm-panel h4 small { display: block; margin: 2px 0 0; }
+.benchmarks-demo .bm-bars { width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.benchmarks-demo .bm-bars th, .benchmarks-demo .bm-bars td { padding: 4px 8px 4px 0; border-bottom: 1px solid #edf0eb; text-align: left; white-space: nowrap; }
+.benchmarks-demo .bm-bars th:first-child { width: 72px; font-weight: 400; }
+.benchmarks-demo .bm-bars tbody tr.is-selected { background: var(--bm-wash); }
+.benchmarks-demo .bm-bars tbody tr.is-selected > * { font-weight: 650; }
+.benchmarks-demo .bm-bars td { width: 44%; }
+.benchmarks-demo .bm-bar { display: inline-block; width: calc(100% - 58px); max-width: 160px; height: 8px; margin-right: 6px; background: #edf1ea; vertical-align: middle; }
+.benchmarks-demo .bm-bar i { display: block; height: 100%; min-width: 1px; }
+.benchmarks-demo .bm-bar.is-true i { background: var(--bm-accent); }
+.benchmarks-demo .bm-bar.is-false i { background: var(--bm-warm); }
+.benchmarks-demo .bm-value { display: inline-block; min-width: 50px; text-align: right; }
+.benchmarks-demo .bm-na .bm-value { color: #8b938e; text-align: left; }
+.benchmarks-demo .bm-legend { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 10px; color: var(--bm-muted); font-size: 11.5px; }
+.benchmarks-demo .bm-key-true::before, .benchmarks-demo .bm-key-false::before { content: ""; display: inline-block; width: 14px; height: 8px; margin-right: 6px; background: var(--bm-accent); vertical-align: 0; }
+.benchmarks-demo .bm-key-false::before { background: var(--bm-warm); }
+.benchmarks-demo .bm-inputs { margin-top: 22px; }
+.benchmarks-demo .bm-inputs h4 small { display: inline; }
+.benchmarks-demo .bm-inputs > .bm-small { max-width: 86ch; margin-bottom: 10px; }
+.benchmarks-demo .bm-input-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.benchmarks-demo .bm-input { min-width: 0; padding: 10px 12px; border: 1px solid var(--bm-line); }
+.benchmarks-demo .bm-input ol { margin: 0; padding-left: 18px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.benchmarks-demo .bm-input li + li { margin-top: 4px; }
+.benchmarks-demo mark { padding: 0 2px; background: var(--bm-wash); color: var(--bm-accent); font-weight: 650; }
+.benchmarks-demo .bm-cases { width: 100%; min-width: 560px; font-size: 12.5px; }
+.benchmarks-demo .bm-cases th, .benchmarks-demo .bm-cases td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--bm-line); text-align: left; vertical-align: top; }
+.benchmarks-demo .bm-cases td:nth-child(-n+2) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+
+/* Self-generated documents. */
+.benchmarks-demo .bm-sd-type { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; align-items: start; }
+.benchmarks-demo .bm-sd-def h4 { font: 400 22px/1.3 Georgia, "Times New Roman", serif; }
+.benchmarks-demo .bm-sd-def h4 small { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.benchmarks-demo .bm-sd-def ul { margin: 0; padding: 0; list-style: none; font-size: 13px; }
+.benchmarks-demo .bm-sd-def li { padding: 4px 0; border-bottom: 1px solid #edf0eb; }
+.benchmarks-demo .bm-sd-def li span { color: var(--bm-muted); }
+.benchmarks-demo .bm-sd-excerpt { margin: 0; min-width: 0; }
+.benchmarks-demo .bm-sd-excerpt blockquote { margin: 0 0 6px; padding: 10px 12px; border: 1px solid var(--bm-line); font: 400 14.5px/1.6 Georgia, "Times New Roman", serif; white-space: pre-line; overflow-wrap: anywhere; }
+.benchmarks-demo .bm-sd-scores, .benchmarks-demo .bm-sd-flips { margin-top: 24px; }
+.benchmarks-demo .bm-scores, .benchmarks-demo .bm-flips { width: 100%; min-width: 520px; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.benchmarks-demo .bm-scores th, .benchmarks-demo .bm-scores td, .benchmarks-demo .bm-flips th, .benchmarks-demo .bm-flips td { padding: 6px 8px; border-bottom: 1px solid var(--bm-line); text-align: right; vertical-align: top; }
+.benchmarks-demo .bm-scores th:first-child, .benchmarks-demo .bm-flips th:first-child { padding-left: 0; text-align: left; }
+.benchmarks-demo .bm-scores thead th small, .benchmarks-demo .bm-scores tbody th small, .benchmarks-demo .bm-flips tbody th small { display: block; color: var(--bm-muted); font-size: 10.5px; font-weight: 400; }
+.benchmarks-demo .bm-scores tbody th small { display: inline; margin-left: 8px; }
+.benchmarks-demo .bm-scores tbody th, .benchmarks-demo .bm-flips tbody th { font-weight: 600; }
+.benchmarks-demo .bm-scores td small, .benchmarks-demo .bm-flips td small { display: block; color: var(--bm-muted); font-size: 10.5px; }
+.benchmarks-demo .bm-scores td.is-best { font-weight: 700; }
+.benchmarks-demo .bm-scores tr.is-selected { background: var(--bm-wash); }
+.benchmarks-demo .bm-scores tr.bm-baseline th, .benchmarks-demo .bm-scores tr.bm-baseline td { color: var(--bm-muted); }
+.benchmarks-demo .bm-scores tr.bm-baseline:first-of-type th, .benchmarks-demo .bm-scores tr[data-sd-baseline="Wiki"] > * { border-top: 1px solid #b8c5bc; }
+.benchmarks-demo .bm-flips td.is-up { color: var(--bm-accent); }
+.benchmarks-demo .bm-flips td.is-down { color: var(--bm-warm); }
+
+/* Narrow layouts. */
+@media (max-width: 900px) {
+  .benchmarks-demo .bm-kg { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .benchmarks-demo .bm-panels, .benchmarks-demo .bm-input-grid, .benchmarks-demo .bm-sd-type { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .benchmarks-demo { padding: 20px 16px; }
+  .benchmarks-demo h3 { font-size: 23px; }
+  .benchmarks-demo .bm-heading > p:last-child { font-size: 13px; }
+}
+@media (max-width: 560px) {
+  .benchmarks-demo .bm-controls { gap: 14px; }
+  .benchmarks-demo .bm-player { gap: 8px 16px; }
+  /* Parent and sibling side by side; the related existing entities below them. */
+  .benchmarks-demo .bm-kg-existing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .benchmarks-demo .bm-kg-existing .bm-kg-card { padding: 10px; }
+  .benchmarks-demo .bm-kg-existing .bm-kg-card:last-child { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--bm-line); }
+  .benchmarks-demo .bm-kg-card ul { font-size: 12px; }
+  .benchmarks-demo .bm-kg-card h4 { font-size: 17px; }
+  .benchmarks-demo .bm-q { grid-template-columns: 34px minmax(0, 1fr); gap: 8px; }
+  .benchmarks-demo .bm-q-text { font-size: 15px; }
+  .benchmarks-demo .bm-bars th:first-child { width: 60px; }
+  .benchmarks-demo .bm-value { min-width: 46px; font-size: 12px; }
+  .benchmarks-demo .bm-bar { width: calc(100% - 52px); }
+  .benchmarks-demo .bm-scores tbody th small { display: block; margin-left: 0; }
+}

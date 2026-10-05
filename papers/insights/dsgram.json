@@ -2,22 +2,22 @@
   "story": {
     "title": "A better-sounding rewrite is not always a better correction",
     "paragraphs": [
-      "Grammatical error correction has two competing expectations: fix the language, and preserve what the writer intended. An LLM may produce an elegant paraphrase that uses few of the reference’s words; it may also rewrite a sentence unnecessarily or subtly change its meaning. A reference-overlap score struggles with the first case, while a fluency-only judgment can reward the second. Evaluation needs to distinguish a valid alternative correction from an overconfident rewrite.",
-      "DSGram makes the trade-off explicit. Semantic coherence asks whether meaning is preserved. Edit level asks whether the changes are necessary and appropriate, rather than merely counting edited tokens. Fluency covers grammatical correctness and natural expression. This decomposition also avoids giving grammaticality and fluency two largely redundant votes: the paper reports a 0.89 correlation between those dimensions in the earlier SOME setup."
+      "Grammatical error correction (GEC) must fix the language while preserving what the writer meant. An LLM corrector may produce a valid paraphrase that shares few words with the reference, or rewrite too much and shift the meaning; overlap scores penalize the first, and fluency-oriented scores can reward the second. In Figure 1, BLEU cannot separate over- from under-correction, and the reference-free metric SOME misses over-correction.",
+      "DSGram scores three criteria. Semantic Coherence asks whether meaning is preserved; Edit Level asks whether the changes were necessary, rather than counting edited tokens; Fluency covers grammar and natural expression. Folding grammaticality into fluency removes a redundant vote: in SOME's annotation data the two correlate at 0.89."
     ]
   },
   "mechanism": {
-    "title": "Separate the quality judgments from their relative importance",
+    "title": "Quality and importance are judged separately for each sentence",
     "paragraphs": [
-      "There are two stages of judgment. First, an LLM scores the original–corrected pair on the three dimensions. Second, it compares the importance of those dimensions for the sentence’s context. A formal instruction may demand restraint and exact meaning preservation; a casual conversation may place greater value on natural phrasing. These comparisons are organized into a reciprocal matrix using the Analytic Hierarchy Process, checked for consistency, and normalized into weights for the overall score.",
-      "The distinction matters because a low edit-level score can be hidden by averaging. The weights therefore come from a judgment matrix rather than a fixed rule: the LLM states how much more one criterion matters than another, the principal eigenvector gives the weights, and a consistency ratio above 0.1 sends the judgments back for revision. The demo runs this step on the two Figure 5 sentence pairs. Cyclic judgments yield equal weights yet fail the consistency check, and consistent judgments that favor edit restraint strongly enough can rank a meaning-destroying output above the Figure 5 correction."
+      "An LLM first scores the original–corrected pair on the three criteria, then judges how much each matters for this sentence: legal or medical text calls for strict Semantic Coherence and Edit Level, casual dialogue for Fluency. Importance is elicited as pairwise comparisons under the Analytic Hierarchy Process (AHP), not as directly stated weights, so inconsistent judgments can be caught and revised.",
+      "Sentence-specific weights matter because a fixed average can hide a low score on the criterion that matters most for a given sentence. In Figure 5, the casual-dialogue pair receives its largest weight on Fluency and the formal pair on Edit Level."
     ]
   },
   "evidence": {
-    "title": "Weighting helps, but the evaluator still determines the ceiling",
+    "title": "Dynamic weighting helps most at sentence level; the scorer sets the ceiling",
     "paragraphs": [
-      "The paper separately tests score generation and aggregation. When human-provided sub-scores are combined, dynamic weights correlate 0.8764 with human overall ratings, compared with 0.8544 for average weighting. Because the input sub-scores already come from humans, this comparison isolates weighting more closely than an end-to-end metric comparison. It does not show that an LLM has learned to assign each component score reliably.",
-      "That reliability remains uneven. On DSGram-Eval, zero-shot GPT-4 has an overall Pearson correlation of 0.772; the fine-tuned LLaMA3-8B reaches 0.419, improving on its five-shot 0.373 while remaining well behind GPT-4. Likewise, SEEDA results vary across system versus sentence evaluation and correlation measures. DSGram offers a more inspectable account of correction quality, but a plausible weighted score is only as dependable as its component judgments and the priorities it assigns."
+      "Weighting can be tested apart from scoring. Applied to human sub-scores on DSGram-Eval, the authors' human-scored set, AHP weights correlate 0.8764 with human overall ratings versus 0.8544 for equal weights, a difference the paper calls significant only at a relaxed level. On SEEDA, equal weights cost far more at sentence level than at system level (Table 3).",
+      "Component scores set the ceiling. GPT-4 correlates best with human sub-scores on all three criteria, LLaMA3-70B is weakest on Edit Level, and LLaMA models fine-tuned on GPT-4-annotated data beat five-shot prompting without approaching GPT-4 (Table 4). On SEEDA-S system-level Pearson correlation, IMPARA and SOME stay ahead of DSGram (Table 3)."
     ]
   },
   "sources": [
@@ -50,6 +50,7 @@
         "url": "https://github.com/jxtse/GEC-Metrics-DSGram/blob/main/Dataset/DSGram-Eval/gec_human_eval_test_1.json"
       }
     ],
-    "eyebrow": "Algorithm 1 · Figure 5 examples"
+    "eyebrow": "Algorithm 1 · Figure 5 examples",
+    "placement": "method"
   }
 }

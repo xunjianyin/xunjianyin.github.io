@@ -4,24 +4,37 @@ from __future__ import annotations
 import argparse
 from html import escape
 import json
-import importlib
+import importlib.util
 import re
+import sys
 from pathlib import Path
-from typing import Any
+from types import ModuleType
+from typing import Any, Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 PAPERS = ROOT / "papers"
+# Demo modules are discovered as scripts/paper_demo_<group>.py; each group ships
+# papers/demos/<group>.css and papers/demos/<group>.js.
+DEMO_SCRIPTS = ROOT / "scripts"
+DEMO_ASSETS = PAPERS / "demos"
+# Page positions a demo module can fill. A plain-string demo goes to the position
+# named by the insight's demo.placement (default "explore").
+DEMO_SLOTS = ("overview", "method", "evidence", "explore")
+DEMO_PLACEMENTS = ("explore", "method", "evidence", "overview")
+# Optional at-a-glance rows shown under the takeaway, in this order.
+GLANCE_LABELS = (("result", "Result"), ("prior", "New vs prior"), ("limitation", "Limitation"))
+AUTHOR_FIELDS = {"name", "affiliations", "equal"}
 
 # Curated research threads for cross-links between pages. Order matters:
 # neighbours in a thread are the most closely related papers.
 RESEARCH_THREADS: dict[str, list[str]] = {
     "Agents, self-improvement, and reasoning": [
         "godel-agent", "derl", "chemagent", "contrasolver", "atomic-to-composite", "geometry-of-reasoning"],
-    "Language modeling and decoding": ["reverse-lm", "coral", "damon"],
+    "Language modeling and decoding": ["reverse-lm", "coral"],
     "Knowledge in language models": [
         "knowledge-boundary", "alcuna", "knowledge-interplay", "history-matters", "mc-mke", "self-generated-documents"],
-    "Evaluating generated text": [
-        "themis", "nlg-evaluation-survey", "dsgram", "context-aware-evaluation", "seq2seq-data2text"],
+    "Evaluation and red-teaming": [
+        "themis", "nlg-evaluation-survey", "dsgram", "context-aware-evaluation", "seq2seq-data2text", "damon"],
     "Retrieval and multimodal generation": ["error-robust-retrieval", "contextual-asr", "eama"],
 }
 # Figures wider than this aspect ratio keep a legible minimum width on phones.
@@ -37,23 +50,161 @@ def normalize_venue(venue: str) -> str:
     return f'arXiv preprint {match.group(1)}' if match else venue.strip()
 
 def paragraphs(section: dict[str, Any]) -> str:
-    return ''.join(f'<p>{e(p)}</p>' for p in section.get('paragraphs', []))
+    return paragraph_html(section.get('paragraphs', []))
 
-def paper_demo(slug: str, insight: dict[str, Any]) -> tuple[str, str]:
-    if not insight.get('demo'):
-        return '', ''
-    for group in ('godel', 'decoding', 'reasoning', 'knowledge', 'evaluation'):
-        module_path = ROOT / 'scripts' / f'paper_demo_{group}.py'
-        if not module_path.exists():
-            continue
-        module = importlib.import_module(f'paper_demo_{group}')
-        html = module.render_demo(slug, insight)
-        if html:
-            for suffix in ('css', 'js'):
-                if not (PAPERS / 'demos' / f'{group}.{suffix}').is_file():
-                    raise ValueError(f'Missing demo asset for {slug}: {group}.{suffix}')
-            return html, group
-    raise ValueError(f'No renderer for the requested demo: {slug}')
+def paragraph_html(texts: Iterable[str]) -> str:
+    return ''.join(f'<p>{e(p)}</p>' for p in texts)
+
+def demo_modules(directory: Path | None = None) -> list[tuple[str, ModuleType]]:
+    """Import every paper_demo_<group>.py in the directory: 'godel' first, then by name."""
+    directory = directory or DEMO_SCRIPTS
+    paths = sorted(directory.glob('paper_demo_*.py'), key=lambda p: (p.stem != 'paper_demo_godel', p.stem))
+    modules = []
+    for path in paths:
+        name = path.stem
+        module = sys.modules.get(name)
+        if module is None or Path(getattr(module, '__file__', '') or '').resolve() != path.resolve():
+            spec = importlib.util.spec_from_file_location(name, path)
+            assert spec and spec.loader
+            module = importlib.util.module_from_spec(spec)
+            # Registered before execution: dataclasses resolve annotations through sys.modules.
+            sys.modules[name] = module
+            # Sibling helpers in the same directory stay importable while the module loads.
+            added = str(directory) not in sys.path
+            if added:
+                sys.path.insert(0, str(directory))
+            try:
+                spec.loader.exec_module(module)
+            except BaseException:
+                del sys.modules[name]
+                raise
+            finally:
+                if added:
+                    sys.path.remove(str(directory))
+        modules.append((name.removeprefix('paper_demo_'), module))
+    return modules
+
+def demo_slots(rendered: Any, placement: str, owner: str) -> dict[str, str]:
+    """Normalize render_demo output: a string fills `placement`, a dict names its slots."""
+    if isinstance(rendered, dict):
+        unknown = set(rendered) - set(DEMO_SLOTS)
+        if unknown:
+            raise ValueError(f'Unknown demo slot from paper_demo_{owner}: {sorted(unknown)}')
+        slots = rendered
+    elif isinstance(rendered, str) or rendered is None:
+        slots = {placement: rendered or ''}
+    else:
+        raise TypeError(f'paper_demo_{owner}.render_demo must return str or dict, not {type(rendered).__name__}')
+    for key, html in slots.items():
+        if not isinstance(html, str):
+            raise TypeError(f'Demo slot {key!r} from paper_demo_{owner} must be an HTML string')
+    return {key: html for key, html in slots.items() if html.strip()}
+
+def paper_demo(slug: str, insight: dict[str, Any],
+               modules: list[tuple[str, ModuleType]] | None = None) -> tuple[dict[str, str], str]:
+    """Return (HTML per page position, owning demo group) for an insight that requests a demo.
+
+    Positions are DEMO_SLOTS plus the optional module hooks: "overview_extra"
+    (render_overview), "method_end" (render_method) and "evidence_end" (render_evidence).
+    Exactly one module may claim a slug, by returning non-empty HTML from render_demo.
+    """
+    demo = insight.get('demo')
+    if not demo:
+        return {}, ''
+    placement = demo.get('placement', 'explore')
+    if placement not in DEMO_PLACEMENTS:
+        raise ValueError(f'Unknown demo placement for {slug}: {placement!r}; use one of {DEMO_PLACEMENTS}')
+    claims = []
+    for group, module in (demo_modules() if modules is None else modules):
+        if not callable(getattr(module, 'render_demo', None)):
+            continue  # A helper module that renders no demo never claims a page.
+        slots = demo_slots(module.render_demo(slug, insight), placement, group)
+        if slots:
+            claims.append((group, module, slots))
+    if len(claims) > 1:
+        raise ValueError(f'Several demo modules claim {slug}: {", ".join("paper_demo_" + c[0] for c in claims)}')
+    if not claims:
+        raise ValueError(f'No renderer for the requested demo: {slug}')
+    group, module, slots = claims[0]
+    for suffix in ('css', 'js'):
+        if not (DEMO_ASSETS / f'{group}.{suffix}').is_file():
+            raise ValueError(f'Missing demo asset for {slug}: {group}.{suffix}')
+    # Specialized case studies can add source-based material at fixed positions.
+    for hook, key in (('render_overview', 'overview_extra'), ('render_method', 'method_end'),
+                      ('render_evidence', 'evidence_end')):
+        if hasattr(module, hook):
+            html = getattr(module, hook)(slug, insight)
+            if html:
+                slots[key] = html
+    return slots, group
+
+def method_demo_split(slug: str, insight: dict[str, Any], paragraphs: list[str], has_demo: bool) -> int:
+    """Number of mechanism paragraphs shown before a method demo (demo.method_after, 1-based)."""
+    demo = insight.get('demo') or {}
+    if 'method_after' not in demo:
+        return 1
+    after = demo['method_after']
+    if not has_demo:
+        raise ValueError(f'demo.method_after is set for {slug}, but no demo fills the method slot')
+    if isinstance(after, bool) or not isinstance(after, int) or not 1 <= after <= len(paragraphs):
+        raise ValueError(f'demo.method_after for {slug} must be an integer from 1 to {len(paragraphs)}: {after!r}')
+    return after
+
+def glance_html(item: dict[str, Any]) -> str:
+    """At-a-glance definition list: the result, what is new, and the main limitation."""
+    glance = item.get('glance')
+    if not glance:
+        return ''
+    unknown = set(glance) - {key for key, _ in GLANCE_LABELS}
+    if unknown:
+        raise ValueError(f'Unknown glance fields: {sorted(unknown)}')
+    rows = ''.join(f'<div><dt>{label}</dt><dd>{e(glance[key])}</dd></div>'
+                   for key, label in GLANCE_LABELS if glance.get(key))
+    return f'<dl class="paper-glance">{rows}</dl>' if rows else ''
+
+def author_name(name: str) -> str:
+    return '<a href="../index.html">Xunjian Yin</a>' if name == 'Xunjian Yin' else e(name)
+
+def authors_html(meta: dict[str, Any], item: dict[str, Any]) -> str:
+    """Author line, plus an affiliation legend when the content gives authors_detail."""
+    detail = item.get('authors_detail')
+    if not detail:
+        return f'<p class="paper-authors">{author_name_links(meta["authors"])}</p>'
+    affiliations = item.get('affiliations', [])
+    for author in detail:
+        unknown = set(author) - AUTHOR_FIELDS
+        if unknown or not author.get('name'):
+            raise ValueError(f'Invalid authors_detail entry: {author}')
+        indices = author.get('affiliations', [])
+        if any(not isinstance(i, int) or not 1 <= i <= len(affiliations) for i in indices):
+            raise ValueError(f'Affiliation index out of range for {author["name"]}: {indices}')
+    equal = any(author.get('equal') for author in detail)
+    shared = {frozenset(author.get('affiliations', [])) for author in detail}
+    # When every author has the same affiliations and no one is marked equal, the
+    # numbers carry no information: the legend lists the institutions alone.
+    if len(shared) == 1 and not equal:
+        indices = sorted(next(iter(shared)))
+        names = [f'<span class="author">{author_name(author["name"])}</span>' for author in detail]
+        listed = [affiliations[i - 1] for i in indices] if indices else affiliations
+        legend = [f'<span>{e(name)}</span>' for name in listed]
+    else:
+        names = []
+        for author in detail:
+            marks = ','.join(str(i) for i in author.get('affiliations', [])) + ('*' if author.get('equal') else '')
+            # No whitespace between a name and its marks, or before the separating comma.
+            names.append(f'<span class="author">{author_name(author["name"])}{f"<sup>{marks}</sup>" if marks else ""}</span>')
+        legend = [f'<span><sup>{i}</sup> {e(name)}</span>' for i, name in enumerate(affiliations, start=1)]
+        if equal:
+            legend.append('<span><sup>*</sup> Equal contribution</span>')
+    legend_html = f'<p class="author-legend">{" · ".join(legend)}</p>' if legend else ''
+    return f'<p class="paper-authors">{", ".join(names)}</p>{legend_html}'
+
+def author_name_links(authors: str) -> str:
+    return e(authors.replace(" ,", ",")).replace("Xunjian Yin", '<a href="../index.html">Xunjian Yin</a>')
+
+def prior_work_html(item: dict[str, Any]) -> str:
+    prior = item.get('prior_work')
+    return f'<div class="prior-work"><h3>Closest prior work</h3><p>{e(prior)}</p></div>' if prior else ''
 
 def e(value: Any) -> str:
     return escape(str(value), quote=True)
@@ -184,45 +335,65 @@ def related_research(slug: str, metadata: dict[str, Any], content: dict[str, Any
     return (f'<nav class="related-research" aria-labelledby="related-title"><h2 id="related-title">Related research</h2>'
             f'<p class="related-thread">{e(name)}</p><ul>{"".join(items)}</ul></nav>')
 
-def render(slug: str, meta: dict[str, Any], item: dict[str, Any], insight: dict[str, Any], related: str = '') -> str:
+def render(slug: str, meta: dict[str, Any], item: dict[str, Any], insight: dict[str, Any], related: str = '',
+           modules: list[tuple[str, ModuleType]] | None = None) -> str:
     meta = meta | item.get("metadata_override", {})
     meta["venue"] = normalize_venue(meta["venue"])
     title, short = meta["title"], item["short_name"]
     title_html = e(title)
     if title.startswith(short + ":"):
         title_html = f'<span class="title-name">{e(short)}:</span>' + e(title[len(short)+1:])
-    authors = e(meta["authors"].replace(" ,", ",")).replace("Xunjian Yin", '<a href="../index.html">Xunjian Yin</a>')
+    authors = authors_html(meta, item)
     links = ''.join(f'<a class="resource-link{" primary" if i == 0 else ""}" href="{e(l["url"])}">{e(l["label"])} <span aria-hidden="true">↗</span></a>' for i,l in enumerate(meta["links"]))
     findings = ''.join(f'<li><p class="finding-value">{e(f["value"])}</p><h3>{e(f["label"])}</h3><p>{e(f["detail"])}</p></li>' for f in item["findings"])
     methods = ''.join(f'<li><span class="method-index">0{i+1}</span><div><h3>{e(m["title"])}</h3><p>{e(m["text"])}</p></div></li>' for i,m in enumerate(item["method"]))
     image_url = "https://xunjianyin.github.io/" + ("papers/" + item["figure_local"] if item.get("figure_local") else "figures/logo.png")
     abstract_label = item.get("abstract_label", "Research summary")
-    demo, demo_group = paper_demo(slug, insight)
-    # Specialized case studies can add source-based material at the relevant section.
-    extra_overview, extra_method, extra_evidence = '', '', ''
-    if demo_group:
-        module = importlib.import_module(f'paper_demo_{demo_group}')
-        if hasattr(module, 'render_method'):
-            extra_method = module.render_method(slug, insight)
-        if hasattr(module, 'render_overview'):
-            extra_overview = module.render_overview(slug, insight)
-        if hasattr(module, 'render_evidence'):
-            extra_evidence = module.render_evidence(slug, insight)
+    slots, demo_group = paper_demo(slug, insight, modules)
     demo_assets = (f'<link rel="stylesheet" href="demos/{demo_group}.css">\n  '
-                   f'<script src="demos/{demo_group}.js" defer></script>') if demo else ''
-    explore_nav = '<a href="#explore">Explore</a>' if demo else ''
+                   f'<script src="demos/{demo_group}.js" defer></script>') if slots else ''
+    # Section numbers follow the sections actually present on the page.
+    explore_demo = slots.get('explore', '')
+    numbers = iter(f'{n:02d}' for n in range(1, 5))
+    overview_number = next(numbers)
+    explore_number = next(numbers) if explore_demo else ''
+    method_number, results_number = next(numbers), next(numbers)
+    explore_nav = '<a href="#explore">Explore</a>' if explore_demo else ''
     explore = f'''<section id="explore" class="content-section explore-section" aria-label="Interactive explanation">
-      <span class="section-label">02 / Explore the idea</span>{demo}</section>''' if demo else ''
-    method_number, results_number = ('03', '04') if demo else ('02', '03')
+      <span class="section-label">{explore_number} / Explore the idea</span>{explore_demo}</section>''' if explore_demo else ''
     overview_title = insight.get('story', {}).get('title', item['diagram']['title'])
     overview_text = paragraphs(insight.get('story', {})) or f'<p>{e(item["question"])}</p>'
+    # The first screen shows the paper's visual explanation directly under the header.
     # Use the richer interactive explanation in place of a redundant three-box flow.
-    visual = diagram_html(slug, item) if not demo or item.get('primary_figure') or slug == 'reverse-lm' else ''
+    visual = diagram_html(slug, item) if not slots or item.get('primary_figure') or slug == 'reverse-lm' else ''
+    lead = visual + slots.get('overview_extra', '') + slots.get('overview', '')
+    # Optional blocks carry their own line break so that absent fields add no blank lines.
+    lead_visual = f'\n    <div class="lead-visual">{lead}</div>' if lead else ''
+    glance = glance_html(item)
+    glance = f'\n      {glance}' if glance else ''
     source_links = ''.join(f'<a href="{e(s["url"])}">{e(s["label"])} ↗</a>' for s in insight.get('sources', []))
     # An inline method figure precedes the prose that explains it.
     method_figure = source_figure(slug, item)
     method_title = insight.get('mechanism', {}).get('title', 'How it works')
+    method_paragraphs = insight.get('mechanism', {}).get('paragraphs', [])
+    method_demo = slots.get('method', '')
+    split = method_demo_split(slug, insight, method_paragraphs, bool(method_demo))
+    if method_demo:
+        # A method demo sits full width after paragraph `demo.method_after` (default 1);
+        # the remaining prose keeps its two-column layout beside the three-step list.
+        before, after = method_paragraphs[:split], method_paragraphs[split:]
+        method_lead = f'<div class="narrative method-lead">{paragraph_html(before)}</div>' if before else ''
+        rest = f'<div class="narrative">{paragraph_html(after)}</div>' if after else ''
+        method_reading = (f'{method_lead}<div class="section-demo method-demo">{method_demo}</div>'
+                          f'<div class="method-reading">{rest}<ol class="method-list">{methods}</ol></div>')
+    else:
+        method_reading = f'<div class="method-reading"><div class="narrative">{paragraph_html(method_paragraphs)}</div><ol class="method-list">{methods}</ol></div>'
     evidence_title = insight.get('evidence', {}).get('title', 'Key findings')
+    evidence_demo = f'<div class="section-demo evidence-demo">{slots["evidence"]}</div>' if slots.get('evidence') else ''
+    # A page without headline findings has no empty grid; an evidence demo then follows the heading.
+    findings_grid = f'<ul class="findings-grid">{findings}</ul>' if findings else ''
+    findings_block = '\n      '.join(block for block in (findings_grid, evidence_demo) if block)
+    table = '' if item.get('remove_results_table') else results_table(item)
     return f'''<!DOCTYPE html>
 <!-- Generated by scripts/build_papers.py. Edit papers/content/ and papers/insights/. -->
 <html lang="en">
@@ -257,29 +428,28 @@ def render(slug: str, meta: dict[str, Any], item: dict[str, Any], insight: dict[
     <header class="paper-header">
       <p class="paper-eyebrow"><span>{e(meta['venue'])}</span><span>{e(item['topic'])}</span></p>
       <h1>{title_html}</h1>
-      <p class="paper-authors">{authors}</p>
+      {authors}
       <div class="paper-links" aria-label="Research resources">{links}</div>
-      <p class="paper-takeaway">{e(item['takeaway'])}</p>
-    </header>
+      <p class="paper-takeaway">{e(item['takeaway'])}</p>{glance}
+    </header>{lead_visual}
     <section id="overview" class="overview-section" aria-labelledby="overview-title">
-      <div class="section-heading"><span class="section-label">01 / The research question</span><h2 id="overview-title">{e(overview_title)}</h2></div>
-      <div class="narrative overview-narrative">{overview_text}</div>
-      {visual}{extra_overview}
+      <div class="section-heading"><span class="section-label">{overview_number} / The research question</span><h2 id="overview-title">{e(overview_title)}</h2></div>
+      <div class="narrative overview-narrative">{overview_text}{prior_work_html(item)}</div>
     </section>
     {explore}
     <section id="method" class="content-section method-section expanded-method" aria-labelledby="method-title">
       <div class="section-heading"><span class="section-label">{method_number} / Inside the method</span><h2 id="method-title">{e(method_title)}</h2></div>
       {method_figure if item.get('figure_inline') else ''}
-      <div class="method-reading"><div class="narrative">{paragraphs(insight.get('mechanism', {}))}</div><ol class="method-list">{methods}</ol></div>
+      {method_reading}
       {'' if item.get('figure_inline') else method_figure}
-      {extra_method}
+      {slots.get('method_end', '')}
     </section>
     <section id="findings" class="content-section" aria-labelledby="findings-title">
       <div class="section-heading"><span class="section-label">{results_number} / Reading the evidence</span><h2 id="findings-title">{e(evidence_title)}</h2></div>
-      <ul class="findings-grid">{findings}</ul>
+      {findings_block}
       <div class="narrative evidence-narrative">{paragraphs(insight.get('evidence', {}))}</div>
-      {extra_evidence}
-      {results_table(item)}
+      {slots.get('evidence_end', '')}
+      {table}
       <p class="scope-note"><strong>Scope.</strong> {e(item['scope'])} <a href="{e(item['source_url'])}">Read the study ↗</a></p>
     </section>
     <div class="reading-sources"><span>Further reading in the paper</span>{source_links}</div>

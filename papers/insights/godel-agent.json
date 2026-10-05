@@ -2,23 +2,23 @@
   "story": {
     "title": "What if the procedure that improves an agent could improve too?",
     "paragraphs": [
-      "A prompt optimizer can revise the solver while keeping its own search routine fixed. That routine still decides which changes to propose, how to test them, what feedback to retain, and how to recover from an error. Gödel Agent makes this outer procedure editable as well: the agent can inspect and rewrite the code that solves tasks and the code that organizes subsequent revisions.",
-      "The practical consequence is a larger choice of computations. An agent can change a prompt, add a verifier, replace an LLM call with an algorithm, or improve the diagnostics used to make the next edit. The Game of 24 cases show these choices in actual code. The central question is whether access to its own implementation helps an agent find better policies from task feedback."
+      "A prompt optimizer revises the solver but keeps its own search routine fixed, and that routine decides which changes to propose, how to test them and how to recover from errors. Gödel Agent makes this routine editable too: the agent can rewrite both the code that solves tasks and the code that organizes its next revisions.",
+      "It can then change a prompt, add a verifier, replace an LLM call with an algorithm, or improve the diagnostics behind its next edit. The question is whether access to its own implementation helps an agent find better policies from task feedback."
     ]
   },
   "mechanism": {
     "title": "Revisions change the running program",
     "paragraphs": [
-      "The implementation exposes Python variables, functions and classes through runtime inspection. A language model reads this state, selects actions, and can install replacement code through monkey patching. Its four core actions are to inspect the current implementation, interact with the task environment, update code, and continue improvement. Recursive invocation lets later iterations enter the revised improvement function.",
-      "This gives feedback two distinct roles. Validation examples assess the task policy. Execution errors diagnose the implementation of an edit. When an action fails, the supplied error-handling mechanism stops that action sequence and carries the error into the next step. The next revision can therefore change the solver, the way errors are interpreted, or the procedure that selects and applies changes.",
-      "The objective and the initial tools still come from the designer. Self-reference makes more of the program available for revision; it does not eliminate the need for a useful evaluation signal, nor does it supply a proof that a proposed edit will improve performance. The empirical implementation uses LLM-generated modifications rather than the formal proof search of a theoretical Gödel machine."
+      "The agent reads its own Python variables, functions and classes at runtime, and a language model installs replacement code by monkey patching, that is, by overwriting functions in the running process. Its four actions (inspect the implementation, interact with the task, update code, continue improving) are invoked recursively, so later iterations run the revised improvement function.",
+      "Feedback has two roles: validation scores assess the task policy, and execution errors diagnose a faulty edit. Error handling stops a failed action sequence and passes the error to the next step, so the next revision can change the solver, how errors are interpreted, or how changes are selected.",
+      "The designer still supplies the objective and the initial tools. Unlike the proof search of the theoretical Gödel machine, the agent accepts LLM-generated edits judged by task feedback, so it needs a useful evaluation signal and cannot guarantee that an edit helps."
     ]
   },
   "evidence": {
     "title": "A strong gain in multilingual math, with smaller gains elsewhere",
     "paragraphs": [
-      "Under the constrained Gödel-base setting, the optimized policies use GPT-3.5 at task execution time. MGSM accuracy increases from Meta Agent Search’s 53.4% to 64.2%. Improvements are smaller on reading comprehension, general knowledge and graduate-level science. The full table below preserves the uncertainty and makes those differences visible.",
-      "The agent that proposes code changes uses GPT-4o. This is distinct from the model used by the resulting task policy. Gödel-free relaxes the execution constraints too, and can call stronger models while solving the task. Keeping these settings separate is necessary to understand which part of the performance gain comes from agent design and which comparison also permits stronger tools."
+      "GPT-4o proposes the code changes, while the optimized policies and all baselines execute tasks with GPT-3.5. The benchmarks cover multilingual math (MGSM), reading comprehension (DROP), general knowledge (MMLU) and graduate-level science (GPQA).",
+      "The search is also cheaper: the paper reports about $15 for a complete 30-iteration run across the four datasets, against $300 for Meta Agent Search. Gödel-free, which may call stronger models while solving tasks, is reported separately below."
     ]
   },
   "sources": [
@@ -37,7 +37,10 @@
   ],
   "reading_notes": "Reread primary HTML 2026-09-29 Sections 3–6, Tables 1–2, Limitations, and Appendix C.2 descriptions. Demo uses illustrative pseudocode informed by search-based solving and richer traceback processing; neither synthetic accuracy nor actual LLM generation. 92%,4%,14% have overlapping/noncomplementary definitions and must not be displayed as parts of a pie. Six cycles/30 iterations are validation search, final optimized agents evaluated separately. Avoid guaranteed rollback and universal optimum claims. v3: reread complete v4, Appendix B, Listings5–9, Table1/2, Fig5 and current public repo. Specific test-card inputs are authored; exact fraction search is browser adaptation, not recorded original output. Figure5 is a different LLM-retaining run from the100% search case. Optimization model GPT4o versus evaluated downstream GPT3.5 corrected. Verified full data in papers/evidence/godel-agent.json.",
   "demo": {
-    "kind": "godel-search-case",
-    "title": "From generated answers to explicit search"
+    "kind": "godel-runtime-loop-and-search-case",
+    "placement": "method",
+    "eyebrow": "Illustrative · Algorithm 1, Figure 3",
+    "title": "One loop through the agent’s own runtime memory",
+    "provenance": "Method: illustrative states of agent_module for the four actions of Algorithm 1 (self_inspect, interact, self_update, continue_improve), with the two edits standing for changes reported in §6.3; then Listings 5-6 and a local Game of 24 search. Evidence: Figure 5 (a recorded LLM-based run) and Tables 1-2 with the §6.2 robustness counts."
   }
 }

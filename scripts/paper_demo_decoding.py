@@ -1,15 +1,18 @@
 """Decoding demos for LEDOM (reverse-lm) and COrAL, built only from published material.
 
-Every value on these demos carries one of three labels:
+Every value on these demos carries one of four labels:
   Measured           a number printed in one of the paper's tables;
-  Published example  text printed in one of the paper's tables or figures;
-  Derived            arithmetic on measured values (differences, ratios, counts).
+  Published example  text or tokens printed in one of the paper's tables or figures;
+  Derived            arithmetic on published values (differences, ratios, counts, and
+                     the paper's own block-update rule applied to the printed rows);
+  Illustrative       an ordering or display choice made for this page.
 Nothing here calls a model or supplies scores the paper does not report. The
 static HTML is complete without JavaScript; papers/demos/decoding.js only adds
-controls and recomputes the same summaries that are rendered here.
+controls and replays states that are rendered or serialized here.
 """
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
 from html import escape
@@ -20,11 +23,14 @@ CORAL_URL = "https://arxiv.org/html/2410.09675v1"
 MINUS = "−"
 
 
-def render_demo(slug: str, insight: dict[str, Any]) -> str:
+def render_demo(slug: str, insight: dict[str, Any]) -> dict[str, str] | str:
+    demo = insight.get("demo", {})
     if slug == "coral":
-        return coral_demo()
+        return {"method": coral_replay_demo(demo.get("eyebrow", "Published example · Figure 2")),
+                "evidence": coral_demo(demo.get("evidence_eyebrow", "Measured · Tables 1–2 and §4.1"))}
     if slug == "reverse-lm":
-        return ledom_examples_demo() + reverse_reward_demo()
+        return {"method": ledom_examples_demo(demo.get("eyebrow", "Published examples · Table 2, Figures 5–6")),
+                "evidence": reverse_reward_demo(demo.get("evidence_eyebrow", "Measured · Table 4"))}
     return ""
 
 
@@ -57,6 +63,367 @@ def _points(value: float) -> str:
 
 def _button(attrs: str, label: str, pressed: bool) -> str:
     return f'<button type="button" {attrs} aria-pressed="{str(pressed).lower()}">{label}</button>'
+
+
+def _player(prefix: str, label: str) -> str:
+    """Play / Pause, Step and Reset; decoding.js swaps the Play label while playing."""
+    play = _button(f'data-demo-action="{prefix}-play"', "Play", False)
+    return (f'<div class="demo-options decode-transport" role="group" aria-label="{_e(label)}">{play}'
+            f'<button type="button" data-demo-action="{prefix}-step">Step</button>'
+            f'<button type="button" data-demo-action="{prefix}-reset">Reset</button></div>')
+
+
+def _quoted(tokens: tuple[str, ...] | list[str]) -> str:
+    return "“" + " ".join(tokens) + "”"
+
+
+def _span(first: int, last: int) -> str:
+    return f"{first}" if first == last else f"{first}–{last}"
+
+
+# ---------------------------------------------------------------------------
+# COrAL: replay of the paper's Figure 2 ("What is coral?"), step by step.
+# ---------------------------------------------------------------------------
+
+# Figure 2 caption: context window size k = 3 and block size b = 6.
+CORAL_K = 3
+CORAL_B = 6
+CORAL_PROMPT: tuple[str, ...] = ("What", "is", "coral", "?")
+
+
+@dataclass(frozen=True)
+class CoralFigureStep:
+    label: str  # Row label as printed, e.g. "3rd"
+    fixed: int  # Leading response tokens drawn as fixed (green in the figure)
+    tokens: tuple[str, ...]  # Response tokens as printed; the rest of the row is the decoding block
+
+
+_COMMON = ("Coral", "is", "a", "marine", "organ", "that", "in", "the", "form", "of", "hard", "skelet", ",", "which",
+           "is", "built", "by")
+# Transcribed from papers/assets/coral-decoding.svg (arXiv v1, decoding.drawio.svg). The
+# figure prints these five rows and a "……" between the 3rd and 9th steps.
+CORAL_FIGURE_STEPS: tuple[CoralFigureStep, ...] = (
+    CoralFigureStep("1st", 0, ("Coral", "is", "a")),
+    CoralFigureStep("2nd", 3, ("Coral", "is", "a", "marine", "marine", "living")),
+    CoralFigureStep("3rd", 4, ("Coral", "is", "a", "marine", "organ", "that", "in", "the", "the")),
+    CoralFigureStep("9th", 11, _COMMON),
+    CoralFigureStep("10th", 14, _COMMON + ("small", "animals", ".")),
+)
+Arrow = tuple[int, int]  # (source position in the earlier row, target position in the later row)
+# Arrows printed into each row, as response positions counted from 1; position 0 is the
+# last prompt token "?". The 9th row has no incoming arrows in the figure.
+CORAL_FIGURE_ARROWS: dict[str, tuple[tuple[Arrow, ...], tuple[Arrow, ...]]] = {
+    "1st": (((0, 1), (0, 2), (0, 3)), ()),
+    "2nd": (((3, 4), (3, 5), (3, 6)), ()),
+    "3rd": (((4, 5), (4, 6), (4, 7), (5, 6), (5, 7), (5, 8), (6, 7), (6, 8), (6, 9)),
+            ((5, 5), (6, 5), (6, 6))),
+    "10th": (((14, 15), (14, 16), (14, 17), (15, 16), (15, 17), (15, 18), (16, 17), (16, 18), (16, 19),
+              (17, 18), (17, 19), (17, 20)),
+             ((15, 15), (16, 15), (16, 16), (17, 15), (17, 16), (17, 17))),
+}
+
+
+def coral_block_end(start: int, length: int) -> int:
+    """Algorithm 1: t_e = min(t_s + b - 1, t + k); the first block ends at min(k, b)."""
+    return min(start + CORAL_B - 1, length + CORAL_K)
+
+
+def coral_rule_arrows(prev_fixed: int, prev_length: int, fixed: int, length: int) -> tuple[tuple[Arrow, ...], tuple[Arrow, ...]]:
+    """Dependencies within the window k into the new block [fixed + 1, length].
+
+    Forward: a source i from the last fixed token onwards predicts i + 1 ... i + k.
+    Backward: a source i in the earlier block re-predicts i - k ... i.
+    Only positions in the new block receive arrows; this reproduces every printed arrow.
+    """
+    block = range(fixed + 1, length + 1)
+    forward = tuple((i, j) for i in range(fixed, prev_length + 1) for j in range(i + 1, i + CORAL_K + 1) if j in block)
+    backward = tuple((i, j) for i in range(prev_fixed + 1, prev_length + 1)
+                     for j in range(i - CORAL_K, i + 1) if j in block)
+    return forward, backward
+
+
+def _coral_checked_pairs() -> list[tuple[CoralFigureStep | None, CoralFigureStep]]:
+    """Consecutive printed rows (the prompt row precedes the 1st step)."""
+    steps = {s.label: s for s in CORAL_FIGURE_STEPS}
+    return [(None, steps["1st"]), (steps["1st"], steps["2nd"]), (steps["2nd"], steps["3rd"]), (steps["9th"], steps["10th"])]
+
+
+def _coral_verify() -> None:
+    """Fail the build if the transcription disagrees with Algorithm 1 or the arrow rule."""
+    for prev, cur in _coral_checked_pairs():
+        prev_fixed, prev_length = (prev.fixed, len(prev.tokens)) if prev else (0, 0)
+        assert len(cur.tokens) == coral_block_end(cur.fixed + 1, prev_length), cur.label
+        assert CORAL_FIGURE_ARROWS[cur.label] == coral_rule_arrows(prev_fixed, prev_length, cur.fixed, len(cur.tokens)), cur.label
+        if prev:
+            assert cur.tokens[:cur.fixed] == prev.tokens[:cur.fixed], cur.label  # accepted tokens are kept
+    ninth = CORAL_FIGURE_STEPS[3]
+    assert len(ninth.tokens) == ninth.fixed + CORAL_B  # the 9th block already spans b positions
+
+
+_coral_verify()
+CORAL_COLUMNS = len(CORAL_PROMPT) + len(CORAL_FIGURE_STEPS[-1].tokens)
+
+
+@dataclass(frozen=True)
+class CoralTransition:
+    accepted: tuple[str, ...]  # Tokens fixed since the earlier row
+    first_accepted: int
+    kept: tuple[int, ...]  # Block positions whose earlier draft token is unchanged
+    revised: tuple[tuple[int, str, str], ...]  # (position, earlier draft, new token)
+    new: tuple[int, ...]  # Block positions beyond the earlier row
+    start: int  # t_s, first block position
+    end: int  # t_e, last block position
+
+
+def coral_transition(prev: CoralFigureStep | None, cur: CoralFigureStep) -> CoralTransition:
+    prev_fixed, prev_tokens = (prev.fixed, prev.tokens) if prev else (0, ())
+    start, end = cur.fixed + 1, len(cur.tokens)
+    in_draft = [p for p in range(start, end + 1) if p <= len(prev_tokens)]
+    return CoralTransition(
+        accepted=cur.tokens[prev_fixed:cur.fixed], first_accepted=prev_fixed + 1,
+        kept=tuple(p for p in in_draft if prev_tokens[p - 1] == cur.tokens[p - 1]),
+        revised=tuple((p, prev_tokens[p - 1], cur.tokens[p - 1]) for p in in_draft if prev_tokens[p - 1] != cur.tokens[p - 1]),
+        new=tuple(p for p in range(start, end + 1) if p > len(prev_tokens)), start=start, end=end)
+
+
+def _coral_step_status(prev: CoralFigureStep | None, cur: CoralFigureStep) -> str:
+    """Status for a printed step, computed from the two printed rows."""
+    t = coral_transition(prev, cur)
+    prev_length = len(prev.tokens) if prev else 0
+    forward, backward = CORAL_FIGURE_ARROWS[cur.label]
+    parts = [f"{cur.label} step."]
+    if prev is None:
+        parts.append(f"Positions {_span(t.start, t.end)} are predicted from the prompt alone, by {len(forward)} forward arrows "
+                     f"from “?”: {_quoted(cur.tokens)}. Nothing is fixed yet.")
+        return " ".join(parts)
+    if t.accepted:
+        noun = "token was" if len(t.accepted) == 1 else "tokens were"
+        parts.append(f"{len(t.accepted)} {noun} accepted and fixed: {_quoted(t.accepted)}.")
+    parts.append(f"The block slides to positions {_span(t.start, t.end)}; Algorithm 1 ends it at "
+                 f"min(t_s + b − 1, t + k) = min({t.start} + {CORAL_B} − 1, {prev_length} + {CORAL_K}) = {t.end}.")
+    if t.revised:
+        changes = ", ".join(f"position {p} “{old}” → “{new}”" for p, old, new in t.revised)
+        parts.append(f"Revised: {changes}.")
+    if t.kept:
+        parts.append(f"Kept from the draft: {_quoted([cur.tokens[p - 1] for p in t.kept])}.")
+    if t.new:
+        parts.append(f"New: {_quoted([cur.tokens[p - 1] for p in t.new])}.")
+    if backward:
+        targets = sorted({j for _, j in backward})
+        parts.append(f"{len(forward)} forward arrows; {len(backward)} backward arrows re-predict positions "
+                     f"{_span(targets[0], targets[-1])} from the earlier draft.")
+    else:
+        parts.append(f"{len(forward)} forward arrows and no backward ones: the whole earlier block was accepted, "
+                     "so no draft token is left to revise.")
+    return " ".join(parts)
+
+
+def _coral_gap_status(third: CoralFigureStep, ninth: CoralFigureStep) -> str:
+    changed = [(p, a, b) for p, (a, b) in enumerate(zip(third.tokens, ninth.tokens), start=1) if p > third.fixed and a != b]
+    fixed = ninth.tokens[third.fixed:ninth.fixed]
+    text = (f"4th–8th steps are not printed in Figure 2, so this jump has no arrows. By the 9th step {len(fixed)} more tokens are fixed "
+            f"({_quoted(fixed)}), and the block is positions {_span(ninth.fixed + 1, len(ninth.tokens))}, {CORAL_B} tokens = b.")
+    for p, a, b in changed:
+        repeated = third.tokens[p - 2] == a
+        text += (f" Position {p} read “{a}” in the 3rd step{' (a repeated token, like “marine marine”)' if repeated else ''}"
+                 f" and “{b}” in the 9th: it was revised in the unprinted steps.")
+    return text
+
+
+def _coral_final_status() -> str:
+    last = CORAL_FIGURE_STEPS[-1]
+    return (f" After 10 steps {last.fixed} response tokens are fixed and {len(last.tokens) - last.fixed} remain in the block."
+            " Each step also verifies candidate blocks, so fewer steps is not the same as faster decoding; measured throughput is under Evidence.")
+
+
+def _coral_widths() -> list[float]:
+    """Column weights: the longest token printed in each column, plus padding."""
+    columns: list[list[str]] = [[token] for token in CORAL_PROMPT] + [[] for _ in CORAL_FIGURE_STEPS[-1].tokens]
+    for step in CORAL_FIGURE_STEPS:
+        for p, token in enumerate(step.tokens):
+            columns[len(CORAL_PROMPT) + p].append(token)
+    return [max(len(token) for token in column) + 2.4 for column in columns]
+
+
+CORAL_WIDTHS = _coral_widths()
+CORAL_LEFTS = [sum(CORAL_WIDTHS[:c]) / sum(CORAL_WIDTHS) * 100 for c in range(CORAL_COLUMNS)]
+CORAL_SPANS = [w / sum(CORAL_WIDTHS) * 100 for w in CORAL_WIDTHS]
+
+
+def _coral_x(position: int, offset: float) -> float:
+    """Percent x of a response position (0 = '?'), at `offset` of its column width."""
+    column = len(CORAL_PROMPT) - 1 + position
+    return round(CORAL_LEFTS[column] + offset * CORAL_SPANS[column], 3)
+
+
+def _coral_arrow_group(key: str, visible: bool) -> str:
+    forward, backward = CORAL_FIGURE_ARROWS.get(key, ((), ()))
+    lines = [f'<line class="cr-forward" x1="{_coral_x(i, .42)}%" y1="0" x2="{_coral_x(j, .42)}%" y2="100%" marker-end="url(#cr-head-forward)"/>'
+             for i, j in forward]
+    lines += [f'<line class="cr-backward" x1="{_coral_x(i, .62)}%" y1="0" x2="{_coral_x(j, .62)}%" y2="100%" marker-end="url(#cr-head-backward)"/>'
+              for i, j in backward]
+    hidden = '' if visible else ' visibility="hidden"'
+    return f'<g data-cr-arrows="{key}" data-forward="{len(forward)}" data-backward="{len(backward)}"{hidden}>{"".join(lines)}</g>'
+
+
+Cell = tuple[str, str]  # (text, class)
+
+
+def _coral_row(step: CoralFigureStep | None, prompt: bool = True) -> list[Cell]:
+    """Cells of one printed row: prompt, fixed response tokens, then the decoding block."""
+    cells: list[Cell] = [(token, "is-prompt") for token in CORAL_PROMPT] if prompt else [("", "is-void")] * len(CORAL_PROMPT)
+    tokens = step.tokens if step else ()
+    for p in range(1, len(CORAL_FIGURE_STEPS[-1].tokens) + 1):
+        if p <= len(tokens):
+            cells.append((tokens[p - 1], "is-fixed" if p <= step.fixed else "is-block"))
+        else:
+            cells.append(("", "is-void"))
+    return cells
+
+
+def _coral_marked(prev: CoralFigureStep | None, cur: CoralFigureStep) -> list[Cell]:
+    """The later row with the change since the earlier row marked on each cell."""
+    t = coral_transition(prev, cur)
+    cells = _coral_row(cur)
+    offset = len(CORAL_PROMPT) - 1
+    for p in range(t.first_accepted, cur.fixed + 1):
+        cells[offset + p] = (cells[offset + p][0], "is-fixed is-accepted")
+    for p, _, _ in t.revised:
+        cells[offset + p] = (cells[offset + p][0], "is-block is-revised")
+    for p in t.new:
+        cells[offset + p] = (cells[offset + p][0], "is-block is-new")
+    return cells
+
+
+def _coral_slide(prev: CoralFigureStep | None, cur: CoralFigureStep) -> list[Cell]:
+    """Intermediate state: accepted tokens fixed, the block moved, its positions not yet predicted."""
+    t = coral_transition(prev, cur)
+    prev_tokens = prev.tokens if prev else ()
+    cells = _coral_row(cur)
+    offset = len(CORAL_PROMPT) - 1
+    for p in range(t.first_accepted, cur.fixed + 1):
+        cells[offset + p] = (cells[offset + p][0], "is-fixed is-accepted")
+    for p in range(t.start, t.end + 1):
+        cells[offset + p] = (prev_tokens[p - 1], "is-block is-draft") if p <= len(prev_tokens) else ("", "is-block is-pending")
+    return cells
+
+
+def _coral_gap_row(third: CoralFigureStep, ninth: CoralFigureStep) -> list[Cell]:
+    """The 9th row, marking tokens fixed since the 3rd step and positions whose token changed."""
+    cells = _coral_row(ninth)
+    offset = len(CORAL_PROMPT) - 1
+    for p in range(third.fixed + 1, ninth.fixed + 1):
+        changed = p <= len(third.tokens) and third.tokens[p - 1] != ninth.tokens[p - 1]
+        cells[offset + p] = (cells[offset + p][0], "is-fixed is-accepted" + (" is-revised" if changed else ""))
+    return cells
+
+
+def _coral_block(cur: CoralFigureStep | None) -> tuple[float, float]:
+    if cur is None:
+        return 0.0, 0.0
+    first = len(CORAL_PROMPT) + cur.fixed
+    last = len(CORAL_PROMPT) + len(cur.tokens) - 1
+    return round(CORAL_LEFTS[first], 3), round(CORAL_LEFTS[last] + CORAL_SPANS[last] - CORAL_LEFTS[first], 3)
+
+
+def coral_frames() -> list[dict[str, Any]]:
+    """Every replay state: rows, block outline, arrows and the computed status."""
+    steps = {s.label: s for s in CORAL_FIGURE_STEPS}
+    frames: list[dict[str, Any]] = [{
+        "key": "prompt", "chip": "Prompt", "beforeLabel": "", "afterLabel": "Prompt",
+        "before": _coral_row(None, prompt=False), "after": _coral_row(None), "block": _coral_block(None), "arrows": "",
+        "status": f"Prompt only: {_quoted(CORAL_PROMPT)}. Algorithm 1 starts the block at t_s = 1 and ends it at min(k, b) = "
+                  f"{coral_block_end(1, 0)}, so the 1st step predicts response positions 1–{coral_block_end(1, 0)}."}]
+    for prev, cur in _coral_checked_pairs():
+        if cur.label == "10th":
+            frames.append({
+                "key": "9th", "chip": "… 9th", "beforeLabel": "3rd step", "afterLabel": "9th step", "gap": True,
+                "before": _coral_row(steps["3rd"]), "after": _coral_gap_row(steps["3rd"], steps["9th"]), "block": _coral_block(steps["9th"]),
+                "arrows": "", "status": _coral_gap_status(steps["3rd"], steps["9th"])})
+        frames.append({
+            "key": cur.label, "chip": cur.label, "beforeLabel": f"{prev.label} step" if prev else "Prompt",
+            "afterLabel": f"{cur.label} step", "before": _coral_row(prev), "after": _coral_marked(prev, cur),
+            "slide": _coral_slide(prev, cur), "block": _coral_block(cur), "arrows": cur.label,
+            "status": _coral_step_status(prev, cur) + (_coral_final_status() if cur.label == "10th" else "")})
+    return frames
+
+
+def _coral_cells(cells: list[Cell]) -> str:
+    return ''.join(f'<span class="cr-cell {cls}" data-col="{c}">{_e(text)}</span>' for c, (text, cls) in enumerate(cells))
+
+
+def _coral_log() -> str:
+    """Step log derived from the printed rows; it is the script-free record of the replay."""
+    rows = []
+    steps = {s.label: s for s in CORAL_FIGURE_STEPS}
+    for prev, cur in _coral_checked_pairs()[:3]:
+        t = coral_transition(prev, cur)
+        change = []
+        if t.revised:
+            change.append("revised " + ", ".join(f"“{old}” → “{new}”" for _, old, new in t.revised))
+        if t.kept:
+            change.append("kept " + _quoted([cur.tokens[p - 1] for p in t.kept]))
+        if t.new:
+            change.append("new " + _quoted([cur.tokens[p - 1] for p in t.new]))
+        rows.append((cur.label, _quoted(t.accepted) if t.accepted else "—", _span(t.start, t.end), str(t.end - t.start + 1), "; ".join(change)))
+    third, ninth, tenth = steps["3rd"], steps["9th"], steps["10th"]
+    rows.append(("4th–8th", "not printed", "", "", ""))
+    rows.append(("9th", f"{ninth.fixed} fixed in total", _span(ninth.fixed + 1, len(ninth.tokens)), str(len(ninth.tokens) - ninth.fixed),
+                 "position 9 “the” → “form” since the 3rd step"))
+    t = coral_transition(ninth, tenth)
+    rows.append(("10th", _quoted(t.accepted), _span(t.start, t.end), str(t.end - t.start + 1),
+                 f"kept {_quoted([tenth.tokens[p - 1] for p in t.kept])}; new {_quoted([tenth.tokens[p - 1] for p in t.new])}"))
+    body = ''.join(f'<tr data-cr-log="{_e("9th" if label == "4th–8th" else label)}"><th scope="row">{_e(label)}</th>'
+                   + ''.join(f'<td>{_e(value)}</td>' for value in values) + '</tr>' for label, *values in rows)
+    return ('<div class="table-scroll" tabindex="0" role="region" aria-label="Figure 2 step log">'
+            '<table class="decode-table cr-log" aria-describedby="cr-log-caption"><thead><tr><th scope="col">Step</th>'
+            '<th scope="col">Accepted since the previous printed step</th><th scope="col">Block positions</th><th scope="col" class="num">Size</th>'
+            f'<th scope="col">Block change</th></tr></thead><tbody>{body}</tbody></table></div>')
+
+
+def coral_replay_demo(eyebrow: str) -> str:
+    frames = coral_frames()
+    final = frames[-1]
+    columns = ' '.join(f'minmax(0, {w:g}fr)' for w in CORAL_WIDTHS)
+    groups = ''.join(_coral_arrow_group(s.label, s.label == "10th") for s in CORAL_FIGURE_STEPS if s.label in CORAL_FIGURE_ARROWS)
+    left, width = final["block"]
+    chips = ''.join(_button(f'data-demo-action="cr-goto" data-frame="{i}"', _e(f["chip"]), i == len(frames) - 1)
+                    for i, f in enumerate(frames))
+    index = ''.join(f'<span>{p}</span>' if p in (1, 5, 10, 15, 20) else '<span></span>'
+                    for p in range(1, len(CORAL_FIGURE_STEPS[-1].tokens) + 1))
+    data = json.dumps({"frames": frames}, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    return f'''<div class="paper-demo decode-demo cr-replay" data-paper-demo="coral-replay">
+  <div class="demo-heading"><span class="demo-tag">{_e(eyebrow)}</span><h3>The same example, one decoding step at a time</h3>
+    <p>Figure 2 prints five steps of decoding “What is coral ?” with window k = {CORAL_K} and block size b = {CORAL_B}. Each step here shows the earlier row above the later one, the arrows printed between them, which tokens became fixed, and where the block slid.</p></div>
+  <div class="demo-controls cr-controls" data-cr-controls hidden>
+    {_player("cr", "Replay")}
+    <div class="demo-options cr-chips" role="group" aria-label="Printed step">{chips}</div>
+  </div>
+  <div data-demo-state>
+    <div class="cr-scroll" tabindex="0" role="region" aria-label="Decoding rows; scroll sideways on narrow screens">
+      <div class="cr-stage" style="--cr-columns:{columns}">
+        <p class="cr-row-label" data-cr-label="before">{_e(final["beforeLabel"])}</p>
+        <div class="cr-row" data-cr-row="before">{_coral_cells(final["before"])}</div>
+        <span class="cr-row-label" aria-hidden="true"></span>
+        <div class="cr-link"><svg class="cr-arrows" width="100%" height="100%" aria-hidden="true" focusable="false"><defs>
+          <marker id="cr-head-forward" class="cr-head-forward" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0.5 L8 4 L0 7.5 Z"/></marker>
+          <marker id="cr-head-backward" class="cr-head-backward" viewBox="0 0 8 8" refX="7.5" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0.5 L8 4 L0 7.5 Z"/></marker></defs>{groups}</svg>
+          <p class="cr-gap" data-cr-gap hidden>…… 4th–8th steps not printed</p></div>
+        <p class="cr-row-label" data-cr-label="after">{_e(final["afterLabel"])}</p>
+        <div class="cr-row" data-cr-row="after">{_coral_cells(final["after"])}<span class="cr-block" data-cr-block style="left:{left}%;width:{width}%"></span></div>
+        <span class="cr-row-label cr-index-label" aria-hidden="true">position</span>
+        <div class="cr-row cr-index" aria-hidden="true"><span></span><span></span><span></span><span></span>{index}</div>
+      </div>
+    </div>
+    <p class="cr-key"><span><i class="cr-swatch is-prompt"></i>Prompt token</span><span><i class="cr-swatch is-fixed"></i>Fixed response token</span><span><i class="cr-swatch is-block"></i>Token in the decoding block</span><span><i class="cr-line is-forward"></i>Forward multi-token dependency</span><span><i class="cr-line is-backward"></i>Backward multi-token dependency</span><span><i class="cr-swatch is-revised"></i>Revised since the earlier row</span></p>
+    <p class="decode-status cr-status" data-cr-status role="status" aria-live="polite">{_e(final["status"])}</p>
+    <details class="paper-details cr-log-details"><summary>Step log of the printed rows</summary>
+      <p class="decode-caption" id="cr-log-caption">Derived from the printed rows. Block positions count response tokens from 1.</p>
+      {_coral_log()}</details>
+  </div>
+  <p class="demo-provenance">Published example: the tokens, colours and arrows of <a href="{CORAL_URL}#S1.F2">Figure 2</a>, transcribed exactly, including the subword “skelet” and the gap between the 3rd and 9th steps. Derived: block bounds from <a href="{CORAL_URL}#alg1">Algorithm 1</a>, t_e = min(t_s + b − 1, t + k), which reproduces every printed block; the printed arrows follow the window k = {CORAL_K} into the new block. The paper’s text names the revision “organism”; the figure prints the token “organ”. Illustrative: the pause between sliding the block and filling it.</p>
+  <script type="application/json" data-cr-data>{data}</script>
+</div>'''
 
 
 # ---------------------------------------------------------------------------
@@ -190,7 +557,7 @@ def _coral_swatch(index: int) -> str:
             f'<use href="#coral-shape-{index}"/></svg>')
 
 
-def coral_demo() -> str:
+def coral_demo(eyebrow: str) -> str:
     reference, highlight = CORAL_DEFAULT_REFERENCE, CORAL_DEFAULT_HIGHLIGHT
     panels = ''.join(_coral_panel(bench, reference, highlight) for bench in CORAL_BENCHMARKS)
     highlight_buttons = ''.join(
@@ -214,7 +581,7 @@ def coral_demo() -> str:
     return f'''<div class="paper-demo decode-demo coral-demo" data-paper-demo="coral-evidence">
   <svg class="decode-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>{defs}
     <marker id="coral-arrowhead" class="coral-arrowhead" viewBox="0 0 10 10" refX="19" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 1 L9 5 L0 9 Z"/></marker></defs></svg>
-  <div class="demo-heading"><span class="demo-tag">Measured results · Tables 1–2 and §4.1</span><h3>Five benchmarks, four decoding settings, one pair of axes</h3>
+  <div class="demo-heading"><span class="demo-tag">{_e(eyebrow)}</span><h3>Five benchmarks, four decoding settings, one pair of axes</h3>
     <p>Each panel plots one benchmark from the paper: accuracy (pass@1 for HumanEval) against accepted tokens per second. Both axes start at zero and are the same in every panel. The arrow runs from the comparison setting to the highlighted one.</p></div>
   <div class="demo-controls coral-controls" data-coral-controls hidden>
     <div class="coral-control-row"><span class="coral-control-label" id="coral-highlight-label">Highlight</span>
@@ -234,7 +601,7 @@ def coral_demo() -> str:
         <tbody>{rows}</tbody></table></div>
     <p class="decode-note">The paper attributes the HumanEval drop mainly to invalid syntax, 70.1% of samples in its no-verifier error analysis (Figure 5). The 61.6 without multi-forward prediction was obtained with a stricter acceptance threshold, ϵ = 0.5. Speeds were measured without a KV cache at batch size 1 on a single GPU, and code generation ran on different GPUs from the reasoning tasks, so compare speeds within a panel.</p>
   </div>
-  <p class="demo-provenance">Measured: <a href="{CORAL_URL}#S4.T1">Table 1</a> (GSM8K, MATH), <a href="{CORAL_URL}#S4.T2">Table 2</a> (LogiQA, ReClor) and the <a href="{CORAL_URL}#S4.F5">§4.1 HumanEval table</a>, Mistral-7B-v0.3, greedy next-token baseline, throughput in accepted tokens per second (hardware and ϵ in Appendix D). Derived: differences and ratios. Axes start at zero; points are reported experiments, not interpolations. The decoding mechanism itself is illustrated by the paper’s Figure 2, reproduced on this page.</p>
+  <p class="demo-provenance">Measured: <a href="{CORAL_URL}#S4.T1">Table 1</a> (GSM8K, MATH), <a href="{CORAL_URL}#S4.T2">Table 2</a> (LogiQA, ReClor) and the <a href="{CORAL_URL}#S4.F5">§4.1 HumanEval table</a>, Mistral-7B-v0.3, greedy next-token baseline, throughput in accepted tokens per second (hardware and ϵ in Appendix D). Derived: differences and ratios. Axes start at zero; points are reported experiments, not interpolations.</p>
 </div>'''
 
 
@@ -260,6 +627,16 @@ class LedomExample:
 # Text is copied as printed (curly quotes included). "\n" marks a printed line break.
 LEDOM_EXAMPLES: tuple[LedomExample, ...] = (
     LedomExample(
+        "question", "Question from answer", "Question generation", "Table 2", "#S2.T2", "as printed",
+        "Answer: She eats 3 eggs every day. 7 days in a week. 3*7 = 21. 21",
+        "Alyssa’s cat loves eggs. If she eats 3 eggs a day, how many in a week?",
+        "The question keeps the answer’s three eggs a day and seven-day week, and adds Alyssa and her cat, which the answer never mentions. Reverse Reward scores this direction, P(question | answer)."),
+    LedomExample(
+        "reversal", "Reversal curse", "Reversal curse", "Table 2", "#S2.T2", "as printed",
+        "is the author of Harry Potter.",
+        "J.K. Rowling",
+        "Text usually names the entity before describing it. Read backwards, the description comes first, so recovering the name is an ordinary prediction for LEDOM (§3)."),
+    LedomExample(
         "backstory", "Backstory", "Abductive reasoning", "Appendix C, Figure 6", "#A3.F6", "full output",
         "That is why Mike gave up his job and started his own business.",
         "Mike worked very hard in school and was the first college graduate in his family. His family did not have a lot"
@@ -278,34 +655,6 @@ LEDOM_EXAMPLES: tuple[LedomExample, ...] = (
         "He walked over to her and gently placed his hand on her cheek. She opened her eyes and looked up at him. He"
         " smiled and leaned down to kiss her. As he kissed her, he whispered in her ear, \"I love you.\"",
         "Look at the names: the output says “Princess Lara”, while the given ending says “Princess Elara”."),
-    LedomExample(
-        "question", "Question from answer", "Question generation", "Table 2", "#S2.T2", "as printed",
-        "Answer: She eats 3 eggs every day. 7 days in a week. 3*7 = 21. 21",
-        "Alyssa’s cat loves eggs. If she eats 3 eggs a day, how many in a week?",
-        "The answer fixes three eggs a day and a seven-day week; the question keeps both. Alyssa and the cat appear nowhere in the answer."),
-    LedomExample(
-        "sentiment", "Few-shot labels", "Few-shot sentiment", "Table 2", "#S2.T2", "as printed",
-        "4. Comment: Wow, that is great. Positive; 5. Comment: I do not like this. Negative;",
-        "1. This movie is very good. Positive;\n2. I haven’t seen this movie, but I like it. Neutral;\n3. That is too bad. Negative.",
-        "Given demonstrations 4 and 5, LEDOM writes demonstrations 1–3, including a “Neutral” label that the given text never uses."),
-    LedomExample(
-        "reversal", "Reversal curse", "Reversal curse", "Table 2", "#S2.T2", "as printed",
-        "is the author of Harry Potter.",
-        "J.K. Rowling",
-        "Text usually names the entity before describing it. Read backwards, the description comes first, so recovering the name is an ordinary prediction for LEDOM (§3)."),
-    LedomExample(
-        "recall", "Quotation", "Knowledge recall", "Table 2", "#S2.T2", "as printed",
-        "Now I become death, the destroyer of worlds.",
-        "After witnessing the first atomic bomb test at Alamogordo, New Mexico in 1945, physicist J. Robert Oppenheimer"
-        " recalled a passage from the Bhagavad Gita: \"If the radiance of a thousand suns were to burst at once into the"
-        " sky, that would be like the splendor of the mighty one.\"",
-        "A successful case, although factual recall is LEDOM’s weakest benchmark area: TriviaQA 19.82 vs. 40.22 for the matched forward model at 2B (Table 3)."),
-    LedomExample(
-        "arithmetic", "Arithmetic", "Math reasoning", "Table 2", "#S2.T2", "as printed",
-        "+2=6.",
-        "(3)=2+½∗2²",
-        "Read together: (3) = 2 + ½ ∗ 2² + 2 = 6, and 2 + 2 + 2 = 6. The terms LEDOM wrote are consistent with the given result. Table 2 prints this fragment as shown.",
-        units="symbols"),
     LedomExample(
         "gsm8k", "GSM8K (incorrect)", "GSM8K evaluation", "Appendix B, Figure 5", "#A2.F5", "full prediction",
         "The above is the thought chain.\nQuestion: Janet’s ducks lay 16 eggs per day. She eats three for breakfast every"
@@ -387,30 +736,32 @@ def _ledom_article(example: LedomExample) -> str:
     </article>'''
 
 
-def ledom_examples_demo() -> str:
+def ledom_examples_demo(eyebrow: str) -> str:
     first = LEDOM_EXAMPLES[0]
     buttons = ''.join(
         _button(f'data-demo-action="rv-example" data-example="{ex.key}"', _e(ex.label), i == 0)
         for i, ex in enumerate(LEDOM_EXAMPLES))
     articles = ''.join(_ledom_article(ex) for ex in LEDOM_EXAMPLES)
     total = len(_words(first))
+    orders = (_button('data-demo-action="rv-order" data-order="reading"', "Reading order", True)
+              + _button('data-demo-action="rv-order" data-order="model"', "LEDOM’s order", False))
     return f'''<div class="paper-demo decode-demo ledom-examples" data-paper-demo="reverse-examples">
-  <div class="demo-heading"><span class="demo-tag">Published examples · Table 2, Figures 5–6</span><h3>Give LEDOM an ending and it writes what came before</h3>
-    <p>Each example pairs a later text with the earlier text LEDOM generated for it, as printed in the paper. The model reads the given text reversed and writes its output last word first, so the words nearest the given text are chosen before the opening. Move the slider to see which parts of each output were committed first.</p></div>
+  <div class="demo-heading"><span class="demo-tag">{_e(eyebrow)}</span><h3>Give LEDOM an ending and it writes what came before</h3>
+    <p>Each example pairs a given later text with the earlier text LEDOM generated for it, exactly as printed in the paper. Press Play to replay the output in LEDOM’s order: the word next to the given text comes first and the opening comes last.</p></div>
   <div class="demo-controls rv-controls" data-rv-controls hidden>
     <div class="demo-options" role="group" aria-label="Published example">{buttons}</div>
     <div class="rv-control-row">
-      <div class="demo-options" role="group" aria-label="Display order">{_button('data-demo-action="rv-order" data-order="reading"', "Reading order", True)}{_button('data-demo-action="rv-order" data-order="model"', "LEDOM’s order", False)}</div>
-      <label class="rv-range" for="rv-progress"><span>Output generated</span>
-        <input id="rv-progress" data-demo-range type="range" min="0" max="{total}" step="1" value="{total}" aria-describedby="rv-progress-help">
+      {_player("rv", "Generation replay")}
+      <div class="demo-options" role="group" aria-label="Display order">{orders}</div>
+      <label class="rv-range" for="rv-progress"><span>Generated</span>
+        <input id="rv-progress" data-demo-range type="range" min="0" max="{total}" step="1" value="{total}" aria-label="Words generated, counted from the end of the output">
         <output for="rv-progress" data-rv-count>{total} / {total}</output></label>
-      <p class="rv-help" id="rv-progress-help">Arrow keys move one word at a time. Generation runs from the end of the output towards its start.</p>
     </div>
   </div>
   <div data-demo-state>
     <div class="rv-examples" data-rv-examples>{articles}</div>
   </div>
-  <p class="demo-provenance">Published examples: <a href="{LEDOM_URL}#S2.T2">Table 2</a>, <a href="{LEDOM_URL}#A2.F5">Appendix B, Figure 5</a> and <a href="{LEDOM_URL}#A3.F6">Appendix C, Figure 6</a>, reproduced in reading order as the paper prints them. Measured: GSM8K and TriviaQA scores from <a href="{LEDOM_URL}#S3.T3">Table 3</a>. Illustrative: the word-level generation order and reversed display. LEDOM reverses subword tokens, so the pieces within each word are also reversed. Table 2 also lists coding, data-augmentation and unsafe-prompt cases. The paper redacts the unsafe output, and this page does not show it.</p>
+  <p class="demo-provenance">Published examples: <a href="{LEDOM_URL}#S2.T2">Table 2</a>, <a href="{LEDOM_URL}#A2.F5">Appendix B, Figure 5</a> and <a href="{LEDOM_URL}#A3.F6">Appendix C, Figure 6</a>, in the paper’s reading order; five of its cases. Measured: GSM8K accuracy from <a href="{LEDOM_URL}#S3.T3">Table 3</a>. Illustrative: the word-by-word replay. LEDOM generates subword tokens in reverse, so the pieces within each word are also produced last to first.</p>
 </div>'''
 
 
@@ -502,7 +853,7 @@ def _rr_swatch(key: str) -> str:
             f'<use href="#rr-shape-{key}"/></svg>')
 
 
-def reverse_reward_demo() -> str:
+def reverse_reward_demo(eyebrow: str) -> str:
     baseline = "greedy"
     groups = ''.join(
         f'<div class="rr-group" role="group" aria-label="{_e(bench)}"><p class="rr-bench">{_e(bench)}</p>'
@@ -527,7 +878,7 @@ def reverse_reward_demo() -> str:
     headings = ''.join(f'<th scope="col" class="num">{_e(b)}</th>' for b in RR_BENCHMARKS)
     return f'''<div class="paper-demo decode-demo rr-demo" data-paper-demo="reverse-reward-results">
   <svg class="decode-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>{''.join(RR_SHAPES)}</defs></svg>
-  <div class="demo-heading"><span class="demo-tag">Measured results · Table 4</span><h3>Does Reverse Reward help beyond sampling more answers?</h3>
+  <div class="demo-heading"><span class="demo-tag">{_e(eyebrow)}</span><h3>Does Reverse Reward help beyond sampling more answers?</h3>
     <p>Reverse Reward ranks candidate solutions by <span class="decode-formula">P(y | x)<sup>1−λ</sup> · P(x | y)<sup>λ</sup></span>, the forward model’s likelihood combined with LEDOM’s probability of reconstructing the question. The paper reports no per-candidate scores, so this chart uses its twelve measured model–benchmark accuracies. Each mark shows how far a strategy lands from the chosen baseline.</p></div>
   <div class="demo-controls" data-rr-controls hidden><span class="coral-control-label" id="rr-baseline-label">Baseline</span>
     <div class="demo-options" role="group" aria-labelledby="rr-baseline-label">{_button('data-demo-action="rr-baseline" data-baseline="greedy"', "Greedy decoding", True)}{_button('data-demo-action="rr-baseline" data-baseline="random"', "Random pick (Best-of-N)", False)}</div></div>

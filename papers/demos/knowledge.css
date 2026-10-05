@@ -8,6 +8,8 @@
   --kd-line: var(--line, #dce2dc);
   --kd-wash: var(--wash, #f0f4ee);
   --kd-tint: #f7f9f6;
+  --kd-warm: #9a5a3c;
+  --kd-mark: #dfe9e1;
   margin-block: 28px;
   padding: 28px;
   border: 1px solid var(--kd-line);
@@ -41,6 +43,22 @@
 .knowledge-demo .kd-buttons button:hover { border-color: var(--kd-accent); }
 .knowledge-demo .kd-buttons button[aria-pressed="true"] { border-color: var(--kd-accent); background: var(--kd-wash); color: var(--kd-accent); font-weight: 600; }
 
+/* Animation player: Play / Pause, Step, Reset, and one toggle per step. */
+.knowledge-demo .kd-player { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px; margin: 0 0 12px; }
+.knowledge-demo .kd-controls + .kd-player { margin-top: -6px; }
+.knowledge-demo .kd-transport button { min-width: 68px; text-align: center; }
+.knowledge-demo .kd-transport button[aria-pressed="true"] { border-color: var(--kd-accent); background: var(--kd-accent); color: #fff; }
+.knowledge-demo .kd-buttons button:disabled { border-color: var(--kd-line); color: #9aa39d; cursor: default; }
+.knowledge-demo .kd-steps button { min-height: 32px; padding: 4px 10px; font-size: 12px; }
+.knowledge-demo .kd-step-status { min-height: 3.4em; margin: 0 0 18px; padding: 10px 0; border-block: 1px solid var(--kd-line); font-size: 13.5px; line-height: 1.65; }
+/* A changed element is marked once (≤ 450 ms) after Play or Step; never on load. */
+.knowledge-demo .is-entering { animation: kd-mark 450ms ease-out; }
+@keyframes kd-mark { from { background-color: var(--kd-mark); } }
+@media (prefers-reduced-motion: reduce) {
+  .knowledge-demo *, .knowledge-demo .is-entering { animation: none !important; transition: none !important; }
+}
+.knowledge-demo[data-motion="reduce"] *, .knowledge-demo[data-motion="reduce"] .is-entering { animation: none !important; transition: none !important; }
+
 /* Structured data. */
 /* position: relative keeps visually hidden text inside the scroll region. */
 .knowledge-demo .kd-table-wrap { position: relative; max-width: 100%; overflow-x: auto; }
@@ -59,29 +77,47 @@
 .knowledge-demo .kd-periods strong { display: block; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
 .knowledge-demo .kd-period-years { display: block; color: var(--kd-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
 .knowledge-demo .kd-period-role { display: block; color: var(--kd-muted); font-size: 11.5px; }
-.knowledge-demo .kd-periods li.is-target { background: var(--kd-wash); }
-.knowledge-demo .kd-periods li.is-target strong { color: var(--kd-accent); }
-.knowledge-demo .kd-periods li.is-target .kd-period-role::after { content: " · asked by this probe"; color: var(--kd-accent); }
-.knowledge-demo .kd-periods li.is-outside { color: #8b938e; }
-.knowledge-demo .kd-periods li.is-outside strong { font-weight: 500; }
+.knowledge-demo .kd-periods li { transition: background-color 400ms ease, color 400ms ease; }
+.knowledge-demo .kd-periods li.is-current { background: var(--kd-wash); }
+.knowledge-demo .kd-periods li.is-current strong, .knowledge-demo .kd-periods li.is-current .kd-period-role { color: var(--kd-accent); }
+.knowledge-demo .kd-periods li.is-past strong { color: var(--kd-ink); }
+.knowledge-demo .kd-periods li.is-pending { color: #8b938e; }
+.knowledge-demo .kd-periods li.is-pending strong { font-weight: 500; }
 
 /* History Matters: edit requests. */
 .knowledge-demo .kd-requests { margin-top: 24px; }
-.knowledge-demo .kd-request-grid { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 24px; margin-bottom: 10px; }
+.knowledge-demo .kd-request-grid { display: grid; gap: 14px; margin-bottom: 10px; }
 .knowledge-demo .kd-targets { width: 100%; font-size: 12.5px; }
-.knowledge-demo .kd-targets th, .knowledge-demo .kd-targets td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--kd-line); text-align: left; vertical-align: top; }
-.knowledge-demo .kd-targets td:first-child { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; overflow-wrap: anywhere; }
-.knowledge-demo .kd-targets td:last-child { width: 38%; }
-.knowledge-demo .kd-target-group th { padding-top: 10px; color: var(--kd-accent); font-size: 11px; font-weight: 600; }
+.knowledge-demo .kd-targets th, .knowledge-demo .kd-targets td { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--kd-line); text-align: left; vertical-align: top; }
+.knowledge-demo .kd-targets td:nth-child(odd) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; overflow-wrap: anywhere; }
+.knowledge-demo .kd-plain-request { max-width: 640px; }
+.knowledge-demo .kd-plain-request td:last-child { width: 38%; }
+.knowledge-demo .kd-meto-request { min-width: 640px; }
+.knowledge-demo .kd-meto-request td:nth-child(2), .knowledge-demo .kd-meto-request td:nth-child(4) { width: 17%; }
+.knowledge-demo .kd-meto-request td:nth-child(3) { border-left: 1px solid var(--kd-line); padding-left: 12px; }
+.knowledge-demo .kd-meto-request th:nth-child(3) { padding-left: 12px; }
 
-/* History Matters: probe. */
-.knowledge-demo .kd-probe { margin-bottom: 26px; }
-.knowledge-demo .kd-probe-table { width: 100%; margin-bottom: 8px; }
-.knowledge-demo .kd-probe-table th, .knowledge-demo .kd-probe-table td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--kd-line); text-align: left; vertical-align: top; }
-.knowledge-demo .kd-probe-table td:last-child { width: 30%; font-weight: 600; }
-.knowledge-demo .kd-cloze { display: block; font: 400 18px/1.45 Georgia, "Times New Roman", serif; overflow-wrap: anywhere; }
+/* History Matters: probe and expected answer after each edit. */
+.knowledge-demo .kd-sequence { margin-top: 24px; }
+.knowledge-demo .kd-seq-table { width: 100%; min-width: 560px; font-size: 13px; }
+.knowledge-demo .kd-seq-table th, .knowledge-demo .kd-seq-table td { padding: 9px 14px 9px 0; border-bottom: 1px solid var(--kd-line); text-align: left; vertical-align: top; }
+.knowledge-demo .kd-seq-table thead th small { display: block; font-weight: 400; }
+.knowledge-demo .kd-seq-table tbody th { width: 21%; font-weight: 400; }
+.knowledge-demo .kd-seq-table tbody th span { display: block; font-weight: 650; }
+.knowledge-demo .kd-seq-table tbody th small { display: block; color: var(--kd-muted); font-size: 11px; line-height: 1.4; }
+.knowledge-demo .kd-seq-table td { width: 39.5%; }
+.knowledge-demo .kd-seq-table ul { margin: 0; padding: 0; list-style: none; }
+.knowledge-demo .kd-seq-table li + li { margin-top: 8px; }
+.knowledge-demo .kd-cloze { display: block; font: 400 16px/1.45 Georgia, "Times New Roman", serif; overflow-wrap: anywhere; }
 .knowledge-demo .kd-blank { color: var(--kd-muted); }
-.knowledge-demo .kd-probe-question { display: block; margin-top: 3px; color: var(--kd-muted); font-size: 12px; }
+.knowledge-demo .kd-answer { display: block; margin-top: 2px; font-weight: 650; }
+.knowledge-demo .kd-answer::before { content: "→ "; color: var(--kd-muted); font-weight: 400; }
+.knowledge-demo .kd-flag { display: block; margin-top: 5px; color: var(--kd-muted); font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.knowledge-demo .kd-flag[data-flag="Same wording, new answer"] { color: var(--kd-warm); }
+.knowledge-demo .kd-cell-pending, .knowledge-demo .kd-cell-none { color: #8b938e; font-size: 12px; }
+.knowledge-demo .kd-seq-cell .kd-cell-pending { display: none; }
+.knowledge-demo .kd-seq-cell.is-pending .kd-cell-body { display: none; }
+.knowledge-demo .kd-seq-cell.is-pending .kd-cell-pending { display: block; }
 
 /* History Matters: measured dumbbells (hollow square = Table 2, filled square = Table 3). */
 .knowledge-demo .kd-measured { padding-top: 20px; border-top: 1px solid var(--kd-line); }
@@ -128,10 +164,15 @@
 .knowledge-demo .kd-decomp th, .knowledge-demo .kd-decomp td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--kd-line); text-align: left; vertical-align: top; }
 .knowledge-demo .kd-decomp tbody th { width: 20%; font-weight: 600; white-space: nowrap; }
 .knowledge-demo .kd-decomp td:last-child { width: 32%; color: var(--kd-muted); }
+.knowledge-demo .kd-decomp tbody tr { transition: background-color 400ms ease; }
 .knowledge-demo .kd-decomp .kd-role-edit { background: var(--kd-tint); }
 .knowledge-demo .kd-decomp .kd-role-edit td:last-child { color: var(--kd-accent); font-weight: 600; }
-.knowledge-demo .kd-decomp .kd-role-check td:last-child { color: var(--kd-ink); font-weight: 600; }
+.knowledge-demo .kd-decomp .kd-role-check { background: var(--kd-wash); }
+.knowledge-demo .kd-decomp .kd-role-check td:last-child { color: var(--kd-ink); font-weight: 650; }
+.knowledge-demo .kd-decomp .kd-role-stale td:last-child, .knowledge-demo .kd-decomp .kd-role-ambiguous td:last-child { color: var(--kd-warm); font-weight: 600; }
 .knowledge-demo .kd-decomp tr > :first-child { padding-left: 8px; }
+.knowledge-demo .kd-compose { margin-top: 10px; }
+.knowledge-demo .kd-compose code { display: block; padding: 8px 10px; border: 1px solid var(--kd-line); font-size: 12.5px; line-height: 1.5; overflow-wrap: anywhere; }
 .knowledge-demo .kd-was { display: block; color: var(--kd-muted); font-size: 11.5px; }
 
 /* MC-MKE: measured results. */
@@ -180,21 +221,11 @@
 .knowledge-demo .kd-echo-output strong { display: block; font-size: 17px; }
 .knowledge-demo .kd-echo-output > p { font-size: 13px; line-height: 1.65; }
 .knowledge-demo .kd-echo-source { color: var(--kd-muted); font-size: 11.5px; line-height: 1.65; }
-.knowledge-demo .kd-echo-measurements { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--kd-line); }
-.knowledge-demo .kd-echo-measurements > p { font-size: 13.5px; }
-.knowledge-demo .kd-echo-instruction { margin: 4px 0 12px; font-size: 13px; line-height: 1.7; }
-.knowledge-demo .kd-echo-chart > div { display: grid; grid-template-columns: minmax(8rem, 1.1fr) 1fr 4.2rem; gap: 12px; align-items: center; padding: 8px; border-bottom: 1px solid #edf0eb; font-size: 12.5px; }
-.knowledge-demo .kd-echo-chart .is-selected { background: var(--kd-wash); font-weight: 650; }
-.knowledge-demo .kd-echo-chart i { display: block; height: 8px; background: #edf1ea; }
-.knowledge-demo .kd-echo-chart i::after { content: ""; display: block; width: var(--echo-rate); min-width: 1px; height: 100%; background: var(--kd-accent); }
-.knowledge-demo .kd-echo-chart strong { font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; }
-.knowledge-demo .kd-echo-measurements > .kd-small { margin-top: 12px; }
 
 /* Narrow layouts. */
 @media (max-width: 760px) {
   .knowledge-demo .kd-mc-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .knowledge-demo .kd-plot-figure { max-width: 440px; }
-  .knowledge-demo .kd-request-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
 }
 @media (max-width: 700px) {
   .knowledge-demo { padding: 20px 16px; }
@@ -206,8 +237,23 @@
   .knowledge-demo .kd-periods { grid-template-columns: minmax(0, 1fr); }
   .knowledge-demo .kd-periods li { border-left: 0; border-top: 1px solid var(--kd-line); }
   .knowledge-demo .kd-periods li:first-child { border-top: 0; }
-  .knowledge-demo .kd-cloze { font-size: 16px; }
-  .knowledge-demo .kd-probe-table td:last-child { width: 38%; }
+  .knowledge-demo .kd-cloze { font-size: 15px; }
+  /* METO request: fact objective, then time objective, for each fact. */
+  .knowledge-demo .kd-meto-request { min-width: 0; }
+  .knowledge-demo .kd-meto-request thead { display: none; }
+  .knowledge-demo .kd-meto-request tr { display: grid; grid-template-columns: minmax(0, 1fr) 34%; gap: 2px 10px; padding: 7px 0; border-bottom: 1px solid var(--kd-line); }
+  .knowledge-demo .kd-meto-request tr[hidden] { display: none; }
+  .knowledge-demo .kd-meto-request td { width: auto !important; padding: 0; border: 0 !important; }
+  .knowledge-demo .kd-meto-request td:nth-child(3) { padding-left: 0; }
+  /* Sequence matrix: one block per form, each edit labelled. */
+  .knowledge-demo .kd-seq-table { min-width: 0; }
+  .knowledge-demo .kd-seq-table thead { display: none; }
+  .knowledge-demo .kd-seq-table tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--kd-line); }
+  .knowledge-demo .kd-seq-table tbody th, .knowledge-demo .kd-seq-table td { display: block; width: auto; padding: 0; border: 0; }
+  .knowledge-demo .kd-seq-table tbody th { margin-bottom: 6px; }
+  .knowledge-demo .kd-seq-table td + td { margin-top: 8px; }
+  .knowledge-demo .kd-seq-table td::before { content: attr(data-label); display: block; color: var(--kd-muted); font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+  .knowledge-demo .kd-player { gap: 8px 16px; }
   /* Dumbbells: numbers on the first line, the full-width track below. */
   .knowledge-demo .kd-dumbbell { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "name values change" "track track track"; gap: 4px 12px; }
   .knowledge-demo .kd-db-name { grid-area: name; }
@@ -230,5 +276,4 @@
   .knowledge-demo .kd-decomp td:last-child { width: auto; font-size: 12px; text-align: right; }
   .knowledge-demo .kd-echo-trace { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .knowledge-demo .kd-echo-output { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .knowledge-demo .kd-echo-chart > div { grid-template-columns: minmax(6.5rem, 1fr) .7fr 3.6rem; gap: 7px; font-size: 12px; }
 }

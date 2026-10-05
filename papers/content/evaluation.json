@@ -2,7 +2,7 @@
   "context-aware-evaluation": {
     "short_name": "Cont-COMET",
     "topic": "Translation evaluation",
-    "takeaway": "Translation quality depends on surrounding sentences. Cont-COMET selects relevant document context and learns to score translations under the same conditions as human annotators.",
+    "takeaway": "Adding document context to a translation metric only at inference trades sentence-level accuracy for system-level gains. Cont-COMET trains COMET with selected context, as human annotators see it, and largely removes that trade-off.",
     "question": "Human annotators judge translations within documents, while many automatic metrics score isolated sentences. How can a metric use context without introducing noise or weakening sentence-level judgments?",
     "method": [
       {
@@ -20,17 +20,17 @@
     ],
     "findings": [
       {
-        "value": "0.943",
-        "label": "WMT22 system correlation",
-        "detail": "With six selected context sentences, Pearson correlation rises from 0.910 for COMET-21 to 0.943 on WMT22."
+        "value": "0.354",
+        "label": "WMT22 segment-level Kendall τ",
+        "detail": "Cont-COMET with six selected context sentences, versus 0.349 for COMET-21 and 0.292 for COMET-21 given three preceding and three following sentences at inference only (Table 2)."
       },
       {
-        "value": "Training matters",
-        "label": "More context alone is insufficient",
-        "detail": "Adding context only at inference improves system correlation but harms segment correlation; context-aware training largely resolves this trade-off."
+        "value": "0.296",
+        "label": "Context at test, not in training",
+        "detail": "A metric trained without context but given the same six-sentence context at test reaches WMT22 segment τ 0.296, versus 0.354 when trained with context (Table 3)."
       }
     ],
-    "scope": "Results cover WMT21 and WMT22 across three language pairs. Gains vary by evaluation level and dataset; selecting context adds only modest improvements over context-aware training.",
+    "scope": "Evaluation covers three language pairs (en-de, en-ru, zh-en) on the WMT21 TED, WMT21 News, and WMT22 test sets. The paper notes that context-annotated training data remain scarce and that the 512-token encoder limit prevents encoding whole documents.",
     "diagram": {
       "title": "Judge the sentence in its document",
       "steps": [
@@ -112,7 +112,43 @@
         5
       ],
       "source_url": "https://aclanthology.org/2023.findings-emnlp.1021.pdf"
-    }
+    },
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xinyu Hu",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "WMT22 segment-level Kendall τ with MQM judgments: Cont-COMET 0.354 vs 0.349 for COMET-21 and 0.292 when COMET-21 gets six context sentences at inference only.",
+      "prior": "Vernikos et al. (2022) add preceding sentences to a pretrained metric only when scoring, which performed poorly at segment level; Cont-COMET trains COMET with selected preceding and following context.",
+      "limitation": "On WMT21 News, every Cont-COMET variant's segment-level τ (0.303–0.306) stays below COMET-21's 0.311, and at WMT22 system level inference-only context scores higher (0.952 vs 0.943)."
+    },
+    "prior_work": "Neural metrics such as COMET (Rei et al., 2020) score each sentence from its source, reference, and hypothesis, although WMT human annotation has included document context since 2019. Vernikos et al. (2022) encoded preceding sentences when computing scores and concluded that two preceding sentences work best; the paper argues that this conclusion was not tested thoroughly and notes the approach's poor segment-level correlation. Cont-COMET uses both preceding and following context, selects it by relevance, and trains the metric with it.",
+    "figure_local": "assets/context-aware-evaluation-lead.png",
+    "figure_url": "https://aclanthology.org/2023.findings-emnlp.1021.pdf (page 2, Figure 1; vector figure rendered at 400 dpi and cropped)",
+    "figure_caption": "Cont-COMET's framework: context sentences are selected from the document by similarity to the current sentence, concatenated with it, and passed with the source, reference, and hypothesis through a cross-lingual encoder, pooling layer, and regression estimator to produce the evaluation score. Original Figure 1 from the paper.",
+    "primary_figure": true
   },
   "contextual-asr": {
     "short_name": "Contextual ASR Correction",
@@ -136,16 +172,16 @@
     "findings": [
       {
         "value": "3.336%",
-        "label": "AISHELL-1 character error rate",
-        "detail": "Offline dataset context reduces CER from 3.528% for sentence-level BART to 3.336%; the reported difference is statistically significant."
+        "label": "AISHELL-1 CER, offline dataset context",
+        "detail": "Versus 3.528% for sentence-level BART, the strongest baseline; the difference is significant at p < 0.05 (Table 2)."
       },
       {
-        "value": "4 datasets",
-        "label": "English and Mandarin evaluation",
-        "detail": "The offline dataset-context model achieves the best or tied-best error rates on AISHELL-1, HKUST, and both LibriSpeech test sets."
+        "value": "3.379%",
+        "label": "AISHELL-1 CER, online mode",
+        "detail": "With only already-corrected preceding sentences, as in a live system, the dataset-context model still improves on BART's 3.528%; on HKUST, 20.68% versus 21.36% (Table 2)."
       }
     ],
-    "scope": "The evaluation uses correction datasets constructed from four ASR corpora. Offline results use future context, so they do not represent the information available to a live system.",
+    "scope": "The authors build the four correction datasets from AISHELL-1 and HKUST (Mandarin, transcribed with WeNet) and LibriSpeech clean and other (English, transcribed with fairseq). The method is not tested beyond ASR correction; the paper names document-level translation as a next task.",
     "diagram": {
       "title": "Retrieve context beyond one sentence",
       "steps": [
@@ -185,7 +221,7 @@
     },
     "abstract_label": "Read the abstract",
     "results_table": {
-      "caption": "Table 2 (selected columns). Character error rate (CER, Mandarin) and word error rate (WER, English) after correction, lower is better; RAW is the uncorrected ASR output. * marks results significant at p < 0.05 against the BART baseline; the CERR/WERR reduction columns are omitted.",
+      "caption": "Table 2 (selected columns). Character error rate (CER, Mandarin) and word error rate (WER, English) after correction, lower is better; RAW is the uncorrected output of the WeNet (Mandarin) or fairseq (English) recognizer (Appendix Table 10). * marks results significant at p < 0.05 against the BART baseline; the CERR/WERR reduction columns are omitted.",
       "headings": [
         "Method",
         "AISHELL-1 CER↓",
@@ -262,7 +298,70 @@
     "figure_local": "assets/contextual-asr-overview.png",
     "figure_url": "https://aclanthology.org/2024.lrec-main.341.pdf",
     "figure_caption": "The correction model is a Transformer encoder-decoder in which one decoder layer is a kNN attention layer: its queries search a datastore of (key, value) pairs, and the retrieved kNN output is mixed with the local attention output through a gate g. Original Figure 1 from the paper.",
-    "primary_figure": true
+    "primary_figure": true,
+    "affiliations": [
+      "Peking University",
+      "Beijing University of Posts and Telecommunications",
+      "Huawei Technologies"
+    ],
+    "authors_detail": [
+      {
+        "name": "Jin Jiang",
+        "affiliations": [
+          1,
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Wei Peng",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Rongjun Li",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Jingyuan Yang",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Yanquan Zhou",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "AISHELL-1 character error rate after correction: 3.336% with offline dataset context vs 3.528% for sentence-level BART, the strongest baseline (p < 0.05).",
+      "prior": "Wang et al. (2021, 2022b) add a context encoder, and doc2doc models feed many sentences, widening attention at a length and noise cost; this work retrieves context through kNN attention.",
+      "limitation": "The best results need offline access to later sentences and a datastore spanning the whole test set; a live system can use only the online setting."
+    },
+    "prior_work": "Most ASR error correction (AEC) models, such as BART-based correctors (Zhao et al., 2021), work one sentence at a time. Document-level MT offers two ways to add context: a separate context encoder (sent2sent), which Wang et al. (2021, 2022b) applied to ASR correction, and multi-sentence input (doc2doc). The paper argues that both widen attention, which limits context length and adds unselected noise. kNN-MT (Khandelwal et al., 2020b) instead retrieves decoder states from a datastore built on training data; this work retrieves attention keys and values from the current document or test set."
   },
   "dsgram": {
     "short_name": "DSGram",
@@ -285,17 +384,17 @@
     ],
     "findings": [
       {
-        "value": "0.927",
-        "label": "System-level Pearson correlation",
-        "detail": "GPT-4-weighted DSGram reaches 0.927 on SEEDA-E, compared with 0.901 for SOME in the same evaluation."
+        "value": "0.776",
+        "label": "SEEDA-S sentence-level accuracy",
+        "detail": "GPT-4-weighted DSGram versus 0.768 for SOME and 0.761 for IMPARA, the strongest baselines (Table 3)."
       },
       {
-        "value": "0.776",
-        "label": "Sentence-level pairwise accuracy",
-        "detail": "On SEEDA-S, GPT-4 weighting reaches 0.776 accuracy versus 0.648 with average weighting; performance varies across metrics and datasets."
+        "value": "0.648",
+        "label": "Same framework, equal weights",
+        "detail": "Fixing every weight at 0.33 lowers SEEDA-S sentence accuracy from 0.776 to 0.648; at system level on SEEDA-E the gap is small, 0.927 versus 0.922 (Table 3)."
       }
     ],
-    "scope": "DSGram does not lead on every correlation measure. Its scores depend on the evaluator, and smaller fine-tuned models remain less aligned with human judgments than GPT-4.",
+    "scope": "Meta-evaluation uses SEEDA and DSGram-Eval, the authors' human-scored set built from CoNLL-2014 and BEA-2019 test sentences. Only GPT-4, GPT-4o, and LLaMA-family models were tested as scorers and weight generators.",
     "diagram": {
       "title": "The same criteria, different priorities",
       "steps": [
@@ -331,6 +430,10 @@
           "url": "https://github.com/jxtse/GEC-Metrics-DSGram"
         },
         {
+          "label": "Data",
+          "url": "https://huggingface.co/datasets/jxtse/DSGram"
+        },
+        {
           "label": "arXiv",
           "url": "https://arxiv.org/abs/2412.12832"
         }
@@ -340,7 +443,7 @@
     "figure_local": "assets/dsgram-overview.png",
     "primary_figure": true,
     "results_table": {
-      "caption": "Table 3 (selected columns). Meta-evaluation on SEEDA: Pearson r and Spearman ρ with human system rankings, and pairwise accuracy (Acc) and Kendall τ at sentence level; higher is better. G.w = GPT-4 weighted, L.w = LLaMA3-70B weighted; Avg_DSGram (G.w) uses equal weights. DSGram does not lead in every column.",
+      "caption": "Table 3 (selected columns). Meta-evaluation on SEEDA, whose human judgments are sentence-based (SEEDA-S) or edit-based (SEEDA-E): Pearson r and Spearman ρ with human system rankings, and pairwise accuracy (Acc) and Kendall τ at sentence level; higher is better. DSGram rows differ only in how the weights are set; the equal-weights row is printed in the paper as Avg_DSGram (G.w), and the other two as DSGram (L.w) and DSGram (G.w).",
       "headings": [
         "Metric",
         "System SEEDA-S r",
@@ -391,7 +494,7 @@
           "0.540"
         ],
         [
-          "Avg_DSGram (G.w)",
+          "DSGram, equal weights (0.33)",
           "0.797",
           "0.922",
           "0.930",
@@ -399,7 +502,7 @@
           "0.296"
         ],
         [
-          "DSGram (L.w)",
+          "DSGram, LLaMA3-70B weights",
           "0.880",
           "0.906",
           "0.895",
@@ -407,7 +510,7 @@
           "0.263"
         ],
         [
-          "DSGram (G.w)",
+          "DSGram, GPT-4 weights",
           "0.880",
           "0.927",
           "0.944",
@@ -420,12 +523,53 @@
         7
       ],
       "source_url": "https://arxiv.org/e-print/2412.12832v2"
-    }
+    },
+    "affiliations": [
+      "Peking University",
+      "Beijing Jiaotong University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Jinxiang Xie",
+        "affiliations": [
+          1,
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Yilin Li",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "SEEDA-S sentence-level pairwise accuracy: GPT-4-weighted DSGram 0.776 vs 0.768 for SOME, the strongest baseline; equal 0.33 weights give 0.648.",
+      "prior": "SOME, following Asano et al. (2017), scores grammaticality, fluency, and meaning with three BERT models and sums them with preset weights; DSGram adds an over-editing criterion and derives sentence-specific weights through AHP.",
+      "limitation": "The scorer sets the ceiling: on DSGram-Eval, fine-tuned LLaMA3-8B correlates 0.419 with human overall scores, versus 0.772 for zero-shot GPT-4."
+    },
+    "prior_work": "Reference-based GEC metrics such as M², ERRANT, and BLEU depend on gold corrections that may not cover every valid edit, and they miss the over-correction typical of LLM correctors (Fang et al. 2023). Reference-free metrics follow Asano et al. (2017): SOME scores grammaticality, fluency, and meaning preservation with three BERT models and combines them by a weighted sum. DSGram merges the largely redundant grammaticality and fluency scores, adds an Edit Level criterion for over-correction, and replaces the single weighting with sentence-specific weights that an LLM derives through AHP; IMPARA appears as a further reference-free baseline in Table 3."
   },
   "eama": {
     "short_name": "EAMA",
     "topic": "Multimodal learning · News captioning",
-    "takeaway": "News captions need names and events that an image alone cannot reveal. EAMA teaches a multimodal model to find relevant entities before writing the caption.",
+    "takeaway": "News captions need names and events that an image alone cannot reveal. EAMA teaches a multimodal LLM, InstructBLIP, to find the relevant sentences and entities in the article before writing the caption.",
     "question": "A news photograph shows a scene, but its article supplies names and events. How can a model select the right entity information without overwhelming caption generation with the full article?",
     "method": [
       {
@@ -445,15 +589,15 @@
       {
         "value": "87.70",
         "label": "GoodNews CIDEr",
-        "detail": "EAMA scores 87.70 versus 78.03 for InstructBLIP under official supervised fine-tuning, improving caption quality on GoodNews."
+        "detail": "EAMA versus 83.52 for Xu et al. (2024a), the strongest previous method, and 78.03 for InstructBLIP fine-tuned with its official scripts (Table 1)."
       },
       {
-        "value": "87.00",
-        "label": "NYTimes800k CIDEr",
-        "detail": "EAMA reaches 87.00 versus 82.70 for full caption-only fine-tuning, supporting the benefit of entity alignment and supplementary context."
+        "value": "87.00 vs 83.50",
+        "label": "Selected vs longer input, NYTimes800k",
+        "detail": "The aligned model scores 87.00 CIDEr with its self-selected sentences and entities, but 83.50 when its usual context is extended to the same maximum length (Table 4)."
       }
     ],
-    "scope": "Results concern two English news-captioning datasets and the tested multimodal models. Higher caption scores and entity recall do not imply that every generated name is correct.",
+    "scope": "EAMA is trained on 100K samples from each of GoodNews and NYTimes800k, both English, with InstructBLIP (7B) as its only backbone; the paper notes high GPU memory use and slower inference than earlier captioners.",
     "diagram": {
       "title": "Find the entities, then write the caption",
       "steps": [
@@ -483,11 +627,11 @@
       "links": [
         {
           "label": "Paper",
-          "url": "https://arxiv.org/abs/2402.19404"
+          "url": "https://doi.org/10.1145/3801548"
         },
         {
-          "label": "Publisher",
-          "url": "https://doi.org/10.1145/3801548"
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2402.19404"
         }
       ],
       "citation": "@article{zhang2026eama,\n  title = {EAMA: Entity-Aware Multimodal Alignment Based Approach for News Image Captioning},\n  author = {Zhang, Junzhe and Zhang, Huixuan and Yin, Xunjian and Wan, Xiaojun},\n  journal = {ACM Transactions on Multimedia Computing, Communications, and Applications},\n  volume = {22},\n  number = {5},\n  pages = {1--19},\n  year = {2026},\n  doi = {10.1145/3801548},\n  url = {https://doi.org/10.1145/3801548}\n}"
@@ -575,7 +719,46 @@
         7
       ],
       "source_url": "https://arxiv.org/e-print/2402.19404v5"
-    }
+    },
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Junzhe Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Huixuan Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "GoodNews CIDEr: EAMA 87.70 vs 83.52 for Xu et al. (2024a), the previous best; on NYTimes800k, 87.00 vs 83.72.",
+      "prior": "Xu et al. (2024a) train a separate CLIP matcher to build confidence-aware prompts for LLaVA; EAMA trains the captioning MLLM itself to select entity-bearing sentences and entities.",
+      "limitation": "Named-entity precision stays below Xu et al. (2024a) on both datasets (GoodNews 27.58 vs 30.19; NYTimes800k 29.79 vs 32.38), although EAMA's entity recall is highest."
+    },
+    "prior_work": "Earlier news captioners either fill templates with entities extracted from the article or, like JoGANIC and ICECAP, read longer inputs or retrieve relevant sentences with a separately trained cross-modal module, leaving the caption model itself unchanged. Xu et al. (2024a) fine-tune CLIP to build confidence-aware prompts for LLaVA, and Qu et al. (2024) align face representations with names, which covers only people. EAMA trains the captioning MLLM itself, from caption data alone, to select entity-bearing sentences and entities."
   },
   "error-robust-retrieval": {
     "short_name": "RERIC",
@@ -599,16 +782,16 @@
     "findings": [
       {
         "value": "80.0 F1",
-        "label": "SIGHAN15 sentence correction",
-        "detail": "RERIC improves correction F1 from 77.8 for its REALISE backbone to 80.0, with correction precision rising from 75.9 to 79.9."
+        "label": "SIGHAN15 sentence-level correction",
+        "detail": "RERIC versus 78.5 for ECOPO, the strongest baseline, and 77.8 for REALISE, the base model whose representations build the datastore (Table 4)."
       },
       {
-        "value": "70.6 F1",
-        "label": "SIGHAN14 sentence correction",
-        "detail": "Correction F1 rises from 68.1 to 70.6 over REALISE; gains are driven primarily by precision rather than recall."
+        "value": "78.2 F1",
+        "label": "Retrieval with ordinary hidden-state keys",
+        "detail": "Using REALISE's standard token representation as the key leaves SIGHAN15 correction F1 near the 77.8 of no retrieval; RERIC's error-robust keys and 3-gram reranking reach 80.0 (Table 5)."
       }
     ],
-    "scope": "The main evaluation uses REALISE on SIGHAN benchmarks. Retrieval quality depends on the datastore and hyperparameters; too many retrieved neighbors can introduce noise.",
+    "scope": "RERIC is tested only on top of REALISE, on the SIGHAN13–15 test sets converted to Simplified Chinese; retrieval hyperparameters are tuned by grid search on a held-out 10% of the training data.",
     "diagram": {
       "title": "Retrieve through the spelling error",
       "steps": [
@@ -710,7 +893,55 @@
         5
       ],
       "source_url": "https://aclanthology.org/2024.lrec-main.553.pdf"
-    }
+    },
+    "affiliations": [
+      "Peking University",
+      "State Key Laboratory of Media Convergence Production Technology and Systems"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1,
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xinyu Hu",
+        "affiliations": [
+          1,
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Jin Jiang",
+        "affiliations": [
+          1,
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1,
+          2
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "SIGHAN15 sentence-level correction F1: RERIC 80.0 vs 78.5 for ECOPO, the strongest baseline, and 77.8 for its unretrained base model, REALISE.",
+      "prior": "kNN-LM (Khandelwal et al., 2019) keys a datastore on context representations and stores single next tokens; RERIC keys on pronunciation, glyph shape, and weighted context, and stores corrected 3-grams for reranking.",
+      "limitation": "On SIGHAN13 RERIC only matches ECOPO (correction F1 85.2 vs 85.1), and F1 declines once more than about 16 neighbors are retrieved."
+    },
+    "prior_work": "Multimodal Chinese Spelling Check (CSC) models such as SpellGCN, PLOME, and REALISE build phonetic and glyph information into the corrector during training. Retrieval methods such as kNN-LM and kNN-MT (Khandelwal et al., 2019, 2020) instead attach a datastore of training examples to a trained model and interpolate its predictions at inference. RERIC, which the authors describe as the first retrieval-augmented CSC method, adapts that pattern to queries that may contain the error: keys combine pronunciation, glyph shape, and distance-weighted context, and candidates are reranked by 3-gram overlap.",
+    "figure_local": "assets/error-robust-retrieval-lead.svg",
+    "figure_url": "https://arxiv.org/e-print/2211.07843v2 (file figure1.pdf; same figure as Figure 1 on page 4 of https://aclanthology.org/2024.lrec-main.553.pdf)",
+    "figure_caption": "ReRiC's pipeline: a base spelling-check model fuses phonetic, semantic, and morphologic features into contextual keys, stores training tokens as key-value n-grams in a datastore, then retrieves the nearest neighbors of each test token and reranks candidate corrections by distance. Original Figure 1 from the paper.",
+    "primary_figure": true
   },
   "nlg-evaluation-survey": {
     "short_name": "LLMs as Evaluators",
@@ -731,19 +962,8 @@
         "text": "Analyze reliability, robustness, bias, interpretability, and how human participation can support evaluation quality."
       }
     ],
-    "findings": [
-      {
-        "value": "4 paradigms",
-        "label": "A shared taxonomy",
-        "detail": "A common framework connects methods that extract model signals, prompt general models, train evaluators, or combine human and model judgments."
-      },
-      {
-        "value": "Bias persists",
-        "label": "Reliability requires validation",
-        "detail": "The surveyed literature reports sensitivity to presentation order, output length, and model preferences, limiting unqualified trust in LLM judgments."
-      }
-    ],
-    "scope": "This is a synthesis of the literature available at publication, not a benchmark establishing a universal best evaluator. Reported strengths depend on tasks, criteria, models, and validation data.",
+    "findings": [],
+    "scope": "The survey covers about 100 works found through June 2024, limited to LLMs with more than one billion parameters on tasks whose input and output are natural language. It excludes evaluation of LLM capabilities, NLG datasets and benchmarks, and statistical analysis of metrics.",
     "diagram": {
       "title": "Three decisions when designing evaluation",
       "steps": [
@@ -785,7 +1005,60 @@
       "citation": "@article{gao-etal-2025-llm,\n  title = {LLM-based NLG Evaluation: Current Status and Challenges},\n  author = {Gao, Mingqi and Hu, Xinyu and Yin, Xunjian and Ruan, Jie and Pu, Xiao and Wan, Xiaojun},\n  journal = {Computational Linguistics},\n  volume = {51},\n  number = {2},\n  year = {2025},\n  pages = {661--687},\n  doi = {10.1162/coli_a_00561},\n  url = {https://aclanthology.org/2025.cl-2.9/}\n}"
     },
     "abstract_label": "Read the abstract",
-    "primary_figure": true
+    "primary_figure": true,
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Mingqi Gao",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xinyu Hu",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Jie Ruan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiao Pu",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "No paradigm wins on every axis: human–LLM collaboration is most flexible and strongest on SummEval but least reproducible and costliest; LLM-derived metrics are reproducible and cheap but least flexible.",
+      "prior": "Earlier surveys cover automatic metrics or human evaluation practice (Celikyilmaz, Clark, and Gao 2020; Gehrmann, Clark, and Sellam 2023); this survey covers LLM-based NLG evaluation, not evaluation of LLMs' abilities.",
+      "limitation": "Coverage ends in June 2024, and the cross-paradigm performance comparison rests on one summarization benchmark, SummEval, because fine-tuned evaluators were tested under incomparable settings."
+    },
+    "prior_work": "Earlier surveys review automatic NLG metrics or human evaluation practice (Celikyilmaz, Clark, and Gao 2020; Sai, Mohankumar, and Khapra 2023; Gehrmann, Clark, and Sellam 2023), and the authors note that none addresses LLM-based evaluation. Surveys on evaluating LLMs' capabilities (Zhuang et al. 2023; Chang et al. 2024) answer a different question and are excluded. This survey instead organizes about 100 works that use LLMs as evaluators into four paradigms and compares them on flexibility, reproducibility, performance, and cost."
   },
   "seq2seq-data2text": {
     "short_name": "Evaluating Data-to-Text",
@@ -808,17 +1081,17 @@
     ],
     "findings": [
       {
-        "value": "5 × 4",
-        "label": "Models and datasets",
-        "detail": "The study compares five Seq2Seq configurations across four benchmarks, exposing error patterns that differ by model and input structure."
+        "value": "19.74 → 7.48",
+        "label": "ToTTo Omission score with copying",
+        "detail": "Adding a copy mechanism to Transformer cuts the severity-weighted Omission score but raises Addition from 4.38 to 11.01 (Table 5; lower is better)."
       },
       {
-        "value": "Copy trade-off",
-        "label": "Fewer omissions, some extra content",
-        "detail": "Copying helps reduce omission and extrinsic inaccuracy, while sometimes increasing addition errors; pre-training and model size strongly affect overall quality."
+        "value": "62.88 vs 59.96",
+        "label": "E2E BLEU, T5-small vs T5-base",
+        "detail": "BLEU ranks T5-small above T5-base, while human MQM scores reverse the order, 86.04 versus 96.36 (Tables 3–4)."
       }
     ],
-    "scope": "The findings describe the selected 2022-era models and datasets. They establish a diagnostic evaluation approach, rather than a ranking of current language models.",
+    "scope": "All four datasets are English and differ in how much content selection they require, from fully specified WebNLG triples and partially specified E2E records to ToTTo's highlighted cells and WikiBio's unspecified infobox content (Table 1).",
     "diagram": {
       "title": "From a single score to an error profile",
       "steps": [
@@ -844,7 +1117,7 @@
     },
     "abstract_label": "Read the abstract",
     "results_table": {
-      "caption": "Table 5 (ToTTo rows; the Positive-Negative Aspect column, 0 for every model on ToTTo, is omitted). Severity-weighted, length-normalized error scores from human MQM annotation of 80 outputs per model, lower is better; ptr-gen is the Transformer with a copy mechanism. On ToTTo, copying reduces Omission but raises Addition and Word Form; the rise in Addition also appears on WikiBio and WebNLG, but not on E2E.",
+      "caption": "Table 5 (ToTTo rows; the Positive-Negative Aspect column, 0 for every model on ToTTo, is omitted), with each model's overall ToTTo human score from Table 3. Error columns are severity-weighted, length-normalized error scores from human MQM annotation of 80 outputs per model, lower is better; the human score is 100 minus the summed error scores, up to rounding, higher is better. ptr-gen is the Transformer with a copy mechanism. On ToTTo, copying reduces Omission but raises Addition and Word Form; the rise in Addition also appears on WikiBio and WebNLG, but not on E2E.",
       "headings": [
         "Model (ToTTo)",
         "Addition",
@@ -853,7 +1126,8 @@
         "Intrinsic",
         "Omission",
         "Word Form",
-        "Word Order"
+        "Word Order",
+        "Human score↑"
       ],
       "rows": [
         [
@@ -864,7 +1138,8 @@
           "17.02",
           "19.74",
           "0",
-          "0"
+          "0",
+          "45.41"
         ],
         [
           "ptr-gen",
@@ -874,7 +1149,8 @@
           "13.47",
           "7.48",
           "3.01",
-          "0"
+          "0",
+          "54.57"
         ],
         [
           "T5-small",
@@ -884,7 +1160,8 @@
           "5.36",
           "9.19",
           "0",
-          "0"
+          "0",
+          "85.44"
         ],
         [
           "T5-base",
@@ -894,7 +1171,8 @@
           "4.38",
           "4.38",
           "0",
-          "0.76"
+          "0.76",
+          "88.59"
         ],
         [
           "BART-base",
@@ -904,12 +1182,38 @@
           "2.41",
           "2.66",
           "0",
-          "2.41"
+          "2.41",
+          "90.71"
         ]
       ],
       "highlight": [],
       "source_url": "https://aclanthology.org/2022.acl-long.531.pdf"
-    }
+    },
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "ToTTo human error scores: adding a copy mechanism to Transformer cuts Omission from 19.74 to 7.48 but raises Addition from 4.38 to 11.01 (lower is better).",
+      "prior": "Ferreira et al. (2019) compare pipeline and end-to-end data-to-text systems, and PolyTope (Huang et al., 2020) annotates summarization errors; this work applies MQM error annotation to five Seq2Seq models on four datasets.",
+      "limitation": "Each model–dataset score rests on 80 annotated outputs, and only models up to 220M parameters were tested; T5-large and BART-large were omitted for compute reasons."
+    },
+    "prior_work": "Ferreira et al. (2019) compared pipeline and end-to-end architectures for neural data-to-text generation, and Thomson and Reiter (2020) proposed a protocol for human evaluation of accuracy. Most model comparisons still rely on BLEU or ROUGE, which can disagree with human judgment (Novikova et al., 2017a; Reiter, 2018), and existing human evaluations cover few samples, datasets, models, or error dimensions. This study adapts the MQM-based PolyTope scheme of Huang et al. (2020), developed for summarization, to annotate five Seq2Seq models on four data-to-text datasets."
   },
   "themis": {
     "short_name": "Themis",
@@ -933,16 +1237,16 @@
     "findings": [
       {
         "value": "0.542",
-        "label": "Average Spearman correlation",
-        "detail": "Across the six reported NLG evaluation tasks, Themis-8B averages 0.542 versus 0.521 for the tested GPT-4 baseline."
+        "label": "Average Spearman ρ, six benchmarks",
+        "detail": "Themis-8B versus 0.521 for prompted GPT-4 and 0.319 for TIGERScore-13B, the strongest fine-tuned evaluator with a full average (Table 2)."
       },
       {
-        "value": "58 datasets",
-        "label": "NLG-Eval corpus",
-        "detail": "The corpus spans nine NLG tasks and roughly half a million samples; consistency selection yields approximately 67,000 supervised training examples."
+        "value": "0.476",
+        "label": "Same-size raw data instead",
+        "detail": "With about 67K randomly sampled raw examples, the size of the selected fine-tuning set, average Spearman falls to 0.476; even all raw data reaches only 0.493 (Table 3)."
       }
     ],
-    "scope": "Themis does not outperform GPT-4 on every task. Its explanations and ratings remain model judgments; evidence is tied to the paper’s datasets, human annotations, and baseline versions.",
+    "scope": "Training labels combine human ratings with GPT-4 analyses and ratings, so GPT-4's judgments partly shape Themis's. Backbones were limited to 7B–13B models; stronger foundations such as Llama-3-70B were not tried.",
     "diagram": {
       "title": "Criteria in, explained judgment out",
       "steps": [
@@ -964,7 +1268,30 @@
     "source_url": "https://aclanthology.org/2024.emnlp-main.891/",
     "source_note": "Verified ACL PDF sections 2–4 and Table 2: 0.542 versus GPT-4 0.521 average Spearman, six tasks; 58 datasets, nine tasks, ~0.5M corpus and ~67K training selection. Original page invented other correlation numbers and incorrectly said eight task categories. v4 results table: Table 3 (ablation settings), ACL Anthology PDF 2024.emnlp-main.891, page 7 (proceedings p. 15930).",
     "metadata_override": {
-      "abstract": "The evaluation of natural language generation (NLG) tasks is a significant and longstanding research area. With the recent emergence of powerful large language models (LLMs), some studies have turned to LLM-based automatic evaluation methods, which demonstrate great potential to become a new evaluation paradigm following traditional string-based and model-based metrics. However, despite the improved performance of existing methods, they still possess some deficiencies, such as dependency on references and limited evaluation flexibility. Therefore, in this paper, we meticulously construct a large-scale NLG evaluation corpus NLG-Eval with annotations from both human and GPT-4 to alleviate the lack of relevant data in this field. Furthermore, we propose Themis, an LLM dedicated to NLG evaluation, which has been trained with our designed multi-perspective consistency verification and rating-oriented preference alignment methods. Themis can conduct flexible and interpretable evaluations without references, and it exhibits superior evaluation performance on various NLG tasks, simultaneously generalizing well to unseen tasks and surpassing other evaluation models, including GPT-4."
+      "abstract": "The evaluation of natural language generation (NLG) tasks is a significant and longstanding research area. With the recent emergence of powerful large language models (LLMs), some studies have turned to LLM-based automatic evaluation methods, which demonstrate great potential to become a new evaluation paradigm following traditional string-based and model-based metrics. However, despite the improved performance of existing methods, they still possess some deficiencies, such as dependency on references and limited evaluation flexibility. Therefore, in this paper, we meticulously construct a large-scale NLG evaluation corpus NLG-Eval with annotations from both human and GPT-4 to alleviate the lack of relevant data in this field. Furthermore, we propose Themis, an LLM dedicated to NLG evaluation, which has been trained with our designed multi-perspective consistency verification and rating-oriented preference alignment methods. Themis can conduct flexible and interpretable evaluations without references, and it exhibits superior evaluation performance on various NLG tasks, simultaneously generalizing well to unseen tasks and surpassing other evaluation models, including GPT-4.",
+      "citation": "@inproceedings{hu-etal-2024-themis,\n    title = \"Themis: A Reference-free {NLG} Evaluation Language Model with Flexibility and Interpretability\",\n    author = \"Hu, Xinyu and Lin, Li and Gao, Mingqi and Yin, Xunjian and Wan, Xiaojun\",\n    booktitle = \"Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing\",\n    year = \"2024\",\n    url = \"https://aclanthology.org/2024.emnlp-main.891/\",\n    pages = \"15924--15951\"\n}",
+      "links": [
+        {
+          "label": "Paper",
+          "url": "https://aclanthology.org/2024.emnlp-main.891/"
+        },
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2406.18365"
+        },
+        {
+          "label": "Code",
+          "url": "https://github.com/PKU-ONELab/Themis"
+        },
+        {
+          "label": "Model",
+          "url": "https://huggingface.co/PKU-ONELab/Themis"
+        },
+        {
+          "label": "Data",
+          "url": "https://huggingface.co/datasets/PKU-ONELab/NLG-Eval"
+        }
+      ]
     },
     "abstract_label": "Read the abstract",
     "results_table": {
@@ -1033,6 +1360,52 @@
     "figure_local": "assets/themis-overview.png",
     "figure_url": "https://aclanthology.org/2024.emnlp-main.891.pdf",
     "figure_caption": "Themis takes an NLG task output together with a chosen evaluation aspect and its criteria, works without a reference, and returns an evaluation analysis plus a 1–5 rating. Original Figure 1 from the paper.",
-    "primary_figure": true
+    "primary_figure": true,
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xinyu Hu",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Li Lin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Mingqi Gao",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "Average Spearman correlation with human ratings on six held-out NLG benchmarks: Themis-8B 0.542 vs 0.521 for prompted GPT-4 and 0.319 for TIGERScore-13B.",
+      "prior": "G-Eval prompts proprietary GPT models; Prometheus needs references, and Auto-J and TIGERScore lack customizable criteria. This work trains an open 8B evaluator that is reference-free, takes custom criteria, and explains ratings.",
+      "limitation": "Prompted GPT-4 still leads on dialogue-response (Topical-Chat) and translation (WMT23) evaluation, which the paper attributes to GPT-4's stronger dialogue and multilingual abilities."
+    },
+    "prior_work": "Prompting approaches such as G-Eval ask proprietary LLMs such as GPT-4 to score, compare, or rank outputs; the paper notes that they are costly and can be irreproducible. Fine-tuned evaluators such as Prometheus, Auto-J, TIGERScore, and InstructScore train open models on human or GPT-4 judgments, but each either needs references or lacks customizable criteria (Table 1). Themis provides both properties with explanations, and adds consistency-based data selection and rating-guided preference alignment."
   }
 }

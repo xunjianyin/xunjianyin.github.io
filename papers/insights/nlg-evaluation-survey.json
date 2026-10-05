@@ -2,22 +2,22 @@
   "story": {
     "title": "Choosing an evaluator also chooses what quality means",
     "paragraphs": [
-      "A generated answer can be fluent, relevant, complete, and factually wrong at the same time. This makes NLG evaluation unlike checking a single label: valid outputs differ, and different users may value different qualities. The survey’s organizing question is not whether an LLM can emit a plausible score. It is how the score is obtained, what information supports it, and which assumptions are hidden inside the evaluation procedure.",
-      "For example, likelihood-based scoring asks whether text is probable under a model, while a prompted judge is asked to apply an explicit rubric. A fine-tuned evaluator learns from examples of judgments; human–LLM collaboration keeps people involved in defining criteria or inspecting assessments. These approaches can use the same underlying language model and still measure different things. The four-part taxonomy makes those design choices visible rather than grouping every use of an LLM under one metric label."
+      "A generated answer can be fluent, relevant, and complete, yet factually wrong; many outputs can be valid, and users value different qualities. The survey therefore asks how an LLM's score is obtained, what information supports it, and which assumptions the procedure hides.",
+      "Likelihood scoring asks whether text is probable under a model; a prompted judge applies an explicit rubric; a fine-tuned evaluator learns from example judgments; human–LLM collaboration keeps people in charge of criteria or final checks. The same underlying model can therefore measure different things, and the taxonomy makes that choice visible."
     ]
   },
   "mechanism": {
     "title": "The taxonomy separates signals, interfaces, and supervision",
     "paragraphs": [
-      "LLM-derived metrics extract evaluation signals from model representations or generation probabilities. Their numerical outputs are convenient, but a score’s relation to a chosen quality dimension may be indirect. Prompted evaluation supplies task instructions and criteria, then requests scores, pairwise comparisons, rankings, answers to evaluation questions, or error analyses. Changing the output format changes the decision being asked of the model; a preference between two answers is not automatically a calibrated absolute rating.",
-      "Fine-tuning moves part of the evaluation design into training data. Important differences include who produces the labels, whether explanations are included, whether references are required, and whether criteria can vary at inference. The final survey also distinguishes human-guided LLM evaluation from LLM-assisted human evaluation. People may define or refine rubrics for a model, while a model may propose critiques or test cases for a human to review. These are different divisions of work, with different costs and failure modes."
+      "LLM-derived metrics turn embeddings or token probabilities into a score, but they do not fully allow criteria to be stated in natural language and cannot use closed models that hide logits (Sections 2.3, 6.2). Prompted judges can return scores, comparisons, rankings, yes/no answers, or error analyses, and the format matters: pairwise comparison beats scoring for medium-sized evaluators such as FlanT5 and LLaMA-2 (Section 3.1).",
+      "Fine-tuning moves design choices into training data: who annotates it (mostly GPT-4), whether references are required, and whether criteria are explicit (Tables 2–3). Collaboration runs in two directions: people write checklists or revise an LLM's scores (human-guided LLM evaluation), or an LLM drafts test cases, critiques, or error annotations for people to review (LLM-assisted human evaluation, Section 5)."
     ]
   },
   "evidence": {
-    "title": "Useful evaluation needs its own evaluation",
+    "title": "LLM judges carry documented biases, and no paradigm wins on every axis",
     "paragraphs": [
-      "Because this is a survey, its contribution is a structured synthesis rather than a new shared leaderboard experiment. The literature documents cases where prompted judges favor a response’s presentation position, length, or stylistic resemblance to model-generated text. Fine-tuning can address some behaviors, but synthetic evaluation data can also carry the teacher model’s biases into a smaller evaluator. An explanation can expose the judge’s stated reasoning without guaranteeing that the reasoning is faithful or correct.",
-      "A practical implication is to validate the evaluator against the decision it will actually support. If the aim is system ranking, inspect agreement at that level; if the aim is identifying factual errors in individual answers, system-level correlation is insufficient. Criteria, model versions, input formats, and human reference judgments all belong in that validation. The survey supports choosing an approach with explicit trade-offs, rather than interpreting the flexibility of natural-language judging as evidence that evaluation has become a solved problem."
+      "Prompted judges are swayed by the order of two texts in a comparison (position bias), prefer longer responses and their own outputs, and can rate a factually wrong answer above a short or ungrammatical one (Section 3.6). Fine-tuning can counter some of these, for example by shuffling training pairs, but GPT-4-annotated data can pass GPT-4's self-bias to the smaller evaluator (Section 4.4).",
+      "SummEval is the one benchmark on which the survey compares all four paradigms (Table 4): the best LLM-derived metric (GPTScore with Qwen-2.5) reaches 0.436 overall, G-Eval with GPT-4 0.523, Themis 0.553 as the only fine-tuned evaluator above G-Eval, and InteractEval's human–LLM checklists 0.725. Because fine-tuned evaluators were tested on different settings and data, the survey calls for unified benchmarks with large-scale human judgments (Section 6.3)."
     ]
   },
   "sources": [
@@ -30,5 +30,19 @@
       "url": "https://aclanthology.org/2025.cl-2.9/"
     }
   ],
-  "reading_notes": "Read final CL2025 PDF, including changed collaboration taxonomy: human-guided LLM evaluation and LLM-assisted human evaluation. Avoid treating ordinal pros/cons discussion as a measured universal ranking."
+  "reading_notes": "Read final CL2025 PDF, including changed collaboration taxonomy: human-guided LLM evaluation and LLM-assisted human evaluation. Avoid treating ordinal pros/cons discussion as a measured universal ranking.",
+  "demo": {
+    "kind": "survey-paradigms",
+    "placement": "evidence",
+    "eyebrow": "Survey · Sections 2–6 and Tables 2–4",
+    "title": "Which paradigm fits your evaluation?",
+    "description": "The survey’s four paradigms side by side: where the score comes from, whether a reference or training is needed, what the evaluator returns, representative methods and the main failure mode, each with the section it condenses. Select the situations that apply to you: the table marks the paradigms that fit, fit with a caveat, or are ruled out, and lists the survey’s reasons. The Section 6.2 orderings and the SummEval results of Table 4 show what each choice trades away.",
+    "note": "Published: every cell condenses the cited section or table of the survey (Computational Linguistics 51(2), 2025); the representative methods are those the survey names. Measured: SummEval overall correlations from Table 4, which collects results from Fu et al. (2023a), Hu et al. (2024) and Chu, Kim, and Yi (2025). The situation rules are our mapping of the survey’s statements onto a decision aid; the survey itself compares the paradigms only by flexibility, reproducibility, performance and cost (Section 6.2), and its performance ordering rests on SummEval alone.",
+    "sources": [
+      {
+        "label": "Survey · Sections 2–6",
+        "url": "https://aclanthology.org/2025.cl-2.9.pdf"
+      }
+    ]
+  }
 }

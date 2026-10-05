@@ -2,22 +2,22 @@
   "story": {
     "title": "Fluent text can put the right entity in the wrong role",
     "paragraphs": [
-      "The paper gives a compact example with two facts about Williamson County: its largest city is Round Rock, and its county seat is Georgetown. A generated description instead calls Georgetown the largest city. The output uses a real entity from the input and reads naturally, but assigns that entity to the wrong relation. This is precisely the kind of mistake that a surface-level overlap score can struggle to characterize.",
-      "The example also separates two problems. The largest-city statement distorts a supplied fact, while the county-seat relation is never expressed. Fixing the wrong city removes the first error without recovering the missing information. A single quality score cannot tell a developer which repair is needed. The study therefore asks human annotators to locate errors and explain their type and severity, giving each model an interpretable error profile."
+      "In the paper's Table 2 example, the input gives Round Rock as the largest city of Williamson County and Georgetown as its county seat; the output calls Georgetown the largest city and omits the county seat. The sentence reads naturally, yet it contains a distorted fact and a missing one, each needing a different repair, and a single overlap score cannot say which.",
+      "Earlier human evaluations of data-to-text systems covered few samples, datasets, models, or error dimensions. Here annotators locate every error and record its type and severity, giving each model an error profile instead of one number."
     ]
   },
   "mechanism": {
     "title": "Faithfulness and content selection are distinct requirements",
     "paragraphs": [
-      "The adapted MQM framework distinguishes eight error types. Inaccuracy intrinsic distorts information that is present in the source; inaccuracy extrinsic introduces information absent from it. Addition has a narrower meaning here: unnecessary or irrelevant material copied from the source. It is therefore not synonymous with hallucination. Omission, polarity errors, duplication, word form, and word order complete the taxonomy. These distinctions matter especially for ToTTo, where only highlighted table content should be described.",
-      "Annotators mark error spans and choose minor, major, or critical severity. Error penalties depend on severity and span length, normalized by output word count; omissions receive a fixed length of one. The study samples 80 inputs from each of four datasets and generates outputs from all five model configurations, producing 1,600 texts for annotation. Each text receives two independent annotations. Annotators are not told which model produced the output, reducing the influence of expectations about pre-training or model size."
+      "The study adapts the Multidimensional Quality Metrics (MQM) framework, via the PolyTope scheme for summarization, to eight error types. Inaccuracy Intrinsic distorts information in the input; Inaccuracy Extrinsic adds information absent from it; Addition, narrower than hallucination, is unnecessary material taken from the input. Omission, Positive-Negative Aspect, Duplication, Word Form, and Word Order complete the set. Addition versus Omission matters most for ToTTo, where only highlighted cells should be described.",
+      "Each error span gets a type and a severity: minor, major, or critical. Five annotators, selected from eight by a qualification test, labeled 1,600 outputs (80 inputs × four datasets × five models), each twice; outputs whose two error scores diverged too much were replaced, and annotators did not know which model produced an output."
     ]
   },
   "evidence": {
     "title": "An architectural improvement can move errors between categories",
     "paragraphs": [
-      "Copying helps preserve source content, but can also pull in content that the requested description does not need. On ToTTo, the pointer-generator lowers the omission error score from 19.74 to 7.48 relative to Transformer, while the addition score rises from 4.38 to 11.01. Those values are weighted error scores, not percentages of sentences with an error. The result explains why copying can improve overall quality while still creating a specific content-selection problem.",
-      "BLEU is not dismissed as wholly useless: its broad trend often agrees with human evaluation. But the rankings can diverge. On E2E, T5-base scores lower BLEU than T5-small, 59.96 versus 62.88, while its human score is higher, 96.36 versus 86.04. Fine-grained annotation explains what an aggregate number leaves unresolved. The interactive example lets a reader annotate the paper’s Table 2 output and score it with the same severity weights and length normalization used for the study."
+      "Copying preserves input content but also pulls in content the description does not need: on ToTTo, the copy model's Omission score falls by more than half while its Addition score more than doubles (Table 5). The paper attributes the extra additions to an auto-regressive decoder that copies long input spans and is hard to interrupt.",
+      "BLEU's overall trend agrees with human evaluation, but the paper reports a Pearson correlation of 0.61 between BLEU and the accuracy score and only 0.08 for fluency (Section 6), and rankings of close models can flip, as on E2E. Pre-training has the largest effect in Table 3: pre-trained models beat the others by a wide margin on every dataset except E2E."
     ]
   },
   "sources": [
@@ -35,13 +35,15 @@
     "kind": "data2text-annotate",
     "title": "Annotate the output, then compare with the paper",
     "description": "The study scores outputs from human error annotations: each error segment receives a type and a severity, the severity weight is multiplied by the segment length, and the total is normalized by the word count (Section 4.3). Annotate the paper’s Table 2 output yourself, then reveal the paper’s annotation.",
-    "note": "Adapted: input triples and output verbatim from Table 2; error types from Section 4.1; severities and the 1:3:7 ratio from Sections 4.2–4.3; omission length fixed to 1 (footnote 3). Measured: Table 6 average error scores. Computed: every score, using Equations 1–2 over this single output (20 words, punctuation not counted). The paper normalizes by all annotated outputs of a dataset (80 per model), so one output moves a system score far less. Table 2 does not report severities; its annotation is scored for every severity combination.",
+    "note": "Adapted: input triples and output verbatim from Table 2; error types from Section 4.1; severities and the 1:3:7 ratio from Sections 4.2–4.3; omission length fixed to 1 (footnote 3). Computed: every score, using Equations 1–2 over this single output (20 words, punctuation not counted). The paper normalizes by all annotated outputs of a dataset (80 per model), so one output moves a system score far less. Table 2 does not report severities; its annotation is scored for every severity combination. The measured Table 6 averages appear under Reading the evidence.",
     "sources": [
       {
         "label": "Paper (ACL 2022)",
         "url": "https://aclanthology.org/2022.acl-long.531/"
       }
     ],
-    "eyebrow": "Published example · Table 2"
+    "eyebrow": "Published example · Table 2",
+    "placement": "method",
+    "evidence_eyebrow": "Measured · Table 6"
   }
 }

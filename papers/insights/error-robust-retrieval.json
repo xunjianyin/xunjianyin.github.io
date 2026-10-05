@@ -2,22 +2,22 @@
   "story": {
     "title": "The erroneous character should not dominate the search",
     "paragraphs": [
-      "Retrieval assumes that similar queries should find useful examples. Spelling correction breaks that assumption: part of the query is wrong. If an embedding strongly represents the mistaken character, the search may retrieve fluent uses of that same wrong character and reinforce the mistake. RERIC treats this as a representation problem before it treats it as a generation problem. The datastore should help whether the current character is correct or needs changing.",
-      "The paper’s example makes the failure concrete. For the fragment “这以个,” the intended correction is “这一个.” A retrieved occurrence of “这以后” can look attractive because it contains the unchanged target character 以. Yet “这一个” matches the surrounding characters that are already correct. Successful retrieval must balance a robust approximate match with more exact evidence from the local spelling pattern."
+      "Chinese Spelling Check (CSC) corrects misspelled characters, which are usually confused with characters of similar sound or shape. In CSC, part of the retrieval query is wrong: a key that encodes the mistaken character can retrieve fluent uses of that character and reinforce the error.",
+      "Strong correctors also underuse their training data: in Table 1, REALISE, a multimodal CSC model, leaves 设 (set) uncorrected where 这 (this) is meant, although that error appears in similar contexts in the training set. RERIC turns the training set into a datastore that the corrector consults at inference."
     ]
   },
   "mechanism": {
     "title": "Dense retrieval finds candidates; local overlap corrects their ranking",
     "paragraphs": [
-      "Each key concatenates the target character’s phonetic representation, morphological representation, and a specially constructed context representation. The context is a distance-weighted average of nearby tokens’ fused information, rather than simply the target token’s ordinary semantic embedding. Nearby evidence receives greater weight through a Gaussian weighting scheme. Queries and datastore keys use the same construction so both noisy and correct characters can occupy a useful retrieval space.",
-      "The stored value is a corrected n-gram, not just a replacement character. After nearest-neighbor search, RERIC checks positional overlap between that n-gram and the input window. Matches reduce the retrieval distance, but a match at the central, possibly erroneous character is deliberately downweighted. Candidate distances become a token distribution, which is interpolated with the base corrector’s distribution. The demo runs Equation 11 with the Table 3 weights on the Figure 1 candidates; its starting distances are illustrative, not recovered model measurements."
+      "Each key concatenates the target character's phonetic and glyph representations from REALISE with a Gaussian-weighted average of the fused semantic, phonetic, and glyph representations of nearby tokens, so it reflects the surrounding characters rather than only the target's possibly wrong meaning. Queries are built the same way, and every training token is stored, correct or not.",
+      "Each value is the corrected 3-gram around the target. Dense retrieval alone can rank 这以后 first for the input 这以个 because it shares the wrong character 以; reranking rewards positional overlap with the input window and downweights a match at the center. The reranked distribution is interpolated with REALISE's own prediction, without retraining REALISE."
     ]
   },
   "evidence": {
     "title": "Much of the gain comes from avoiding unnecessary corrections",
     "paragraphs": [
-      "On SIGHAN15, correction precision improves from 75.9 to 79.9 while recall changes only from 79.9 to 80.1. The resulting F1 gain therefore reflects fewer wrong corrections more than finding many additional errors. This fits the datastore design: it includes correct training tokens as well as error cases, allowing retrieved evidence to support leaving valid text alone.",
-      "The method needs no further training of the base model, but that does not make retrieval costless or universally beneficial. The study reports sensitivity to the number of neighbors, with excessive retrieval introducing noise. Its main comparisons use REALISE and established SIGHAN test sets; the result is evidence for this correction setting, rather than proof that any retriever improves any language model. The separate reranking step is valuable precisely because nearest-neighbor similarity alone can choose a misleading example."
+      "On SIGHAN15, the 2015 test set of the SIGHAN Chinese spelling-check shared tasks, nearly all of the gain over REALISE comes from precision (Table 4): RERIC makes fewer wrong corrections rather than finding more errors. In the case study, REALISE changes a correct 带 (take) to 戴 (wear); RERIC, with many correct uses of 带 in its datastore, does not.",
+      "The key design, not retrieval itself, carries the gain: replacing the key's context part with the token's semantic representation falls below no retrieval (Table 5). Retrieval adds about 6% inference time and a 1.3 GB datastore; adding about one million error-free Chinese Wikipedia articles to the datastore raises SIGHAN15 correction F1 from 80.0 to 80.9 without retraining (Table 7)."
     ]
   },
   "sources": [
@@ -34,14 +34,15 @@
   "demo": {
     "kind": "reric-reranking",
     "title": "Should matching the wrong character count?",
-    "description": "RERIC reranks retrieved 3-grams by their positional overlap with the input window: α sums the weights of matching positions and divides by n = 3, and the retrieval distance is multiplied by 1 − α (Equation 11). Compare the paper’s weights with equal weights, move the center weight, and set your own distances.",
-    "note": "Adapted: the input window and the three candidates from Figure 1, and w = (1.68, 0.68, 1.68) with n = 3 from Table 3. Illustrative: the l2 distances, which the paper does not print; the defaults keep Figure 1’s retrieval order. Figure 1 lists the scores 0.93, 0.89 and 0.84 beside the candidates without defining them, so they are not used as distances. Computed: α, adjusted distances and ranks. With Table 3 weights, α reaches 1.12 when both neighbors match, making 1 − α negative. The softmax (T = 50) and interpolation with the base model (λ = 0.4) in Equations 12–13 are not simulated. This is not a live spelling corrector.",
+    "description": "RERIC reranks retrieved 3-grams by their positional overlap with the input window: α sums the weights of the matching positions, and the retrieval distance is multiplied by 1 − α (Equation 11). By default α is divided by the sum of the weights, so that a full match gives α = 1; switch to the printed normalization (÷ n = 3) to see what the equation gives with the Table 3 weights. Move the weights and set your own distances.",
+    "note": "Adapted: the input window and the three candidates from Figure 1, and w = (1.68, 0.68, 1.68) with n = 3 from Table 3. Normalization: Equation 11 is printed with ÷ n; with the Table 3 weights this gives α = 1.12 when both neighbors match, so 1 − α is negative and a larger distance ranks higher. Dividing by Σw = 4.04 is our reading; it keeps α between 0 and 1 and reproduces Figure 1’s ranking with the default distances. Illustrative: the l2 distances, which the paper does not print; the defaults keep Figure 1’s retrieval order. Figure 1 lists the scores 0.93, 0.89 and 0.84 beside the candidates without defining them, so they are not used as distances. Computed: α, adjusted distances and ranks. The softmax (T = 50) and interpolation with the base model (λ = 0.4) in Equations 12–13 are not simulated. This is not a live spelling corrector.",
     "sources": [
       {
         "label": "Paper (LREC-COLING 2024)",
         "url": "https://aclanthology.org/2024.lrec-main.553.pdf"
       }
     ],
-    "eyebrow": "Equation 11 · Figure 1 candidates"
+    "eyebrow": "Equation 11 · Figure 1 candidates",
+    "placement": "method"
   }
 }

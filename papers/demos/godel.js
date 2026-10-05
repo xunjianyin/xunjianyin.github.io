@@ -1,3 +1,84 @@
+/* Gödel Agent runtime loop: replay serialized states of agent_module. Each step
+ * names the action executed (Algorithm 1), moves the binding pointer when a name
+ * is rebound, and pushes a frame for each recursive call. Reader-started; the
+ * pointer move is the only transition (400 ms) and is removed under reduced motion. */
+(() => {
+  'use strict';
+  const root = document.querySelector('[data-paper-demo="godel-runtime"]');
+  if (!root) return;
+  const { frames, objects } = JSON.parse(root.querySelector('[data-gd-data]').textContent);
+  const chips = [...root.querySelectorAll('[data-demo-action="gd-goto"]')];
+  const play = root.querySelector('[data-demo-action="gd-play"]');
+  const step = root.querySelector('[data-demo-action="gd-step"]');
+  const status = root.querySelector('[data-gd-status]');
+  const last = frames.length - 1;
+  const HOLD_MS = 2200;
+  let current = last;
+  let timer = null;
+
+  const element = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  const render = index => {
+    current = index;
+    const frame = frames[index];
+    Object.entries(objects).forEach(([name, list]) => {
+      const binding = root.querySelector(`[data-gd-binding="${name}"]`);
+      binding.dataset.mark = frame.marks[name] || '';
+      const slot = list.findIndex(([key]) => key === frame.bound[name]);
+      binding.querySelector('.gd-slots').style.setProperty('--gd-slot', String(slot));
+      list.forEach(([key]) => {
+        const item = binding.querySelector(`[data-gd-object="${key}"]`);
+        item.toggleAttribute('data-absent', !frame.created.includes(key)); // keeps its space, so the panel does not jump
+        item.className = key === frame.bound[name] ? 'is-bound' : 'is-unbound';
+      });
+    });
+    const stack = root.querySelector('[data-gd-stack]');
+    stack.replaceChildren(...[...frame.stack].reverse().map(([fn, note], i) => {
+      const item = element('li', i === 0 && index > 0 && frames[index - 1].stack.length < frame.stack.length ? 'is-new' : '');
+      item.append(element('code', '', fn.replace('_v', ' v')), element('span', '', note));
+      return item;
+    }));
+    root.querySelector('[data-gd-action]').textContent = frame.action;
+    root.querySelector('[data-gd-tool]').textContent = frame.tool ? `implementation: ${frame.tool}` : '';
+    root.querySelector('[data-gd-code]').replaceChildren(...frame.code.map(([cls, text]) => element('span', `gd-line${cls ? ` is-${cls}` : ''}`, text)));
+    root.querySelector('[data-gd-feedback]').textContent = frame.feedback;
+    status.textContent = frame.status;
+    chips.forEach(chip => chip.setAttribute('aria-pressed', String(Number(chip.dataset.frame) === index)));
+    // On phones the action row scrolls sideways; keep the pressed action in view.
+    const bar = chips[index].parentElement.getBoundingClientRect();
+    const box = chips[index].getBoundingClientRect();
+    if (box.left < bar.left) chips[index].parentElement.scrollLeft -= bar.left - box.left + 8;
+    else if (box.right > bar.right) chips[index].parentElement.scrollLeft += box.right - bar.right + 8;
+    step.disabled = index === last;
+  };
+  const stop = () => {
+    clearTimeout(timer);
+    timer = null;
+    play.textContent = 'Play';
+    play.setAttribute('aria-pressed', 'false');
+  };
+  const advance = () => {
+    render(current + 1);
+    if (current >= last) stop(); else timer = setTimeout(advance, HOLD_MS);
+  };
+  play.addEventListener('click', () => {
+    if (timer) { stop(); return; }
+    play.textContent = 'Pause';
+    play.setAttribute('aria-pressed', 'true');
+    if (current >= last) { render(0); timer = setTimeout(advance, HOLD_MS / 2); } else advance();
+  });
+  step.addEventListener('click', () => { stop(); if (current < last) render(current + 1); });
+  root.querySelector('[data-demo-action="gd-reset"]').addEventListener('click', () => { stop(); render(0); });
+  chips.forEach(chip => chip.addEventListener('click', () => { stop(); render(Number(chip.dataset.frame)); }));
+  root.classList.add('is-enhanced');
+  root.querySelector('[data-gd-controls]').hidden = false;
+  render(0);
+})();
+
 /* Execute a small, auditable arithmetic search. No model responses are simulated. */
 (() => {
   'use strict';

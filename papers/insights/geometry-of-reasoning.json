@@ -1,24 +1,31 @@
 {
+  "demo": {
+    "kind": "reasoning-flow",
+    "placement": "method",
+    "eyebrow": "Illustrative trajectories · paper’s formulas (Sections 3–4)",
+    "title": "Build two reasoning flows and compare their geometry",
+    "caption": "Pick a logic, topic and language for each flow. The trajectories are illustrative 2-D paths, but position, velocity and curvature similarity are computed with the paper’s own formulas. Press Play to draw each flow step by step."
+  },
   "story": {
     "title": "Similar meanings can obscure similar reasoning",
     "paragraphs": [
-      "A representation of an argument contains several signals at once: its topic, language, entities, and logical structure. Two English passages about weather may occupy nearby positions even when their deductions differ. Conversely, the same deduction expressed in different languages can look far apart. Comparing isolated embeddings therefore risks measuring the surface content when the question concerns reasoning.",
-      "A minimal illustration is “If it rains, the ground is wet; it rains; therefore the ground is wet.” Replace weather with “If a server is overloaded, latency rises; the server is overloaded; therefore latency rises.” The concepts change, but the inference pattern is preserved. The paper extends this controlled variation to longer natural-deduction structures across topics and languages."
+      "An argument’s representation mixes topic, language, entities and logical structure. Two English passages about weather can sit close together even when their deductions differ, while one deduction in two languages can sit far apart, so comparing isolated embeddings risks measuring surface content.",
+      "Take “If it rains, the ground is wet; it rains; therefore the ground is wet.” Replacing weather with servers (“If a server is overloaded, latency rises; …”) changes the concepts but keeps the inference. The paper applies this controlled variation to longer natural-deduction structures across topics and languages."
     ]
   },
   "mechanism": {
     "title": "Measure how a trajectory changes from step to step",
     "paragraphs": [
-      "For each reasoning step, the experiment averages its token representations from the model’s final transformer layer. The resulting sequence of vectors is a trajectory indexed by reasoning progress. This is not a visualization of one token moving through successive transformer layers; it compares successive textual steps represented at the same final layer.",
-      "Position asks where each step is embedded. Velocity uses the difference between neighboring step vectors. Curvature asks how sharply the trajectory turns, using a quantity derived from triples of points. Position and velocity similarities use cosine similarity, while curvature sequences are compared by Pearson correlation. Measuring changes can reduce the dominance of components shared across a passage, such as language or topic.",
-      "The theoretical framework relates these discrete increments to a continuous representation curve: a logical step corresponds to accumulated semantic change along part of that curve. This motivates looking for geometric patterns shared by the same logical structure under different semantic realizations. The experiment then compares grouping by logic, by topic, and by language, rather than relying on a visually appealing low-dimensional plot alone."
+      "Each reasoning step is represented by the average of its token representations at the final transformer layer, so a trajectory follows successive text steps at one layer, not one token through successive layers.",
+      "Position is where a step is embedded, velocity is the difference between neighboring steps, and curvature is the Menger curvature of three consecutive points, which measures how sharply the path turns. Position and velocity are compared by cosine similarity, curvature by Pearson correlation. Differences reduce the weight of components shared across a passage, such as its language or topic.",
+      "The theory treats the steps as samples from a continuous curve on which logical statements act as local controllers of velocity. It therefore predicts shared geometry for the same logic under different semantic carriers, which the experiment tests by grouping flows by logic, topic and language."
     ]
   },
   "evidence": {
-    "title": "A change in which factor explains similarity",
+    "title": "Positions group by language; velocity and curvature group by logic",
     "paragraphs": [
-      "For Qwen3-0.6B, Table 1 reports position similarity of 0.85 for shared language but only 0.26 for shared logic. With velocity, shared logic reaches 0.17 versus 0.08 for language; curvature correlation is 0.53 for logic versus 0.13 for language. The numerical scales belong to different measurements and should not be compared as accuracy gains. The meaningful comparison is which grouping dominates within each measurement.",
-      "The main experiments find this change across three Qwen3 sizes and LLaMA3-8B. That supports a geometric signature of logical organization beyond surface form. It does not establish that these quantities cause correct reasoning, that every generated reasoning trace is faithful, or that an intervention on curvature would improve answers. Those are possible follow-up uses of the framework rather than results demonstrated by the controlled comparison."
+      "Position similarity is highest for flows that share a language; velocity and curvature similarity are highest for flows that share logic. Randomly permuting the logical steps keeps the same sentences but collapses velocity and curvature similarity, while position similarity stays high: the logical signal lies in the order of the steps.",
+      "The pattern holds across six models (Qwen1.5-0.5B, Qwen2-0.5B, Qwen3 at 0.6B, 1.7B and 4B, and LLaMA3-8B) and changes little with model size or family."
     ]
   },
   "sources": [

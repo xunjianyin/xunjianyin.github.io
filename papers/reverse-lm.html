@@ -7,13 +7,13 @@
   <meta name="description" content="Train a language model to predict the past. Then use its backward probabilities to help forward models choose better answers.">
   <meta name="theme-color" content="#fbfcfa">
   <link rel="canonical" href="https://xunjianyin.github.io/papers/reverse-lm.html">
-  <meta property="og:title" content="LEDOM: An Open and Fundamental Reverse Language Model">
+  <meta property="og:title" content="LEDOM: Reverse Language Model">
   <meta property="og:description" content="Train a language model to predict the past. Then use its backward probabilities to help forward models choose better answers.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://xunjianyin.github.io/papers/reverse-lm.html">
   <meta property="og:image" content="https://xunjianyin.github.io/papers/assets/reverse-lm-overview.png">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="LEDOM: An Open and Fundamental Reverse Language Model">
+  <meta name="twitter:title" content="LEDOM: Reverse Language Model">
   <meta name="twitter:description" content="Train a language model to predict the past. Then use its backward probabilities to help forward models choose better answers.">
   <meta name="twitter:image" content="https://xunjianyin.github.io/papers/assets/reverse-lm-overview.png">
   <title>LEDOM — Xunjian Yin</title>
@@ -27,20 +27,18 @@
   <a href="#main-content" class="skip-link">Skip to content</a>
   <header class="site-header"><div class="header-inner">
     <a class="site-name" href="../index.html">Xunjian Yin <span>/ Research</span></a>
-    <nav aria-label="Paper sections"><a href="#overview">Overview</a><a href="#explore">Explore</a><a href="#method">Method</a><a href="#findings">Evidence</a><a href="#citation">Cite</a></nav>
+    <nav aria-label="Paper sections"><a href="#overview">Overview</a><a href="#method">Method</a><a href="#findings">Evidence</a><a href="#citation">Cite</a></nav>
   </div></header>
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>ACL 2026</span><span>Reverse language modeling</span></p>
-      <h1><span class="title-name">LEDOM:</span> An Open and Fundamental Reverse Language Model</h1>
-      <p class="paper-authors"><a href="../index.html">Xunjian Yin</a>, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan</p>
-      <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://arxiv.org/abs/2507.01335">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://huggingface.co/Corning/Reverse-Model-7B-348B">Model (7B) <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://huggingface.co/Corning/Reverse-Model-2B-348B">Model (2B) <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://github.com/Arvid-pku/ReverseModel">Code <span aria-hidden="true">↗</span></a></div>
+      <h1><span class="title-name">LEDOM:</span> Reverse Language Model</h1>
+      <p class="paper-authors"><span class="author"><a href="../index.html">Xunjian Yin</a><sup>1</sup></span>, <span class="author">Sitao Cheng<sup>3</sup></span>, <span class="author">Yuxi Xie<sup>5</sup></span>, <span class="author">Xinyu Hu<sup>1</sup></span>, <span class="author">Li Lin<sup>1</sup></span>, <span class="author">Xinyi Wang<sup>2</sup></span>, <span class="author">Liangming Pan<sup>1</sup></span>, <span class="author">William Yang Wang<sup>4</sup></span>, <span class="author">Xiaojun Wan<sup>1</sup></span></p><p class="author-legend"><span><sup>1</sup> Peking University</span> · <span><sup>2</sup> Princeton University</span> · <span><sup>3</sup> University of Waterloo</span> · <span><sup>4</sup> University of California, Santa Barbara</span> · <span><sup>5</sup> National University of Singapore</span></p>
+      <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://aclanthology.org/2026.acl-long.975/">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://arxiv.org/abs/2507.01335">arXiv <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://huggingface.co/Corning/Reverse-Model-7B-348B">Model (7B, preliminary) <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://github.com/Arvid-pku/LEDOM">Code <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">Train a language model to predict the past. Then use its backward probabilities to help forward models choose better answers.</p>
+      <dl class="paper-glance"><div><dt>Result</dt><dd>With QwenMath on AIME 2024, Reverse Reward reranking reaches 23.3% vs 16.7% for greedy decoding and 11.3% for random selection among the same samples.</dd></div><div><dt>New vs prior</dt><dd>TRLM reranks forward outputs with a small reverse model, and Golovneva et al. train forward then reverse; this work pretrains a purely reverse 2B/7B model and uses it as a posterior scorer.</dd></div><div><dt>Limitation</dt><dd>Reverse Reward is compared only with greedy decoding and random selection, not with learned outcome or process reward models.</dd></div></dl>
     </header>
-    <section id="overview" class="overview-section" aria-labelledby="overview-title">
-      <div class="section-heading"><span class="section-label">01 / The research question</span><h2 id="overview-title">An answer can be fluent and still fail to explain the question</h2></div>
-      <div class="narrative overview-narrative"><p>A forward language model scores how plausible a response is after a prompt. That is useful for generation, but a plausible continuation may quietly drop one of the problem&#x27;s constraints. LEDOM starts from the complementary question: if this response were given, how well could a model reconstruct the prompt that led to it? The intended signal is sensitivity to the premises, rather than fluency alone.</p><p>Changing the direction does not require inventing a different joint distribution over text. Left-to-right and right-to-left factorizations are both valid applications of the chain rule. With finite data and model capacity, however, they condition on different evidence and learn different approximations. LEDOM studies that asymmetry by reversing token sequences while holding the decoder architecture and tokenizer fixed in its controlled forward/reverse comparison.</p></div>
-      <div class="direction-demo" data-direction-demo>
+    <div class="lead-visual"><div class="direction-demo" data-direction-demo>
   <div class="demo-toolbar"><span class="demo-label">One sentence. Two directions.</span>
     <div class="direction-controls" role="group" aria-label="Generation direction" hidden>
       <button type="button" data-direction="forward" aria-pressed="false">Forward →</button>
@@ -54,24 +52,52 @@
     <p class="direction-description">Given the ending, predict what comes before it.</p></div>
   <div class="demo-key"><span><i class="key-known"></i>Given context</span><span><i class="key-predicted"></i>Text to predict</span></div>
   <p class="demo-caption">Illustrative word-level example. LEDOM reverses tokens during training; this is not a live model output.</p>
-</div>
+</div></div>
+    <section id="overview" class="overview-section" aria-labelledby="overview-title">
+      <div class="section-heading"><span class="section-label">01 / The research question</span><h2 id="overview-title">An answer can be fluent and still fail to explain the question</h2></div>
+      <div class="narrative overview-narrative"><p>A forward language model scores how plausible a response is after a prompt, but a plausible continuation can quietly drop one of the problem’s constraints. LEDOM asks the complementary question: given the response, how well can a model reconstruct the prompt? The intended signal is sensitivity to the premises, not fluency.</p><p>Both factorization directions are exact by the chain rule, but with finite data and capacity they learn different approximations. LEDOM isolates the asymmetry: reverse and forward models share the architecture, the tokenizer and a 435B-token corpus of general text, mathematics and code, at 2B and 7B parameters. The public 7B checkpoint (Reverse-Model-7B-348B) is a preliminary release at about 348B training tokens, according to the code repository.</p><div class="prior-work"><h3>Closest prior work</h3><p>Earlier reverse-generation work regularized forward models with forward-backward agreement (Serdyuk et al., 2017; Zhang et al., 2019), trained small reverse models to find worst-case inputs (Pfau et al., 2023), or trained forward then reverse to mitigate the reversal curse (Golovneva et al., 2024). Closest to its application, TRLM (Varun et al., 2025) uses a small reverse model for unsupervised feedback and best-of-N reranking. LEDOM pretrains a purely reverse model at 2B and 7B scale, matched to forward models, and extends reranking with a noisy-channel analysis and step-level verification.</p></div></div>
     </section>
-    <section id="explore" class="content-section explore-section" aria-label="Interactive explanation">
-      <span class="section-label">02 / Explore the idea</span><div class="paper-demo decode-demo ledom-examples" data-paper-demo="reverse-examples">
+
+    <section id="method" class="content-section method-section expanded-method" aria-labelledby="method-title">
+      <div class="section-heading"><span class="section-label">02 / Inside the method</span><h2 id="method-title">Reconstruct the prompt, then combine the two scores</h2></div>
+
+      <div class="narrative method-lead"><p>For a question x and a candidate response y, the forward model estimates P(y | x); the reverse model reads the reversed response, then the reversed prompt, and estimates P(x | y). The prompt tokens are what is scored, so the method does not ask a second model whether an answer looks correct.</p></div><div class="section-demo method-demo"><div class="paper-demo decode-demo ledom-examples" data-paper-demo="reverse-examples">
   <div class="demo-heading"><span class="demo-tag">Published examples · Table 2, Figures 5–6</span><h3>Give LEDOM an ending and it writes what came before</h3>
-    <p>Each example pairs a later text with the earlier text LEDOM generated for it, as printed in the paper. The model reads the given text reversed and writes its output last word first, so the words nearest the given text are chosen before the opening. Move the slider to see which parts of each output were committed first.</p></div>
+    <p>Each example pairs a given later text with the earlier text LEDOM generated for it, exactly as printed in the paper. Press Play to replay the output in LEDOM’s order: the word next to the given text comes first and the opening comes last.</p></div>
   <div class="demo-controls rv-controls" data-rv-controls hidden>
-    <div class="demo-options" role="group" aria-label="Published example"><button type="button" data-demo-action="rv-example" data-example="backstory" aria-pressed="true">Backstory</button><button type="button" data-demo-action="rv-example" data-example="story" aria-pressed="false">Story ending</button><button type="button" data-demo-action="rv-example" data-example="question" aria-pressed="false">Question from answer</button><button type="button" data-demo-action="rv-example" data-example="sentiment" aria-pressed="false">Few-shot labels</button><button type="button" data-demo-action="rv-example" data-example="reversal" aria-pressed="false">Reversal curse</button><button type="button" data-demo-action="rv-example" data-example="recall" aria-pressed="false">Quotation</button><button type="button" data-demo-action="rv-example" data-example="arithmetic" aria-pressed="false">Arithmetic</button><button type="button" data-demo-action="rv-example" data-example="gsm8k" aria-pressed="false">GSM8K (incorrect)</button></div>
+    <div class="demo-options" role="group" aria-label="Published example"><button type="button" data-demo-action="rv-example" data-example="question" aria-pressed="true">Question from answer</button><button type="button" data-demo-action="rv-example" data-example="reversal" aria-pressed="false">Reversal curse</button><button type="button" data-demo-action="rv-example" data-example="backstory" aria-pressed="false">Backstory</button><button type="button" data-demo-action="rv-example" data-example="story" aria-pressed="false">Story ending</button><button type="button" data-demo-action="rv-example" data-example="gsm8k" aria-pressed="false">GSM8K (incorrect)</button></div>
     <div class="rv-control-row">
+      <div class="demo-options decode-transport" role="group" aria-label="Generation replay"><button type="button" data-demo-action="rv-play" aria-pressed="false">Play</button><button type="button" data-demo-action="rv-step">Step</button><button type="button" data-demo-action="rv-reset">Reset</button></div>
       <div class="demo-options" role="group" aria-label="Display order"><button type="button" data-demo-action="rv-order" data-order="reading" aria-pressed="true">Reading order</button><button type="button" data-demo-action="rv-order" data-order="model" aria-pressed="false">LEDOM’s order</button></div>
-      <label class="rv-range" for="rv-progress"><span>Output generated</span>
-        <input id="rv-progress" data-demo-range type="range" min="0" max="104" step="1" value="104" aria-describedby="rv-progress-help">
-        <output for="rv-progress" data-rv-count>104 / 104</output></label>
-      <p class="rv-help" id="rv-progress-help">Arrow keys move one word at a time. Generation runs from the end of the output towards its start.</p>
+      <label class="rv-range" for="rv-progress"><span>Generated</span>
+        <input id="rv-progress" data-demo-range type="range" min="0" max="16" step="1" value="16" aria-label="Words generated, counted from the end of the output">
+        <output for="rv-progress" data-rv-count>16 / 16</output></label>
     </div>
   </div>
   <div data-demo-state>
-    <div class="rv-examples" data-rv-examples><article class="rv-example" data-rv-example="backstory" data-units="words" aria-labelledby="rv-title-backstory">
+    <div class="rv-examples" data-rv-examples><article class="rv-example" data-rv-example="question" data-units="words" aria-labelledby="rv-title-question">
+      <header class="rv-meta"><h4 id="rv-title-question">Question generation</h4>
+        <p>Published example · <a href="https://arxiv.org/html/2507.01335v3#S2.T2">Table 2</a> · as printed · 16 words</p></header>
+      <div class="rv-rows" data-rv-rows>
+        <div class="rv-row rv-row-output" data-rv-row="output"><p class="rv-row-label" data-rv-label>Earlier text · written by LEDOM, last word first</p>
+          <p class="rv-text" data-rv-reading><span data-u="w">Alyssa’s</span> <span data-u="w">cat</span> <span data-u="w">loves</span> <span data-u="w">eggs.</span> <span data-u="w">If</span> <span data-u="w">she</span> <span data-u="w">eats</span> <span data-u="w">3</span> <span data-u="w">eggs</span> <span data-u="w">a</span> <span data-u="w">day,</span> <span data-u="w">how</span> <span data-u="w">many</span> <span data-u="w">in</span> <span data-u="w">a</span> <span data-u="w">week?</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
+        <div class="rv-row rv-row-given" data-rv-row="given"><p class="rv-row-label" data-rv-label>Later text · given to LEDOM</p>
+          <p class="rv-text" data-rv-reading><span data-u="w">Answer:</span> <span data-u="w">She</span> <span data-u="w">eats</span> <span data-u="w">3</span> <span data-u="w">eggs</span> <span data-u="w">every</span> <span data-u="w">day.</span> <span data-u="w">7</span> <span data-u="w">days</span> <span data-u="w">in</span> <span data-u="w">a</span> <span data-u="w">week.</span> <span data-u="w">3*7</span> <span data-u="w">=</span> <span data-u="w">21.</span> <span data-u="w">21</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
+      </div>
+      <p class="rv-note">The question keeps the answer’s three eggs a day and seven-day week, and adds Alyssa and her cat, which the answer never mentions. Reverse Reward scores this direction, P(question | answer).</p>
+      <p class="decode-status rv-status" data-rv-status role="status" aria-live="polite">All 16 words generated. LEDOM wrote “week?” first and “Alyssa’s” last.</p>
+    </article><article class="rv-example" data-rv-example="reversal" data-units="words" aria-labelledby="rv-title-reversal">
+      <header class="rv-meta"><h4 id="rv-title-reversal">Reversal curse</h4>
+        <p>Published example · <a href="https://arxiv.org/html/2507.01335v3#S2.T2">Table 2</a> · as printed · 2 words</p></header>
+      <div class="rv-rows" data-rv-rows>
+        <div class="rv-row rv-row-output" data-rv-row="output"><p class="rv-row-label" data-rv-label>Earlier text · written by LEDOM, last word first</p>
+          <p class="rv-text" data-rv-reading><span data-u="w">J.K.</span> <span data-u="w">Rowling</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
+        <div class="rv-row rv-row-given" data-rv-row="given"><p class="rv-row-label" data-rv-label>Later text · given to LEDOM</p>
+          <p class="rv-text" data-rv-reading><span data-u="w">is</span> <span data-u="w">the</span> <span data-u="w">author</span> <span data-u="w">of</span> <span data-u="w">Harry</span> <span data-u="w">Potter.</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
+      </div>
+      <p class="rv-note">Text usually names the entity before describing it. Read backwards, the description comes first, so recovering the name is an ordinary prediction for LEDOM (§3).</p>
+      <p class="decode-status rv-status" data-rv-status role="status" aria-live="polite">All 2 words generated. LEDOM wrote “Rowling” first and “J.K.” last.</p>
+    </article><article class="rv-example" data-rv-example="backstory" data-units="words" aria-labelledby="rv-title-backstory">
       <header class="rv-meta"><h4 id="rv-title-backstory">Abductive reasoning</h4>
         <p>Published example · <a href="https://arxiv.org/html/2507.01335v3#A3.F6">Appendix C, Figure 6</a> · full output · 104 words</p></header>
       <div class="rv-rows" data-rv-rows>
@@ -93,61 +119,6 @@
       </div>
       <p class="rv-note">Look at the names: the output says “Princess Lara”, while the given ending says “Princess Elara”.</p>
       <p class="decode-status rv-status" data-rv-status role="status" aria-live="polite">All 107 words generated. LEDOM wrote “you.&#x27;” first and “&#x27;Goodnight,” last.</p>
-    </article><article class="rv-example" data-rv-example="question" data-units="words" aria-labelledby="rv-title-question">
-      <header class="rv-meta"><h4 id="rv-title-question">Question generation</h4>
-        <p>Published example · <a href="https://arxiv.org/html/2507.01335v3#S2.T2">Table 2</a> · as printed · 16 words</p></header>
-      <div class="rv-rows" data-rv-rows>
-        <div class="rv-row rv-row-output" data-rv-row="output"><p class="rv-row-label" data-rv-label>Earlier text · written by LEDOM, last word first</p>
-          <p class="rv-text" data-rv-reading><span data-u="w">Alyssa’s</span> <span data-u="w">cat</span> <span data-u="w">loves</span> <span data-u="w">eggs.</span> <span data-u="w">If</span> <span data-u="w">she</span> <span data-u="w">eats</span> <span data-u="w">3</span> <span data-u="w">eggs</span> <span data-u="w">a</span> <span data-u="w">day,</span> <span data-u="w">how</span> <span data-u="w">many</span> <span data-u="w">in</span> <span data-u="w">a</span> <span data-u="w">week?</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
-        <div class="rv-row rv-row-given" data-rv-row="given"><p class="rv-row-label" data-rv-label>Later text · given to LEDOM</p>
-          <p class="rv-text" data-rv-reading><span data-u="w">Answer:</span> <span data-u="w">She</span> <span data-u="w">eats</span> <span data-u="w">3</span> <span data-u="w">eggs</span> <span data-u="w">every</span> <span data-u="w">day.</span> <span data-u="w">7</span> <span data-u="w">days</span> <span data-u="w">in</span> <span data-u="w">a</span> <span data-u="w">week.</span> <span data-u="w">3*7</span> <span data-u="w">=</span> <span data-u="w">21.</span> <span data-u="w">21</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
-      </div>
-      <p class="rv-note">The answer fixes three eggs a day and a seven-day week; the question keeps both. Alyssa and the cat appear nowhere in the answer.</p>
-      <p class="decode-status rv-status" data-rv-status role="status" aria-live="polite">All 16 words generated. LEDOM wrote “week?” first and “Alyssa’s” last.</p>
-    </article><article class="rv-example" data-rv-example="sentiment" data-units="words" aria-labelledby="rv-title-sentiment">
-      <header class="rv-meta"><h4 id="rv-title-sentiment">Few-shot sentiment</h4>
-        <p>Published example · <a href="https://arxiv.org/html/2507.01335v3#S2.T2">Table 2</a> · as printed · 24 words</p></header>
-      <div class="rv-rows" data-rv-rows>
-        <div class="rv-row rv-row-output" data-rv-row="output"><p class="rv-row-label" data-rv-label>Earlier text · written by LEDOM, last word first</p>
-          <p class="rv-text" data-rv-reading><span data-u="w">1.</span> <span data-u="w">This</span> <span data-u="w">movie</span> <span data-u="w">is</span> <span data-u="w">very</span> <span data-u="w">good.</span> <span data-u="w">Positive;</span><br data-u="br"><span data-u="w">2.</span> <span data-u="w">I</span> <span data-u="w">haven’t</span> <span data-u="w">seen</span> <span data-u="w">this</span> <span data-u="w">movie,</span> <span data-u="w">but</span> <span data-u="w">I</span> <span data-u="w">like</span> <span data-u="w">it.</span> <span data-u="w">Neutral;</span><br data-u="br"><span data-u="w">3.</span> <span data-u="w">That</span> <span data-u="w">is</span> <span data-u="w">too</span> <span data-u="w">bad.</span> <span data-u="w">Negative.</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
-        <div class="rv-row rv-row-given" data-rv-row="given"><p class="rv-row-label" data-rv-label>Later text · given to LEDOM</p>
-          <p class="rv-text" data-rv-reading><span data-u="w">4.</span> <span data-u="w">Comment:</span> <span data-u="w">Wow,</span> <span data-u="w">that</span> <span data-u="w">is</span> <span data-u="w">great.</span> <span data-u="w">Positive;</span> <span data-u="w">5.</span> <span data-u="w">Comment:</span> <span data-u="w">I</span> <span data-u="w">do</span> <span data-u="w">not</span> <span data-u="w">like</span> <span data-u="w">this.</span> <span data-u="w">Negative;</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
-      </div>
-      <p class="rv-note">Given demonstrations 4 and 5, LEDOM writes demonstrations 1–3, including a “Neutral” label that the given text never uses.</p>
-      <p class="decode-status rv-status" data-rv-status role="status" aria-live="polite">All 24 words generated. LEDOM wrote “Negative.” first and “1.” last.</p>
-    </article><article class="rv-example" data-rv-example="reversal" data-units="words" aria-labelledby="rv-title-reversal">
-      <header class="rv-meta"><h4 id="rv-title-reversal">Reversal curse</h4>
-        <p>Published example · <a href="https://arxiv.org/html/2507.01335v3#S2.T2">Table 2</a> · as printed · 2 words</p></header>
-      <div class="rv-rows" data-rv-rows>
-        <div class="rv-row rv-row-output" data-rv-row="output"><p class="rv-row-label" data-rv-label>Earlier text · written by LEDOM, last word first</p>
-          <p class="rv-text" data-rv-reading><span data-u="w">J.K.</span> <span data-u="w">Rowling</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
-        <div class="rv-row rv-row-given" data-rv-row="given"><p class="rv-row-label" data-rv-label>Later text · given to LEDOM</p>
-          <p class="rv-text" data-rv-reading><span data-u="w">is</span> <span data-u="w">the</span> <span data-u="w">author</span> <span data-u="w">of</span> <span data-u="w">Harry</span> <span data-u="w">Potter.</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
-      </div>
-      <p class="rv-note">Text usually names the entity before describing it. Read backwards, the description comes first, so recovering the name is an ordinary prediction for LEDOM (§3).</p>
-      <p class="decode-status rv-status" data-rv-status role="status" aria-live="polite">All 2 words generated. LEDOM wrote “Rowling” first and “J.K.” last.</p>
-    </article><article class="rv-example" data-rv-example="recall" data-units="words" aria-labelledby="rv-title-recall">
-      <header class="rv-meta"><h4 id="rv-title-recall">Knowledge recall</h4>
-        <p>Published example · <a href="https://arxiv.org/html/2507.01335v3#S2.T2">Table 2</a> · as printed · 49 words</p></header>
-      <div class="rv-rows" data-rv-rows>
-        <div class="rv-row rv-row-output" data-rv-row="output"><p class="rv-row-label" data-rv-label>Earlier text · written by LEDOM, last word first</p>
-          <p class="rv-text" data-rv-reading><span data-u="w">After</span> <span data-u="w">witnessing</span> <span data-u="w">the</span> <span data-u="w">first</span> <span data-u="w">atomic</span> <span data-u="w">bomb</span> <span data-u="w">test</span> <span data-u="w">at</span> <span data-u="w">Alamogordo,</span> <span data-u="w">New</span> <span data-u="w">Mexico</span> <span data-u="w">in</span> <span data-u="w">1945,</span> <span data-u="w">physicist</span> <span data-u="w">J.</span> <span data-u="w">Robert</span> <span data-u="w">Oppenheimer</span> <span data-u="w">recalled</span> <span data-u="w">a</span> <span data-u="w">passage</span> <span data-u="w">from</span> <span data-u="w">the</span> <span data-u="w">Bhagavad</span> <span data-u="w">Gita:</span> <span data-u="w">&quot;If</span> <span data-u="w">the</span> <span data-u="w">radiance</span> <span data-u="w">of</span> <span data-u="w">a</span> <span data-u="w">thousand</span> <span data-u="w">suns</span> <span data-u="w">were</span> <span data-u="w">to</span> <span data-u="w">burst</span> <span data-u="w">at</span> <span data-u="w">once</span> <span data-u="w">into</span> <span data-u="w">the</span> <span data-u="w">sky,</span> <span data-u="w">that</span> <span data-u="w">would</span> <span data-u="w">be</span> <span data-u="w">like</span> <span data-u="w">the</span> <span data-u="w">splendor</span> <span data-u="w">of</span> <span data-u="w">the</span> <span data-u="w">mighty</span> <span data-u="w">one.&quot;</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
-        <div class="rv-row rv-row-given" data-rv-row="given"><p class="rv-row-label" data-rv-label>Later text · given to LEDOM</p>
-          <p class="rv-text" data-rv-reading><span data-u="w">Now</span> <span data-u="w">I</span> <span data-u="w">become</span> <span data-u="w">death,</span> <span data-u="w">the</span> <span data-u="w">destroyer</span> <span data-u="w">of</span> <span data-u="w">worlds.</span></p><p class="rv-text rv-model" data-rv-model hidden></p></div>
-      </div>
-      <p class="rv-note">A successful case, although factual recall is LEDOM’s weakest benchmark area: TriviaQA 19.82 vs. 40.22 for the matched forward model at 2B (Table 3).</p>
-      <p class="decode-status rv-status" data-rv-status role="status" aria-live="polite">All 49 words generated. LEDOM wrote “one.&#x27;” first and “After” last.</p>
-    </article><article class="rv-example" data-rv-example="arithmetic" data-units="symbols" aria-labelledby="rv-title-arithmetic">
-      <header class="rv-meta"><h4 id="rv-title-arithmetic">Math reasoning</h4>
-        <p>Published example · <a href="https://arxiv.org/html/2507.01335v3#S2.T2">Table 2</a> · as printed · 10 symbols</p></header>
-      <div class="rv-rows" data-rv-rows>
-        <div class="rv-row rv-row-output" data-rv-row="output"><p class="rv-row-label" data-rv-label>Earlier text · written by LEDOM, last symbol first</p>
-          <p class="rv-text rv-symbols" data-rv-reading><span data-u="w">(</span><span data-u="w">3</span><span data-u="w">)</span><span data-u="w">=</span><span data-u="w">2</span><span data-u="w">+</span><span data-u="w">½</span><span data-u="w">∗</span><span data-u="w">2</span><span data-u="w">²</span></p><p class="rv-text rv-symbols rv-model" data-rv-model hidden></p></div>
-        <div class="rv-row rv-row-given" data-rv-row="given"><p class="rv-row-label" data-rv-label>Later text · given to LEDOM</p>
-          <p class="rv-text rv-symbols" data-rv-reading><span data-u="w">+</span><span data-u="w">2</span><span data-u="w">=</span><span data-u="w">6</span><span data-u="w">.</span></p><p class="rv-text rv-symbols rv-model" data-rv-model hidden></p></div>
-      </div>
-      <p class="rv-note">Read together: (3) = 2 + ½ ∗ 2² + 2 = 6, and 2 + 2 + 2 = 6. The terms LEDOM wrote are consistent with the given result. Table 2 prints this fragment as shown.</p>
-      <p class="decode-status rv-status" data-rv-status role="status" aria-live="polite">All 10 symbols generated. LEDOM wrote “²” first and “(” last.</p>
     </article><article class="rv-example" data-rv-example="gsm8k" data-units="words" aria-labelledby="rv-title-gsm8k">
       <header class="rv-meta"><h4 id="rv-title-gsm8k">GSM8K evaluation</h4>
         <p>Published example · <a href="https://arxiv.org/html/2507.01335v3#A2.F5">Appendix B, Figure 5</a> · full prediction · 70 words</p></header>
@@ -161,10 +132,19 @@
       <p class="decode-status rv-status" data-rv-status role="status" aria-live="polite">All 70 words generated. LEDOM wrote “day.” first and “16” last.</p>
     </article></div>
   </div>
-  <p class="demo-provenance">Published examples: <a href="https://arxiv.org/html/2507.01335v3#S2.T2">Table 2</a>, <a href="https://arxiv.org/html/2507.01335v3#A2.F5">Appendix B, Figure 5</a> and <a href="https://arxiv.org/html/2507.01335v3#A3.F6">Appendix C, Figure 6</a>, reproduced in reading order as the paper prints them. Measured: GSM8K and TriviaQA scores from <a href="https://arxiv.org/html/2507.01335v3#S3.T3">Table 3</a>. Illustrative: the word-level generation order and reversed display. LEDOM reverses subword tokens, so the pieces within each word are also reversed. Table 2 also lists coding, data-augmentation and unsafe-prompt cases. The paper redacts the unsafe output, and this page does not show it.</p>
-</div><div class="paper-demo decode-demo rr-demo" data-paper-demo="reverse-reward-results">
+  <p class="demo-provenance">Published examples: <a href="https://arxiv.org/html/2507.01335v3#S2.T2">Table 2</a>, <a href="https://arxiv.org/html/2507.01335v3#A2.F5">Appendix B, Figure 5</a> and <a href="https://arxiv.org/html/2507.01335v3#A3.F6">Appendix C, Figure 6</a>, in the paper’s reading order; five of its cases. Measured: GSM8K accuracy from <a href="https://arxiv.org/html/2507.01335v3#S3.T3">Table 3</a>. Illustrative: the word-by-word replay. LEDOM generates subword tokens in reverse, so the pieces within each word are also produced last to first.</p>
+</div></div><div class="method-reading"><div class="narrative"><p>Reverse Reward combines the two as P(y | x)^(1−λ) × P(x | y)^λ, a weighted sum of log-likelihoods. The paper’s Proposition 1 states when this helps: an incorrect chain with comparable forward likelihood but poorer backward reconstruction is ranked lower.</p><p>The main experiments rerank 64 sampled complete responses; a step-level beam search scores partial paths. The forward generator is unchanged, the reverse scorer is fine-tuned on math data, and each candidate costs one extra reverse forward pass.</p></div><ol class="method-list"><li><span class="method-index">01</span><div><h3>Reverse the token order</h3><p>Train a standard causal Transformer on reversed sequences. The architecture stays the same; each prediction now depends on text that originally came after it.</p></div></li><li><span class="method-index">02</span><div><h3>Learn backward reconstruction</h3><p>Given an ending, reconstruct plausible earlier text. The paper illustrates this with abductive reasoning, question synthesis, and inverse relation completion.</p></div></li><li><span class="method-index">03</span><div><h3>Score in both directions</h3><p>Reverse Reward combines forward P(response | prompt) with reverse P(prompt | response) to rerank candidate answers, without updating the forward model’s weights.</p></div></li></ol></div>
+      <details class="paper-details figure-details"><summary>View the paper’s figure</summary><figure class="source-figure" style="--figure-max-width:619px"><a href="assets/reverse-lm-overview.png" target="_blank" rel="noopener" aria-label="Open figure at full size">
+    <img src="assets/reverse-lm-overview.png" alt="Forward and reverse language modeling use complementary factorizations of the same sequence. Original Figure 1 from the paper." width="619" height="290" loading="lazy" decoding="async"></a>
+    <figcaption>Forward and reverse language modeling use complementary factorizations of the same sequence. Original Figure 1 from the paper. <a href="assets/reverse-lm-overview.png" target="_blank" rel="noopener">Full size ↗</a></figcaption></figure></details>
+
+    </section>
+    <section id="findings" class="content-section" aria-labelledby="findings-title">
+      <div class="section-heading"><span class="section-label">03 / Reading the evidence</span><h2 id="findings-title">Reverse scores choose better answers than greedy or random selection</h2></div>
+      <ul class="findings-grid"><li><p class="finding-value">23.3 vs 16.7</p><h3>AIME 2024 accuracy (%) · QwenMath, Reverse Reward vs greedy</h3><p>Random selection from the same samples scores 11.3. Reverse Reward Best-of-N exceeds greedy decoding in 11 of 12 model–benchmark pairs and ties in one.</p></li><li><p class="finding-value">19.82 vs 40.22</p><h3>TriviaQA accuracy (%) · LEDOM-2B vs matched forward model</h3><p>As a standalone model, LEDOM trails its forward counterpart on forward-causal tasks such as factual retrieval and code (HumanEval 2.44 vs 8.54).</p></li></ul>
+      <div class="section-demo evidence-demo"><div class="paper-demo decode-demo rr-demo" data-paper-demo="reverse-reward-results">
   <svg class="decode-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs><rect id="rr-shape-greedy" x="-4.5" y="-4.5" width="9" height="9"/><circle id="rr-shape-random" r="5"/><circle id="rr-shape-rr" r="5.5"/><path id="rr-shape-beam" d="M0 -6.5 L6.5 0 L0 6.5 L-6.5 0 Z"/></defs></svg>
-  <div class="demo-heading"><span class="demo-tag">Measured results · Table 4</span><h3>Does Reverse Reward help beyond sampling more answers?</h3>
+  <div class="demo-heading"><span class="demo-tag">Measured · Table 4</span><h3>Does Reverse Reward help beyond sampling more answers?</h3>
     <p>Reverse Reward ranks candidate solutions by <span class="decode-formula">P(y | x)<sup>1−λ</sup> · P(x | y)<sup>λ</sup></span>, the forward model’s likelihood combined with LEDOM’s probability of reconstructing the question. The paper reports no per-candidate scores, so this chart uses its twelve measured model–benchmark accuracies. Each mark shows how far a strategy lands from the chosen baseline.</p></div>
   <div class="demo-controls" data-rr-controls hidden><span class="coral-control-label" id="rr-baseline-label">Baseline</span>
     <div class="demo-options" role="group" aria-labelledby="rr-baseline-label"><button type="button" data-demo-action="rr-baseline" data-baseline="greedy" aria-pressed="true">Greedy decoding</button><button type="button" data-demo-action="rr-baseline" data-baseline="random" aria-pressed="false">Random pick (Best-of-N)</button></div></div>
@@ -183,41 +163,45 @@
     <p class="decode-note">Derived: every greedy, Reverse Reward and beam-search value in the AIME 2024 and AMC 2023 columns is a whole number of problems out of 30 or 40, consistent with the standard sets. QwenMath’s +6.6 points on AIME 2024 would then be 5 → 7 solved problems. The paper does not state set sizes, and most random-pick values (e.g. 8.97) are not whole-problem fractions.</p>
   </div>
   <p class="demo-provenance">Measured: <a href="https://arxiv.org/html/2507.01335v3#S6.T4">Table 4</a>, accuracy (%) for DeepSeekMath-7B, QwenMath-7B and OpenMath2-8B, with LEDOM fine-tuned on 100K OpenMathInstruct-2 examples as the reverse scorer (Appendix D.2). Derived: differences in percentage points. Table 4 and §6.5 state N = 64 candidates, while Appendix D.2.3 lists N = 4 for reranking and beams of k = 4 with n = 3 expansions. The paper does not report λ. The case studies in <a href="https://arxiv.org/html/2507.01335v3#A4.T7">Tables 7–8</a> give responses and orderings but no score values, and Figure 3 plots accuracy against N without numeric labels, so neither is reproduced as numbers here.</p>
-</div></section>
-    <section id="method" class="content-section method-section expanded-method" aria-labelledby="method-title">
-      <div class="section-heading"><span class="section-label">03 / Inside the method</span><h2 id="method-title">Reconstruct the prompt, then combine the two scores</h2></div>
+</div></div>
+      <div class="narrative evidence-narrative"><p>In the paper’s download case, a 200 GB file at 2 GB/minute fails at 40% and needs a 20-minute restart and a fresh download: 40 + 20 + 100 = 160 minutes. The forward model’s top candidate downloads only the remainder and adds a second restart; Reverse Reward ranks it lower because that chain cannot reconstruct the problem.</p><p>Random selection from the same samples is usually below greedy decoding, so the gain comes from the reverse score, not from sampling diversity. Finer search is not always better: on AIME 2024, OpenMath2’s step-level beam search falls below greedy decoding, which the paper attributes to pruning partially correct beams early.</p></div>
 
-      <div class="method-reading"><div class="narrative"><p>Let x be a question and y a candidate response. The forward model estimates P(y | x); the reverse model processes the reversed response followed by the reversed prompt to estimate P(x | y). The response is the conditioning context, and the prompt tokens are what is scored. This distinction matters: the method is not simply asking a second model whether an answer looks correct.</p><p>Reverse Reward combines the two conditional probabilities as P(y | x)^(1−λ) × P(x | y)^λ. In log space this is a weighted sum of the forward and backward log-likelihoods. The paper&#x27;s argument is conditional: when incorrect chains have comparable forward likelihood but poorer backward reconstruction, the reverse term separates them. It does not prove that every wrong answer receives a low score, and a reverse model can also make mistakes.</p><p>The main experiments generate 64 candidates and rerank complete responses. The paper also explores selecting partial reasoning paths with step-level beam search. The forward generator&#x27;s weights stay unchanged, but the reverse scorer is fine-tuned on domain-specific mathematical reasoning data. Inference therefore adds sampling and reverse evaluation; it is not a cost-free accuracy improvement or evidence that no model training was required.</p></div><ol class="method-list"><li><span class="method-index">01</span><div><h3>Reverse the token order</h3><p>Train a standard causal Transformer on reversed sequences. The architecture stays the same; each prediction now depends on text that originally came after it.</p></div></li><li><span class="method-index">02</span><div><h3>Learn backward reconstruction</h3><p>Given an ending, reconstruct plausible earlier text. The paper illustrates this with abductive reasoning, question synthesis, and inverse relation completion.</p></div></li><li><span class="method-index">03</span><div><h3>Score in both directions</h3><p>Reverse Reward combines forward P(response | prompt) with reverse P(prompt | response) to rerank candidate answers, without updating the forward model’s weights.</p></div></li></ol></div>
-      <details class="paper-details figure-details"><summary>View the paper’s figure</summary><figure class="source-figure" style="--figure-max-width:619px"><a href="assets/reverse-lm-overview.png" target="_blank" rel="noopener" aria-label="Open figure at full size">
-    <img src="assets/reverse-lm-overview.png" alt="Forward and reverse language modeling use complementary factorizations of the same sequence. Original Figure 1 from the paper." width="619" height="290" loading="lazy" decoding="async"></a>
-    <figcaption>Forward and reverse language modeling use complementary factorizations of the same sequence. Original Figure 1 from the paper. <a href="assets/reverse-lm-overview.png" target="_blank" rel="noopener">Full size ↗</a></figcaption></figure></details>
 
-    </section>
-    <section id="findings" class="content-section" aria-labelledby="findings-title">
-      <div class="section-heading"><span class="section-label">04 / Reading the evidence</span><h2 id="findings-title">Complementary verification, with a cost and a failure mode</h2></div>
-      <ul class="findings-grid"><li><p class="finding-value">2B / 7B</p><h3>Open reverse models</h3><p>Two model scales study right-to-left pretraining with the same architecture and tokenizer as their forward counterparts.</p></li><li><p class="finding-value">435B</p><h3>Pretraining tokens</h3><p>A corpus of general text, mathematics, and code supports training a reverse model at foundation-model scale.</p></li><li><p class="finding-value">+6.6 pp</p><h3>AIME 2024 · QwenMath</h3><p>Reverse Reward raises accuracy from 16.7% with greedy decoding to 23.3% with candidate reranking in the reported setup.</p></li></ul>
-      <div class="narrative evidence-narrative"><p>The download example in the appendix makes the mechanism concrete. A 200 GB file downloads at 2 GB/minute, reaches 40%, then suffers a 20-minute restart and must begin again. The correct decomposition is 40 + 20 + 100 = 160 minutes. The forward-selected response shown in the paper instead finishes only the remaining bytes and inserts a second restart. Comparing these responses reveals which parts of the original question the reasoning has lost.</p><p>Random selection from sampled candidates is an important control: it separates the value of reranking from the existence of diverse samples. On QwenMath AIME 2024, greedy decoding scores 16.7%, random selection 11.3%, and Reverse Reward 23.3%. Finer-grained search is not always better: OpenMath2 beam search reaches only 6.7% on AIME versus 16.7% for complete-response reranking. Prematurely pruning a useful partial chain can undo the benefit of verification. Comparisons with supervised reward models remain an open evaluation gap.</p></div>
-
-      <div class="results-block"><p class="table-caption" id="results-caption">Selected results from Table 4. Accuracy (%); Reverse Reward uses best-of-N sampling. These are not matched-compute comparisons with greedy decoding.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Selected experimental results"><table class="results-table" aria-describedby="results-caption"><thead><tr><th scope="col">Base model / benchmark</th><th scope="col" class="num">Greedy</th><th scope="col" class="num">Reverse Reward</th><th scope="col" class="num is-emphasis">Change</th></tr></thead><tbody><tr><th scope="row">QwenMath · AIME 2024</th><td class="num">16.7</td><td class="num">23.3</td><td class="num is-emphasis">+6.6 pp</td></tr><tr><th scope="row">DeepSeekMath · AMC 2023</th><td class="num">12.5</td><td class="num">27.5</td><td class="num is-emphasis">+15.0 pp</td></tr><tr><th scope="row">QwenMath · MATH-500</th><td class="num">78.0</td><td class="num">80.8</td><td class="num is-emphasis">+2.8 pp</td></tr></tbody></table></div></div>
-      <p class="scope-note"><strong>Scope.</strong> These are inference-time reranking results with additional sampling and scoring. LEDOM alone trails forward models on many standard benchmarks; backward generation examples are qualitative. <a href="https://arxiv.org/html/2507.01335v3">Read the study ↗</a></p>
+      <p class="scope-note"><strong>Scope.</strong> The backward-generation examples are qualitative, and the reasoning gains are limited to mathematics, with a reverse scorer fine-tuned on mathematical data. <a href="https://arxiv.org/html/2507.01335v3">Read the study ↗</a></p>
     </section>
     <div class="reading-sources"><span>Further reading in the paper</span><a href="https://arxiv.org/html/2507.01335v3#S2">Reverse factorization · §2 ↗</a><a href="https://arxiv.org/html/2507.01335v3#S5">Reverse Reward · §5 ↗</a><a href="https://arxiv.org/html/2507.01335v3#S6">Math results, controls and costs · §6 ↗</a></div>
     <section class="paper-reference" aria-label="Summary and citation">
-      <details class="paper-details"><summary>Research summary</summary><div class="abstract-content"><p>LEDOM studies right-to-left autoregressive pretraining at 2B and 7B parameters on 435 billion tokens. It reconstructs earlier text from later context, with qualitative examples of abductive reasoning, question synthesis, and inverse relation completion. Reverse Reward combines forward response likelihood with reverse prompt likelihood to rerank candidate responses. In the reported experiments, this improves mathematical reasoning over greedy baselines, while standalone reverse models remain weaker on many forward-oriented benchmarks. Models, code, and data are released for further research.</p><a href="https://arxiv.org/abs/2507.01335">Full paper ↗</a></div></details>
+      <details class="paper-details"><summary>Research summary</summary><div class="abstract-content"><p>LEDOM studies right-to-left autoregressive pretraining at 2B and 7B parameters on 435 billion tokens. It reconstructs earlier text from later context, with qualitative examples of abductive reasoning, question synthesis, and inverse relation completion. Reverse Reward combines forward response likelihood with reverse prompt likelihood to rerank candidate responses. In the reported experiments, this improves mathematical reasoning over greedy baselines, while standalone reverse models remain weaker on many forward-oriented benchmarks. Models, code, and data are released for further research.</p><a href="https://aclanthology.org/2026.acl-long.975/">Full paper ↗</a></div></details>
       <details class="paper-details citation-details" id="citation"><summary>Citation <span>BibTeX</span></summary>
         <div class="citation-content"><div class="citation-toolbar"><span class="copy-status" role="status" aria-live="polite"></span><button type="button" class="copy-citation-btn" hidden>Copy BibTeX</button></div>
-        <pre class="paper-citation"><code>@misc{yin2025ledomopenfundamentalreverse,
-    title={LEDOM: An Open and Fundamental Reverse Language Model},
-    author={Xunjian Yin and Sitao Cheng and Yuxi Xie and Xinyu Hu and Li Lin and Xinyi Wang and Liangming Pan and William Yang Wang and Xiaojun Wan},
-    year={2025},
-    eprint={2507.01335},
-    archivePrefix={arXiv},
-    primaryClass={cs.CL},
-    url={https://arxiv.org/abs/2507.01335}
+        <pre class="paper-citation"><code>@inproceedings{yin-etal-2026-ledom,
+    title = &quot;{LEDOM}: Reverse Language Model&quot;,
+    author = &quot;Yin, Xunjian  and
+      Cheng, Sitao  and
+      Xie, Yuxi  and
+      Hu, Xinyu  and
+      Lin, Li  and
+      Wang, Xinyi  and
+      Pan, Liangming  and
+      Wang, William Yang  and
+      Wan, Xiaojun&quot;,
+    editor = &quot;Liakata, Maria  and
+      Moreira, Viviane P.  and
+      Zhang, Jiajun  and
+      Jurgens, David&quot;,
+    booktitle = &quot;Proceedings of the 64th Annual Meeting of the {A}ssociation for {C}omputational {L}inguistics (Volume 1: Long Papers)&quot;,
+    month = jul,
+    year = &quot;2026&quot;,
+    address = &quot;San Diego, California, United States&quot;,
+    publisher = &quot;Association for Computational Linguistics&quot;,
+    url = &quot;https://aclanthology.org/2026.acl-long.975/&quot;,
+    doi = &quot;10.18653/v1/2026.acl-long.975&quot;,
+    pages = &quot;21306--21326&quot;,
+    ISBN = &quot;979-8-89176-390-6&quot;
 }</code></pre></div>
       </details>
     </section>
-    <nav class="related-research" aria-labelledby="related-title"><h2 id="related-title">Related research</h2><p class="related-thread">Language modeling and decoding</p><ul><li><a href="coral.html"><span class="related-name">COrAL</span><span class="related-title">Order-Agnostic Language Modeling for Efficient Iterative Refinement</span></a><span class="related-venue">arXiv preprint 2024</span></li><li><a href="damon.html"><span class="related-name">DAMON</span><span class="related-title">A Dialogue-Aware MCTS Framework for Jailbreaking Large Language Models</span></a><span class="related-venue">EMNLP 2025</span></li></ul></nav>
+    <nav class="related-research" aria-labelledby="related-title"><h2 id="related-title">Related research</h2><p class="related-thread">Language modeling and decoding</p><ul><li><a href="coral.html"><span class="related-name">COrAL</span><span class="related-title">Order-Agnostic Language Modeling for Efficient Iterative Refinement</span></a><span class="related-venue">arXiv preprint 2024</span></li></ul></nav>
   </main>
   <footer class="paper-footer"><a href="../publications.html">← All publications</a><a href="../index.html">Xunjian Yin</a></footer>
 </body>

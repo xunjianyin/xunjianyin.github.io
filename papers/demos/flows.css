@@ -1,0 +1,107 @@
+/* Geometry of Reasoning flow demo: flat, square-cornered, page palette.
+ * Motion only during a reader-started Play: discrete steps, no tweening; nothing moves on load. */
+.flows-demo {
+  --fl-flow1: var(--accent);
+  --fl-flow2: #9a5a3c;
+  --fl-rule: #e8ece7;
+  margin-top: 18px;
+  padding: 27px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.flows-demo [hidden] { display: none !important; }
+.flows-demo *, .flows-demo *::before { border-radius: 0; }
+.flows-demo .fl-heading { margin-bottom: 20px; }
+.flows-demo .fl-heading h3 { margin: 6px 0 10px; }
+.flows-demo .fl-heading p { margin: 0; max-width: 760px; }
+.flows-demo .fl-small-label { display: block; margin: 0 0 6px; color: var(--muted); font-size: 10.5px; font-weight: 600; letter-spacing: .08em; line-height: 1.5; text-transform: uppercase; }
+.flows-demo .fl-eyebrow { color: var(--accent); font-size: 10px; letter-spacing: .1em; }
+.flows-demo h4 { margin: 0 0 8px; font: 400 18px/1.4 Georgia, serif; }
+.flows-demo code { font: 11.5px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); }
+
+/* Controls */
+.flows-demo .fl-controls { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-start; margin: 0 0 20px; }
+.flows-demo .fl-flow-controls { display: flex; flex-wrap: wrap; gap: 8px 12px; margin: 0; padding: 12px 14px 14px; border: 1px solid var(--line); min-width: 0; }
+.flows-demo .fl-flow-controls legend { padding: 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.flows-demo .fl-flow-controls.is-flow1 legend { color: var(--fl-flow1); }
+.flows-demo .fl-flow-controls.is-flow2 legend { color: var(--fl-flow2); }
+.flows-demo .fl-select { display: grid; gap: 4px; font-size: 11px; color: var(--muted); }
+.flows-demo .fl-select span { letter-spacing: .02em; }
+.flows-demo select {
+  min-height: 34px; padding: 5px 8px; border: 1px solid #bbc8bf; background: #fff; color: var(--ink);
+  font: inherit; font-size: 13px; cursor: pointer;
+}
+.flows-demo select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.flows-demo .fl-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; line-height: 1.4; align-self: center; }
+.flows-demo .fl-toggle input { width: 16px; height: 16px; accent-color: var(--accent); }
+
+/* Workspace */
+.flows-demo .fl-workspace { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 30px; align-items: start; }
+.flows-demo .fl-figure { margin: 0; }
+.flows-demo .fl-graph { display: block; width: 100%; max-width: 320px; height: auto; margin: 0 auto; border: 1px solid var(--fl-rule); background: #fcfdfb; }
+.flows-demo .fl-flow.is-flow1 { color: var(--fl-flow1); }
+.flows-demo .fl-flow.is-flow2 { color: var(--fl-flow2); }
+.flows-demo .fl-seg { stroke: currentColor; stroke-width: 1.4; fill: none; }
+.flows-demo .fl-arrow path { fill: currentColor; }
+.flows-demo .fl-dot { fill: #fff; stroke: currentColor; stroke-width: 1.3; }
+.flows-demo .fl-dot.is-start { fill: currentColor; }
+.flows-demo .fl-flow-label { fill: currentColor; font: 600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.flows-demo .fl-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+.flows-demo .fl-key { display: inline-flex; align-items: center; gap: 6px; }
+.flows-demo .fl-key i { display: inline-block; width: 18px; height: 0; border-top: 2px solid currentColor; }
+.flows-demo .fl-key.is-flow1 { color: var(--fl-flow1); }
+.flows-demo .fl-key.is-flow2 { color: var(--fl-flow2); }
+.flows-demo .fl-key.is-vel { color: var(--muted); }
+.flows-demo .fl-key.is-vel i { border-top: 2px solid var(--muted); }
+
+/* Play controls */
+.flows-demo .rd-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin: 14px 0 0; }
+.flows-demo button {
+  min-height: 34px; margin: 0; padding: 6px 13px; border: 1px solid #bbc8bf; background: #fff; color: var(--ink);
+  font: inherit; font-size: 13px; line-height: 1.3; cursor: pointer;
+}
+.flows-demo button:hover { background: var(--wash); }
+.flows-demo button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: #fff; }
+.flows-demo button:disabled { cursor: default; color: #a3aba6; background: #f6f7f5; border-color: var(--line); }
+.flows-demo button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.flows-demo .fl-step-status { color: var(--muted); font-size: 12px; }
+
+/* Metrics */
+.flows-demo .fl-readout { min-width: 0; }
+.flows-demo .fl-metrics { display: grid; gap: 16px; }
+.flows-demo .fl-metric-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.flows-demo .fl-metric-name { font-size: 13px; font-weight: 600; }
+.flows-demo .fl-metric-value { font: 400 20px/1 Georgia, serif; font-variant-numeric: tabular-nums; }
+.flows-demo .fl-metric[data-metric="position"] .fl-metric-value { color: var(--fl-flow2); }
+.flows-demo .fl-metric[data-metric="velocity"] .fl-metric-value,
+.flows-demo .fl-metric[data-metric="curvature"] .fl-metric-value { color: var(--accent); }
+.flows-demo .fl-metric-track { position: relative; height: 10px; margin: 7px 0 5px; background: var(--wash); border: 1px solid var(--fl-rule); }
+.flows-demo .fl-zero { position: absolute; top: -2px; bottom: -2px; left: 50%; width: 1px; background: #c3ccc5; }
+.flows-demo .fl-metric-fill { position: absolute; top: 0; bottom: 0; left: 0; background: #b7c4bc; }
+.flows-demo .fl-metric[data-metric="velocity"] .fl-metric-fill,
+.flows-demo .fl-metric[data-metric="curvature"] .fl-metric-fill { background: var(--accent); }
+.flows-demo .fl-metric[data-metric="position"] .fl-metric-fill { background: var(--fl-flow2); }
+.flows-demo .fl-metric-note { margin: 0; color: var(--muted); font-size: 11.5px; line-height: 1.5; }
+.flows-demo .fl-caption { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.6; }
+
+.flows-demo .fl-measured { margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--line); color: var(--ink); font-size: 13px; line-height: 1.6; max-width: 820px; }
+.flows-demo .fl-measured .fl-small-label { display: inline; margin-right: 6px; }
+.flows-demo .fl-footnote { margin: 14px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; max-width: 820px; }
+
+@media (max-width: 760px) {
+  .flows-demo { padding: 20px 16px; }
+  .flows-demo .fl-workspace { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .flows-demo .fl-controls { gap: 12px; }
+  .flows-demo .fl-flow-controls { flex: 1 1 100%; }
+}
+@media (max-width: 420px) {
+  .flows-demo .fl-flow-controls { flex-direction: column; }
+  .flows-demo .fl-select { width: 100%; }
+  .flows-demo select { width: 100%; }
+}
+
+/* Play reveals one step at a time as a discrete sequence; no tweening, so the
+ * reduced-motion path is identical. Nothing animates on page load. */

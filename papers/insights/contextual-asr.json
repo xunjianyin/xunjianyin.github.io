@@ -2,22 +2,22 @@
   "story": {
     "title": "Correcting a transcript requires remembering what was said elsewhere",
     "paragraphs": [
-      "Consider the Chinese pronouns 他 and 她: both are pronounced tā, but the written choice depends on who is being discussed. The paper illustrates this with a report about volleyball player Zhu Ting. A sentence-level corrector outputs the masculine pronoun even though the surrounding report supplies the relevant identity. The missing evidence is not a new spelling rule; it is information already present in another sentence of the transcript.",
-      "Putting a longer transcript directly into a correction model is an obvious response, but creates two problems. Attention becomes more expensive as the input grows, and unrelated sentences compete with useful clues. The paper instead asks whether a corrector can keep its local input small while retrieving useful internal representations from a larger context. This is a text post-correction task: the proposed module operates on ASR output, rather than changing the acoustic recognizer."
+      "Automatic speech recognition (ASR) error correction (AEC) rewrites a recognizer's text output, and some errors cannot be fixed from one sentence. The pronouns 他 (he) and 她 (she) are both pronounced tā; in the paper's Table 1, a report names the volleyball player Zhu Ting, yet a sentence-level corrector writes 他 in the next sentence.",
+      "A longer input is the obvious fix, but attention cost grows with length and unrelated sentences add noise. The corrector instead keeps a one-sentence input and retrieves internal representations from a larger context; the recognizer itself is unchanged."
     ]
   },
   "mechanism": {
     "title": "A memory of decoder states extends local attention",
     "paragraphs": [
-      "The model begins with BART trained for sentence-level ASR error correction. One decoder layer is augmented with a nearest-neighbor attention branch. The same queries used for local self-attention search a datastore of keys and values produced by other processed tokens. Attention over those retrieved entries creates a second representation, which is combined with the local branch using a gate. Retrieval is inside the correction architecture, not a step that retrieves documents and pastes their text into a prompt.",
-      "Two independent choices determine what the datastore contains. Document context restricts retrieval to the current transcript; dataset context also allows other documents within the same split. Online mode adds states as sentences are corrected, so only preceding processed context is available. Offline mode initializes from an online pass and can access later context as well. Training, validation, and test use separate datastores; dataset-context results should not be mistaken for retrieving gold corrections from the training set during evaluation."
+      "The corrector starts from BART fine-tuned for sentence-level AEC. In one decoder layer, the self-attention queries also search a datastore of attention keys and values from other processed tokens, and a gate mixes the retrieved output with local attention (Figure 1). A gate of about 0.4–0.5 works best; larger values let retrieved context override the current sentence.",
+      "Two choices set what the datastore holds. Document context limits retrieval to the current transcript; dataset context adds the other documents of the same split, so at test time it holds only test transcripts. Online mode adds each corrected sentence's states as it goes, so only earlier sentences are searchable; offline mode starts from the finished online store and can also use later sentences."
     ]
   },
   "evidence": {
-    "title": "The comparisons separate useful context from a longer input",
+    "title": "Retrieved context helps where a longer input hurts",
     "paragraphs": [
-      "The baselines show why this distinction matters. On AISHELL-1, sentence-level BART achieves 3.528% CER, while a sliding document window is worse at 3.638%. The offline dataset-context model reaches 3.336%. On LibriSpeech Clean, its WER is 1.822%, compared with BART’s 1.967%. These are incremental improvements over an already effective correction baseline, rather than the much larger reduction measured against completely uncorrected ASR output.",
-      "The four datastore settings provide a more informative test than a single best result. Later context generally helps, and the broader dataset store offers additional gains, although some differences are small or tied. This supports selective contextual reuse under the tested conditions. It does not mean a real-time system receives the offline advantage: future sentences are unavailable until spoken, and the wider datastore’s usefulness depends on whether other transcripts contain relevant information. Retrieval also brings storage and inference overhead."
+      "More context is not automatically better: a sliding window of neighboring sentences raises error rates above sentence-level BART on all four datasets, and a dual context encoder helps only slightly on three (Table 2). All four retrieval variants beat BART on every dataset, though by far less than BART's own reduction of the raw WeNet (Mandarin) and fairseq (English) output.",
+      "Offline beats online and dataset context beats document context, with one tie on LibriSpeech Other. Shuffling the documents or replacing retrieved entries with random vectors raises error rates, so the gain comes from the retrieved context itself (Table 5). The cost is inference time: with 16 neighbors, decoding takes 1.19× BART's time with a document store and 1.50× with a dataset store (Table 7)."
     ]
   },
   "sources": [
@@ -30,5 +30,19 @@
       "url": "https://github.com/jiangjin1999/context_ASR"
     }
   ],
-  "reading_notes": "Re-read architecture, separate-split datastore construction, online/offline definitions, and Table2. Example adapted from Table1, not a new model output. Important distinction: datastore stores contextual attention keys/values, not retrieved gold labels."
+  "reading_notes": "Re-read architecture, separate-split datastore construction, online/offline definitions, and Table2. Example adapted from Table1, not a new model output. Important distinction: datastore stores contextual attention keys/values, not retrieved gold labels.",
+  "demo": {
+    "kind": "asr-datastore",
+    "placement": "method",
+    "eyebrow": "Section 3.4 rules · Table 1 and Table 4 examples",
+    "title": "Which sentences can the corrector search?",
+    "description": "The kNN attention layer searches a datastore of attention keys and values from other sentences. Two choices decide what it holds (Section 3.4): online or offline timing, and document or dataset scope. Step through the documents and watch which sentences are searchable while sentence A3 is corrected, and whether the sentence that disambiguates it, from the paper’s Table 1 or Table 4, is among them.",
+    "note": "Published: the sentences, BART outputs and labels of Table 1 (他 or 她, document context) and Table 4 (管撤 or 贯彻, a sentence from another document). Schematic and illustrative: three test documents of five sentences, processed in parallel one position per step as in Figure 2(a), and the positions of the cue and the target, which the paper does not print; the cue position is reader-set. Computed: which sentences are searchable, from the Section 3.4 rules: online mode stores only sentences already corrected, offline mode starts from the finished online store, document context searches the current document and dataset context every test document. Figure 2 marks the current sentence separately, so it is not counted as context. Measured: AISHELL-1 character error rates (Table 2). The demo shows availability only; it does not run retrieval or the gate that mixes retrieved and local attention (0.4–0.5 works best, Section 5.5).",
+    "sources": [
+      {
+        "label": "Section 3.4 and Figure 2",
+        "url": "https://aclanthology.org/2024.lrec-main.341.pdf"
+      }
+    ]
+  }
 }

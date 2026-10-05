@@ -3,6 +3,7 @@ from __future__ import annotations
 from html.parser import HTMLParser
 import json
 from pathlib import Path
+import re
 import subprocess
 import unittest
 from urllib.parse import unquote, urlsplit
@@ -78,6 +79,22 @@ class PaperPagesTest(unittest.TestCase):
                 for resource in meta["links"]:
                     self.assertIn(resource["url"], page.links)
                 self.assertIn(item["source_url"], page.links)
+                if item.get("authors_detail"):
+                    self.assertIn("Xunjian Yin", [author["name"] for author in item["authors_detail"]])
+
+    def test_sections_are_numbered_in_order_and_match_the_nav(self) -> None:
+        for slug in self.metadata:
+            with self.subTest(slug=slug):
+                html = (ROOT / "papers" / f"{slug}.html").read_text()
+                numbers = re.findall(r'<span class="section-label">(\d\d) / ', html)
+                self.assertEqual(numbers, [f"{n:02d}" for n in range(1, len(numbers) + 1)])
+                nav = re.search(r'<nav aria-label="Paper sections">(.*?)</nav>', html).group(1)
+                has_explore = 'id="explore"' in html
+                self.assertEqual('href="#explore"' in nav, has_explore)
+                self.assertEqual(len(numbers), 4 if has_explore else 3)
+                # The first screen carries the visual: it sits between the header and section 01.
+                if 'class="lead-visual"' in html:
+                    self.assertLess(html.index('</header>\n    <div class="lead-visual">'), html.index('<section id="overview"'))
 
     def test_explanations_and_primary_sources_are_static(self) -> None:
         for slug in self.metadata:

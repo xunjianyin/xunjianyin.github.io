@@ -1,7 +1,9 @@
 /* Decoding demos for LEDOM and COrAL. All data is read from the server-rendered
- * markup (published text and measured tables); nothing here calls a model.
- * Summaries mirror scripts/paper_demo_decoding.py so the no-script page and the
- * enhanced page state the same thing for the same selection.
+ * markup (published text, the transcribed Figure 2 rows and measured tables);
+ * nothing here calls a model. Summaries mirror scripts/paper_demo_decoding.py so
+ * the no-script page and the enhanced page state the same thing for the same selection.
+ * Animations are reader-started, at most 600 ms per transition, and become
+ * immediate steps under prefers-reduced-motion.
  */
 (() => {
   'use strict';
@@ -21,6 +23,126 @@
     return (rounded > 0 ? '+' : MINUS) + decimal(rounded);
   };
   const setPressed = (buttons, isPressed) => buttons.forEach(button => button.setAttribute('aria-pressed', String(isPressed(button))));
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // On phones a row of step buttons scrolls sideways; keep the pressed one in view.
+  const reveal = button => {
+    const bar = button.parentElement.getBoundingClientRect();
+    const box = button.getBoundingClientRect();
+    if (box.left < bar.left) button.parentElement.scrollLeft -= bar.left - box.left + 8;
+    else if (box.right > bar.right) button.parentElement.scrollLeft += box.right - bar.right + 8;
+  };
+
+  /* COrAL: replay Figure 2. Each frame is serialized by the generator: the earlier
+   * and later printed rows, the block outline, the printed arrows and a status
+   * computed from the rows. A step first fixes the accepted tokens and slides the
+   * block (the later row's positions still show the earlier draft), then draws the
+   * arrows and fills the block with the printed tokens. */
+  const replay = document.querySelector('[data-paper-demo="coral-replay"]');
+  if (replay) {
+    const { frames } = JSON.parse(replay.querySelector('[data-cr-data]').textContent);
+    const cells = name => [...replay.querySelectorAll(`[data-cr-row="${name}"] .cr-cell`)];
+    const rows = { before: cells('before'), after: cells('after') };
+    const afterRow = replay.querySelector('[data-cr-row="after"]');
+    const labels = { before: replay.querySelector('[data-cr-label="before"]'), after: replay.querySelector('[data-cr-label="after"]') };
+    const groups = [...replay.querySelectorAll('[data-cr-arrows]')];
+    const block = replay.querySelector('[data-cr-block]');
+    const gap = replay.querySelector('[data-cr-gap]');
+    const status = replay.querySelector('[data-cr-status]');
+    const scroller = replay.querySelector('.cr-scroll');
+    const chips = [...replay.querySelectorAll('[data-demo-action="cr-goto"]')];
+    const logRows = [...replay.querySelectorAll('[data-cr-log]')];
+    const play = replay.querySelector('[data-demo-action="cr-play"]');
+    const step = replay.querySelector('[data-demo-action="cr-step"]');
+    const SLIDE_MS = 560; // block slide and token colour change; CSS transitions stay below this
+    const HOLD_MS = 2000; // reading time per printed step while playing
+    const last = frames.length - 1;
+    let current = last;
+    let timer = null;
+    let phase = null;
+
+    const paint = (targets, spec) => spec.forEach(([text, cls], i) => {
+      targets[i].textContent = text;
+      targets[i].className = `cr-cell ${cls}`;
+    });
+    const showArrows = key => groups.forEach(group => {
+      const shown = group.dataset.crArrows === key;
+      group.classList.toggle('is-shown', shown);
+      if (shown) group.removeAttribute('visibility'); else group.setAttribute('visibility', 'hidden');
+    });
+    // On narrow screens the rows scroll sideways; keep the block in view (an instant jump, not a tween).
+    const keepInView = ([left, width]) => {
+      if (scroller.scrollWidth <= scroller.clientWidth + 1 || !width) return;
+      const row = afterRow.getBoundingClientRect();
+      const origin = row.left - scroller.getBoundingClientRect().left + scroller.scrollLeft;
+      const start = origin + row.width * left / 100;
+      const end = start + row.width * width / 100;
+      if (start < scroller.scrollLeft + 8 || end > scroller.scrollLeft + scroller.clientWidth - 8) {
+        scroller.scrollLeft = Math.max(0, start - 72);
+      }
+    };
+    const render = (index, animate) => {
+      clearTimeout(phase);
+      phase = null;
+      current = index;
+      const frame = frames[index];
+      labels.before.textContent = frame.beforeLabel;
+      labels.after.textContent = frame.afterLabel;
+      paint(rows.before, frame.before);
+      gap.hidden = !frame.gap;
+      const [left, width] = frame.block;
+      block.style.left = `${left}%`;
+      block.style.width = `${width}%`;
+      block.hidden = width === 0;
+      keepInView(frame.block);
+      setPressed(chips, chip => Number(chip.dataset.frame) === index);
+      reveal(chips[index]);
+      logRows.forEach(row => row.classList.toggle('is-current', row.dataset.crLog === frame.key));
+      step.disabled = index === last;
+      const fill = () => {
+        phase = null;
+        paint(rows.after, frame.after);
+        showArrows(frame.arrows);
+        replay.dataset.phase = 'filled';
+        status.textContent = frame.status;
+      };
+      if (animate && frame.slide && !reducedMotion.matches) {
+        paint(rows.after, frame.slide);
+        showArrows('');
+        replay.dataset.phase = 'slide';
+        phase = setTimeout(fill, SLIDE_MS);
+      } else {
+        fill();
+      }
+    };
+    const stop = () => {
+      clearTimeout(timer);
+      timer = null;
+      play.textContent = 'Play';
+      play.setAttribute('aria-pressed', 'false');
+    };
+    const advance = () => {
+      if (current >= last) { stop(); return; }
+      render(current + 1, true);
+      if (current >= last) { timer = setTimeout(stop, SLIDE_MS); return; }
+      timer = setTimeout(advance, HOLD_MS + (frames[current].slide && !reducedMotion.matches ? SLIDE_MS : 0));
+    };
+    play.addEventListener('click', () => {
+      if (timer) { stop(); return; }
+      play.textContent = 'Pause';
+      play.setAttribute('aria-pressed', 'true');
+      if (current >= last) { render(0, false); timer = setTimeout(advance, HOLD_MS / 2); } else advance();
+    });
+    step.addEventListener('click', () => {
+      stop();
+      if (phase) render(current, false); // finish the step in progress
+      else if (current < last) render(current + 1, true);
+    });
+    replay.querySelector('[data-demo-action="cr-reset"]').addEventListener('click', () => { stop(); render(0, false); });
+    chips.forEach(chip => chip.addEventListener('click', () => { stop(); render(Number(chip.dataset.frame), false); }));
+    replay.classList.add('is-enhanced');
+    replay.querySelector('[data-cr-controls]').hidden = false;
+    render(0, false);
+  }
 
   /* COrAL: highlight one setting across all five measured panels. */
   const coral = document.querySelector('[data-paper-demo="coral-evidence"]');
@@ -137,8 +259,11 @@
     const orderButtons = [...examples.querySelectorAll('[data-demo-action="rv-order"]')];
     const slider = examples.querySelector('#rv-progress');
     const counter = examples.querySelector('[data-rv-count]');
+    const play = examples.querySelector('[data-demo-action="rv-play"]');
+    const stepButton = examples.querySelector('[data-demo-action="rv-step"]');
     const bare = text => text.replaceAll('"', "'");
     let order = 'reading';
+    let timer = null;
 
     // Build a reversed copy of a unit sequence. Each output word keeps its reading
     // index; a line break takes the index of the word before it in reading order.
@@ -192,7 +317,8 @@
       const opening = remaining.slice(0, 4).join(joiner) + (remaining.length > 4 ? `${joiner}…` : '');
       return `${count} of ${total} ${noun} generated, from “${bare(s.texts[total - 1])}” back to “${bare(s.texts[total - count])}”. Still unwritten: “${bare(opening)}”.`;
     };
-    const render = () => {
+    // While playing, the status is updated silently; it is announced when playback stops.
+    const render = (quiet = false) => {
       const s = state.get(current);
       const total = s.words.length;
       const count = Number(slider.value);
@@ -216,20 +342,52 @@
           : isGiven ? 'Read first · given text, reversed' : `Then generated · LEDOM’s output, reversed${count < total ? ' (so far)' : ''}`;
       });
       counter.textContent = `${count} / ${total}`;
+      s.status.setAttribute('aria-live', quiet ? 'off' : 'polite');
       s.status.textContent = status(s, count);
+      stepButton.disabled = count >= total;
       articles.forEach(article => { article.hidden = article.dataset.rvExample !== current; });
       setPressed(exampleButtons, b => b.dataset.example === current);
       setPressed(orderButtons, b => b.dataset.order === order);
     };
+    const stop = () => {
+      clearInterval(timer);
+      timer = null;
+      play.textContent = 'Play';
+      play.setAttribute('aria-pressed', 'false');
+    };
+    // One generated word per tick, last word first; about six seconds for short outputs.
+    const tick = () => {
+      const total = Number(slider.max);
+      slider.value = String(Math.min(total, Number(slider.value) + 1));
+      const done = Number(slider.value) >= total;
+      if (done) stop();
+      render(!done);
+    };
+    play.addEventListener('click', () => {
+      if (timer) { stop(); render(); return; }
+      const total = Number(slider.max);
+      if (Number(slider.value) >= total) slider.value = '0';
+      play.textContent = 'Pause';
+      play.setAttribute('aria-pressed', 'true');
+      render(true);
+      timer = setInterval(tick, Math.max(120, Math.min(600, 6000 / total)));
+    });
+    stepButton.addEventListener('click', () => {
+      stop();
+      slider.value = String(Math.min(Number(slider.max), Number(slider.value) + 1));
+      render();
+    });
+    examples.querySelector('[data-demo-action="rv-reset"]').addEventListener('click', () => { stop(); slider.value = '0'; render(); });
     exampleButtons.forEach(button => button.addEventListener('click', () => {
+      stop();
       current = button.dataset.example;
       const total = state.get(current).words.length;
       slider.max = String(total);
       slider.value = String(total); // Each example opens complete, as printed.
       render();
     }));
-    orderButtons.forEach(button => button.addEventListener('click', () => { order = button.dataset.order; render(); }));
-    slider.addEventListener('input', render);
+    orderButtons.forEach(button => button.addEventListener('click', () => { order = button.dataset.order; render(Boolean(timer)); }));
+    slider.addEventListener('input', () => { stop(); render(); });
     examples.classList.add('is-enhanced');
     examples.querySelector('[data-rv-controls]').hidden = false;
     render();

@@ -2,22 +2,22 @@
   "story": {
     "title": "Naming the scene requires evidence beyond the pixels",
     "paragraphs": [
-      "An ordinary image caption can say that a person is speaking at a podium. A news caption often needs to identify the person, the event, and the circumstances. Some of those facts are not visually recoverable, while the associated article may mention many people who are not pictured. The task therefore requires selecting the right relationship between visual content and textual entity information, rather than merely producing a more detailed visual description.",
-      "EAMA identifies a second tension: more article text is not automatically more useful. A long article contains names and facts that may help, but also material unrelated to the image. Truncating the article risks removing the needed identity; passing the whole article can bury it. The proposed solution teaches the captioning model to extract a compact set of useful sentences and entities before composing the final caption."
+      "A generic caption can say that a person is speaking at a podium; a news caption must say who and at which event, and over 96% of captions in common news datasets contain entities (Tran et al., 2020). Many such facts are not visible, and the article also names people who are not pictured.",
+      "Multimodal large language models (MLLMs) rarely produce entities zero-shot and stay weak on them after official fine-tuning. InstructBLIP (7B), whose connector compresses the image into 32 tokens and leaves the most room for article text, performs best of those tested and becomes the backbone. Even so, truncating the article can drop the needed name, while the full article can bury it."
     ]
   },
   "mechanism": {
     "title": "The auxiliary tasks teach two different kinds of relevance",
     "paragraphs": [
-      "Entity-aware sentence selection is trained using entities shared with the reference caption. Sentences containing relevant visual entities become positive examples, while sentences from the same article that lack those entities become hard negatives. The distinction between visual and nonvisual information matters: dates are excluded from the visual-entity criterion used for this task. This makes sentence selection more specific to news captioning than generic image–text similarity, which can recognize a scene without resolving the identity needed by its caption.",
-      "Entity selection complements that task by supervising which named entities from the article should be supplied to caption generation. Unlike sentence selection, it includes nonvisual entities that can be inferred from the article context. These two tasks are trained jointly with captioning. At inference, the aligned model first selects information from the article and then supplements its usual textual context with that information. The same model performs extraction and generation. “No extra module” describes this inference pipeline; it does not mean entity information appears without supervision during dataset construction."
+      "Entity-Aware Sentence Selection turns caption data into an image–text matching task: article sentences that share a visual entity with the reference caption are positives, and same-article sentences without one are hard negatives, close in topic but differing in entities. Non-visual entities such as dates do not count. Unlike CLIP-style matchers trained on open-domain captions, this adds no separate training stage.",
+      "Entity Selection asks the model to list the article's entities that also appear in the caption, including non-visual ones. Labels for both tasks come from SpaCy entity matches against training captions, and both are trained jointly with captioning. At inference the same model extracts sentences and entities, adds them to its usual context within a 600-word limit, and writes the caption."
     ]
   },
   "evidence": {
-    "title": "The ablation distinguishes learning to select from simply reading more",
+    "title": "Selecting entity context beats reading more of the article",
     "paragraphs": [
-      "On NYTimes800k, full caption-only fine-tuning yields 82.70 CIDEr. Training with both alignment tasks raises it to 84.45; the complete method, including self-supplemented generation, reaches 87.00. Giving the caption-only model the full article instead yields 83.17, while simply extending its usual input yields 81.75. The evidence supports selecting useful entity context, rather than treating input length as the main intervention.",
-      "Oracle entity and sentence information reaches 94.27 CIDEr in the same analysis, leaving a substantial gap above the model’s own selection. Moreover, EAMA’s named-entity precision is lower than a compared method on both main datasets, even though recall and overall caption metrics improve. This is an important qualification: the model becomes better at producing informative news captions, but it has not solved factual identification. A caption can mention more correct entities while still introducing an incorrect one."
+      "On NYTimes800k (Table 2), fully fine-tuning InstructBLIP beats the official connector-only recipe, 82.70 versus 75.95 CIDEr, the caption metric that weights rare words such as names most. Each alignment task helps alone, both together reach 84.45, and self-supplemented generation adds the largest step among EAMA's components. Reading the full article lifts the caption-only model only to 83.17, at nearly twice the cost.",
+      "Oracle sentences and entities from the reference caption reach 94.27 CIDEr, so selection has room to improve. EAMA recalls the most reference entities, including 28.21% of NYTimes800k entities unseen in training, but a larger share of its generated names miss the reference than for Xu et al. (2024a)."
     ]
   },
   "sources": [
@@ -30,5 +30,19 @@
       "url": "https://doi.org/10.1145/3801548"
     }
   ],
-  "reading_notes": "Re-read visual-entity sentence-label construction, joint alignment, inference selection, Tables1–2, AppendixC Table4. Preserve distinction between training entity annotation and no extra inference module. All numeric values from v5."
+  "reading_notes": "Re-read visual-entity sentence-label construction, joint alignment, inference selection, Tables1–2, AppendixC Table4. Preserve distinction between training entity annotation and no extra inference module. All numeric values from v5.",
+  "demo": {
+    "kind": "eama-ladder",
+    "placement": "evidence",
+    "eyebrow": "Measured · Tables 2 and 4, NYTimes800k",
+    "title": "What each step adds, and how far the oracle is",
+    "description": "On NYTimes800k, the ablation adds one component at a time to InstructBLIP: full fine-tuning, then each alignment task, then the self-supplemented input. Table 4 adds the alternatives the paper tested: reading more of the article, and oracle sentences and entities taken from the reference caption. Switch the metric to see which steps help the caption scores and which help the named entities.",
+    "note": "Measured: all values from Tables 2 and 4 of arXiv 2402.19404v5 (NYTimes800k test set; BLEU-4, METEOR, ROUGE, CIDEr, and precision and recall of generated named entities). Computed: the change from the row named beside each value, and the share of the Base-to-oracle gap. Oracle rows use sentences and entities from the reference caption, which is unavailable at inference, so they are an upper bound rather than a method. The full-article model is trained and tested on the whole article, which the paper reports nearly doubles time and memory (Section 5.4). Single runs; no variance is reported.",
+    "sources": [
+      {
+        "label": "Tables 2 and 4 (arXiv v5)",
+        "url": "https://arxiv.org/html/2402.19404v5"
+      }
+    ]
+  }
 }

@@ -1,24 +1,23 @@
 {
   "story": {
-    "title": "A failed question is not a clean test of ignorance",
+    "title": "A failed question does not prove ignorance",
     "paragraphs": [
-      "A factual question can fail because the model lacks the information or because that wording does not elicit it. Conversely, a prompt can produce the desired string without expressing the original question. Measuring a knowledge boundary therefore requires more than increasing answer accuracy. The probe must find accessible knowledge while preserving what was asked and resisting prompts that manufacture apparently correct responses.",
-      "Consider the illustrative pair “Which country contains Canberra?” and “Canberra is located in which country?” If only one works, a single template underestimates accessible knowledge. But replacing the question with an instruction to output the target country would not demonstrate knowledge at all. The research problem lies between those cases: search beyond a fixed template without allowing the search to redefine success."
+      "A factual question can fail because the model lacks the fact or because that wording does not elicit it. Conversely, a prompt can produce the target string without asking the original question. The paper defines a model's knowledge boundary as the facts it answers correctly under at least one expression; estimating it needs a probe that searches wordings while preserving what was asked.",
+      "If “Canberra is located in which country?” fails but “Which country contains Canberra?” succeeds, a single template underestimates the model. An instruction to print the target country, however, would show no knowledge at all. The search must go beyond a fixed template without redefining success."
     ]
   },
   "mechanism": {
-    "title": "Optimize the question under constraints",
+    "title": "Gradient search stays close to the original question",
     "paragraphs": [
-      "PGDC searches in the continuous space of token embeddings, where gradients can suggest changes that make an accepted answer more likely. Its target objective allows the answer to appear after some generated text rather than requiring it at the first output position. When several answer aliases are acceptable, the objective can use the easiest valid alias. This avoids treating one surface form as the only evidence of knowing a fact.",
-      "Two additional constraints address the risk of gaming the probe. A semantic loss keeps the candidate close to the original prompt's representation, while another term encourages embeddings to remain near real vocabulary items. During optimization, embeddings sufficiently close to a token are projected back to discrete text. The resulting procedure aims to balance useful search directions with readable, semantically faithful questions.",
-      "The known answer is part of this optimization, and the method requires white-box access. It is therefore an evaluation procedure for eliciting a fact whose truth is already available to the researcher. It is not a general question-answering technique that discovers unknown correct answers. This distinction is necessary when interpreting the resulting score as a capacity estimate."
+      "PGDC (projected gradient descent with semantic constraints) searches the continuous space of token embeddings, where gradients point toward changes that make an accepted answer more likely. The target loss lets the answer appear after some generated text, not only at the first output position, and uses whichever valid answer alias is most probable.",
+      "Two further terms keep the probe from being gamed. A semantic loss penalizes the L2 distance between the candidate's last-layer representation and the original question's, and a regularizer keeps embeddings near real vocabulary items. After each step, embeddings close enough to a token are projected back to it, so the result stays a readable question."
     ]
   },
   "evidence": {
-    "title": "Success needs a negative control",
+    "title": "PGDC finds more true facts without forcing false ones",
     "paragraphs": [
-      "On PaRaRel with LLaMA2, PGDC reaches 71.36 compared with 34.43 for zero-shot prompting and 66.95 for the paper's paraphrased few-shot baseline. However, the more diagnostic comparison asks whether a probe can also elicit false targets. In the CFACT counterfactual test, AutoPrompt reaches 88.35 for LLaMA2 while PGDC reaches 3.41. Here the smaller number is desirable: the method should not readily force a false fact into the output.",
-      "Semantic preservation is still imperfect. Human assessment of 200 PaRaRel samples reports 83.3% preservation for LLaMA2, so a representation-level constraint cannot certify every rewrite. The reported boundary is an empirical estimate under the available search and validation procedures, not a proof that every knowable fact has been found. The paper's knowledge-focused MMLU evaluation also changes questions into cloze form, so those scores should not be read as standard MMLU scores."
+      "Baselines follow common evaluation practice: zero-shot (zero) and few-shot (few) prompting, and a discriminator format (dis) that asks whether a statement is true; the P- prefix counts a fact as known if any listed paraphrase succeeds. PGDC is highest on both true-fact datasets, PaRaRel and KAssess, for every backbone except Vicuna on PaRaRel. On the fabricated facts of CFACT (CounterFact) and ALCUNA, a sound probe should rarely elicit the false target; the discriminator baselines fail this test, which the paper links to models' preference for answering “true”.",
+      "Semantic preservation is imperfect: three annotators judging 200 PaRaRel samples find that 83.3% of LLaMA2's optimized prompts keep the original meaning, from 80.5% for GPT-2 to 86.2% for Vicuna. A representation-level constraint therefore cannot certify every rewrite."
     ]
   },
   "sources": [
@@ -27,5 +26,285 @@
       "url": "https://aclanthology.org/2024.acl-long.124/"
     }
   ],
-  "reading_notes": "Read formal desiderata, gradient objective/proximal projection, experiments, counterfactual robustness, human study, examples, MMLU conversion, limitations. Source labels verified: Table 1 prompt success, Table 3 CFACT robustness; human preservation reported in Section 4.5. LLaMA2 semantic preservation83.3%. Example Canberra paraphrases are newly authored illustration. Do not portray representation constraints as guaranteed equivalence or answer-aware optimization as an inference-time QA method."
+  "reading_notes": "Read formal desiderata, gradient objective/proximal projection, experiments, counterfactual robustness, human study, examples, MMLU conversion, limitations. Source labels verified: Table 1 prompt success, Table 3 CFACT robustness; human preservation reported in Section 4.5. LLaMA2 semantic preservation83.3%. Example Canberra paraphrases are newly authored illustration. Do not portray representation constraints as guaranteed equivalence or answer-aware optimization as an inference-time QA method.",
+  "demo": {
+    "type": "boundary-explorer",
+    "placement": "evidence",
+    "eyebrow": "Measured · Table 1, all four backbones · Table 3 · inputs from Tables 2 and 4",
+    "title": "Which probes find true facts without forcing false ones?",
+    "description": "Pick a true-fact set and a negative control. Each panel shows one backbone: how often a probe elicits the target answer of a true fact (higher is better) and of a counterfactual or fabricated one (lower is better). Select a probe to see the exact input the paper sends and to compare it across backbones.",
+    "datasets": {
+      "pararel": {
+        "label": "PaRaRel",
+        "kind": "true",
+        "note": "328 paraphrases of 38 relations"
+      },
+      "kassess": {
+        "label": "KAssess",
+        "kind": "true",
+        "note": "5.82 paraphrased templates per relation on average"
+      },
+      "cfact": {
+        "label": "CFACT",
+        "kind": "false",
+        "note": "counterfactual targets from COUNTERFACT"
+      },
+      "alcuna": {
+        "label": "ALCUNA",
+        "kind": "false",
+        "note": "facts about artificial entities; one expression per query"
+      }
+    },
+    "models": {
+      "GPT-2": "GPT-2 (774M)",
+      "GPT-J": "GPT-J (6B)",
+      "LLaMA2": "LLaMA2 (7B)",
+      "Vicuna": "Vicuna (7B)"
+    },
+    "methods": {
+      "zero": "Zero-shot cloze query",
+      "few": "Four retrieved examples, then the query",
+      "dis": "True/False judgment of a statement",
+      "P-zero": "zero, counted as known if any listed paraphrase succeeds",
+      "P-few": "few, counted as known if any listed paraphrase succeeds",
+      "P-dis": "dis, counted as known if any listed paraphrase succeeds",
+      "PGDC": "Projected gradient descent with semantic constraints"
+    },
+    "results": {
+      "pararel": {
+        "GPT-2": {
+          "zero": 9.27,
+          "few": 12.61,
+          "dis": 3.13,
+          "P-zero": 18.18,
+          "P-few": 20.46,
+          "P-dis": 9.01,
+          "PGDC": 47.68
+        },
+        "GPT-J": {
+          "zero": 23.23,
+          "few": 44.84,
+          "dis": 2.4,
+          "P-zero": 40.78,
+          "P-few": 54.06,
+          "P-dis": 7.25,
+          "PGDC": 55.95
+        },
+        "LLaMA2": {
+          "zero": 34.43,
+          "few": 58.23,
+          "dis": 17.96,
+          "P-zero": 54.78,
+          "P-few": 66.95,
+          "P-dis": 44.16,
+          "PGDC": 71.36
+        },
+        "Vicuna": {
+          "zero": 34.19,
+          "few": 59.56,
+          "dis": 8.4,
+          "P-zero": 54.97,
+          "P-few": 69.69,
+          "P-dis": 23.06,
+          "PGDC": 69.63
+        }
+      },
+      "kassess": {
+        "GPT-2": {
+          "zero": 4.03,
+          "few": 3.64,
+          "dis": 2.46,
+          "P-zero": 13.66,
+          "P-few": 11.44,
+          "P-dis": 15.75,
+          "PGDC": 24.71
+        },
+        "GPT-J": {
+          "zero": 15.95,
+          "few": 20.47,
+          "dis": 12.67,
+          "P-zero": 40.23,
+          "P-few": 38.2,
+          "P-dis": 2.26,
+          "PGDC": 48.62
+        },
+        "LLaMA2": {
+          "zero": 23.69,
+          "few": 32.03,
+          "dis": 6.73,
+          "P-zero": 50.0,
+          "P-few": 50.75,
+          "P-dis": 24.73,
+          "PGDC": 69.84
+        },
+        "Vicuna": {
+          "zero": 23.21,
+          "few": 33.37,
+          "dis": 9.9,
+          "P-zero": 51.15,
+          "P-few": 53.66,
+          "P-dis": 38.2,
+          "PGDC": 57.63
+        }
+      },
+      "cfact": {
+        "GPT-2": {
+          "zero": 1.1,
+          "few": 1.77,
+          "dis": 3.28,
+          "P-zero": 3.0,
+          "P-few": 3.92,
+          "P-dis": 9.32,
+          "PGDC": 2.81
+        },
+        "GPT-J": {
+          "zero": 1.39,
+          "few": 3.18,
+          "dis": 2.3,
+          "P-zero": 3.75,
+          "P-few": 6.12,
+          "P-dis": 6.74,
+          "PGDC": 4.82
+        },
+        "LLaMA2": {
+          "zero": 1.32,
+          "few": 4.56,
+          "dis": 13.88,
+          "P-zero": 3.3,
+          "P-few": 9.31,
+          "P-dis": 36.46,
+          "PGDC": 3.41
+        },
+        "Vicuna": {
+          "zero": 1.4,
+          "few": 3.08,
+          "dis": 4.95,
+          "P-zero": 3.36,
+          "P-few": 6.91,
+          "P-dis": 14.28,
+          "PGDC": 3.5
+        }
+      },
+      "alcuna": {
+        "GPT-2": {
+          "zero": 0.0,
+          "few": 0.3,
+          "dis": 2.1,
+          "P-zero": 0.0,
+          "P-few": 0.3,
+          "P-dis": 2.1,
+          "PGDC": 0.0
+        },
+        "GPT-J": {
+          "zero": 0.0,
+          "few": 0.08,
+          "dis": 0.72,
+          "P-zero": 0.0,
+          "P-few": 0.08,
+          "P-dis": 0.72,
+          "PGDC": 0.0
+        },
+        "LLaMA2": {
+          "zero": 0.0,
+          "few": 0.63,
+          "dis": 30.48,
+          "P-zero": 0.0,
+          "P-few": 0.63,
+          "P-dis": 30.48,
+          "PGDC": 0.0
+        },
+        "Vicuna": {
+          "zero": 0.0,
+          "few": 0.8,
+          "dis": 0.9,
+          "P-zero": 0.0,
+          "P-few": 0.8,
+          "P-dis": 0.9,
+          "PGDC": 0.0
+        }
+      }
+    },
+    "autoprompt_cfact": {
+      "GPT-2": 92.38,
+      "GPT-J": 85.67,
+      "LLaMA2": 88.35,
+      "Vicuna": 33.09
+    },
+    "pgdc_cfact_table3": {
+      "GPT-2": 2.81,
+      "GPT-J": 4.82,
+      "LLaMA2": 3.41,
+      "Vicuna": 3.5
+    },
+    "semantic_preservation": {
+      "GPT-2": 80.5,
+      "GPT-J": 85.1,
+      "LLaMA2": 83.3,
+      "Vicuna": 86.2
+    },
+    "inputs": {
+      "kassess": {
+        "zero": "10,000 metres record is held by [Kenenisa Bekele]",
+        "few": [
+          "Pole vault record is held by Fabiana Murer.",
+          "800 metres record is held by David Rudisha",
+          "10,000 metres record is held by [Kenenisa Bekele]"
+        ],
+        "dis": "Check whether the following statement is correct: 10,000 metres record is held by Kenenisa Bekele. The statement is (True/False): [True]"
+      },
+      "pararel": {
+        "zero": "The mother tongue of Go Hyeon-jeong is [Korean]",
+        "few": [
+          "The mother tongue of Michel Denisot is French.",
+          "The mother tongue of Thomas Joannes Stieltjes is Dutch.",
+          "The mother tongue of Go Hyeon-jeong is [Korean]"
+        ],
+        "dis": "Check whether the following statement is correct: The mother tongue of Go Hyeon-jeong is Korean. The statement is (True/False): [True]"
+      },
+      "cfact": {
+        "zero": "IBM Connections is created by [Adobe]",
+        "few": [
+          "Windows Embedded CE 6.0 is created by IBM.",
+          "Sandy Bridge was a product of Apple.",
+          "IBM Connections is created by [Adobe]"
+        ],
+        "dis": "Check whether the following statement is correct: IBM Connections is created by Adobe. The statement is (True/False): [True]"
+      },
+      "alcuna": {
+        "zero": "What’s the body length of Leuciaiaivea? [8.1 cm]",
+        "few": [
+          "What’s the body length of Octopus perralis? 100.0 cm.",
+          "What’s the body length of Sepia bidabilis? 17.0 cm.",
+          "What’s the body length of Leuciaiaivea? [8.1 cm]"
+        ],
+        "dis": "Check whether the following statement is correct: What’s the body length of Leuciaiaivea? 8.1 cm. The statement is (True/False): [True]"
+      }
+    },
+    "pgdc_cases": [
+      {
+        "original": "The associated item of source code is",
+        "answer": "program",
+        "pgdc": "The early item of source code is a simple",
+        "category": "Optimal Paraphrase"
+      },
+      {
+        "original": "Isatis tinctoria is a source of",
+        "answer": "indigo",
+        "pgdc": "Isatis tinctoria, a source of the natural dye",
+        "category": "Reasoning and Inference"
+      },
+      {
+        "original": "The host country of Australian Capital Territory is",
+        "answer": "Australia",
+        "pgdc": "<s> host country of Australian Capital Territory is",
+        "category": "Format and Stop Words"
+      }
+    ],
+    "initial": {
+      "true": "pararel",
+      "false": "cfact",
+      "method": "PGDC"
+    },
+    "source_url": "https://aclanthology.org/2024.acl-long.124/"
+  }
 }

@@ -2,23 +2,23 @@
   "story": {
     "title": "Generated context is a representation choice",
     "paragraphs": [
-      "Asking a model to write a document and then answer from it does not automatically add new knowledge. The document externalizes what the generator can already produce, potentially making useful facts easier for the answerer to access. This creates a useful research question: if the source is generated rather than retrieved, which properties of that intermediate text determine whether it helps?",
-      "The paper studies this representation layer instead of treating all generated passages as one category. A compact overview, an explanatory essay, and a detailed formal report may contain overlapping information while supporting different tasks. A fact verification question needs specific evidence; a long-form explanation needs useful coverage and organization. There is no reason to assume the same document style optimizes both."
+      "Self-generated documents (Self-Docs) are passages a model writes from its own parametric memory before answering. They draw on no external source; they externalize what the generator can already produce, which may make useful facts easier to use. If the source is generated rather than retrieved, which properties of that text decide whether it helps?",
+      "The paper treats the document type as an experimental variable. A detailed formal report and a conversational overview can share facts yet suit different tasks: fact verification needs specific evidence, while a long-form explanation needs coverage and organization."
     ]
   },
   "mechanism": {
-    "title": "Vary the generator, the document, and the mixture",
+    "title": "Generator size, document type, and mixing are tested separately",
     "paragraphs": [
-      "The experiments first separate three factors that can otherwise be confounded: answer-model size, number of generated documents, and generator size while the answer model stays fixed. The default backbone is Qwen2.5-32B-Instruct. Generation follows a GenRead-style few-shot pipeline, using diverse query–document examples selected through clustering. Thus, a gain from a larger generator can be examined separately from giving the answerer more parameters.",
-      "The style taxonomy crosses three binary choices: fine- versus coarse-grained content, authoritative versus conversational tone, and structured versus unstructured presentation. The resulting eight types provide a controlled way to compare communicative properties. As an illustrative example, a question about why seasons occur could receive a formal outline of orbital facts or a conversational explanation connecting axial tilt to changing sunlight. The comparison concerns how information is presented, not a guarantee that either passage is factually sound.",
-      "Finally, the study combines generated documents with retrieved Wikipedia passages. Direct Mix concatenates the two sources. Style-Transformation Mix rewrites the retrieved material to match the target style before combination. This asks whether the interface between sources matters in addition to their individual contents. Rewriting is itself a model operation, so any accuracy gain should be interpreted as a property of the full pipeline."
+      "The experiments first separate three factors that are otherwise confounded: the size of the base model, which both writes and answers; the number of documents; and the size of the generator alone, with the answerer fixed at Qwen2.5-32B-Instruct. Documents come from GenRead's few-shot pipeline, whose examples are drawn from k-means clusters of query–document pairs.",
+      "The taxonomy, grounded in Systemic Functional Linguistics, crosses three binary choices: tone (Authoritative or Conversational), granularity (Fine- or Coarse-grained), and structure (Structured or Unstructured). Types are named by these initials: AFU is authoritative, fine-grained, and unstructured (the paper's example is a case study), CFU a personal essay, and CCU a social media post.",
+      "Finally, Direct Mix concatenates retrieved Wikipedia passages with Self-Docs, while Style-Transformation Mix first has an LLM rewrite the passages in the Self-Docs' style. Because the rewrite is itself a model step, a gain belongs to the whole pipeline, not to the retrieved content alone."
     ]
   },
   "evidence": {
-    "title": "The improvements depend on the task",
+    "title": "Style-aligned mixing helps, except on long-form answers",
     "paragraphs": [
-      "For authoritative, fine-grained, unstructured documents, HotpotQA F1 is 39.9 with generated documents alone, 41.0 with Direct Mix, and 43.3 with Style-Transformation Mix. The corresponding ELI5 F1 values are 22.8, 23.1, and 22.7. The same transformation therefore improves one measured task while slightly reducing another. It is more informative to inspect these task-level changes than to average exact-match and F1 scores into one universal quality measure.",
-      "The main study uses the first 500 examples of each of four datasets and emphasizes one model family, with additional models in the appendix. More documents and larger generators do not produce uniform gains. Human checks assess adherence to the intended document style, but do not establish factual correctness. The resulting guidance is to validate generation style, source mixing, and document count for the actual downstream task rather than treating self-generated context as independently verified evidence."
+      "Gains are task-specific. Relative to the same documents alone, Style-Transformation Mix gains most on multi-hop HotpotQA and fact-verification FEVER and leaves long-form ELI5 essentially unchanged. Among generated types, unstructured documents beat structured ones on average, authoritative fine-grained ones suit FEVER, and conversational ones suit ELI5.",
+      "Scale effects are also uneven. A larger generator helps only above a size threshold; smaller generators struggle to beat either answering without documents or Wikipedia retrieval. More documents help FEVER, while ELI5 may plateau or dip."
     ]
   },
   "sources": [
@@ -27,5 +27,470 @@
       "url": "https://aclanthology.org/2025.findings-naacl.149/"
     }
   ],
-  "reading_notes": "Read main full methods, taxonomy, factor analysis, task-level Tables2/3/5, mixing methods, limitations and ethics; appendix model-dependence checked in previous pass. AFU Hotpot39.9→41.0→43.3, ELI522.8→23.1→22.7. Style taxonomy intended controls can change content; do not claim causally isolated style or guaranteed faithful rewriting. Generated-doc example newly authored illustrative."
+  "reading_notes": "Read main full methods, taxonomy, factor analysis, task-level Tables2/3/5, mixing methods, limitations and ethics; appendix model-dependence checked in previous pass. AFU Hotpot39.9→41.0→43.3, ELI522.8→23.1→22.7. Style taxonomy intended controls can change content; do not claim causally isolated style or guaranteed faithful rewriting. Generated-doc example newly authored illustrative.",
+  "demo": {
+    "type": "selfdoc-taxonomy",
+    "placement": "evidence",
+    "eyebrow": "Measured · Tables 2, 10 and 12 · examples from Figure 1 and Appendix G.2",
+    "title": "Which document type helps which task?",
+    "description": "Choose a tone, a granularity, and a structure to select one of the eight Self-Doc types, then choose whether the documents are used alone or mixed with Wikipedia passages. All eight types stay in the table; the second table changes one choice at a time.",
+    "dimensions": [
+      {
+        "key": "tone",
+        "label": "Tone",
+        "metafunction": "Interpersonal",
+        "values": [
+          [
+            "A",
+            "Authoritative",
+            "a formal style that establishes authority, as in a research paper"
+          ],
+          [
+            "C",
+            "Conversational",
+            "an engaging tone that addresses the reader, as in a blog"
+          ]
+        ]
+      },
+      {
+        "key": "granularity",
+        "label": "Granularity",
+        "metafunction": "Ideational",
+        "values": [
+          [
+            "F",
+            "Fine-grained",
+            "detailed information, as in a technical paper"
+          ],
+          [
+            "C",
+            "Coarse-grained",
+            "a broader overview, as in a summary"
+          ]
+        ]
+      },
+      {
+        "key": "structure",
+        "label": "Structure",
+        "metafunction": "Textual",
+        "values": [
+          [
+            "S",
+            "Structured",
+            "headings and lists that aid navigation, as in a report"
+          ],
+          [
+            "U",
+            "Unstructured",
+            "continuous prose with a narrative flow, as in an essay"
+          ]
+        ]
+      }
+    ],
+    "tasks": [
+      [
+        "TQA",
+        "Open-domain QA",
+        "EM"
+      ],
+      [
+        "HotpotQA",
+        "Multi-hop QA",
+        "F1"
+      ],
+      [
+        "FEVER",
+        "Fact verification",
+        "EM"
+      ],
+      [
+        "ELI5",
+        "Long-form QA",
+        "F1"
+      ],
+      [
+        "Average",
+        "Mean of the four",
+        ""
+      ]
+    ],
+    "types": {
+      "AFS": {
+        "genre": "Research Paper",
+        "figure1": true,
+        "excerpt": "# The VS-300: An Overview and Historical Context\n## Introduction\nThe VS-300, formally designated as the Sikorsky VS-300, is recognized as a seminal helicopter design."
+      },
+      "AFU": {
+        "genre": "Case Studies",
+        "figure1": true,
+        "excerpt": "The VS-300 is a helicopter, specifically a prototype that marked a pivotal moment in the evolution of rotorcraft technology during the early 1940s."
+      },
+      "ACS": {
+        "genre": "News Article",
+        "figure1": false,
+        "excerpt": "# Overview of the VS-300\n## Introduction\nThe VS-300 was a significant aircraft in the development of vertical takeoff and landing (VTOL) technology."
+      },
+      "ACU": {
+        "genre": "Opinion Pieces",
+        "figure1": false,
+        "excerpt": "The VS-300 is a notable aircraft that stands out in the history of aviation as a significant experimental helicopter."
+      },
+      "CFS": {
+        "genre": "How-to Guides",
+        "figure1": false,
+        "excerpt": "# The VS-300: A Conversational Dive into History\nHey there! Let's talk about a pretty cool piece of aviation history - the VS-300."
+      },
+      "CFU": {
+        "genre": "Personal Essays",
+        "figure1": false,
+        "excerpt": "Hey there! So, let's chat about the VS-300 for a bit. It's actually pretty cool what this thing is all about. The VS-300 was a type of helicopter, and it really marked the beginning of something really revolutionary in the world of aviation."
+      },
+      "CCS": {
+        "genre": "Travel Blogs",
+        "figure1": true,
+        "excerpt": "# The VS-300: A Quick Overview\nHey there! Let's dive into a brief look at what the VS-300 is all about."
+      },
+      "CCU": {
+        "genre": "Social Media Posts",
+        "figure1": true,
+        "excerpt": "Hey there! So, you've probably heard of helicopters, right? Well, the VS-300 was actually one of the very first models of a whole new kind of aircraft."
+      }
+    },
+    "codes": [
+      "AFS",
+      "AFU",
+      "ACS",
+      "ACU",
+      "CFS",
+      "CFU",
+      "CCS",
+      "CCU"
+    ],
+    "conditions": {
+      "alone": {
+        "label": "Self-Docs alone",
+        "table": "Table 2",
+        "rows": {
+          "AFS": [
+            55.4,
+            37.5,
+            83.4,
+            20.9,
+            49.3
+          ],
+          "AFU": [
+            58.4,
+            39.9,
+            85.2,
+            22.8,
+            51.6
+          ],
+          "ACS": [
+            56.8,
+            38.7,
+            83.6,
+            22.0,
+            50.3
+          ],
+          "ACU": [
+            56.4,
+            39.6,
+            85.0,
+            23.5,
+            51.1
+          ],
+          "CFS": [
+            57.4,
+            36.4,
+            81.8,
+            24.0,
+            49.9
+          ],
+          "CFU": [
+            57.8,
+            39.5,
+            84.2,
+            25.1,
+            51.6
+          ],
+          "CCS": [
+            56.0,
+            35.2,
+            82.0,
+            25.4,
+            49.6
+          ],
+          "CCU": [
+            56.6,
+            38.7,
+            83.8,
+            26.4,
+            51.4
+          ]
+        }
+      },
+      "direct": {
+        "label": "With Wiki · Direct Mix",
+        "table": "Table 10",
+        "rows": {
+          "AFS": [
+            56.0,
+            38.3,
+            73.6,
+            22.0,
+            47.5
+          ],
+          "AFU": [
+            56.8,
+            41.0,
+            84.4,
+            23.1,
+            51.3
+          ],
+          "ACS": [
+            55.8,
+            39.5,
+            84.8,
+            22.7,
+            50.7
+          ],
+          "ACU": [
+            56.2,
+            40.8,
+            86.6,
+            23.8,
+            51.8
+          ],
+          "CFS": [
+            56.4,
+            39.0,
+            78.2,
+            24.8,
+            49.6
+          ],
+          "CFU": [
+            57.2,
+            41.6,
+            85.0,
+            25.6,
+            52.4
+          ],
+          "CCS": [
+            56.4,
+            40.1,
+            84.0,
+            25.7,
+            51.6
+          ],
+          "CCU": [
+            57.4,
+            41.8,
+            85.8,
+            26.5,
+            52.9
+          ]
+        },
+        "changes": {
+          "AFS": [
+            "+0.6",
+            "+0.8",
+            "-9.8",
+            "+1.1",
+            "-1.8"
+          ],
+          "AFU": [
+            "-1.6",
+            "+1.1",
+            "-0.8",
+            "+0.3",
+            "-0.3"
+          ],
+          "ACS": [
+            "-1.0",
+            "+0.8",
+            "+1.2",
+            "+0.7",
+            "+0.4"
+          ],
+          "ACU": [
+            "-0.2",
+            "+1.2",
+            "+1.6",
+            "+0.3",
+            "+0.7"
+          ],
+          "CFS": [
+            "-1.0",
+            "+2.6",
+            "-3.6",
+            "+0.8",
+            "-0.3"
+          ],
+          "CFU": [
+            "-0.6",
+            "+2.1",
+            "+0.8",
+            "+0.5",
+            "+0.8"
+          ],
+          "CCS": [
+            "+0.4",
+            "+4.9",
+            "+2.0",
+            "+0.3",
+            "+2.0"
+          ],
+          "CCU": [
+            "+0.8",
+            "+3.1",
+            "+2.0",
+            "+0.1",
+            "+1.5"
+          ]
+        }
+      },
+      "style": {
+        "label": "With Wiki · Style-Transformation Mix",
+        "table": "Table 12",
+        "rows": {
+          "AFS": [
+            56.6,
+            37.5,
+            87.6,
+            21.3,
+            50.8
+          ],
+          "AFU": [
+            59.4,
+            43.3,
+            87.6,
+            22.7,
+            53.3
+          ],
+          "ACS": [
+            56.8,
+            42.4,
+            88.8,
+            22.2,
+            52.6
+          ],
+          "ACU": [
+            57.0,
+            41.9,
+            90.4,
+            23.3,
+            53.2
+          ],
+          "CFS": [
+            57.0,
+            39.3,
+            86.0,
+            24.2,
+            51.6
+          ],
+          "CFU": [
+            58.0,
+            41.0,
+            86.4,
+            25.3,
+            52.7
+          ],
+          "CCS": [
+            57.4,
+            41.8,
+            86.6,
+            25.6,
+            52.9
+          ],
+          "CCU": [
+            57.6,
+            43.0,
+            87.4,
+            26.3,
+            53.6
+          ]
+        },
+        "changes": {
+          "AFS": [
+            "+1.2",
+            "0.0",
+            "+4.2",
+            "+0.4",
+            "+1.5"
+          ],
+          "AFU": [
+            "+1.0",
+            "+3.4",
+            "+2.4",
+            "-0.1",
+            "+1.7"
+          ],
+          "ACS": [
+            "0.0",
+            "+3.7",
+            "+5.2",
+            "+0.2",
+            "+2.3"
+          ],
+          "ACU": [
+            "+0.6",
+            "+2.3",
+            "+5.4",
+            "-0.2",
+            "+2.1"
+          ],
+          "CFS": [
+            "-0.4",
+            "+2.9",
+            "+4.2",
+            "+0.2",
+            "+1.7"
+          ],
+          "CFU": [
+            "+0.2",
+            "+1.5",
+            "+2.2",
+            "+0.2",
+            "+1.1"
+          ],
+          "CCS": [
+            "+1.4",
+            "+6.6",
+            "+4.6",
+            "+0.2",
+            "+3.3"
+          ],
+          "CCU": [
+            "+1.0",
+            "+4.3",
+            "+3.6",
+            "-0.1",
+            "+2.2"
+          ]
+        }
+      }
+    },
+    "baselines": {
+      "Wiki": [
+        52.6,
+        36.3,
+        66.8,
+        26.7,
+        45.6
+      ],
+      "GenRead mix": [
+        57.6,
+        39.1,
+        87.0,
+        24.7,
+        52.1
+      ]
+    },
+    "question": "The VS-300 was a type of what?",
+    "initial": {
+      "type": "AFU",
+      "condition": "alone"
+    },
+    "source_url": "https://aclanthology.org/2025.findings-naacl.149/"
+  }
 }

@@ -405,11 +405,23 @@ def _severity_grid(highlight: tuple[str, str] | None = None) -> str:
             f'{head}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
 
 
-def _table6_html() -> str:
-    rows = ''.join(f'<tr><th scope="row">{_e(name)}</th><td>{value:.2f}</td></tr>' for name, value in D2T_TABLE6)
-    return ('<div class="eval-table-wrap" tabindex="0" role="region" aria-label="Table 6 average error scores">'
-            '<table class="eval-table6"><thead><tr><th scope="col">Error type</th><th scope="col">Average error score ↓</th></tr></thead>'
-            f'<tbody>{rows}</tbody></table></div>')
+D2T_EXAMPLE_TYPES = ('Omission', 'Inaccuracy Intrinsic')   # the two errors in the Table 2 annotation
+
+
+def _table6_evidence(demo: dict[str, Any]) -> str:
+    """Evidence-slot block: the measured Table 6 averages, ordered as printed by size."""
+    top = max(value for _, value in D2T_TABLE6)
+    example = ' class="is-example"'
+    rows = ''.join(
+        f'<tr{example if name in D2T_EXAMPLE_TYPES else ""}><th scope="row">{_e(name)}</th>'
+        f'<td><span class="eval-bar eval-bar-wide" aria-hidden="true"><i style="width:{value / top * 100:.1f}%"></i></span>'
+        f'<span data-eval-table6="{_e(name)}">{value:.2f}</span></td></tr>'
+        for name, value in D2T_TABLE6)
+    return f'''<section class="paper-demo evaluation-demo eval-evidence-block" data-eval-evidence="seq2seq-data2text" aria-labelledby="seq2seq-data2text-table6-title">
+      <div class="eval-heading"><p class="eval-kicker">{_e(demo.get("evidence_eyebrow", "Measured · Table 6"))}</p><h3 id="seq2seq-data2text-table6-title">Which error types cost the most across the study</h3><p>Average severity-weighted, length-normalized error score of each type over all models and datasets (Table 6, lower is better). Each score is Σ α<sub>e</sub> L<sub>e</sub> / wordcount for that type, the quantity the annotation demo in Inside the method computes for one output.</p></div>
+      <div class="eval-table-wrap" tabindex="0" role="region" aria-label="Table 6 average error scores"><table class="eval-table6"><thead><tr><th scope="col">Error type</th><th scope="col">Average error score ↓</th></tr></thead><tbody>{rows}</tbody></table></div>
+      <p class="eval-caption">{_tag("measured", "Table 6")} printed averages. Shaded rows are the two error types of the Table 2 example (Omission and Inaccuracy Intrinsic); they carry the two largest average penalties. The other six types together sum to 5.37.</p>
+    </section>'''
 
 
 def _paper_annotation_html() -> str:
@@ -440,10 +452,7 @@ def _d2t_static() -> str:
         f'<ol class="eval-triples">{triples}</ol>'
         '<h4>Model output · Table 2</h4>'
         f'<p class="eval-output">{_output_html(True)}</p></div>'
-        + _paper_annotation_html() +
-        '<div class="eval-block"><h4>Across the whole study</h4>' + _table6_html() +
-        '<p class="eval-caption">' + _tag('measured', 'Table 6') + ' average error score of each type across all models '
-        'and datasets. The two error types in this example carry the largest average penalties.</p></div>')
+        + _paper_annotation_html())
 
 
 def _d2t_controls(slug: str) -> str:
@@ -483,15 +492,16 @@ def _d2t_controls(slug: str) -> str:
         + _group('Annotation', _button('reveal', 'Compare with the paper’s annotation') + _button('clear', 'Clear my annotation')))
 
 
-def _data2text(slug: str, demo: dict[str, Any]) -> str:
+def _data2text(slug: str, demo: dict[str, Any]) -> dict[str, str]:
+    """The annotation mechanism goes to Method; the measured Table 6 averages go to Evidence."""
     config = {
         'triples': D2T_TRIPLES, 'tokens': D2T_TOKENS, 'wordcount': D2T_WORDCOUNT,
         'severity': D2T_SEVERITY, 'paperWord': D2T_PAPER_WORD, 'paperTriple': D2T_PAPER_TRIPLE,
-        'table6': D2T_TABLE6,
     }
     verdict = ('The paper marks two errors here but does not report their severities: with both Major the '
                f'output scores {_fmt(mqm_score(6), 1)}; the range is {_fmt(mqm_score(14), 1)} to {_fmt(mqm_score(2), 1)}.')
-    return _shell(slug, demo, _d2t_controls(slug), _d2t_static(), verdict, config)
+    return {'method': _shell(slug, demo, _d2t_controls(slug), _d2t_static(), verdict, config),
+            'evidence': _table6_evidence(demo)}
 
 
 # ---------------------------------------------------------------------------
@@ -499,24 +509,36 @@ def _data2text(slug: str, demo: dict[str, Any]) -> str:
 # ---------------------------------------------------------------------------
 
 CONTEXT_TARGET = 'They returned to the bank.'
+# Illustrative document. The nearest previous sentence is deliberately neutral, so
+# that an adjacent window and similarity-based selection can disagree.
 CONTEXT_SENTENCES = [
     {'id': '−3', 'distance': 3, 'side': 'previous', 'text': 'Their canoe had drifted downstream.', 'similarity': 0.92},
     {'id': '−2', 'distance': 2, 'side': 'previous', 'text': 'They spent the afternoon outdoors.', 'similarity': 0.38},
-    {'id': '−1', 'distance': 1, 'side': 'previous', 'text': 'The water began to rise.', 'similarity': 0.70},
+    {'id': '−1', 'distance': 1, 'side': 'previous', 'text': 'It had been a long day.', 'similarity': 0.45},
     {'id': '+1', 'distance': 1, 'side': 'following', 'text': 'They pulled the canoe onto the shore.', 'similarity': 0.88},
     {'id': '+2', 'distance': 2, 'side': 'following', 'text': 'The trip ended before sunset.', 'similarity': 0.31},
 ]
+CONTEXT_DEFAULTS = {'budget': 2, 'decay': 0.80, 'previous_only': False}
 
 
-def context_selection(budget: int, decay: float, previous_only: bool) -> tuple[list[dict[str, Any]], set[str], set[str]]:
+def context_selection(budget: int, decay: float, previous_only: bool,
+                      similarities: Sequence[float] | None = None) -> tuple[list[dict[str, Any]], set[str], set[str]]:
     """Score = cosine similarity x alpha^|i-j|; take the top `budget`; compare with an adjacent window."""
-    scored = [{**item, 'score': item['similarity'] * decay ** item['distance'],
-               'eligible': not previous_only or item['side'] == 'previous'} for item in CONTEXT_SENTENCES]
+    cosines = similarities or [item['similarity'] for item in CONTEXT_SENTENCES]
+    scored = [{**item, 'similarity': cos, 'score': cos * decay ** item['distance'],
+               'eligible': not previous_only or item['side'] == 'previous'}
+              for item, cos in zip(CONTEXT_SENTENCES, cosines)]
     eligible = [item for item in scored if item['eligible']]
     selected = {item['id'] for item in sorted(eligible, key=lambda s: -s['score'])[:budget]}
     # Adjacent window of the same size: nearest first, previous sentence first on a tie.
     window = {item['id'] for item in sorted(eligible, key=lambda s: (s['distance'], s['side'] != 'previous'))[:budget]}
     return scored, selected, window
+
+
+def _ids(scored: Sequence[dict[str, Any]], keep: set[str]) -> str:
+    """Sentence ids in document order, e.g. '−3 and +1'."""
+    names = [item['id'] for item in scored if item['id'] in keep]
+    return ' and '.join(names) if len(names) < 3 else ', '.join(names[:-1]) + ' and ' + names[-1]
 
 
 def _context_results(budget: int, decay: float, previous_only: bool) -> tuple[str, str]:
@@ -533,28 +555,44 @@ def _context_results(budget: int, decay: float, previous_only: bool) -> tuple[st
     after = [item for item in scored if item['side'] == 'following']
     html = ('<p class="eval-formula">Sim(R<sub>i</sub>, R<sub>j</sub>) = cos(r<sub>i</sub>, r<sub>j</sub>) · α<sup>|i−j|</sup></p>'
             '<ol class="eval-context-list">' + ''.join(row(item) for item in before)
-            + f'<li class="eval-context-target"><span>Current reference</span><strong>{_e(CONTEXT_TARGET)}</strong></li>'
+            + f'<li class="eval-context-target"><span>Current reference</span><strong>{_e(CONTEXT_TARGET)}</strong>'
+            '<small>“bank” is ambiguous: a river bank or a financial bank. Only the context can tell the evaluator which one the translation must preserve.</small></li>'
             + ''.join(row(item) for item in after) + '</ol>'
-            '<p class="eval-caption">' + _tag('illustrative') + ' document and cosine values; α is not '
+            '<p class="eval-caption">' + _tag('illustrative') + ' document and cosine values (editable above); α is not '
             'reported in the paper. ' + _tag('adapted', 'Section 2.2') + ' selection rule; selection also stops before the '
             '512-token encoder limit, which this short document never reaches.</p>')
-    chain = ' → '.join([item['id'] for item in before if item['id'] in selected] + ['current']
-                       + [item['id'] for item in after if item['id'] in selected])
-    differs = len(selected - window)
-    window_text = ('It matches an adjacent window of the same size.' if not differs else
-                   f'An adjacent window of the same size would swap {differs} sentence{"s" if differs > 1 else ""}.')
-    verdict = f'{len(selected)} context sentence{"s" if len(selected) != 1 else ""} selected, in document order: {chain}. {window_text}'
-    return html, verdict
+    return html, _context_verdict(scored, selected, window)
+
+
+def _context_verdict(scored: Sequence[dict[str, Any]], selected: set[str], window: set[str]) -> str:
+    before = [item['id'] for item in scored if item['side'] == 'previous' and item['id'] in selected]
+    after = [item['id'] for item in scored if item['side'] == 'following' and item['id'] in selected]
+    chain = ' → '.join(before + ['current'] + after)
+    count = len(selected)
+    text = f'{count} context sentence{"s" if count != 1 else ""} selected, in document order: {chain}. '
+    if selected == window:
+        return text + 'It matches an adjacent window of the same size.'
+    return (text + f'An adjacent window of the same size would use {_ids(scored, window - selected)} '
+            f'instead of {_ids(scored, selected - window)}.')
 
 
 def _context(slug: str, demo: dict[str, Any]) -> str:
     config = {'target': CONTEXT_TARGET, 'sentences': CONTEXT_SENTENCES}
+    budget, decay = CONTEXT_DEFAULTS['budget'], CONTEXT_DEFAULTS['decay']
     controls = _group('Eligible context', _button('both', 'Previous and following', True) + _button('previous', 'Previous only'))
-    controls += ('<div class="eval-range-grid eval-two-ranges">' + _range(slug, 'budget', 'Sentence budget', 1, 5, 2, '2')
-                 + _range(slug, 'decay', 'Distance factor α', 10, 100, 80, '0.80') + '</div>')
+    controls += ('<div class="eval-range-grid eval-two-ranges">'
+                 + _range(slug, 'budget', 'Sentence budget', 1, 5, budget, str(budget))
+                 + _range(slug, 'decay', 'Distance factor α', 10, 100, round(decay * 100), f'{decay:.2f}') + '</div>')
+    cosines = ''.join(
+        f'<label class="eval-number" for="{slug}-cos-{index}"><span>{_e(item["id"])}</span>'
+        f'<input id="{slug}-cos-{index}" type="number" min="0" max="1" step="0.01" value="{item["similarity"]:.2f}" '
+        f'inputmode="decimal" data-demo-range="cos-{index}"></label>'
+        for index, item in enumerate(CONTEXT_SENTENCES))
+    controls += ('<fieldset class="eval-distances"><legend>Cosine similarity of each sentence to the current reference '
+                 f'(illustrative; set your own between 0 and 1)</legend>{cosines}</fieldset>')
     controls += ('<p class="eval-control-help">The paper evaluates budgets of 2, 4, 6 and 8 sentences (Table 2); '
                  '“Previous only” corresponds to the “w/ previous sentences” ablation in Table 3.</p>')
-    results, verdict = _context_results(2, 0.8, False)
+    results, verdict = _context_results(budget, decay, CONTEXT_DEFAULTS['previous_only'])
     return _shell(slug, demo, controls, results, verdict, config)
 
 
@@ -569,13 +607,29 @@ RERIC_CANDIDATES = [
     {'tokens': ['这', '几', '个'], 'gloss': 'these few', 'distance': 0.50},
 ]
 RERIC_WEIGHTS = (1.68, 0.68, 1.68)   # Table 3
+RERIC_N = 3                          # 3-gram values (Table 3)
+# 'weights' divides by the sum of the weights, so that a full match gives alpha = 1;
+# 'printed' divides by n = 3 as Equation 11 is printed.
+RERIC_NORMALIZATIONS = {'weights': 'Normalized by Σw', 'printed': 'As printed (÷ n = 3)'}
+RERIC_FIGURE1_TOP = '这一个'
+RERIC_DIFFERENCE = ('Equation 11 as printed divides by n = 3, but the Table 3 weights sum to 4.04, so a candidate that '
+                    'matches both neighbors gets α = 3.36 / 3 = 1.12 and a negative d′ that ranks a farther candidate higher; '
+                    'dividing by the sum of the weights keeps α between 0 and 1, gives α = 1 for a full match, and '
+                    'reproduces Figure 1’s ranking. With equal weights the two normalizations coincide.')
 
 
-def reric_rank(distances: Sequence[float], weights: Sequence[float], rerank: bool = True) -> list[dict[str, Any]]:
-    """Equation 11: alpha = sum_i 1[v(i) = g(i)] w_i / n and d' = (1 - alpha) d, n = 3."""
+def reric_denominator(weights: Sequence[float], normalization: str) -> float:
+    return sum(weights) if normalization == 'weights' else float(RERIC_N)
+
+
+def reric_rank(distances: Sequence[float], weights: Sequence[float], rerank: bool = True,
+               normalization: str = 'weights') -> list[dict[str, Any]]:
+    """Equation 11: alpha = sum_i 1[v(i) = g(i)] w_i / Z and d' = (1 - alpha) d, with Z = sum(w) or n = 3."""
+    denominator = reric_denominator(weights, normalization)
     rows = []
     for index, (candidate, distance) in enumerate(zip(RERIC_CANDIDATES, distances)):
-        overlap = sum(w for token, query, w in zip(candidate['tokens'], RERIC_QUERY, weights) if token == query) / 3
+        matched = sum(w for token, query, w in zip(candidate['tokens'], RERIC_QUERY, weights) if token == query)
+        overlap = matched / denominator if denominator > 0 else 0.0
         adjusted = (1 - overlap) * distance if rerank else distance
         rows.append({'index': index, 'overlap': overlap, 'distance': distance, 'adjusted': adjusted})
     return sorted(rows, key=lambda row: row['adjusted'])
@@ -595,15 +649,25 @@ def reric_verdict(ranked: Sequence[dict[str, Any]], rerank: bool) -> str:
         names = ' and '.join(''.join(RERIC_CANDIDATES[row['index']]['tokens']) for row in negative)
         text += (f'α exceeds 1 for {names}, so (1 − α) is negative and a larger retrieval distance gives a '
                  'smaller adjusted distance.')
-        if top['tokens'][1] != '一':
-            text += ' Figure 1 instead shows 这一个 (“this one”) as the most probable correction.'
+        if name != RERIC_FIGURE1_TOP:
+            text += f' Figure 1 instead shows {RERIC_FIGURE1_TOP} (“this one”) as the most probable correction.'
     else:
         text += 'Matching both correct neighbors outweighs matching the uncertain center.'
+        if name == RERIC_FIGURE1_TOP:
+            text += ' This is Figure 1’s ranking: 这一个 (“this one”) is the most probable correction.'
     return text
 
 
-def _reric_results(distances: Sequence[float], weights: Sequence[float], rerank: bool) -> tuple[str, str]:
-    ranked = reric_rank(distances, weights, rerank)
+def _reric_formula(weights: Sequence[float], normalization: str) -> str:
+    denominator = 'Σ<sub>i</sub> w<sub>i</sub>' if normalization == 'weights' else '3'
+    total = f' = {sum(weights):.2f}' if normalization == 'weights' else ''
+    return (f'α = Σ<sub>i</sub> 1[v(i) = g(i)] · w<sub>i</sub> / {denominator}{total};  d′ = (1 − α) · d;'
+            f'  w = ({weights[0]:.2f}, {weights[1]:.2f}, {weights[2]:.2f})')
+
+
+def _reric_results(distances: Sequence[float], weights: Sequence[float], rerank: bool,
+                   normalization: str = 'weights') -> tuple[str, str]:
+    ranked = reric_rank(distances, weights, rerank, normalization)
     rows = []
     for rank, row in enumerate(ranked):
         candidate = RERIC_CANDIDATES[row['index']]
@@ -616,24 +680,30 @@ def _reric_results(distances: Sequence[float], weights: Sequence[float], rerank:
             f'<span lang="zh">{tokens}</span><small>{_e(candidate["gloss"])}</small></th>'
             f'<td>{_fmt(row["distance"])}</td><td>{_fmt(row["overlap"])}</td>'
             f'<td><strong>{_fmt(row["adjusted"])}</strong></td></tr>')
+    rule = (' α divided by Σw, so a full match gives α = 1.' if normalization == 'weights'
+            else ' as printed: α divided by n = 3.')
     html = (
         '<p class="eval-query">Input window <span lang="zh">这<mark>以</mark>个</span>'
-        '<small>from “这以个重大发…”, Figure 1; 以 should be 一 (yī, as in 这一个 “this one”)</small></p>'
-        '<p class="eval-formula">α = Σ<sub>i</sub> 1[v(i) = g(i)] · w<sub>i</sub> / 3;  d′ = (1 − α) · d;'
-        f'  w = ({weights[0]:.2f}, {weights[1]:.2f}, {weights[2]:.2f})</p>'
+        '<small>from “这以个重大发…”, Figure 1; 以 is a misspelling, corrected as in 这一个 (“this one”)</small></p>'
+        f'<p class="eval-formula" data-eval-formula>{_reric_formula(weights, normalization)}</p>'
         '<div class="eval-table-wrap" tabindex="0" role="region" aria-label="Candidate reranking">'
         '<table><thead><tr><th scope="col">Rank · retrieved 3-gram</th><th scope="col">Distance d</th>'
         f'<th scope="col">Overlap α</th><th scope="col">{"Adjusted d′" if rerank else "Ranking distance"} ↓</th></tr></thead>'
         f'<tbody>{"".join(rows)}</tbody></table></div>'
-        '<p class="eval-caption">' + _tag('adapted', 'Figure 1') + ' input and candidates. ' + _tag('adapted', 'Table 3')
-        + ' weights w = (1.68, 0.68, 1.68), n = 3. ' + _tag('illustrative') + ' l2 distances in Figure 1’s '
+        '<p class="eval-caption">' + _tag('adapted', 'Figure 1') + ' input and candidates. '
+        + _tag('adapted', 'Equation 11') + f'{_e(rule)} '
+        + _tag('adapted', 'Table 3') + ' weights w = (1.68, 0.68, 1.68), n = 3. ' + _tag('illustrative') + ' l2 distances in Figure 1’s '
         'retrieval order; the paper does not print them.</p>')
     return html, reric_verdict(ranked, rerank)
 
 
 def _reric(slug: str, demo: dict[str, Any]) -> str:
-    config = {'query': RERIC_QUERY, 'candidates': RERIC_CANDIDATES, 'paperWeights': RERIC_WEIGHTS}
+    config = {'query': RERIC_QUERY, 'candidates': RERIC_CANDIDATES, 'paperWeights': RERIC_WEIGHTS,
+              'n': RERIC_N, 'figureTop': RERIC_FIGURE1_TOP}
     controls = _group('Ranking', _button('raw', 'Retrieval distance only') + _button('rerank', 'Equation 11 reranking', True))
+    controls += _group('Normalization', ''.join(
+        _button(f'norm-{key}', label, key == 'weights') for key, label in RERIC_NORMALIZATIONS.items()))
+    controls += f'<p class="eval-control-help eval-norm-help">{_e(RERIC_DIFFERENCE)}</p>'
     controls += _group('Weights', _button('weights-paper', 'Table 3 weights', True) + _button('weights-equal', 'Equal weights (1, 1, 1)'))
     controls += ('<div class="eval-range-grid eval-two-ranges">'
                  + _range(slug, 'neighbor', 'Neighbor weight w₁ = w₃', 0, 200, 168, '1.68')
@@ -644,11 +714,11 @@ def _reric(slug: str, demo: dict[str, Any]) -> str:
         f'inputmode="decimal" data-demo-range="distance-{index}"></label>'
         for index, c in enumerate(RERIC_CANDIDATES))
     controls += (f'<fieldset class="eval-distances"><legend>Retrieval distances d (illustrative; set your own)</legend>{distances}</fieldset>')
-    results, verdict = _reric_results([c['distance'] for c in RERIC_CANDIDATES], RERIC_WEIGHTS, True)
+    results, verdict = _reric_results([c['distance'] for c in RERIC_CANDIDATES], RERIC_WEIGHTS, True, 'weights')
     return _shell(slug, demo, controls, results, verdict, config)
 
 
-def render_demo(slug: str, insight: dict[str, Any]) -> str:
+def render_demo(slug: str, insight: dict[str, Any]) -> str | dict[str, str]:
     """Render one evaluation demo, or an empty string for pages owned by other modules."""
     owned_slugs = {'dsgram', 'context-aware-evaluation', 'error-robust-retrieval', 'seq2seq-data2text'}
     if slug not in owned_slugs:

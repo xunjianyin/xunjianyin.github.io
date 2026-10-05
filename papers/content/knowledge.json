@@ -20,14 +20,14 @@
     ],
     "findings": [
       {
-        "value": "75.44%",
-        "label": "Understanding",
-        "detail": "ChatGPT's knowledge-understanding score with vanilla few-shot prompting; reading the supplied facts is the stronger capability in this comparison."
+        "value": "75.44 vs 41.52",
+        "label": "ChatGPT: understanding vs association (%)",
+        "detail": "Few-shot vanilla accuracy. The strongest model reads the new entity's description well but struggles to connect it to knowledge it already has."
       },
       {
-        "value": "41.52%",
-        "label": "Association",
-        "detail": "The same model and prompting setup score much lower when answers require connecting the new entity to existing knowledge."
+        "value": "27.47 → 44.43",
+        "label": "ChatGLM association with chain entities (%)",
+        "detail": "Adding the entities on the reasoning chain to the context raises association; the same number of irrelevant entities lowers it to 18.56."
       }
     ],
     "scope": "The benchmark uses synthetic biological entities and the models evaluated in 2023. Freshly generated entities reduce memorization concerns; publishing a fixed dataset does not guarantee permanent freedom from contamination.",
@@ -97,7 +97,61 @@
     "figure_url": "https://arxiv.org/e-print/2310.14820v1 (file alcuna1.pdf; same figure as Figure 1 on page 4 of https://aclanthology.org/2023.emnlp-main.87.pdf)",
     "figure_caption": "KnowGen builds the artificial entity Alcuna from the existing entity Alpaca through heredity (diet), variation (body mass), dropout (life span), and extension (first appearance, taken from the sibling Vicuna); the right panel shows example knowledge understanding, differentiation, and association questions. Original Figure 1 from the paper.",
     "primary_figure": true,
-    "figure_scroll": true
+    "figure_scroll": true,
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Baizhou Huang",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "ChatGPT, the strongest tested model, scores 75.44% on knowledge understanding but 41.52% on knowledge association (few-shot vanilla); all four models score lowest on association there.",
+      "prior": "Temporal benchmarks such as TemporalWiki must be recollected and may leak into training data, and entity substitution (Longpre et al., 2022) builds contradicting statements; this work generates ontology-consistent artificial entities.",
+      "limitation": "KnowGen is implemented only on biological taxonomy data, and only four 2023 models (ChatGPT, Alpaca-7B, Vicuna-13B, ChatGLM-6B) are evaluated."
+    },
+    "prior_work": "Earlier evaluations obtain new knowledge from temporal change, as in TemporalWiki (Jang et al., 2023) and Lazaridou et al. (2021); the paper notes that such data must be recollected for each new model, may already be in undisclosed training data, and differs across models with different cutoffs. Entity-substitution methods (Longpre et al., 2022; Zhou et al., 2023) replace an entity name in a short statement to create knowledge that contradicts the model. KnowGen instead builds a complete artificial entity in ontological form, through heredity, variation, extension, and dropout, so the new knowledge stays consistent with, and connected to, existing knowledge.",
+    "metadata_override": {
+      "links": [
+        {
+          "label": "Paper",
+          "url": "https://aclanthology.org/2023.emnlp-main.87/"
+        },
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2310.14820"
+        },
+        {
+          "label": "Code",
+          "url": "https://github.com/arvid-pku/alcuna"
+        },
+        {
+          "label": "Data",
+          "url": "https://drive.google.com/drive/folders/1P2Yt4XM-uSzfJoec4psIhpk-mfm-K3R1?usp=share_link"
+        }
+      ],
+      "abstract": "With the rapid development of NLP, large-scale language models (LLMs) excel in various tasks across multiple domains now. However, existing benchmarks may not adequately measure these models’ capabilities, especially when faced with new knowledge. In this paper, we address the lack of benchmarks to evaluate LLMs’ ability to handle new knowledge, an important and challenging aspect in the rapidly evolving world. We propose an approach called KnowGen that generates new knowledge by altering existing entity attributes and relationships, resulting in artificial entities that are distinct from real-world entities. With KnowGen, we introduce a benchmark named ALCUNA to assess LLMs’ abilities in knowledge understanding, differentiation, and association. We benchmark several LLMs, reveals that their performance in face of new knowledge is not satisfactory, particularly in reasoning between new and internal knowledge. We also explore the impact of entity similarity on the model’s understanding of entity knowledge and the influence of contextual entities. We appeal to the need for caution when using LLMs in new scenarios or with new knowledge, and hope that our benchmarks can help drive the development of LLMs in face of new knowledge."
+    },
+    "abstract_label": "Read the abstract"
   },
   "history-matters": {
     "short_name": "History Matters",
@@ -125,9 +179,9 @@
         "detail": "On AToKe single edits, METO raises MEMIT's accuracy on questions with explicit historical dates by 28.09 percentage points."
       },
       {
-        "value": "99.66 → 86.40",
+        "value": "99.66 → 86.4",
         "label": "Current score (%)",
-        "detail": "For that same comparison, current explicit-date accuracy decreases, showing that improved historical recall still comes with an editing tradeoff."
+        "detail": "Current explicit-time accuracy for the same edits. The cost depends on the editor: METO changes it by −13.26 points for MEMIT, −0.04 for ROME, and +2.79 for MEND."
       }
     ],
     "scope": "The main experiments edit GPT-J on timestamped fact chains. Historical recall improves substantially but remains incomplete, and improvements need to be assessed alongside accuracy on current facts.",
@@ -197,7 +251,74 @@
       ],
       "highlight": [],
       "source_url": "https://arxiv.org/abs/2312.05497v3"
-    }
+    },
+    "affiliations": [
+      "Peking University",
+      "Tsinghua University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Jin Jiang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Liming Yang",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "On AToKe single edits with GPT-J, METO raises MEMIT's historical explicit-time accuracy (HES) from 2.22% to 30.31%, while current accuracy (CES) falls from 99.66% to 86.4%.",
+      "prior": "ROME, MEMIT, and MEND optimize only the new fact, and evaluations such as MQuAKE check related facts; this work also requires the replaced fact to survive as dated history.",
+      "limitation": "Historical recall stays incomplete: after multiple edits the best final historical score (HES*) is 21.93%, and METO lowers MEMIT's current explicit-time accuracy by 13.26 points."
+    },
+    "prior_work": "Existing editors, from constrained fine-tuning and MEND to ROME and MEMIT, are built to make the model memorize the new fact, and their evaluations check edit success, paraphrases, and unrelated neighborhood facts. MQuAKE (Zhong et al., 2023) adds multi-hop questions about facts related to an edit, and Cohen et al. (2023) measure ripple effects. The paper argues that none of these checks whether the pre-edit fact is preserved as history, which is the requirement Temporal Knowledge Editing adds.",
+    "remove_results_table": true,
+    "metadata_override": {
+      "links": [
+        {
+          "label": "Paper",
+          "url": "https://ojs.aaai.org/index.php/AAAI/article/view/29912/31594"
+        },
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2312.05497"
+        },
+        {
+          "label": "Code",
+          "url": "https://github.com/Arvid-pku/ATOKE"
+        },
+        {
+          "label": "Data",
+          "url": "https://github.com/Arvid-pku/ATOKE/tree/main/datasets"
+        }
+      ],
+      "abstract": "The imperative task of revising or updating the knowledge stored within large language models arises from two distinct sources: intrinsic errors inherent in the model which should be corrected and outdated knowledge due to external shifts in the real world which should be updated. Prevailing efforts in model editing conflate these two distinct categories of edits arising from distinct reasons and directly modify the original knowledge in models into new knowledge. However, we argue that preserving the model's original knowledge remains pertinent. Specifically, if a model's knowledge becomes outdated due to evolving worldly dynamics, it should retain recollection of the historical knowledge while integrating the newfound knowledge. In this work, we introduce the task of Temporal Knowledge Editing (TKE) and establish a benchmark AToKe (Assessment of TempOral Knowledge Editing) to evaluate current model editing methods. We find that while existing model editing methods are effective at making models remember new knowledge, the edited model catastrophically forgets historical knowledge. To address this gap, we propose a simple and general framework termed Multi-Editing with Time Objective (METO) for enhancing existing editing models, which edits both historical and new knowledge concurrently and optimizes the model's prediction for the time of each fact. Our assessments demonstrate that while AToKe is still difficult, METO maintains the effectiveness of learning new knowledge and meanwhile substantially improves the performance of edited models on utilizing historical knowledge."
+    },
+    "abstract_label": "Read the abstract",
+    "figure_local": "assets/history-matters-lead.svg",
+    "figure_url": "https://arxiv.org/e-print/2312.05497v3 (file method_08161731.pdf; Figure 3 on page 6 of https://arxiv.org/pdf/2312.05497v3, same figure as Figure 3 in the AAAI 2024 paper)",
+    "figure_caption": "METO: the model is first queried for the fact it currently holds (its model-time knowledge), and then both that historical fact and the new facts become editing targets, optimized together with a time objective that predicts when each fact holds, using any baseline editing method. Original Figure 3 from the paper.",
+    "primary_figure": true
   },
   "knowledge-boundary": {
     "short_name": "Knowledge Boundary",
@@ -220,14 +341,14 @@
     ],
     "findings": [
       {
-        "value": "34.43 → 71.36",
-        "label": "PaRaRel success (%)",
-        "detail": "For LLaMA2, PGDC elicits more accepted answers than the zero-shot baseline, demonstrating how evaluation changes with prompt search."
+        "value": "71.36% vs 66.95%",
+        "label": "PaRaRel success, LLaMA2",
+        "detail": "PGDC vs the strongest baseline, P-few (few-shot prompting, counted as success if any listed paraphrase works). Zero-shot prompting with one wording reaches 34.43%."
       },
       {
-        "value": "83.3%",
-        "label": "Meaning preserved",
-        "detail": "Human evaluation of LLaMA2's optimized prompts finds substantial but imperfect semantic preservation; successful elicitation alone does not establish valid knowledge."
+        "value": "3.41% vs 88.35%",
+        "label": "CFACT false-target success, LLaMA2 (lower is better)",
+        "detail": "On counterfactual facts, AutoPrompt forces the false answer far more often; the paper attributes the difference to PGDC's semantic constraint."
       }
     ],
     "scope": "This estimates accessible knowledge under a particular search procedure. It needs target answers and model gradients, and semantic constraints do not guarantee meaning preservation or exhaustive coverage.",
@@ -253,7 +374,7 @@
     "source_note": "Verified ACL paper Table 1 (LLaMA2 PaRaRel zero 34.43%, PGDC 71.36%) and Section 4.5 (83.3% semantic preservation). Corrected title to plural Models. Existing abstract overstates independence from phrasing; revised summary avoids claiming a proven true or exhaustive knowledge boundary. v4 results table: Table 1, LLaMA2 row of each dataset block (ACL 2024 PDF page 5; identical in arXiv 2402.11493v2 source acl2023.tex, label tab:result).",
     "metadata_override": {
       "title": "Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation",
-      "abstract": "Fixed prompts can underestimate the knowledge that a language model can express. We define a knowledge boundary that includes both prompt-agnostic and prompt-sensitive knowledge, and introduce projected gradient descent with semantic constraints (PGDC) to search for prompts that elicit known answers. Experiments compare elicitation success, robustness on fabricated knowledge, and human judgments of semantic preservation. The resulting estimate characterizes accessible knowledge while retaining limitations from the search procedure and imperfect semantic constraints."
+      "abstract": "In recent years, substantial advancements have been made in the development of large language models, achieving remarkable performance across diverse tasks. To evaluate the knowledge ability of language models, previous studies have proposed lots of benchmarks based on question-answering pairs. We argue that it is not reliable and comprehensive to evaluate language models with a fixed question or limited paraphrases as the query, since language models are sensitive to prompt. Therefore, we introduce a novel concept named knowledge boundary to encompass both prompt-agnostic and prompt-sensitive knowledge within language models. Knowledge boundary avoids prompt sensitivity in language model evaluations, rendering them more dependable and robust. To explore the knowledge boundary for a given model, we propose a projected gradient descent method with semantic constraints, a new algorithm designed to identify the optimal prompt for each piece of knowledge. Experiments demonstrate a superior performance of our algorithm in computing the knowledge boundary compared to existing methods. Furthermore, we evaluate the ability of multiple language models in several domains with knowledge boundary."
     },
     "results_table": {
       "caption": "Table 1 (LLaMA2 rows only; transposed so methods are rows). Success rate of eliciting the target answer with LLaMA2 (7B): higher is better on PaRaRel and KAssess (true facts), lower is better on CFACT and ALCUNA (counterfactual or fabricated facts). P- baselines count a fact as elicited if any of its listed paraphrases succeeds; ALCUNA has a single expression per query, so P- and plain baselines coincide there. In the full table (GPT-2, GPT-J, Vicuna, LLaMA2), PGDC is also highest on PaRaRel and KAssess except Vicuna on PaRaRel, where P-few is marginally higher (69.69% vs 69.63%), and zero-shot has the lowest CFACT rate for every backbone.",
@@ -323,7 +444,48 @@
     "figure_local": "assets/knowledge-boundary-overview.png",
     "figure_url": "https://arxiv.org/e-print/2402.11493v2 (file figure/method.pdf; same figure as Figure 2 on page 3 of https://aclanthology.org/2024.acl-long.124.pdf)",
     "figure_caption": "PGDC optimizes a prompt in embedding space within the semantic space of the original question, projecting embeddings back to tokens where possible (left); each step combines a semantic loss against the original representation, a target loss over answer logits, and a regularization term (right). Original Figure 2 from the paper.",
-    "primary_figure": true
+    "primary_figure": true,
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xu Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Jie Ruan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "On PaRaRel with LLaMA2, PGDC elicits 71.36% of facts vs 66.95% for the strongest baseline (P-few); on counterfactual CFACT it elicits 3.41% vs AutoPrompt's 88.35%.",
+      "prior": "LAMA queries facts with fixed cloze prompts, ParaRel and KAssess with a few paraphrases, and AutoPrompt optimizes trigger tokens toward a target; this work optimizes prompts under a semantic constraint.",
+      "limitation": "PGDC needs the known answer and white-box gradients, and human raters judge only 83.3% of LLaMA2's optimized prompts to preserve the original meaning."
+    },
+    "prior_work": "LAMA (Petroni et al., 2019) probes each fact with a fixed cloze prompt, and ParaRel (Elazar et al., 2021) and KAssess (Dong et al., 2023) measure consistency across a limited set of paraphrases; the paper argues that all such evaluations still rest on fixed prompts. AutoPrompt (Shin et al., 2020) optimizes discrete trigger tokens to produce a target output, which the paper finds behaves more like an adversarial attack because it also elicits counterfactual targets. PGDC instead searches for the best wording within the semantic neighborhood of the original question.",
+    "abstract_label": "Read the abstract",
+    "remove_results_table": true
   },
   "knowledge-interplay": {
     "short_name": "EchoQA",
@@ -378,54 +540,128 @@
     "source_url": "https://arxiv.org/abs/2410.08414",
     "source_note": "Verified arXiv v1 Sections 3–4 and Table 3: Llama 3.1-70B ALCUNA unknown ratios w/o K 23.89, NI 62.72, TYI 23.88. These are unknown-answer rates, not error rates or accuracy. Findings explicitly limited to complementary scientific context. v4 results table: Table 4, arXiv 2410.08414v1 PDF page 8; source main/experimental_results.tex, label tab:ur_for_conflict.",
     "results_table": {
-      "caption": "Table 4. Unknown-answer rate U_R (%) under irrelevant context on ConflictQA (factual knowledge), by instruction: NI = Neutral, TYI = Trust Yourself, SOLI = Speak Out Loud. Lower means fewer abstentions, not higher accuracy; each model is evaluated on its own filtered example set (Table 2).",
+      "caption": "Table 3. Unknown-answer rate U_R (%) for complementary reasoning on ALCUNA (scientific knowledge): the share of answers marked Unknown on questions whose prerequisite fact the model answered without context. w/o K = no context; NI = Neutral Instruction with the complementary context; TYI = Trust Yourself Instruction; Gold K = all required knowledge, including the elicited parametric fact, written into the context. Lower means fewer abstentions, not higher accuracy; each model is evaluated on its own filtered example set (Table 2). NI gives the highest rate for every model except OpenAI o1 (o1-preview).",
       "headings": [
         "Model",
+        "w/o K",
         "NI",
         "TYI",
-        "SOLI"
+        "Gold K"
       ],
       "rows": [
         [
           "OpenAI o1",
-          "6.12",
-          "6.12",
-          "0.98"
+          "65.78",
+          "46.12",
+          "35.43",
+          "20.63"
         ],
         [
           "GPT-4o",
-          "50.38",
-          "13.46",
-          "0.53"
+          "36.45",
+          "59.90",
+          "26.94",
+          "8.08"
         ],
         [
           "GPT-4o-mini",
-          "48.42",
-          "17.81",
-          "0.80"
+          "46.12",
+          "76.13",
+          "68.28",
+          "12.52"
         ],
         [
-          "Llama3.1-70B",
-          "55.14",
-          "27.36",
-          "2.33"
-        ],
-        [
-          "Llama3.1-8B",
-          "50.41",
+          "Llama 3.1-70B",
+          "23.89",
+          "62.72",
           "23.88",
-          "4.83"
+          "0.08"
         ],
         [
-          "Qwen2-7B",
-          "80.59",
-          "41.82",
-          "4.57"
+          "Llama 3.1-8B",
+          "18.12",
+          "58.50",
+          "34.35",
+          "12.70"
+        ],
+        [
+          "Qwen 2-7B",
+          "40.28",
+          "81.26",
+          "73.62",
+          "28.60"
         ]
       ],
       "highlight": [],
       "source_url": "https://arxiv.org/abs/2410.08414v1"
-    }
+    },
+    "affiliations": [
+      "University of California, Santa Barbara",
+      "University of Arizona"
+    ],
+    "authors_detail": [
+      {
+        "name": "Sitao Cheng",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Liangming Pan",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xinyi Wang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "William Yang Wang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "Llama 3.1-70B answers Unknown 62.72% of the time with complementary context, vs 23.89% with no context and 0.08% with all facts supplied.",
+      "prior": "Knowledge-conflict studies (Xie et al., 2024; Wu et al., 2024) test one relationship at a time; EchoQA compares four kinds of context in one benchmark.",
+      "limitation": "The instructions that restore parametric knowledge must tell the model its context is insufficient, which the authors call impractical."
+    },
+    "prior_work": "Earlier studies examine one relationship at a time: context that conflicts with what the model knows (Wang et al., 2023b; Xie et al., 2024) or irrelevant context (Wu et al., 2024). ConflictQA (Xie et al., 2024) places the model's own elicited evidence and conflicting evidence together in the prompt and asks it to choose; EchoQA puts only the contextual knowledge in the prompt, so the model must draw on its parametric knowledge unprompted. It also adds the complementary case, built from new entity profiles rather than the entity-description substitutions of earlier multi-hop datasets, so that the context is new to the model.",
+    "metadata_override": {
+      "links": [
+        {
+          "label": "Paper",
+          "url": "https://arxiv.org/abs/2410.08414"
+        },
+        {
+          "label": "Code",
+          "url": "https://github.com/sitaocheng/Knowledge_Interplay"
+        },
+        {
+          "label": "Data",
+          "url": "https://github.com/sitaocheng/Knowledge_Interplay/tree/main/echoqa_dataset"
+        }
+      ]
+    },
+    "figure_local": "assets/knowledge-interplay-lead.svg",
+    "figure_url": "https://arxiv.org/e-print/2410.08414v1 (file img/main_example.pdf; Figure 1 on page 2 of https://arxiv.org/pdf/2410.08414v1)",
+    "figure_caption": "EchoQA's construction: the model is first questioned to elicit the facts it knows (unanswerable ones are discarded), contexts that are supportive, complementary, conflicting, or irrelevant to that knowledge are then built, and the model is asked again with the context; Llama 3.1-70B on ALCUNA often answers 'I don't know' despite knowing the fact. Original Figure 1 from the paper.",
+    "primary_figure": true
   },
   "mc-mke": {
     "short_name": "MC-MKE",
@@ -448,14 +684,14 @@
     ],
     "findings": [
       {
-        "value": "44,118",
-        "label": "Test inputs",
-        "detail": "The benchmark expands 2,884 knowledge entries into multiple probes, allowing an edit's downstream consistency to be checked from different inputs."
+        "value": "98.48 vs 9.09",
+        "label": "IE_edit reliability vs consistency (%)",
+        "detail": "InstructBLIP edited with FT(LLM) or SERAC: the requested recognition edit almost always succeeds, but the image-based fact rarely follows. IKE reaches 49.05 consistency."
       },
       {
-        "value": "Consistency gap",
-        "label": "Across four methods",
-        "detail": "Fine-tuning, MEND, IKE, and SERAC do not maintain strong consistency across all three scenarios, especially after image-recognition edits."
+        "value": "38.07 vs 9.09",
+        "label": "IE_edit consistency: vision vs LLM fine-tuning (%)",
+        "detail": "On InstructBLIP, fine-tuning the vision module keeps recognition edits more consistent; for textual-fact edits the LLM module wins (MiniGPT-v2 SRO_edit: 91.24 vs 31.67)."
       }
     ],
     "scope": "The study tests four editing methods on 7B multimodal checkpoints. High consistency can reflect overfitting, so it must be interpreted together with preservation of unrelated knowledge.",
@@ -480,7 +716,25 @@
     "source_url": "https://aclanthology.org/2025.findings-acl.896/",
     "source_note": "Verified ACL PDF Sections 3, 4.3, 5.2 and Limitations. Table 2: 44,118 test inputs / 2,884 knowledge entries. Corrected current page's unsupported six-method claim and inaccurate misreading/misrecognition taxonomy; actual scenarios are IE_edit, SRO_edit, IRO_edit. Four method families include vision/language component variants. v4 results table: Appendix Table 9, InstructBLIP block (ACL 2025 Findings PDF page 15). The main-text Figure 4 shows the same results only as radar charts..",
     "metadata_override": {
-      "abstract": "MC-MKE evaluates whether multimodal knowledge edits remain consistent across image recognition, textual facts, and image-based factual questions. It introduces three editing scenarios derived from a decomposed representation of multimodal knowledge, and evaluates consistency alongside reliability, locality, and generality. Experiments with fine-tuning, MEND, IKE, and SERAC reveal limitations across the scenarios, particularly in maintaining agreement between related answers after an edit."
+      "abstract": "Multimodal large language models (MLLMs) are prone to non-factual or outdated knowledge issues, highlighting the importance of knowledge editing. Many benchmark has been proposed for researching multimodal knowledge editing. However, previous benchmarks focus on limited scenarios due to the lack of rigorous definition of multimodal knowledge. To better evaluate multimodal knowledge editing, we propose a decomposed definition of multimodal knowledge. Following the decomposed definition of multimodal knowledge, we introduce three scenarios and a novel requirement modality consistency. We construct MC-MKE, a fine-grained Multimodal Knowledge Editing benchmark emphasizing Modality Consistency through strict data selection. We evaluate four multimodal knowledge editing methods on MC-MKE, revealing their limitations, particularly in terms of modality consistency. Our work highlights the challenges posed by multimodal knowledge editing and motivates further research in developing effective techniques for this task.",
+      "links": [
+        {
+          "label": "Paper",
+          "url": "https://aclanthology.org/2025.findings-acl.896/"
+        },
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2406.13219"
+        },
+        {
+          "label": "Code",
+          "url": "https://github.com/reroze/MC-MKE"
+        },
+        {
+          "label": "Data",
+          "url": "https://huggingface.co/datasets/reroze/MC-MKE"
+        }
+      ]
     },
     "results_table": {
       "caption": "Table 9 (InstructBLIP rows only). Scores (%) on IE_edit, where the edit changes which entity is recognized in the image, higher is better; Vision/LLM indicates the edited model component. '/' marks metrics not evaluated for IKE because the model does not accept multiple images.",
@@ -547,7 +801,69 @@
     },
     "figure_local": "assets/mc-mke-overview.png",
     "figure_url": "https://aclanthology.org/2025.findings-acl.896.pdf (page 1, Figure 1; rendered from the PDF at 800 dpi and cropped)",
-    "figure_caption": "An image-recognition edit: the model wrongly recognizes the pictured player as Mac Allister and so answers Liverpool; the edit changes the recognized entity to Messi, and consistency requires the image-based club answer to change to Miami FC. Original Figure 1 from the paper."
+    "figure_caption": "An image-recognition edit: the model wrongly recognizes the pictured player as Mac Allister and so answers Liverpool; the edit changes the recognized entity to Messi, and consistency requires the image-based club answer to change to Miami FC. Original Figure 1 from the paper.",
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Junzhe Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Huixuan Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Baizhou Huang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xu Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xinyu Hu",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "On recognition edits (IE_edit) in InstructBLIP, FT(LLM) and SERAC reach 98.48% reliability but only 9.09% consistency; the most consistent method, IKE, reaches 49.05%.",
+      "prior": "MMEdit edits VQA and captioning answers and VLKEB and MIKE edit entity recognition, without testing consistency; this work covers three decomposed edit scenarios and checks that linked answers change together.",
+      "limitation": "Experiments cover only two 7B multimodal models (InstructBLIP, MiniGPT-v2) and four editing methods; the authors could not test larger checkpoints."
+    },
+    "prior_work": "Text-only editing benchmarks such as CounterFact, MQuAKE, and AToKe address language-model editing; MC-MKE builds its facts from MQuAKE. Among multimodal benchmarks, MMEdit (Cheng et al., 2024) is built from visual question answering and image captioning, while VLKEB (Huang et al., 2024) and MIKE (Li et al., 2024b) focus on entity-level recognition edits. The paper argues that none defines multimodal knowledge as recognition composed with a textual fact, so none checks whether an edit to one component carries through to the composed answer.",
+    "remove_results_table": true,
+    "abstract_label": "Read the abstract"
   },
   "self-generated-documents": {
     "short_name": "Self-Generated Documents",
@@ -570,14 +886,14 @@
     ],
     "findings": [
       {
-        "value": "Task-dependent",
-        "label": "Best document style",
-        "detail": "Detailed, authoritative documents work well for fact verification; conversational, broader descriptions are more effective for long-form questions in the main experiments."
+        "value": "53.6 vs 52.1",
+        "label": "Average score: CCU + style-transformed Wikipedia vs GenRead Direct Mix",
+        "detail": "Qwen2.5-32B-Instruct; mean of EM (TQA, FEVER) and F1 (HotpotQA, ELI5). Wikipedia passages alone average 45.6."
       },
       {
-        "value": "Capacity matters",
-        "label": "Generator quality",
-        "detail": "Larger document generators help, while smaller ones can underperform both answering without documents and answering with retrieved Wikipedia passages."
+        "value": "26.7 vs 26.5",
+        "label": "ELI5 F1: Wikipedia alone vs best mix",
+        "detail": "On long-form QA, retrieved Wikipedia passages alone remain best; no self-generated document type or mixing strategy surpasses them."
       }
     ],
     "scope": "Main experiments use Qwen2.5-32B-Instruct and 500 examples per task across four datasets. Generated documents can contain factual errors, and effective styles vary with task and model.",
@@ -617,7 +933,7 @@
           "url": "https://github.com/leejamesss/Eval_Self_Docs_RAG"
         }
       ],
-      "abstract": "This study investigates how self-generated documents contribute to retrieval-augmented generation. It evaluates the effects of model size and document quantity, then uses a taxonomy based on Systemic Functional Linguistics to compare document tone, granularity, and structure. Experiments across four knowledge-intensive tasks examine both generated documents and combinations with retrieved Wikipedia passages. Results show that useful document properties depend on the task, generator capacity, and integration strategy.",
+      "abstract": "The integration of documents generated by LLMs themselves (Self-Docs) alongside retrieved documents has emerged as a promising strategy for retrieval-augmented generation systems. However, previous research primarily focuses on optimizing the use of Self-Docs, with their inherent properties remaining underexplored. To bridge this gap, we first investigate the overall effectiveness of Self-Docs, identifying key factors that shape their contribution to RAG performance (RQ1). Building on these insights, we develop a taxonomy grounded in Systemic Functional Linguistics to compare the influence of various Self-Docs categories (RQ2) and explore strategies for combining them with external sources (RQ3). Our findings reveal which types of Self-Docs are most beneficial and offer practical guidelines for leveraging them to achieve significant improvements in knowledge-intensive question answering tasks.",
       "citation": "@inproceedings{li-etal-2025-evaluating,\n    title = {Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models},\n    author = {Li, Jiatao and Hu, Xinyu and Yin, Xunjian and Wan, Xiaojun},\n    booktitle = {Findings of the Association for Computational Linguistics: NAACL 2025},\n    year = {2025},\n    url = {https://aclanthology.org/2025.findings-naacl.149/},\n    doi = {10.18653/v1/2025.findings-naacl.149},\n    pages = {2741--2775}\n}"
     },
     "results_table": {
@@ -706,7 +1022,48 @@
     "figure_local": "assets/self-generated-documents-overview.png",
     "figure_url": "https://aclanthology.org/2025.findings-naacl.149.pdf (page 2, Figure 1 embedded image; pixel-identical to figure/overview.png in https://arxiv.org/e-print/2410.13192v4)",
     "figure_caption": "The three research questions on one example question: RQ1 compares a direct answer with answering from self-generated documents, RQ2 shows four of the eight document types from the tone/granularity/structure taxonomy, and RQ3 contrasts Direct Mix with Style-Transformation Mix of Wikipedia and self-generated documents. Original Figure 1 from the paper.",
-    "primary_figure": true
+    "primary_figure": true,
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Jiatao Li",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xinyu Hu",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "CCU documents plus style-transformed Wikipedia average 53.6 (EM/F1, Qwen2.5-32B), vs 52.1 for GenRead Direct Mix and 45.6 for Wikipedia alone.",
+      "prior": "GenRead (Yu et al., 2023) generates background documents instead of retrieving them; this work asks which document types and mixing strategies help.",
+      "limitation": "Human evaluation checks only style adherence; the authors note that the factual accuracy of self-generated documents cannot be guaranteed."
+    },
+    "prior_work": "Generation-augmented methods such as GenRead (Yu et al., 2023) and recitation-augmented models (Sun et al., 2023) have a model write background passages before answering, and hybrid approaches (Zhang et al., 2023; Abdallah and Jatowt, 2024) merge generated with retrieved documents. The paper notes that this work has mostly focused on how to use such documents, for example how to handle conflicting knowledge, while overlooking how different types of generated documents affect performance. It therefore classifies Self-Docs with a Systemic Functional Linguistics taxonomy and reuses GenRead's pipeline as its generator.",
+    "abstract_label": "Read the abstract",
+    "remove_results_table": true
   },
   "damon": {
     "short_name": "DAMON",
@@ -729,14 +1086,14 @@
     ],
     "findings": [
       {
-        "value": "5 models",
-        "label": "Three safety datasets",
-        "detail": "Evaluation spans AdvBench, MaliciousInstruct, and HarmBench, revealing undesired responses across the five tested models under the study's protocol."
+        "value": "92.0% vs 84.0%",
+        "label": "HarmBench attack success, GPT-3.5: DAMON vs MPA",
+        "detail": "Attack success rate (ASR): share of instructions whose response the GPT-4o judge rates 5 of 5 for harm. MPA is the strongest of six baselines here."
       },
       {
-        "value": "Context matters",
-        "label": "A conversation-level risk",
-        "detail": "Dialogue-history analysis shows that safety assessment needs to consider accumulated context, because isolated-message testing can miss failures that emerge across turns."
+        "value": "84.0% → 68.5%",
+        "label": "HarmBench ASR on GPT-4o without depth or breadth expansion",
+        "detail": "Limiting decomposition to one round, or to one strategy, lowers success on every victim model, so iterative and diverse decomposition both matter."
       }
     ],
     "scope": "Results depend on the tested model versions, manually specified objectives, and evaluation protocol. The study diagnoses vulnerabilities; it does not establish comprehensive safety or a complete defense.",
@@ -761,7 +1118,8 @@
     "source_url": "https://aclanthology.org/2025.emnlp-main.323/",
     "source_note": "Verified ACL PDF abstract, Table 1 (five models, three datasets, six baseline methods), Section 4, and Limitations. Kept description focused on research evaluation; no attack prompts, decomposition instructions, or operating parameters. Corrected citation pages from 6361–6377 to 6350–6366 per authoritative PDF. v4 results table: Table 1, HarmBench block, ACL Anthology 2025.emnlp-main.323 PDF page 6 (proceedings p. 6355); values checked with pdftotext -layout and -raw.",
     "metadata_override": {
-      "citation": "@inproceedings{zhang-etal-2025-damon,\n    title = {{DAMON}: A Dialogue-Aware {MCTS} Framework for Jailbreaking Large Language Models},\n    author = {Zhang, Xu and Yin, Xunjian and Jing, Dinghao and Zhang, Huixuan and Hu, Xinyu and Wan, Xiaojun},\n    booktitle = {Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing},\n    year = {2025},\n    url = {https://aclanthology.org/2025.emnlp-main.323/},\n    pages = {6350--6366}\n}"
+      "citation": "@inproceedings{zhang-etal-2025-damon,\n    title = {{DAMON}: A Dialogue-Aware {MCTS} Framework for Jailbreaking Large Language Models},\n    author = {Zhang, Xu and Yin, Xunjian and Jing, Dinghao and Zhang, Huixuan and Hu, Xinyu and Wan, Xiaojun},\n    booktitle = {Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing},\n    year = {2025},\n    url = {https://aclanthology.org/2025.emnlp-main.323/},\n    pages = {6350--6366}\n}",
+      "abstract": "While large language models (LLMs) demonstrate remarkable capabilities across a wide range of tasks, they remain vulnerable to generating outputs that are potentially harmful. Red teaming, which involves crafting adversarial inputs to expose vulnerabilities, is a widely adopted approach for evaluating the robustness of these models. Prior studies have indicated that LLMs are susceptible to vulnerabilities exposed through multi-turn interactions as opposed to single-turn scenarios. Nevertheless, existing methods for multi-turn attacks mainly utilize a predefined dialogue pattern, limiting their effectiveness in realistic situations. Effective attacks require adaptive dialogue strategies that respond dynamically to the initial user prompt and the evolving context of the conversation. To address these limitations, we propose DAMON, a novel multi-turn jailbreak attack method. DAMON leverages Monte Carlo Tree Search (MCTS) to systematically explore multi-turn conversational spaces, efficiently identifying sub-instruction sequences that induce harmful responses. We evaluate DAMON’s efficacy across five LLMs and three datasets. Our experimental results show that DAMON can effectively induce undesired behaviors."
     },
     "results_table": {
       "caption": "Table 1 (HarmBench rows, transposed so that methods are rows and victim models are columns). Attack success rate (%), the share of test instructions whose response the GPT-4o judge rated 5 on a 1-5 harmfulness scale; higher means more safety failures were elicited. ActorAttack exceeds DAMON on GPT-4o (84.5% vs. 84.0%).",
@@ -838,6 +1196,61 @@
     },
     "figure_local": "assets/damon-overview.png",
     "figure_url": "https://aclanthology.org/2025.emnlp-main.323.pdf (page 3, Figure 2, left panel only; rendered at 800 dpi)",
-    "figure_caption": "DAMON's search loop: Monte Carlo tree search over attack states, where edges are decomposition strategies and each iteration selects a node by maximum UCT value, expands it by instruction decomposition, scores the simulated dialogue, and backpropagates the score. Left panel of original Figure 2 from the paper; the right panel, which details the contents of an attack state, the dialogue-evaluation pipeline, and an example decomposition of a harmful request under three strategies, is omitted."
+    "figure_caption": "DAMON's search loop: a Monte Carlo tree whose nodes are attack states and whose edges are decomposition strategies, searched by repeated selection (maximum UCT value), expansion, simulated dialogue evaluation, and backpropagation. Left panel of original Figure 2 from the paper; the right panel is omitted.",
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xu Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Dinghao Jing",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Huixuan Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xinyu Hu",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "On HarmBench against GPT-3.5, DAMON reaches 92.0% attack success rate vs 84.0% for MPA, the strongest baseline; on GPT-4o, ActorAttack edges it (84.5% vs 84.0%).",
+      "prior": "ActorAttack and other multi-turn attacks follow predefined decomposition patterns, and PAIR and TAP refine single-turn prompts; this work searches over decomposition strategies turn by turn with MCTS.",
+      "limitation": "Attack objectives and the three decomposition strategies are manually designed, and success is judged by GPT-4o, with only 20 HarmBench instances checked by human annotators."
+    },
+    "prior_work": "Single-turn jailbreaks either optimize adversarial suffixes with gradients, as in GCG, or refine a whole prompt with an attack LLM, as in PAIR and TAP. Multi-turn attacks decompose a harmful query into less harmful sub-questions or escalate gradually from benign topics, as in Crescendo (Russinovich et al., 2025), but the paper notes that they follow a static, manually designed dialogue pattern; ActorAttack, for instance, builds its interactions from predefined decomposition patterns. DAMON instead treats decomposition as a search problem and chooses among strategies at each turn according to the victim model's responses.",
+    "abstract_label": "Read the abstract",
+    "primary_figure": true
   }
 }

@@ -2,23 +2,23 @@
   "story": {
     "title": "Why should a token become permanent as soon as it is generated?",
     "paragraphs": [
-      "Ordinary autoregressive decoding commits to an output from left to right. A later phrase can make an earlier choice look wrong, but the decoder does not revise that choice in place. Asking the model to critique and regenerate its answer creates another sequential pass. Parallel decoding addresses latency, yet independently proposed tokens can also disagree with one another. COrAL studies these two problems together: how to keep the useful sequential structure while making nearby predictions revisable.",
-      "The important restriction is local. Learning arbitrary orderings over an entire sequence is difficult; COrAL instead learns dependencies within a bounded window. A target position may be predicted from an earlier prefix or reconstructed with some later text available. These are different views of the same position, and their agreement can help decide what to keep."
+      "Autoregressive decoding commits to each token from left to right; when a later phrase makes an earlier choice look wrong, revising it takes another sequential pass. Parallel decoding cuts latency, but independently proposed tokens can disagree. COrAL keeps the sequential structure while making nearby predictions revisable.",
+      "The key restriction is locality: COrAL learns dependencies only within a bounded window, not arbitrary orderings over a whole sequence. A position can be predicted from the prefix or reconstructed with some later text visible, and agreement between these two views helps decide what to keep."
     ]
   },
   "mechanism": {
     "title": "Train for revision, then decode with several views of each position",
     "paragraphs": [
-      "The training objective has two complementary parts. Forward training predicts several future positions from clean sequences. Reconstruction training corrupts patches of a sequence and asks the model to recover the original tokens, with loss applied to corrupted positions. Patch replacement and repetition create errors that the model must learn to repair. Refinement is therefore a trained capability, rather than an instruction added to an unchanged next-token model.",
-      "Predicting different positions from one context also requires knowing which position is being queried. COrAL modifies RoPE in the final attention layer so that the query is encoded for the target position. This target-aware representation avoids a separate output head for every offset. Training is staged: adapt the last layer first, then train the network more broadly, reducing the mismatch with the pretrained model.",
-      "At inference, a sliding block contains positions to predict or revise. The model combines available conditional distributions, with weights reflecting dependency distance and context confidence. It constructs candidate blocks and verifies them using next-token and backward probabilities, with an additional contrastive term. An acceptance procedure determines how much of the block's prefix can be committed. Only that accepted prefix moves the window forward; the remaining positions can be reconsidered."
+      "Forward training predicts several future positions from clean sequences. Reconstruction training corrupts patches by replacement or repetition and asks the model to recover the original tokens. Refinement is therefore a trained capability, not an instruction given to an unchanged next-token model.",
+      "To predict several positions from one context, COrAL applies a generalized RoPE (rotary position embedding) in the last Transformer layer so that the query encodes the target position, avoiding a separate output head for each offset. Training adapts the last layer first and then the whole network, to limit the mismatch with the pretrained model.",
+      "At inference, a sliding block holds the positions to predict or revise. The model combines conditional distributions weighted by dependency distance and confidence, builds candidate blocks, and verifies them with next-token and backward probabilities plus a contrastive term. Only the accepted prefix is committed and advances the window; other positions stay revisable."
     ]
   },
   "evidence": {
-    "title": "Accuracy and speed change with the decoding setting",
+    "title": "Full COrAL gains on three of five benchmarks and fails on code",
     "paragraphs": [
-      "The ablations separate two contributions. On GSM8K, the full system raises accuracy from 74.1% to 75.3% while increasing accepted-token throughput from 39.7 to 43.4 tokens/s. Removing multi-forward prediction keeps backward refinement and reaches 78.7%, but throughput falls to 14.9 tokens/s. Removing verification reaches 156.8 tokens/s, while accuracy falls to 72.4%. The 4.6-point gain and 3.9× speedup describe different operating points.",
-      "The code results expose a boundary that the headline numbers miss. HumanEval pass@1 drops from 64.6% to 13.0% with the full method, and the paper's error analysis identifies syntax as a major failure source. Disabling multi-forward prediction recovers 61.6%, at lower throughput. Local agreement is useful for refinement, but it is not enough to ensure globally well-formed programs. The experiment asks where flexible token ordering helps, and where stronger structural constraints are needed."
+      "Among COrAL’s settings, backward refinement without multi-forward prediction gives the highest accuracy and the lowest throughput, and multi-forward prediction without verification the highest throughput and the lowest accuracy; the full method lies between them on every benchmark. The abstract’s 4.6-point GSM8K gain and 3.9× speedup thus come from two different settings. Throughput is accepted tokens per second, measured for both decoders without a KV cache at batch size 1.",
+      "Code is the boundary. The paper attributes the HumanEval drop mainly to invalid syntax; recovering most of the pass rate requires turning off multi-forward prediction and raising the acceptance threshold, which runs slower than the baseline. Local agreement helps refinement but does not ensure well-formed programs."
     ]
   },
   "sources": [
@@ -37,7 +37,11 @@
   ],
   "reading_notes": "Re-read full Sections 2,3,4. Extracted all four decoding rows for GSM8K/MATH/LogiQA/ReClor/HumanEval. v5 removes the hand-authored token trace; the paper's own Figure 2 is the overview figure. The explorer shows all 40 measured points from Tables 1–2 and the HumanEval table at once. Preserved comparison settings; HumanEval 61.6 uses ε = 0.5 and code runs on different GPUs.",
   "demo": {
-    "kind": "measured-small-multiples",
-    "provenance": "All 40 values (5 benchmarks x 4 settings x accuracy and accepted tokens/s) from Tables 1-2 and the §4.1 HumanEval table, Mistral-7B-v0.3. The hand-authored token trace was removed; the paper's Figure 2 illustrates the mechanism."
+    "kind": "figure-replay-and-measured-small-multiples",
+    "placement": "method",
+    "eyebrow": "Published example · Figure 2, step by step",
+    "evidence_eyebrow": "Measured · Tables 1–2 and §4.1",
+    "provenance": "Method: the tokens, colours and arrows of Figure 2 transcribed exactly (1st, 2nd, 3rd, 9th and 10th steps; steps 4–8 are not printed), with block bounds derived from Algorithm 1 (k = 3, b = 6). Evidence: all 40 values (5 benchmarks x 4 settings x accuracy and accepted tokens/s) from Tables 1-2 and the §4.1 HumanEval table, Mistral-7B-v0.3.",
+    "method_after": 3
   }
 }

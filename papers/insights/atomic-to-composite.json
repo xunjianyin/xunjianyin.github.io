@@ -2,23 +2,22 @@
   "story": {
     "title": "A high score can hide the missing skill",
     "paragraphs": [
-      "Suppose a document identifies the new editor of a magazine, while the editor’s business partner and that partner’s occupation are facts stored in a model. Answering the full question requires crossing between context and memory. Success on either source alone leaves this transition untested. Ordinary question-answering benchmarks make the diagnosis difficult: a model might already know the complete answer from pretraining.",
-      "The study therefore builds synthetic biographies and separates which relations are learned through parameters from which arrive in context. Questions follow paths of two to five relations. This makes the location of each required fact explicit, so a failure to combine sources can be distinguished from the absence of the underlying information."
+      "Suppose a document names a magazine’s new chief editor, while the editor’s business partner and that partner’s occupation are stored in the model. Answering requires crossing between context and memory. Ordinary QA benchmarks cannot isolate this step, because a model may already know the full answer from pretraining.",
+      "The study therefore builds synthetic biographies, controls which relations are learned in parameters and which arrive in context, and asks questions along paths of two to five relations. Because every required fact has a known location, a failure to combine sources can be told apart from missing information."
     ]
   },
   "mechanism": {
     "title": "Control what is new at test time",
     "paragraphs": [
-      "The evaluation separates three kinds of novelty. IID questions use a practiced relational path with different entities. Composition questions recombine relations that appeared in other training paths. Structural zero-shot questions contain a relation absent from the training questions, although its facts remain available in biographies or context. This final category tests a broader transfer than changing the names in a familiar template.",
-      "The key intervention is the preparation before RL. One model receives SFT on parametric and contextual reasoning separately; another learns complete complementary questions. Both then receive the same composite RL examples, with GRPO rewarded only for the final answer. A further comparison matches SFT sample counts and hop distributions, reducing the possibility that an easier dataset or more reasoning steps explains the advantage.",
-      "The interactive example follows the paper’s editor-and-business-partner question. Switching between parametric, contextual, and combined tasks makes the required source of each fact explicit. A separate comparison shows measured SFT accuracy across the three generalization splits; the worked answer is not presented as a new model result."
+      "The test splits differ in novelty. I.I.D. questions reuse a practiced relational path with new entities; Composition questions recombine relations seen in other training paths; structural zero-shot questions contain a relation absent from all training questions, although its facts remain available in the biographies or the context.",
+      "The key variable is the preparation before RL. One model receives supervised fine-tuning (SFT) on parametric and contextual reasoning separately (Mem and Ctx in the tables), another on complete complementary questions (Comp). Both then get the same composite RL examples, trained with GRPO (Group Relative Policy Optimization) on a final-answer reward. A further comparison equalizes SFT sample counts and hop distributions."
     ]
   },
   "evidence": {
-    "title": "The prerequisite matters beyond the starting score",
+    "title": "Atomic skills, not a higher starting score, let RL generalize",
     "paragraphs": [
-      "In Section 5.2, models with comparable initial complementary-task scores respond differently to the same 12,800 RL examples. Learning both atomic skills provides a stronger foundation than limited direct composite supervision. Starting from the atomic model, further SFT, LoRA, and RL all help, but SFT is strongest on familiar paths while RL is strongest on the structural zero-shot split.",
-      "The pass@k analysis adds a separate test: after atomic preparation, the RL advantage persists even with 512 samples. After composite preparation, the curves approach each other. This is evidence of different changes to the answer distribution, but finite sampling cannot prove that a solution had exactly zero probability beforehand. The practical result is the curriculum effect; identifying the internal mechanism remains open."
+      "Starting scores do not explain the effect: models with similar initial complementary-task accuracy respond differently to the same 12,800 RL examples, and only the model that learned both atomic skills generalizes well. From that model, further SFT, LoRA and RL all help, but SFT is strongest on familiar paths and RL on the zero-shot split.",
+      "In pass@k, the RL advantage after atomic preparation persists up to 512 samples, while after composite preparation the curves converge; the paper reads this as RL synthesizing new strategies rather than amplifying existing ones. Finite sampling cannot prove that a solution had zero probability before RL, and the internal mechanism remains open."
     ]
   },
   "sources": [
@@ -35,7 +34,12 @@
   "demo": {
     "kind": "atomic-trace",
     "title": "One question, two sources of knowledge",
-    "caption": "Choose a task type to see every fact the question needs and where each one comes from. Below, measured SFT results for all three test splits appear together.",
-    "eyebrow": "Published example · Figure 1(a)"
+    "caption": "Choose a task type to see every fact the question needs and where each one comes from. Play follows the path one hop at a time: only the complementary task has to cross from the supplied document into the model’s stored facts.",
+    "eyebrow": "Published example · Figure 1(a)",
+    "evidence": {
+      "eyebrow": "Measured · Tables 1(b) and 2",
+      "title": "What each preparation generalizes to, and where the remaining errors occur",
+      "caption": "SFT results for all three test splits side by side, then the first wrong step of answers that stay wrong after composite RL."
+    }
   }
 }

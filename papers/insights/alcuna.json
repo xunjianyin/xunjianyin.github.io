@@ -1,24 +1,24 @@
 {
   "story": {
-    "title": "Novelty has to be controlled",
+    "title": "Artificial entities make novelty verifiable",
     "paragraphs": [
-      "A benchmark about new knowledge faces a basic identification problem: a model may answer because it memorized the entity, because it understood the supplied description, or because a familiar name suggested a plausible guess. ALCUNA makes novelty part of the experimental design. It creates artificial biological entities whose properties can be traced back to a controlled transformation of an existing knowledge graph.",
-      "The construction preserves enough biological structure for the questions to remain meaningful. Properties shared by a class are retained, while selected attributes and relationships change. This produces a harder test than inventing an arbitrary name with an unrelated list of facts: the new entity resembles something the model already knows, so familiar knowledge can help with reasoning but can also interfere with the new description."
+      "A correct answer about a new entity may come from memorization, from the supplied description, or from a guess prompted by a familiar name. ALCUNA controls for memorization by construction: its generator, KnowGen, creates artificial organisms by transforming entities in the Encyclopedia of Life (EOL) taxonomy, so every property traces back to a known operation.",
+      "Properties shared by the class are kept while selected attributes and relations change, so the questions stay biologically meaningful. This is a harder test than an arbitrary name with unrelated facts: the new entity resembles one the model already knows, so familiar knowledge can support reasoning or interfere with the new description."
     ]
   },
   "mechanism": {
-    "title": "A missing fact is also a test",
+    "title": "Each KnowGen operation fixes an expected answer",
     "paragraphs": [
-      "KnowGen uses four operations: inherit a property, vary its value, extend the entity with a related property, or drop a property. The paper's example starts from Alpaca: the new entity keeps a leaf diet, changes body mass from 60 to 56.5 kilograms, drops lifespan, and gains a first-appearance property from a related species. Each operation gives the evaluator a specific expectation about the answer.",
-      "Dropping lifespan is especially revealing. The description does not authorize copying the parent's lifespan, even if that value is readily available from memory. A correct response must distinguish an unspecified fact from an inherited one. Association questions add another requirement: follow a relationship from the artificial entity into existing knowledge, then complete the reasoning chain using a fact that was not repeated in the new description.",
-      "To isolate this last ability, the authors check whether each model already answers the prerequisite questions about existing entities. Association evaluation is filtered accordingly. Question templates are also generated before the artificial entity is inserted. These controls help separate failures to combine available facts from failures caused by an unknown prerequisite or a template that accidentally reveals the answer."
+      "KnowGen starts from a parent entity and its siblings in the same class. Heredity keeps a parent property, variation perturbs a numeric value or swaps in a value from a related entity, extension adds a sibling's property, and dropout removes a parent property. Each operation fixes the expected answer to a question.",
+      "Differentiation questions target the varied and dropped properties. Asked for a lifespan that dropout removed, the correct answer is that it is unknown, even though the parent's lifespan is easy to recall. Association questions follow a relation from the artificial entity into existing knowledge and finish the chain with a fact absent from the new description.",
+      "Questions are filtered so that each model fully recalls the parent entity and every hop of a reasoning chain, and the intersection across models is used. A failure therefore points to combining facts, not to a missing prerequisite."
     ]
   },
   "evidence": {
-    "title": "The bottleneck is integration",
+    "title": "The bottleneck is linking new to existing knowledge",
     "paragraphs": [
-      "The ablations make the benchmark more informative than a single average score. For ChatGLM, the association score rises from 27.47 to 44.43 when relevant entities along the reasoning chain are supplied, but falls to 18.56 with irrelevant entity information. For Vicuna, differentiation drops from 46.76 to 35.04 when the parent entity's information is added. Related context can therefore assist a missing connection or strengthen the wrong association.",
-      "These results concern the tested 2023 models, biological entities, and particular prompting conditions. They do not establish a permanent limit on learning novel facts. They instead show why evaluation should track understanding, separation from similar entities, and connection to existing knowledge individually. The paper also finds sensitivity to structured versus natural-language presentation, so success depends partly on how new knowledge is communicated."
+      "The context ablations show why separate ability scores matter. Supplying the chain entities raises association for all three open models, so the main problem is linking new and existing knowledge, not only multi-hop reasoning. Adding the parent entity instead lowers Vicuna's differentiation from 46.76 to 35.04: related context can supply a missing link or strengthen the wrong association.",
+      "Presentation also matters. All three open models score higher when the new entity is given as structured JSON than as natural-language text; ChatGLM's average falls to 20.54 with natural language. Success therefore depends partly on how new knowledge is communicated."
     ]
   },
   "sources": [
@@ -27,5 +27,126 @@
       "url": "https://aclanthology.org/2023.emnlp-main.87/"
     }
   ],
-  "reading_notes": "Read full construction, evaluation, ablations, and limitations. Figure 1 supports the Alpaca example. Table 4 association values: ChatGLM vanilla 27.47, chain 44.43, irrelevant 18.56. Table 3 Vicuna differentiation 46.76 to 35.04 with parent information. Avoid the internally inconsistent headline question total. Prerequisite filtering is model-specific. Biological examples describe benchmark-generated entities, not claims about real organisms."
+  "reading_notes": "Read full construction, evaluation, ablations, and limitations. Figure 1 supports the Alpaca example. Table 4 association values: ChatGLM vanilla 27.47, chain 44.43, irrelevant 18.56. Table 3 Vicuna differentiation 46.76 to 35.04 with parent information. Avoid the internally inconsistent headline question total. Prerequisite filtering is model-specific. Biological examples describe benchmark-generated entities, not claims about real organisms.",
+  "demo": {
+    "type": "knowgen",
+    "placement": "method",
+    "eyebrow": "Published example · Figure 1 · Algorithm 1",
+    "title": "Build Alcuna from Alpaca",
+    "description": "Switch KnowGen's operations on or off, then press Play to build the artificial entity one operation at a time. Each generated question lists the operations its expected answer depends on, and whether knowledge of the parent alone would answer it.",
+    "class": "Camels",
+    "parent": {
+      "name": "Alpaca",
+      "parts": [
+        "Al",
+        "paca"
+      ]
+    },
+    "sibling": {
+      "name": "Vicuna",
+      "parts": [
+        "Vi",
+        "cuna"
+      ]
+    },
+    "entity": "Alcuna",
+    "operations": {
+      "heredity": "Heredity keeps a parent property unchanged.",
+      "variation": "Variation perturbs a value: Gaussian noise for a number, a sibling of the related entity for a relation.",
+      "dropout": "Dropout removes a parent property from the new entity.",
+      "extension": "Extension adds a property sampled from a sibling of the parent."
+    },
+    "properties": [
+      {
+        "id": "body-mass",
+        "label": "Body mass",
+        "value": "60kg",
+        "op": "variation",
+        "varied": "56.5kg",
+        "how": "numeric value + N(0, v/10)"
+      },
+      {
+        "id": "life-span",
+        "label": "Life span",
+        "value": "25.8years",
+        "op": "dropout"
+      },
+      {
+        "id": "diet",
+        "label": "Diet",
+        "value": "leaves",
+        "op": "heredity"
+      },
+      {
+        "id": "eaten-by",
+        "label": "Eaten by",
+        "value": "Cougar",
+        "op": "variation",
+        "varied": "Jaguar",
+        "relation": true,
+        "how": "a sibling of Cougar in the class Cats"
+      }
+    ],
+    "sibling_properties": [
+      {
+        "id": "sib-body-mass",
+        "label": "Body mass",
+        "value": "47.5kg"
+      },
+      {
+        "id": "first-appearance",
+        "label": "First appearance",
+        "value": "middle Pleistocene age",
+        "op": "extension"
+      },
+      {
+        "id": "weaning-age",
+        "label": "Weaning age",
+        "value": "7 months"
+      },
+      {
+        "id": "sib-eaten-by",
+        "label": "Eaten by",
+        "value": "Cougar",
+        "relation": true
+      }
+    ],
+    "existing": {
+      "class": "Cats",
+      "members": [
+        "Cougar",
+        "Jaguar"
+      ],
+      "relations": [
+        [
+          "Jaguar",
+          "Compete with",
+          "Maned Wolf"
+        ]
+      ]
+    },
+    "questions": {
+      "diet": {
+        "text": "What type of food is included in the diet of Alcuna?",
+        "answer": "leaves"
+      },
+      "first-appearance": {
+        "text": "In which geological period did Alcuna first appear?",
+        "answer": "middle Pleistocene age"
+      },
+      "body-mass": {
+        "text": "Does Alcuna have a body mass of 60kg?",
+        "answer": "No."
+      },
+      "life-span": {
+        "text": "What's the average life span of Alcuna?",
+        "answer": "I don't know."
+      },
+      "eaten-by": {
+        "text": "What organism is the competitor of the Alcuna's natural enemy?",
+        "answer": "Maned Wolf."
+      }
+    },
+    "source_url": "https://aclanthology.org/2023.emnlp-main.87/"
+  }
 }

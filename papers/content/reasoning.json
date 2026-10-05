@@ -20,14 +20,14 @@
     ],
     "findings": [
       {
-        "value": "90.30% → 18.41%",
-        "label": "Composite SFT: IID to zero-shot",
-        "detail": "Direct composite supervision performs well on familiar paths but drops sharply on the structural zero-shot split."
+        "value": "50.87 vs 43.25",
+        "label": "Zero-shot exact match (%) · SFT(Mem+Ctx) → RL(Comp) vs SFT(Mem+Ctx+Comp)",
+        "detail": "Qwen2.5-1.5B on relations absent from training questions. SFT on all data still leads on I.I.D. and Composition."
       },
       {
-        "value": "Atomic skills first",
-        "label": "Condition for RL generalization",
-        "detail": "RL generalizes better after learning both component skills than after direct composite supervision in the tested setting."
+        "value": "90.30 → 18.41",
+        "label": "Composite-only SFT · I.I.D. to zero-shot exact match (%)",
+        "detail": "Supervising the composite task directly fits familiar paths but collapses on unseen relations, the paper’s “SFT generalization paradox”."
       }
     ],
     "scope": "These results isolate a training mechanism in synthetic biography tasks; they do not establish that RL universally creates new reasoning abilities across domains.",
@@ -50,14 +50,14 @@
       "caption": "The training sequence is the experimental variable."
     },
     "figure_index": 1,
-    "figure_caption": "RL gains depend on which reasoning skills were established during SFT.",
+    "figure_caption": "The study's setup: worked examples of parametric, contextual, and complementary reasoning (a), training paths and the three test levels of I.I.D., composition, and zero-shot (b), and which training recipes generalize to each level (c). Original Figure 1 from the paper.",
     "source_url": "https://arxiv.org/html/2512.01970v1",
     "source_note": "Verified abstract, Sections 3–6, Table 1. Exact 90.30 and 18.41 are Qwen2.5-1.5B complementary-SFT IID/zero-shot scores. Removed old invented four-level comparison and universal synthesizer language. Structural zero-shot means unseen relations in QA, not ordinary zero-shot prompting. Table 1 values are authoritative here; nearby Section 4.3 prose contains conflicting values. v4 results table: Table 7 (label tab:other_sufficiency_results), arXiv 2512.01970v1 source file iclr2025_conference.tex lines 779-797; PDF page 19 (Appendix D discusses it).",
-    "figure_url": "https://arxiv.org/html/2512.01970v1/images/figure1_relative_abs.png",
+    "figure_url": "https://arxiv.org/e-print/2512.01970v1 (file images/multi-gen.pdf; Figure 1 on page 2 of https://arxiv.org/pdf/2512.01970v1)",
     "metadata_override": {
       "abstract": "Reinforcement Learning (RL) following Supervised Fine-Tuning (SFT) has become the standard paradigm for post-training Large Language Models (LLMs). However, the mechanism by which RL contributes to reasoning capabilities—whether it incentivizes the synthesis of new skills or merely amplifies existing behaviors—remains a subject of intense debate. In this work, we investigate this question through the lens of Complementary Reasoning, a complex task that requires integrating internal parametric knowledge with external contextual information. Using a controlled synthetic dataset of human biographies, we strictly decouple this ability into two atomic skills: Parametric Reasoning (relying on internal knowledge encoded in model parameters) and Contextual Reasoning (depending on novel information provided in the context window). To rigorously assess capability boundaries, we evaluate generalization across three distinct levels of difficulty: I.I.D., Composition, and Zero-shot settings. We find that while SFT is sufficient for in-distribution performance, it struggles with out-of-distribution generalization, particularly in Zero-shot settings where relational combinations are novel. Crucially, we identify the SFT Generalization Paradox: Models supervised solely on the composite task achieve near-perfect in-distribution accuracy (90%) but collapse on out-of-distribution generalization (18%), indicating their reliance on rote memorization of path shortcuts. In contrast, we find that RL acts as a reasoning synthesizer rather than a probability amplifier. However, we uncover a strict atomic prerequisite: RL can only synthesize these complex strategies if the base model has first mastered the independent atomic skills (Parametric and Contextual) via SFT. These findings challenge the view of RL as a mere amplifier, suggesting that given sufficient atomic foundations, RL can actively synthesize complex reasoning strategies from learned primitives without explicit supervision on such complex strategies. This indicates that decoupled atomic training followed by RL offers a scalable path to generalization for complex reasoning tasks. Code and data will be at https://github.com/sitaocheng/from_atomic_to_composite."
     },
-    "figure_local": "assets/atomic-to-composite-overview.png",
+    "figure_local": "assets/atomic-to-composite-lead.svg",
     "results_table": {
       "caption": "Table 7 (appendix, all rows). Exact-match accuracy (%) on the complementary-reasoning test set by generalization level, higher is better; Qwen2.5-1.5B backbone. Mem, Ctx, and Comp denote parametric, contextual, and complementary training data; every RL(Comp) stage uses the same 12.8k Comp samples, and SFT(Mem+Ctx) → RL(Mem+Ctx) uses 80% of the atomic data for SFT and the remaining 20% for RL. SFT on the mixed Mem+Ctx+Comp data scores highest on I.I.D. and Composition, while the proposed SFT(Mem+Ctx) → RL(Comp) recipe scores highest on Zero-shot (50.87), narrowly ahead of the three-stage variant (49.56).",
       "headings": [
@@ -102,7 +102,80 @@
         4
       ],
       "source_url": "https://arxiv.org/e-print/2512.01970v1"
-    }
+    },
+    "affiliations": [
+      "University of Waterloo",
+      "Duke University",
+      "National University of Singapore",
+      "Princeton University",
+      "Peking University",
+      "University of California, Santa Barbara"
+    ],
+    "authors_detail": [
+      {
+        "name": "Sitao Cheng",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Ruiwen Zhou",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Yuxuan Li",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xinyi Wang",
+        "affiliations": [
+          4
+        ],
+        "equal": false
+      },
+      {
+        "name": "Liangming Pan",
+        "affiliations": [
+          5
+        ],
+        "equal": false
+      },
+      {
+        "name": "William Yang Wang",
+        "affiliations": [
+          6
+        ],
+        "equal": false
+      },
+      {
+        "name": "Victor Zhong",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "Structural zero-shot exact match: 50.87% for atomic SFT followed by composite RL vs 43.25% for SFT on all atomic and composite data (Qwen2.5-1.5B).",
+      "prior": "Prior studies debate whether RL composes new skills (Yuan et al., 2025) or only amplifies existing ones (Yue et al., 2025); this work shows it composes them only after atomic SFT.",
+      "limitation": "The recipe trails SFT on all data on familiar paths (I.I.D. 73.11% vs 80.14%), and all evidence comes from synthetic biography question answering."
+    },
+    "prior_work": "Studies of post-training report that SFT tends to memorize the training distribution while RL generalizes (Chu et al., 2025), and they disagree on whether RL composes new skills (Yuan et al., 2025; Liu et al., 2025) or only amplifies what the model already produces (Yue et al., 2025; Wu and Choi, 2025). Open-domain multi-hop benchmarks cannot settle this, because pretraining contamination blurs which knowledge is new. This work uses controlled synthetic biographies to show that RL composes parametric and contextual reasoning only after SFT has taught both atomic skills.",
+    "primary_figure": true
   },
   "chemagent": {
     "short_name": "ChemAgent",
@@ -135,7 +208,7 @@
         "detail": "Removing solution review lowers average accuracy from 57.16%, showing that memory and active correction contribute together."
       }
     ],
-    "scope": "Evaluation uses textbook chemistry problems. Retrieved memories can be misleading, and the paper does not demonstrate experimental drug discovery or materials design in practice.",
+    "scope": "Evaluation uses four SciBench textbook chemistry sets; the paper suggests, but does not test, applications such as drug discovery or materials design.",
     "diagram": {
       "title": "A solution becomes experience for the next problem",
       "steps": [
@@ -243,7 +316,103 @@
       "source_url": "https://arxiv.org/e-print/2501.06590v1"
     },
     "primary_figure": true,
-    "figure_scroll": true
+    "figure_scroll": true,
+    "affiliations": [
+      "Yale University",
+      "UIUC",
+      "Stanford University",
+      "Shanghai Jiao Tong University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xiangru Tang",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Tianyu Hu",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Muyang Ye",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Yanjun Shao",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Siru Ouyang",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Wangchunshu Zhou",
+        "affiliations": [],
+        "equal": false
+      },
+      {
+        "name": "Pan Lu",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Zhuosheng Zhang",
+        "affiliations": [
+          4
+        ],
+        "equal": false
+      },
+      {
+        "name": "Yilun Zhao",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Arman Cohan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Mark Gerstein",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "Average accuracy over four SciBench chemistry sets with GPT-4: 57.16% for ChemAgent vs 47.66% for StructChem.",
+      "prior": "StructChem structures chemical reasoning into formula generation, step-by-step reasoning and confidence-based review; this work adds a self-updating library of solved sub-tasks that is retrieved for each new sub-task.",
+      "limitation": "Evaluation and refinement nearly double the cost, from about 0.012 to 0.023 million tokens per problem, excluding library construction."
+    },
+    "prior_work": "StructChem (Ouyang et al., 2024), the main baseline, structures chemical reasoning into formula generation, step-by-step reasoning and confidence-based review, but the paper notes that it still struggles with highly complex problems. Agent self-evolution frameworks with memory, such as Agent Workflow Memory (Wang et al., 2024) and Investigate-Consolidate-Exploit (Qian et al., 2024), mainly reuse past workflows in daily tasks. ChemAgent instead decomposes solved chemistry problems into planning and execution memories, retrieves them for each sub-task, and adds newly solved sub-tasks to the library."
   },
   "contrasolver": {
     "short_name": "ContraSolver",
@@ -266,17 +435,17 @@
     ],
     "findings": [
       {
-        "value": "90.00%",
-        "label": "AdvBench safe-response rate",
-        "detail": "Llama-2-7b-chat improves from 65.77% before alignment and 85.96% with confidence-only selection under the paper's automatic metric."
+        "value": "90.00 vs 85.96",
+        "label": "AdvBench safe-response rate (%) · ContraSolver vs Max-Confidence",
+        "detail": "Llama-2-7b-chat after DPO on the same number of self-labeled pairs; Vanilla scores 65.77. Safety is judged by automatic substring matching."
       },
       {
-        "value": "4 tasks",
-        "label": "Alignment evaluation",
-        "detail": "Experiments cover harm-free generation, instruction following, sentiment control, and summarization; preference-graph analysis also finds fewer contradictions."
+        "value": "13.30% → 10.40%",
+        "label": "SafeEdit training prompts with a cyclic preference graph",
+        "detail": "Self-alignment of Llama-2-7b-chat reduces contradictions on all four datasets, but does not remove them."
       }
     ],
-    "scope": "Consistent preferences are not automatically correct preferences. Results depend on the model's judgments and task-specific evaluation, including automatic safety and quality metrics.",
+    "scope": "Results rely on the model’s own preference labels and on automatic metrics: substring matching for safety and GPT-4 judgments for instruction following and summarization.",
     "diagram": {
       "title": "From cyclic judgments to alignment data",
       "steps": [
@@ -300,7 +469,13 @@
     "source_url": "https://arxiv.org/html/2406.08842v1",
     "source_note": "Verified Algorithm 1, Sections 3.3–4.3 and Table 1. Corrected fabricated old task list (dialogue/translation/QA). DPO uses heuristic supporting edges E_h, not simply every flipped contradiction. 90% is automatic substring-based safe-response rate, not a guarantee of safety. v4 results table: Table 1 (label tab:safety), arXiv 2406.08842v1 source file neurips_2024.tex lines 402-428; PDF page 7.",
     "metadata_override": {
-      "abstract": "While substantial advancements have been made in developing large language models (LLMs), achieving control over their behavior can be difficult. Direct preference optimization (DPO) assumes the existence of a latent reward function to evaluate the responses of LLMs. This assumption indicates a strict preference ordering of different responses to the same input. However, there always exist contradictions of preference in LLMs according to our experimental observations. In this paper, we construct a graph structure of the preference relationship among different responses with self-annotation to find contradictions in the preference order. We propose ContraSolver, an algorithm that traverses all edges on the preference graph to identify those that might cause contradictions. ContraSolver initializes the graph with a maximum spanning tree and identifies contradictory edges, prioritizing the resolution of low-confidence preferences while preserving high-confidence ones. Experimental results on four different generation tasks show that the performance of different LLMs can be largely improved through our completely unsupervised self-alignment. Furthermore, by analyzing the preference graphs of LLMs with and without self-alignment by ContraSolver, we quantify the reduction in contradictions, suggesting that resolving preference contradictions is crucial for achieving better alignment performance."
+      "abstract": "While substantial advancements have been made in developing large language models (LLMs), achieving control over their behavior can be difficult. Direct preference optimization (DPO) assumes the existence of a latent reward function to evaluate the responses of LLMs. This assumption indicates a strict preference ordering of different responses to the same input. However, there always exist contradictions of preference in LLMs according to our experimental observations. In this paper, we construct a graph structure of the preference relationship among different responses with self-annotation to find contradictions in the preference order. We propose ContraSolver, an algorithm that traverses all edges on the preference graph to identify those that might cause contradictions. ContraSolver initializes the graph with a maximum spanning tree and identifies contradictory edges, prioritizing the resolution of low-confidence preferences while preserving high-confidence ones. Experimental results on four different generation tasks show that the performance of different LLMs can be largely improved through our completely unsupervised self-alignment. Furthermore, by analyzing the preference graphs of LLMs with and without self-alignment by ContraSolver, we quantify the reduction in contradictions, suggesting that resolving preference contradictions is crucial for achieving better alignment performance.",
+      "links": [
+        {
+          "label": "Paper",
+          "url": "https://arxiv.org/abs/2406.08842"
+        }
+      ]
     },
     "figure_url": "https://arxiv.org/html/2406.08842v1/algorithm.png",
     "figure_local": "assets/contrasolver-overview.png",
@@ -343,7 +518,39 @@
         3
       ],
       "source_url": "https://arxiv.org/e-print/2406.08842v1"
-    }
+    },
+    "affiliations": [
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xu Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "AdvBench safe-response rate for Llama-2-7b-chat: 90.00% vs 85.96% for Max-Confidence selection of the same number of pairs; human-judged harmless rate 91.0% vs 86.0%.",
+      "prior": "Self-alignment methods such as ReST train on all of a model’s self-labeled preference pairs; this work selects pairs by resolving contradictory cycles in the model’s preference graph.",
+      "limitation": "The method assumes that higher-confidence preferences are more reliable, which the paper notes is not scientifically validated, and it cannot represent ties between responses."
+    },
+    "prior_work": "Self-alignment methods such as ReST (Gulcehre et al., 2023) and Guo et al. (2024) train a model on pairwise preferences it generates itself, and, as the paper argues, trust all of those labels regardless of the model’s proficiency. A separate line of work questions whether preferences are transitive and studies learning under a general preference oracle, for example Nash learning from human feedback (Munos et al., 2023). ContraSolver stays within DPO but uses the cycles in a self-annotated preference graph to decide which self-labeled pairs to train on."
   },
   "coral": {
     "short_name": "COrAL",
@@ -366,17 +573,17 @@
     ],
     "findings": [
       {
-        "value": "+4.6 pp",
-        "label": "GSM8K · accuracy setting",
-        "detail": "Accuracy rises from 74.1% to 78.7% without multi-forward prediction; this setting runs more slowly than the baseline."
+        "value": "58.2 vs 55.1",
+        "label": "LogiQA accuracy (%) · full COrAL vs next-token decoding",
+        "detail": "Throughput rises from 33.6 to 62.1 accepted tokens/s (1.8×). On GSM8K the same full setting gives 75.3 vs 74.1 at 1.1×."
       },
       {
-        "value": "3.9×",
-        "label": "GSM8K · speed setting",
-        "detail": "Removing verification increases throughput, while accuracy falls to 72.4%. The largest speed and accuracy gains use different settings."
+        "value": "13.0 vs 64.6",
+        "label": "HumanEval pass@1 (%) · full COrAL vs next-token decoding",
+        "detail": "Turning off multi-forward prediction recovers 61.6, but at 28.8 vs 42.2 accepted tokens/s, slower than the baseline."
       }
     ],
-    "scope": "Parallel refinement is sensitive to output structure: the full method performs poorly on HumanEval, so the reported reasoning gains do not generalize to code generation.",
+    "scope": "Order-agnostic training is applied only during task-specific fine-tuning of Mistral-7B-v0.3, with fixed windows of 4 forward and 8 backward tokens; extending it to pretraining is left to future work.",
     "diagram": {
       "title": "Generation can revisit nearby positions",
       "steps": [
@@ -403,7 +610,80 @@
     "figure_local": "assets/coral-decoding.svg",
     "figure_url": "https://arxiv.org/html/2410.09675v1/decoding.drawio.svg",
     "figure_caption": "Sliding blockwise order-agnostic decoding on the paper's own example: at each step the block is refined with forward and backward multi-token dependencies, the repeated “marine” is revised to “organ”, and verified tokens become fixed as the block advances. Original Figure 2 from the paper.",
-    "primary_figure": true
+    "primary_figure": true,
+    "affiliations": [
+      "National University of Singapore",
+      "University of California, Santa Barbara",
+      "Mila",
+      "Nanyang Technological University",
+      "University of Arizona"
+    ],
+    "authors_detail": [
+      {
+        "name": "Yuxi Xie",
+        "affiliations": [
+          1,
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Anirudh Goyal",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaobao Wu",
+        "affiliations": [
+          2,
+          4
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiao Xu",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Min-Yen Kan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Liangming Pan",
+        "affiliations": [
+          5
+        ],
+        "equal": false
+      },
+      {
+        "name": "William Yang Wang",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "LogiQA accuracy 58.2% vs 55.1% for next-token greedy decoding, at 62.1 vs 33.6 accepted tokens/s (1.8×), both measured without KV cache at batch size 1.",
+      "prior": "Self-Refine refines through extra prompting passes, and Jacobi and look-ahead decoding parallelize forward decoding only; this work trains the model to predict forward and reconstruct backward within a sliding window.",
+      "limitation": "On HumanEval the full method lowers pass@1 from 64.6% to 13.0%, which the paper attributes mainly to syntax errors from inconsistent multi-token predictions."
+    },
+    "prior_work": "Iterative refinement in LLMs usually runs on autoregressive models, either through prompting frameworks such as Self-Refine (Madaan et al., 2023) or by using feedback as a training signal, and each refinement adds sequential passes. Parallel decoding methods, such as speculative decoding with a draft model and Jacobi or look-ahead decoding, speed up generation but decode only in the forward direction, while non-autoregressive models often produce inconsistent outputs. COrAL trains the model itself to predict forward and reconstruct backward within a local window, so refinement happens inside the decoding loop."
   },
   "derl": {
     "short_name": "DERL",
@@ -413,7 +693,7 @@
     "method": [
       {
         "title": "Compose a reward",
-        "text": "A trainable meta-optimizer combines task-specific checks and arithmetic operations into a reward function."
+        "text": "A trainable Meta-Optimizer combines task-specific atomic primitives with arithmetic operations into a reward function."
       },
       {
         "title": "Train a policy",
@@ -436,7 +716,7 @@
         "detail": "Standard DERL improves success over RLVMR's 34.4%, supporting reward learning beyond the household-task benchmark in the same evaluation."
       }
     ],
-    "scope": "Reward search still depends on supplied atomic checks and repeated policy training. Policy gradients update the reward generator; the method does not directly backpropagate through every training run.",
+    "scope": "Learned rewards can only combine the predefined atomic primitives; the Meta-Optimizer cannot add a check that the primitives do not provide.",
     "diagram": {
       "title": "Reward design learns from the policy it produces",
       "steps": [
@@ -527,7 +807,56 @@
         5
       ],
       "source_url": "https://arxiv.org/e-print/2512.13399v1"
-    }
+    },
+    "affiliations": [
+      "University of Waterloo",
+      "The University of Hong Kong",
+      "The Chinese University of Hong Kong, Shenzhen",
+      "Duke University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Sitao Cheng",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Tianle Li",
+        "affiliations": [
+          2
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xuhan Huang",
+        "affiliations": [
+          3
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          4
+        ],
+        "equal": false
+      },
+      {
+        "name": "Difan Zou",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "ALFWorld held-out-task (L2) success: 65.0% for DERL and 76.4% for DERL-pop vs 56.3% for RLVMR, all with a Qwen2.5-1.5B-Instruct policy.",
+      "prior": "Evolutionary and prompted-agent methods such as AlphaEvolve search agent or reward configurations as a black box from sparse fitness scores; this work trains the reward generator with policy gradients from validation performance.",
+      "limitation": "Each Meta-Optimizer update requires training several inner-loop policies, which the paper identifies as the framework’s primary computational bottleneck."
+    },
+    "prior_work": "The paper frames prior automatic agent evolution, from population-based training to prompted-agent systems such as AlphaEvolve and the Darwin Gödel Machine, as discrete black-box search that relies on sparse final fitness scores and ignores training dynamics. Meta-gradient RL (Xu et al., 2018) instead learns inside the inner optimization, which DERL avoids: it neither backpropagates through the inner-loop optimizer nor tunes continuous reward parameters. An LLM Meta-Optimizer proposes discrete symbolic reward compositions and is trained with RL on the validation performance of independently trained policies."
   },
   "geometry-of-reasoning": {
     "short_name": "The Geometry of Reasoning",
@@ -550,14 +879,14 @@
     ],
     "findings": [
       {
-        "value": "Position",
-        "label": "Surface content dominates",
-        "detail": "Across the four main models, embedding positions are more similar within a language than within a logical structure."
+        "value": "0.53 vs 0.13",
+        "label": "Curvature similarity · same logic vs same language (Qwen3 0.6B)",
+        "detail": "Position similarity shows the opposite order (0.26 vs 0.85): raw embeddings group by language, while curvature groups by logical structure."
       },
       {
-        "value": "Velocity + curvature",
-        "label": "Logical structure becomes clearer",
-        "detail": "Stepwise changes and trajectory curvature show stronger similarity for shared logic than for shared topics or languages."
+        "value": "0.53 → 0.02",
+        "label": "Curvature similarity for shared logic · random-shuffle control",
+        "detail": "Permuting the order of the logical steps collapses velocity and curvature similarity, while position similarity stays high (0.81 for shared language)."
       }
     ],
     "scope": "Evidence comes from controlled reasoning sequences and representation proxies. Geometric correlations support the framework but do not establish a causal mechanism or universal theory of reasoning.",
@@ -582,7 +911,22 @@
     "source_url": "https://arxiv.org/html/2510.09782v1",
     "source_note": "Verified Sections 5–6 and Table 1. Old page wrongly described cross-layer ODE trajectories and geodesic validity; experiment actually pools final-layer representations per reasoning step. Existing local PCA illustration was inspected but cannot be matched to original paper figures; omit figure_index. Dataset arithmetic is internally inconsistent (30×20×4 vs stated 2,430), so no dataset-size headline. v4 results table: Table 1 (label tab:model_similarity), arXiv 2510.09782v1 source file 6_experiment.tex lines 7-29; PDF page 8.",
     "metadata_override": {
-      "abstract": "We study how large language models (LLMs) “think” through their representation space. We propose a novel geometric framework that models an LLM's reasoning as flows—embedding trajectories evolving where logic goes. We disentangle logical structure from semantics by employing the same natural deduction propositions with varied semantic carriers, allowing us to test whether LLMs internalize logic beyond surface form. This perspective connects reasoning with geometric quantities such as position, velocity, and curvature, enabling formal analysis in representation and concept spaces. Our theory establishes: (1) LLM reasoning corresponds to smooth flows in representation space, and (2) logical statements act as local controllers of these flows' velocities. Using learned representation proxies, we design controlled experiments to visualize and quantify reasoning flows, providing empirical validation of our theoretical framework. Our work serves as both a conceptual foundation and practical tools for studying reasoning phenomenon, offering a new lens for interpretability and formal analysis of LLMs' behavior."
+      "abstract": "We study how large language models (LLMs) “think” through their representation space. We propose a novel geometric framework that models an LLM's reasoning as flows—embedding trajectories evolving where logic goes. We disentangle logical structure from semantics by employing the same natural deduction propositions with varied semantic carriers, allowing us to test whether LLMs internalize logic beyond surface form. This perspective connects reasoning with geometric quantities such as position, velocity, and curvature, enabling formal analysis in representation and concept spaces. Our theory establishes: (1) LLM reasoning corresponds to smooth flows in representation space, and (2) logical statements act as local controllers of these flows' velocities. Using learned representation proxies, we design controlled experiments to visualize and quantify reasoning flows, providing empirical validation of our theoretical framework. Our work serves as both a conceptual foundation and practical tools for studying reasoning phenomenon, offering a new lens for interpretability and formal analysis of LLMs' behavior.",
+      "citation": "@inproceedings{zhou2026the,\n  title={The Geometry of Reasoning: Flowing Logics in Representation Space},\n  author={Yufa Zhou and Yixiao Wang and Xunjian Yin and Shuyan Zhou and Anru Zhang},\n  booktitle={The Fourteenth International Conference on Learning Representations},\n  year={2026},\n  url={https://openreview.net/forum?id=ixr5Pcabq7}\n}",
+      "links": [
+        {
+          "label": "Paper",
+          "url": "https://openreview.net/forum?id=ixr5Pcabq7"
+        },
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2510.09782"
+        },
+        {
+          "label": "Code",
+          "url": "https://github.com/MasterZhou1/Reasoning-Flow"
+        }
+      ]
     },
     "results_table": {
       "caption": "Table 1 (Qwen3 0.6B row, rearranged with one row per measure). Mean cosine similarity (position, velocity) and Pearson correlation (curvature) between reasoning flows that share the same logic, topic, or language; higher means more similar. Each measure has its own scale, so compare groupings within a row, not values across rows.",
@@ -618,7 +962,53 @@
     "figure_local": "assets/geometry-of-reasoning-overview.png",
     "figure_url": "https://arxiv.org/pdf/2510.09782v1 (page 2, Figure 1; rendered at 500 dpi, cropped to the panel area, resized to 2400 px wide)",
     "figure_caption": "Reasoning flows: 3-D and 2-D PCA projections of step-wise representation trajectories for one MATH500 problem with six distinct answers (left, center), and the paper's schematic of mappings among input space X, concept space C, logic space L, and representation space R (right). Original Figure 1 from the paper.",
-    "primary_figure": true
+    "primary_figure": true,
+    "affiliations": [
+      "Duke University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Yufa Zhou",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Yixiao Wang",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Shuyan Zhou",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Anru R. Zhang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "For Qwen3-0.6B, curvature similarity is 0.53 between flows sharing logic vs 0.13 between flows sharing language; position similarity reverses the order (0.26 vs 0.85).",
+      "prior": "The Linear Representation Hypothesis treats concepts as linear directions, and graph views treat chain-of-thought as discrete nodes; this work models reasoning as a continuous flow with velocity and curvature.",
+      "limitation": "The study analyzes understanding rather than generation, so the paper does not relate its geometric measures to the accuracy of model outputs."
+    },
+    "prior_work": "The Linear Representation Hypothesis holds that concepts align with linear directions in embedding space, and later work finds multi-dimensional, manifold-like and compositional features. Graph-based accounts model chain-of-thought as discrete nodes (Wang et al., 2024; Minegishi et al., 2025), which the paper argues fits random walks between isolated embeddings but misses the smooth, directed dynamics under cumulative context. This work instead treats reasoning as a continuous flow and tests whether its velocity and curvature track logical structure across topics and languages."
   },
   "godel-agent": {
     "short_name": "Gödel Agent",
@@ -641,14 +1031,14 @@
     ],
     "findings": [
       {
-        "value": "64.2%",
-        "label": "MGSM · Gödel-base",
-        "detail": "Under the closed-book GPT-3.5 setup, test accuracy exceeds Meta Agent Search's 53.4% on multilingual mathematical reasoning."
+        "value": "64.2 vs 53.4",
+        "label": "MGSM accuracy (%) · Gödel-base vs Meta Agent Search",
+        "detail": "Both execute tasks with GPT-3.5 (closed-book); GPT-4o proposes Gödel Agent’s code edits. Gains on DROP, MMLU and GPQA are smaller, with overlapping confidence intervals."
       },
       {
-        "value": "80.9 F1",
-        "label": "DROP · Gödel-base",
-        "detail": "The constrained agent improves over the reported 79.4 F1 for Meta Agent Search on reading comprehension requiring discrete reasoning."
+        "value": "64.2 → 49.4",
+        "label": "MGSM accuracy (%) · without error handling",
+        "detail": "Removing the mechanism that returns failed edits as feedback causes the largest drop in the ablation study."
       }
     ],
     "scope": "The experiments support a broader empirical search over agent programs. They do not establish monotonic improvement, global optimality, or open-ended gains beyond current model capabilities.",
@@ -683,6 +1073,61 @@
     "figure_url": "https://arxiv.org/html/2410.04444v4/method_1.png",
     "figure_local": "assets/godel-agent-overview.png",
     "primary_figure": false,
-    "figure_inline": true
+    "figure_inline": true,
+    "affiliations": [
+      "Peking University",
+      "University of California, Santa Barbara",
+      "University of Arizona"
+    ],
+    "authors_detail": [
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xinyi Wang",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Liangming Pan",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Li Lin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "William Yang Wang",
+        "affiliations": [
+          2
+        ],
+        "equal": false
+      }
+    ],
+    "glance": {
+      "result": "MGSM accuracy 64.2% for Gödel-base vs 53.4% for Meta Agent Search, both executing tasks with GPT-3.5 in a closed-book setting.",
+      "prior": "Meta Agent Search and natural-language-gradient methods improve agents through a fixed, human-designed meta-learning routine; this work lets the agent inspect and rewrite that routine as well as its task policy.",
+      "limitation": "Gains on DROP, MMLU and GPQA have overlapping 95% confidence intervals, and 14% of 100 MGSM optimization trials ended below the initial policy."
+    },
+    "prior_work": "The paper groups earlier agents into hand-designed agents, which iterate over fixed modules, and meta-learning optimized agents, such as natural-language-gradient methods (Zhou et al., 2024) and Meta Agent Search (Hu et al., 2024), which update modules through a pre-defined meta-learning routine whose human priors cannot change at inference time. Gödel Agent makes that routine part of its own editable code. Unlike the Gödel machine (Schmidhuber, 2003), which relies on a proof searcher, or STOP (Zelikman et al., 2023), which recursively improves an optimizer for code generation, it uses an LLM to propose and apply modifications to the whole running agent."
   }
 }
