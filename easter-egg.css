@@ -1,129 +1,219 @@
-/* A research instrument with room beyond its current evidence. */
-#research-atlas {
-  --atlas-paper: #070f1b; --atlas-ink: #e4edf7; --atlas-muted: #9cacc0;
-  --atlas-blue: #99d3ff; --atlas-line: #233449;
+/* Spira mirabilis. While the egg draws the page's words, only their glyphs are hidden:
+   colour, borders, SVG icons and list markers stay, so the swap is invisible. */
+html.spira-hide-text #main-content, html.spira-hide-text #main-content *,
+html.spira-hide-text #site-footer, html.spira-hide-text #site-footer *,
+html.spira-hide-text body:not(:has(#main-content)) main,
+html.spira-hide-text body:not(:has(#main-content)) main * {
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+}
+
+#spira {
+  --spira-night: #05070c;
+  --spira-text: #e9edf2;
+  --spira-muted: #9aa6b5;
+  --spira-caption: #8a95a4;
+  --spira-line: rgba(207, 217, 230, 0.16);
+  --spira-focus: #cfd9e6;
+  --spira-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --spira-sans: Lato, "Helvetica Neue", Arial, sans-serif;
+  --spira-lift: radial-gradient(ellipse 55% 62% at var(--spira-cx, 64%) var(--spira-cy, 46%), rgba(36, 54, 86, 0.22), rgba(36, 54, 86, 0) 72%);
   color-scheme: dark;
   position: fixed; inset: 0; box-sizing: border-box;
-  width: 100%; max-width: none; height: 100%; height: 100dvh; max-height: none;
-  margin: 0; padding: 0; border: 0; overflow: auto; overscroll-behavior: contain;
-  background: var(--atlas-paper); color: var(--atlas-ink);
-  font-family: Lato, Helvetica, Arial, sans-serif;
-  opacity: 0; transition: opacity 460ms ease;
+  width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0; border-radius: 0; outline: none;
+  overflow: hidden; overscroll-behavior: contain;
+  background-color: transparent; color: var(--spira-text);
+  font-family: var(--spira-sans); font-size: 14px; line-height: 1.5; text-align: left;
+  -webkit-text-fill-color: currentColor;
 }
-#research-atlas.is-visible { opacity: 1; }
-#research-atlas.is-leaving { opacity: 0; transition-duration: 220ms; }
-#research-atlas::backdrop { background: transparent; }
-#research-atlas *, #research-atlas *::before { box-sizing: border-box; }
-#research-atlas p, #research-atlas button, #research-atlas a { font-family: inherit; }
-#research-atlas button { border-radius: 0; box-shadow: none; cursor: pointer; }
-#research-atlas :focus { outline: none; }
-#research-atlas :focus-visible { outline: 1px solid var(--atlas-blue); outline-offset: 5px; }
-#research-atlas .atlas-sheet { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 22px 56px 22px; }
-#research-atlas .atlas-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 13px; border-bottom: 1px solid var(--atlas-line); }
-#research-atlas .atlas-signature { font-size: 13px; font-weight: 700; }
-#research-atlas .atlas-signature span { margin-left: 12px; color: var(--atlas-muted); font-weight: 400; font-size: 11px; }
-#research-atlas .atlas-text-button { min-height: 44px; border: 0; padding: 9px 0; background: transparent; color: var(--atlas-muted); font-size: 11px; white-space: nowrap; }
-#research-atlas .atlas-text-button:hover, #research-atlas .atlas-text-button[aria-pressed='true'] { color: var(--atlas-blue); }
-#research-atlas .atlas-text-button span { margin-left: 12px; font-size: 10px; }
-#research-atlas .atlas-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; padding-top: 28px; }
-#research-atlas .atlas-eyebrow { color: var(--atlas-muted); font-size: 9px; letter-spacing: .14em; line-height: 1.6; text-transform: uppercase; margin: 0 0 10px; }
-#research-atlas #atlas-title { border: 0; padding: 0; margin: 0; font-size: clamp(32px, 3.8vw, 49px); color: var(--atlas-ink); font-weight: 400; line-height: 1.08; letter-spacing: -.04em; text-transform: none; }
-#research-atlas #atlas-title em { color: var(--atlas-blue); font-weight: 400; font-family: Georgia, serif; }
-#research-atlas #atlas-description { margin: 0 0 3px; color: var(--atlas-ink); font-size: 13px; line-height: 1.8; }
-#research-atlas #atlas-description span { display: block; color: var(--atlas-muted); font-size: 11px; margin-top: 7px; }
-#research-atlas .atlas-stage { position: relative; height: clamp(340px, 45vh, 510px); margin-top: 4px; cursor: grab; touch-action: pan-y; isolation: isolate; }
-#research-atlas .atlas-stage.is-dragging { cursor: grabbing; }
-#research-atlas .atlas-stage.over-paper { cursor: pointer; }
-#research-atlas canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-#research-atlas .atlas-thread { position: absolute; z-index: 1; display: grid; grid-template-columns: 22px 1fr; align-content: center; min-height: 52px; gap: 5px 7px; padding: 7px 10px; border: 0; background: transparent; color: var(--atlas-ink); text-align: left; }
-#research-atlas .atlas-thread-number { font: 9px ui-monospace, monospace; color: var(--atlas-muted); padding-top: 3px; }
-#research-atlas .atlas-thread-name { font-size: 14px; }
-#research-atlas .atlas-thread-count { grid-column: 2; color: var(--atlas-muted); font-size: 9px; }
-#research-atlas .atlas-thread::before { content: ''; position: absolute; left: -3px; top: 23px; width: 5px; height: 5px; border: 1px solid var(--atlas-muted); border-radius: 50%; background: var(--atlas-paper); }
-#research-atlas .atlas-thread:hover, #research-atlas .atlas-thread[aria-pressed='true'] { color: var(--atlas-blue); }
-#research-atlas .atlas-thread[aria-pressed='true']::before { border-color: var(--atlas-blue); background: var(--atlas-blue); }
-#research-atlas .atlas-thread[aria-pressed='true'] .atlas-thread-number { color: var(--atlas-blue); }
-#research-atlas .atlas-frontier-label { position: absolute; transform: translateX(-50%); color: var(--atlas-blue); background: var(--atlas-paper); padding: 3px 8px; white-space: nowrap; font: italic 12px Georgia, serif; pointer-events: none; opacity: 0; }
-#research-atlas .atlas-coordinate { position: absolute; left: 0; bottom: 7px; color: var(--atlas-muted); font-size: 9px; line-height: 1.8; pointer-events: none; }
-#research-atlas .atlas-coordinate span { display: block; }
-#research-atlas .atlas-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid var(--atlas-line); border-bottom: 1px solid var(--atlas-line); }
-#research-atlas .atlas-toolbar p { margin: 0; color: var(--atlas-muted); font-size: 11px; line-height: 1.7; }
-#research-atlas .atlas-toolbar > div { display: flex; gap: 28px; }
-#research-atlas .atlas-readout { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 6vw, 100px); min-height: 158px; padding: 26px 0; }
-#research-atlas .atlas-readout .atlas-eyebrow { color: var(--atlas-blue); font-size: 9px; letter-spacing: .08em; }
-#research-atlas #atlas-question { margin: 0; border: 0; padding: 0; font: 400 clamp(23px, 2.15vw, 30px)/1.22 Georgia, serif; letter-spacing: -.02em; color: var(--atlas-ink); }
-#research-atlas .atlas-reading p { margin: 0 0 12px; color: var(--atlas-muted); font-size: 12px; line-height: 1.85; }
-#research-atlas .atlas-reading a { font-size: 11px; color: var(--atlas-blue); text-decoration: none; border-bottom: 1px solid #365c7d; padding-bottom: 2px; }
-#research-atlas .atlas-works { border-top: 1px solid var(--atlas-line); }
-#research-atlas .atlas-works summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 49px; cursor: pointer; list-style: none; color: var(--atlas-muted); font-size: 11px; }
-#research-atlas .atlas-works summary::-webkit-details-marker { display: none; }
-#research-atlas .atlas-works summary > span:first-child::before { content: '+'; display: inline-block; width: 21px; color: var(--atlas-blue); }
-#research-atlas .atlas-works[open] summary > span:first-child::before { content: '−'; }
-#research-atlas .atlas-work-list { display: grid; grid-template-columns: 1fr 1fr; gap: 25px 60px; padding: 8px 0 27px; }
-#research-atlas .atlas-work-list h4 { font-size: 11px; color: var(--atlas-blue); font-weight: 400; margin: 0 0 12px; }
-#research-atlas .atlas-work-list ul { list-style: none; margin: 0; padding: 0; }
-#research-atlas .atlas-work-list li { margin: 0 0 14px !important; padding: 0 !important; }
-#research-atlas .atlas-work-list a { font-size: 12px; line-height: 1.6; color: var(--atlas-ink); text-decoration: none; }
-#research-atlas .atlas-work-list a:hover { color: var(--atlas-blue); }
-#research-atlas .atlas-work-list li > span { display: block; margin-top: 3px; color: var(--atlas-muted); font-size: 10px; }
-#research-atlas .atlas-footer { border-top: 1px solid var(--atlas-line); padding-top: 15px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
-#research-atlas .atlas-footer p { margin: 0; color: var(--atlas-muted); font-size: 10px; line-height: 1.9; }
-#research-atlas .atlas-footer p:last-child { text-align: right; color: var(--atlas-blue); }
-#research-atlas .atlas-footer p span { color: var(--atlas-muted); }
-#research-atlas .atlas-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-#research-atlas .atlas-replay { font-size: 10px; min-height: 36px; padding: 6px 0; }
-#research-atlas.is-opening { background: rgb(7 15 27 / var(--atlas-reveal, 0)); overflow: hidden; opacity: 1; transition: none; }
-#research-atlas.is-opening[data-phase='settle'] { background: var(--atlas-paper); }
-#research-atlas.is-opening.is-leaving { opacity: 0; transition: opacity 220ms ease; }
-#research-atlas.is-opening .atlas-sheet, #research-atlas.is-opening .atlas-sky { opacity: var(--atlas-reveal, 0); }
-#research-atlas .atlas-opening { --opening-ink: #d0dfec; position: fixed; inset: 0; z-index: 4; overflow: hidden; touch-action: none; }
-#research-atlas .atlas-opening-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-#research-atlas .atlas-opening-controls { position: absolute; inset: auto 34px 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; color: var(--opening-ink); }
-#research-atlas .atlas-opening-controls > span { font: italic 14px Georgia, serif; }
-#research-atlas .atlas-opening-controls > div { display: flex; align-items: center; gap: 24px; }
-#research-atlas .atlas-opening-controls button { min-height: 44px; border: 0; background: transparent; padding: 8px 0; color: var(--opening-ink); font-size: 11px; }
-#research-atlas .atlas-opening-controls button span { padding-left: 8px; opacity: .6; }
-#research-atlas .atlas-opening-controls :focus-visible { outline-color: var(--opening-ink); }
-@media (max-width: 700px) {
-  #research-atlas .atlas-opening-controls { inset: auto 22px 12px; gap: 12px; }
-  #research-atlas .atlas-opening-controls > div { gap: 18px; }
-  #research-atlas .atlas-opening-controls > span { font-size: 12px; }
-  #research-atlas .atlas-opening-controls button { font-size: 10px; }
-  #research-atlas .atlas-opening-controls [data-opening-close] span { display: none; }
-  #research-atlas .atlas-sheet { padding: 12px 22px 20px; }
-  #research-atlas .atlas-header { padding-bottom: 6px; }
-  #research-atlas .atlas-signature { font-size: 12px; }
-  #research-atlas .atlas-signature span { display: block; margin: 4px 0 0; font-size: 9px; }
-  #research-atlas .atlas-header .atlas-text-button span { display: none; }
-  #research-atlas .atlas-intro { display: block; padding-top: 23px; }
-  #research-atlas .atlas-eyebrow { font-size: 8px; letter-spacing: .09em; }
-  #research-atlas #atlas-title { font-size: clamp(28px, 9.2vw, 36px); }
-  #research-atlas #atlas-description { margin-top: 16px; font-size: 11px; }
-  #research-atlas #atlas-description br { display: none; }
-  #research-atlas #atlas-description span { display: none; }
-  #research-atlas .atlas-stage { height: 365px; margin-top: 15px; }
-  #research-atlas .atlas-thread { padding: 7px 5px; grid-template-columns: 17px 1fr; gap: 4px; }
-  #research-atlas .atlas-thread-name { font-size: 11px; }
-  #research-atlas .atlas-thread-number, #research-atlas .atlas-thread-count { font-size: 8px; }
-  #research-atlas .atlas-thread::before { left: -2px; width: 4px; height: 4px; }
-  #research-atlas .atlas-coordinate { font-size: 8px; bottom: 2px; }
-  #research-atlas .atlas-coordinate span:last-child { display: none; }
-  #research-atlas .atlas-toolbar { gap: 12px; align-items: center; padding: 6px 0; }
-  #research-atlas .atlas-toolbar p { font-size: 10px; max-width: 135px; }
-  #research-atlas .atlas-toolbar > div { gap: 15px; }
-  #research-atlas .atlas-text-button { font-size: 10px; }
-  #research-atlas .atlas-toolbar .atlas-text-button span { display: none; }
-  #research-atlas .atlas-readout { grid-template-columns: 1fr; gap: 14px; padding: 22px 0; }
-  #research-atlas #atlas-question { font-size: 25px; }
-  #research-atlas .atlas-reading p { font-size: 11px; }
-  #research-atlas .atlas-work-list { grid-template-columns: 1fr; }
-  #research-atlas .atlas-footer { display: block; }
-  #research-atlas .atlas-footer p { font-size: 9px; }
-  #research-atlas .atlas-footer p:last-child { text-align: left; margin-top: 9px; }
+#spira[open] {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 380px) minmax(0, 1fr) auto 40px;
+  grid-template-rows: 40px auto minmax(0, 1fr) auto auto auto 32px;
+  grid-template-areas:
+    ".  .      . .       ."
+    ".  head   . actions ."
+    ".  .      . .       ."
+    ".  plate  . .       ."
+    ".  themes . .       ."
+    ".  note   . .       ."
+    ".  .      . .       .";
 }
-@media (prefers-reduced-motion: reduce) { #research-atlas, #research-atlas * { transition: none !important; } }
+#spira::backdrop { background: transparent; }
+/* One very subtle lift of the night near the chart centre, faded in with the chart UI
+   (a pseudo-element, so it can fade). The opening's night stays flat. */
+#spira::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0;
+  background-image: var(--spira-grain, none), var(--spira-lift);
+  transition: opacity 250ms linear;
+}
+#spira.is-night { background-color: var(--spira-night); }
+#spira.is-lift::before { opacity: 1; transition-duration: 800ms; }
+#spira.is-fading-skip { transition: background-color 350ms linear; }
+#spira.is-fading-replay { transition: background-color 250ms linear; }
+#spira.is-leaving { opacity: 0; transition: opacity 280ms ease; }
 
-#research-atlas canvas.atlas-sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
-#research-atlas .atlas-lift { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-#research-atlas .atlas-lift-word { position: absolute; display: block; white-space: pre; transform-origin: center; will-change: transform, opacity; }
-#research-atlas .atlas-opening-controls { z-index: 2; }
+#spira *, #spira *::before, #spira *::after { box-sizing: border-box; }
+#spira .spira-canvas { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+#spira .spira-stage {
+  position: absolute; inset: 0; z-index: 1; outline: none;
+  cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none;
+}
+#spira .spira-stage.is-dragging { cursor: grabbing; }
+#spira .spira-stage.is-over { cursor: pointer; }
+#spira .spira-stage:focus-visible { outline: 1px solid var(--spira-focus); outline-offset: -8px; }
+#spira .spira-head, #spira .spira-plate, #spira .spira-note, #spira .spira-themes, #spira .spira-actions { position: relative; z-index: 2; }
+
+/* Type */
+#spira p, #spira h2, #spira h3 {
+  margin: 0; padding: 0; border: 0; color: inherit; background: none;
+  font-family: inherit; font-size: inherit; font-weight: 400; letter-spacing: 0; text-transform: none;
+}
+#spira a {
+  color: var(--spira-text); text-decoration: none; text-shadow: none; transition: color 160ms ease;
+  font-family: inherit; font-size: inherit;
+}
+#spira a:hover { color: #ffffff; text-shadow: none; }
+#spira button {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; padding: 0 2px;
+  border: 0; border-radius: 0; box-shadow: none; background: none; color: var(--spira-muted);
+  font: inherit; font-size: 12px; letter-spacing: 0.02em; cursor: pointer; white-space: nowrap;
+}
+#spira button:hover { color: var(--spira-text); }
+#spira :focus { outline: none; }
+#spira :focus-visible { outline: 1px solid var(--spira-focus); outline-offset: 3px; }
+#spira[data-quiet] :focus-visible { outline: none; }
+#spira .spira-key { color: var(--spira-caption); font-size: 10px; letter-spacing: 0.06em; }
+
+/* Motto */
+#spira .spira-head { grid-area: head; align-self: start; padding-top: 8px; max-width: 420px; pointer-events: none; }
+#spira .spira-kicker {
+  color: var(--spira-muted); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  font-variant: small-caps;
+}
+#spira #spira-title {
+  margin: 10px 0 8px; color: var(--spira-text);
+  font-family: var(--spira-serif); font-style: italic; font-size: clamp(30px, 3vw, 42px); line-height: 1.08; letter-spacing: -0.005em;
+}
+#spira .spira-translation { color: var(--spira-muted); font-size: 13px; }
+
+/* Plate */
+#spira .spira-plate { grid-area: plate; align-self: end; max-width: 380px; font-size: 14px; line-height: 1.7; scrollbar-width: none; }
+#spira .spira-plate::-webkit-scrollbar { display: none; }
+#spira #spira-text { color: #d7dde5; }
+#spira .spira-hint { margin-top: 10px; color: var(--spira-caption); font-size: 12px; letter-spacing: 0.02em; }
+#spira .spira-plate-kicker { color: var(--spira-muted); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
+#spira .spira-plate-title {
+  margin: 8px 0 6px; color: var(--spira-text);
+  font-family: var(--spira-serif); font-size: 19px; font-weight: 400; line-height: 1.32; letter-spacing: 0; text-transform: none;
+}
+#spira .spira-venue { color: var(--spira-muted); font-size: 13px; }
+#spira .spira-link { display: inline-block; margin-top: 10px; font-size: 13px; border-bottom: 1px solid rgba(207, 217, 230, 0.38); padding-bottom: 1px; }
+#spira .spira-row { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding: 5px 0; border-top: 1px solid var(--spira-line); font-size: 13px; line-height: 1.55; }
+#spira .spira-row:first-of-type { margin-top: 6px; }
+#spira .spira-year { color: var(--spira-caption); font-variant-numeric: tabular-nums; }
+#spira .spira-row-links { color: var(--spira-caption); }
+#spira .spira-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+#spira .spira-note {
+  grid-area: note; align-self: end; max-width: 380px; margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--spira-line);
+  color: var(--spira-caption); font-family: var(--spira-serif); font-style: italic; font-size: 11px; line-height: 1.6; pointer-events: none;
+}
+
+/* Five recurring questions */
+#spira .spira-themes { grid-area: themes; align-self: end; justify-self: start; display: flex; flex-direction: column; align-items: flex-start; margin-top: 14px; max-width: 380px; }
+/* Desktop rows are 26 px (above the WCAG 2.2 24 px target minimum); touch layouts keep 44 px. */
+#spira .spira-theme { min-height: 26px; line-height: 26px; color: var(--spira-muted); font-size: 13px; letter-spacing: 0.01em; }
+#spira .spira-theme[aria-pressed="true"] { color: var(--spira-text); }
+#spira .spira-dot { width: 6px; height: 6px; border-radius: 50%; opacity: 0.85; flex: none; }
+#spira .spira-theme[aria-pressed="true"] .spira-dot { opacity: 1; box-shadow: none; outline: 1px solid currentColor; outline-offset: 2px; }
+
+/* Actions */
+#spira .spira-actions { grid-area: actions; align-self: start; justify-self: end; display: flex; gap: 22px; }
+#spira .spira-actions [aria-expanded="true"] { color: var(--spira-text); }
+
+/* All works */
+#spira .spira-index {
+  position: absolute; z-index: 3; top: 92px; right: 40px; width: 340px; max-height: calc(100% - 92px - 40px);
+  overflow-y: auto; overscroll-behavior: contain; padding: 4px 18px 14px;
+  background: rgba(5, 7, 12, 0.94); border-left: 1px solid var(--spira-line);
+  scrollbar-width: thin; scrollbar-color: rgba(207, 217, 230, 0.25) transparent;
+}
+#spira .spira-index[hidden] { display: none; }
+#spira .spira-index-year { padding: 10px 0 4px; border-bottom: 1px solid var(--spira-line); }
+#spira .spira-index-year:last-child { border-bottom: 0; }
+#spira .spira-index-label { color: var(--spira-caption); font-size: 10px; letter-spacing: 0.16em; font-variant-numeric: tabular-nums; margin-bottom: 2px; }
+#spira .spira-index-link { display: block; padding: 4px 0; font-size: 13px; line-height: 1.45; }
+#spira .spira-index-link span { color: var(--spira-caption); font-size: 12px; }
+
+/* Opening controls */
+#spira .spira-opening { position: absolute; z-index: 4; right: 40px; bottom: 26px; display: flex; gap: 24px; }
+#spira .spira-opening[hidden] { display: none; }
+#spira .spira-opening button { color: rgba(233, 237, 242, 0.82); font-size: 12px; }
+#spira .spira-opening button:hover { color: #ffffff; }
+
+/* Short landscape screens: a left column for the motto and plate, themes on the right. */
+@media (max-height: 559px) and (min-width: 600px) {
+  #spira[open] {
+    grid-template-columns: 22px minmax(0, 270px) minmax(0, 1fr) auto 18px;
+    grid-template-rows: 12px auto minmax(0, 1fr) auto 10px;
+    grid-template-areas:
+      ".  .      . .       ."
+      ".  head   . actions ."
+      ".  plate  . .       ."
+      ".  themes . .       ."
+      ".  .      . .       .";
+  }
+  #spira .spira-head { padding-top: 0; }
+  #spira #spira-title { margin: 4px 0 4px; font-size: 24px; }
+  #spira .spira-translation { font-size: 12px; }
+  #spira .spira-plate { align-self: end; max-height: 100%; overflow-y: auto; margin-top: 10px; font-size: 12.5px; line-height: 1.6; }
+  #spira .spira-note { display: none; }
+  #spira .spira-actions { gap: 16px; }
+  #spira .spira-themes { flex-direction: row; flex-wrap: wrap; gap: 0 14px; margin-top: 4px; }
+  #spira .spira-theme { min-height: 32px; line-height: 32px; font-size: 12px; }
+  #spira .spira-index { top: 56px; right: 18px; bottom: 10px; max-height: none; width: 300px; }
+  #spira .spira-opening { right: 18px; bottom: 8px; }
+}
+
+/* Narrow and portrait screens: motto on top, themes and plate below the chart. */
+@media (max-width: 899px) and (min-height: 560px), (max-width: 599px) {
+  #spira[open] {
+    grid-template-columns: 16px minmax(0, 1fr) 16px;
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto auto 8px;
+    grid-template-areas:
+      ".  actions ."
+      ".  head    ."
+      ".  .       ."
+      ".  themes  ."
+      ".  plate   ."
+      ".  note    ."
+      ".  .       .";
+  }
+  #spira { --spira-lift: radial-gradient(ellipse 80% 50% at var(--spira-cx, 50%) var(--spira-cy, 45%), rgba(36, 54, 86, 0.22), rgba(36, 54, 86, 0) 72%); }
+  #spira .spira-actions { justify-self: end; gap: 18px; }
+  #spira .spira-head { padding-top: 0; max-width: none; }
+  #spira .spira-kicker { font-size: 9px; }
+  #spira #spira-title { margin: 4px 0 4px; font-size: 24px; }
+  #spira .spira-translation { font-size: 12px; }
+  /* One wrapping row with even gaps; its width breaks it 3 + 2, so no label is left alone. */
+  #spira .spira-themes { flex-direction: row; flex-wrap: wrap; justify-self: start; gap: 4px 16px; margin-top: 0; max-width: 300px; }
+  #spira .spira-theme { min-height: 44px; line-height: 1.2; font-size: 12px; gap: 6px; }
+  #spira .spira-plate { max-width: none; max-height: 27vh; overflow-y: auto; font-size: 13px; line-height: 1.62; padding-top: 6px; border-top: 1px solid var(--spira-line); }
+  #spira .spira-note { max-width: none; margin-top: 6px; padding-top: 6px; }
+  #spira .spira-index { top: 48px; left: 0; right: 0; bottom: 0; width: auto; max-height: none; padding: 4px 16px 16px; background: var(--spira-night); border-left: 0; border-top: 1px solid var(--spira-line); }
+  #spira .spira-opening { right: 16px; bottom: 10px; gap: 20px; }
+}
+@media (max-width: 899px) and (max-height: 700px) and (min-height: 560px), (max-width: 599px) and (max-height: 700px) {
+  #spira .spira-note { display: none; }
+  #spira .spira-plate { max-height: 22vh; }
+}
+@media (max-width: 380px) {
+  #spira .spira-actions { gap: 12px; }
+  #spira .spira-themes { gap: 0 12px; }
+  #spira .spira-theme { min-height: 40px; font-size: 11.5px; gap: 5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #spira, #spira::before, #spira * { transition: none !important; }
+}
