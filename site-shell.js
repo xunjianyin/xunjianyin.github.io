@@ -137,7 +137,7 @@
     <footer class="site-footer">
       <div class="footer-social">${socialLinks}
       </div>
-      <p class="footer-copyright">${getFooterCopy()} <button class="easter-egg-footnote" aria-label="Try a small experiment" title="A playable footnote">*</button></p>
+      <p class="footer-copyright">${getFooterCopy()} <button class="easter-egg-footnote" aria-label="Explore the research atlas" title="An unfinished atlas">*</button></p>
     </footer>
   </div>
   <button id="back-to-top" class="back-to-top" aria-label="Back to top">
@@ -165,9 +165,9 @@
       if (eggLoading) return;
       const script = document.createElement('script');
       const style = document.createElement('link');
-      script.src = toRootHref('easter-egg.js');
+      script.src = toRootHref('easter-egg.js?v=atlas-v3');
       style.rel = 'stylesheet';
-      style.href = toRootHref('easter-egg.css');
+      style.href = toRootHref('easter-egg.css?v=atlas-v3');
       if (footnote) footnote.setAttribute('aria-busy', 'true');
       eggLoading = Promise.all([script, style].map(asset => new Promise((resolve, reject) => {
         asset.onload = resolve;

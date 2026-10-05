@@ -1,5 +1,5 @@
-/* Run with agent-browser eval --stdin against the local site preview.
- * Checks the puzzle's causal behavior as well as modal/loading restoration.
+/* Run with agent-browser eval --stdin against a local site preview.
+ * Tests the research atlas, corpus coverage, and modal/loading restoration.
  */
 (async () => {
   const failures = [];
@@ -8,7 +8,7 @@
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
   const until = async predicate => {
     for (let i = 0; i < 240; i++) { if (predicate()) return; await delay(25); }
-    throw new Error('Timed out waiting for the self-reference experiment.');
+    throw new Error('Timed out waiting for the research atlas.');
   };
   const frame = document.createElement('iframe');
   frame.style.cssText = 'position:fixed;inset:0;width:1280px;height:900px;z-index:200000;border:0;background:white';
@@ -26,15 +26,16 @@
       key, code: `Key${key.toUpperCase()}`, bubbles: true, cancelable: true, ...extra
     }));
   };
-  const lab = () => doc.querySelector('#self-reference-lab');
-  const scene = () => lab().querySelector('.lab-scene');
-  const state = () => scene().dataset.state;
-  const rule = () => lab().querySelector('[data-rule]');
-  const agentX = () => Number(lab().querySelector('[data-agent]').getAttribute('transform').match(/translate\(([^,]+)/)[1]);
-  const open = async () => { type(); await until(() => lab()?.open); };
-  const close = async () => { lab().dispatchEvent(new win.Event('cancel', { cancelable: true })); await until(() => !lab()); };
-  const press = (key, extra = {}) => rule().dispatchEvent(new win.KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...extra }));
+  const atlas = () => doc.querySelector('#research-atlas');
+  const stage = () => atlas().querySelector('.atlas-stage');
+  const threads = () => [...atlas().querySelectorAll('[data-thread]')];
+  const reset = () => atlas().querySelector('[data-reset]').click();
+  const question = () => atlas().querySelector('#atlas-question').textContent;
+  const workLinks = () => [...atlas().querySelectorAll('.atlas-work-list a')];
+  const open = async () => { type(); await until(() => atlas()?.open); };
+  const close = async () => { atlas().dispatchEvent(new win.Event('cancel', { cancelable: true })); await until(() => !atlas()); };
   const assets = () => doc.querySelectorAll('script[src*="easter-egg.js"],link[href*="easter-egg.css"]');
+  const nextPaint = () => new Promise(resolve => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve)));
   const reducedMotion = () => {
     const original = win.matchMedia.bind(win);
     win.matchMedia = query => {
@@ -45,7 +46,7 @@
   };
   try {
     await load();
-    check(assets().length === 0, 'No puzzle assets load before discovery');
+    check(assets().length === 0, 'No atlas assets load before discovery');
     type('yxjgogo'); check(assets().length === 0, 'Partial password does not download assets'); type('x');
     for (const tag of ['input', 'textarea', 'select', 'div']) {
       const control = doc.createElement(tag); if (tag === 'div') control.contentEditable = 'true';
@@ -67,11 +68,10 @@
     win.cancelAnimationFrame = id => { pending.delete(id); originalCancel(id); };
     await open();
     check(assets().length === 2, 'First complete password loads the script and stylesheet once');
-    check(lab().matches(':modal'), 'Native modal prevents interaction with the background');
-    check(lab().contains(doc.activeElement), 'Opening focuses a modal control');
+    check(atlas().matches(':modal'), 'Native modal prevents interaction with the background');
+    check(atlas().contains(doc.activeElement), 'Opening focuses a modal control');
     check(main.innerHTML === before, 'Opening does not rewrite the live page');
-    check(lab().textContent.includes('Gödel Agent') && lab().querySelector('a').pathname === '/papers/godel-agent.html', 'The idea links to the author’s real Gödel Agent paper');
-    check(!/flora|furong|yeye|petal|serendipity/i.test(lab().textContent), 'The unrelated botanical/name concept is gone');
+    check(!/flora|furong|yeye|petal|serendipity/i.test(atlas().textContent), 'Unrelated botanical names are absent');
     await close();
     check(main.innerHTML === before, 'Early dismissal preserves text, styles and disclosure state');
     check(doc.documentElement.dataset.theme === 'dark' && localStorage.getItem('theme') === 'dark', 'Dark theme and saved preference survive');
@@ -80,63 +80,80 @@
     check(pending.size === 0, 'Early dismissal cancels all animation frames');
 
     await open(); win.SiteEasterEgg.open();
-    check(doc.querySelectorAll('#self-reference-lab').length === 1, 'Repeated triggers cannot stack dialogs');
-    await until(() => state() === 'blocked');
-    const stoppedAt = agentX(); await delay(120);
-    check(agentX() === stoppedAt && pending.size === 0, 'Without a bridge the agent stops, with no idle animation loop');
-    check(lab().querySelector('[data-revised]').disabled, 'A revised policy cannot run before the visitor makes an edit');
-    const firstPosition = rule().getBoundingClientRect(); press('ArrowDown');
-    check(rule().getBoundingClientRect().top > firstPosition.top, 'Arrow keys move the instruction');
-    press('Enter');
-    await until(() => state() === 'solved');
-    const placed = rule().getBoundingClientRect(); const gap = lab().querySelector('.lab-drop-zone').getBoundingClientRect();
-    check(Math.abs(placed.x - gap.x) < 1 && Math.abs(placed.y - gap.y) < 1, 'The instruction physically occupies the bridge position');
-    check(agentX() > stoppedAt + 100, 'The agent crosses only after a bridge exists');
-    check(rule().textContent.includes('Build a way. Then walk.'), 'Success changes the instruction');
-    check(!lab().querySelector('[data-revised]').disabled, 'The changed instruction can be executed');
-    check(lab().querySelector('[data-message]').textContent.includes('You changed'), 'The puzzle credits the visitor’s edit');
-    const oldX = agentX(); press('ArrowLeft');
-    check(Math.abs(rule().getBoundingClientRect().x - placed.x) < 1 && agentX() === oldX, 'A completed bridge cannot be removed beneath the agent');
-
-    lab().querySelector('[data-revised]').focus();
-    lab().querySelector('[data-revised]').click();
-    check(doc.activeElement === lab().querySelector('[data-revised]'), 'Starting the revised run preserves keyboard focus');
-    check(state() === 'building' && !lab().classList.contains('has-bridge'), 'The revised run resets the physical scene and builds first');
-    const startX = agentX(); const startRuleY = rule().getBoundingClientRect().y;
-    await delay(250);
-    check(agentX() === startX && rule().getBoundingClientRect().y > startRuleY + 5, 'The revised rule moves itself while the agent waits');
-    await until(() => state() === 'solved');
-    check(lab().querySelector('[data-agent-version]').textContent === 'v2', 'The new run visibly uses the revised policy');
-    check(lab().querySelector('[data-message]').textContent.includes('before taking the first step'), 'The second-run result explains the changed order of actions');
-    await delay(80); check(pending.size === 0, 'Solved state stops scheduling animation frames');
-    lab().querySelector('[data-reset]').click();
-    check(!lab().classList.contains('has-bridge') && rule().textContent.includes('Walk to the paper.'), 'Start over removes the bridge and resets the original rule');
-    check(lab().querySelector('[data-agent-version]').textContent === 'v1' && lab().querySelector('[data-revised]').disabled, 'Start over clears the revised policy');
-    await close(); check(main.innerHTML === before && assets().length === 2, 'Both runs preserve the source page and reuse assets');
+    check(doc.querySelectorAll('#research-atlas').length === 1, 'Repeated triggers cannot stack dialogs');
+    await delay(2000);
+    check(pending.size === 0, 'The introduction stops scheduling frames when settled');
+    const metadata = await (await fetch('/papers/content/metadata.json')).json();
+    const allLinks = workLinks();
+    const slugs = allLinks.map(a => a.pathname.split('/').pop().replace('.html', ''));
+    check(slugs.length === 23 && new Set(slugs).size === 23, 'Each of the 23 papers appears exactly once');
+    check(JSON.stringify([...slugs].sort()) === JSON.stringify(Object.keys(metadata).sort()), 'The atlas covers the complete local paper corpus');
+    const pageResults = await Promise.all(allLinks.map(async a => {
+      const response = await fetch(a.href);
+      const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+      const normalize = text => text.replace(/\s+/g, ' ').trim();
+      return response.ok && normalize(page.querySelector('h1')?.textContent || '') === normalize(a.textContent);
+    }));
+    check(pageResults.every(Boolean), 'Every paper link resolves and its title matches the linked page');
+    check(threads().length === 5 && atlas().querySelectorAll('.atlas-work-list section').length === 5, 'Five research threads cover the work');
+    check(atlas().querySelector('[data-readout-link]').pathname === '/blogs/agents-that-learn-after-deployment.html', 'The broader research direction is linked');
+    const questions = new Set();
+    const counts = [4, 4, 7, 3, 5];
+    for (let a = 0; a < 5; a++) {
+      reset(); threads()[a].click();
+      check(workLinks().length === counts[a] && threads()[a].getAttribute('aria-pressed') === 'true', `Thread ${a}: matching papers and pressed state`);
+      for (let b = a + 1; b < 5; b++) {
+        reset(); threads()[a].click(); threads()[b].click();
+        questions.add(question());
+        check(atlas().dataset.selection === `${a}-${b}` && atlas().querySelector('[data-readout-label]').textContent.startsWith('Open question'), `Pair ${a}-${b}: explicitly framed as an open question`);
+        check(workLinks().length === counts[a] + counts[b], `Pair ${a}-${b}: the two paper groups are available`);
+      }
+    }
+    check(questions.size === 10, 'Every pair offers its own research question');
+    reset(); threads()[0].click(); threads()[3].click(); threads()[4].click();
+    check(atlas().dataset.selection === '3-4' && threads().filter(b => b.getAttribute('aria-pressed') === 'true').length === 2, 'Choosing a third thread retains only the latest two');
+    threads()[3].click(); check(atlas().dataset.selection === '4', 'A selected thread can be deselected');
+    atlas().querySelector('[data-readout-link]').click();
+    const details = atlas().querySelector('#atlas-works');
+    check(details.open && doc.activeElement === details.querySelector('summary'), 'Explore papers opens the disclosure and moves keyboard focus');
+    details.open = false; atlas().scrollTop = 0;
+    threads()[1].click(); atlas().querySelector('[data-horizon]').click();
+    check(atlas().classList.contains('is-frontier') && atlas().querySelector('[data-horizon]').getAttribute('aria-pressed') === 'true', 'Step back opens the wider horizon');
+    check(question().includes('lifetime') && atlas().querySelector('[data-readout-text]').textContent.includes('open research direction'), 'The future agenda is distinct from existing results');
+    check(atlas().dataset.selection === '4-1' && atlas().querySelector('[data-readout-link]').pathname.startsWith('/blogs/'), 'Step back reveals the larger agenda even when a pair is selected');
+    await delay(1100); check(pending.size === 0, 'The horizon transition also settles without an idle loop');
+    reset(); await delay(1100);
+    check(!atlas().classList.contains('is-frontier') && !atlas().dataset.selection && workLinks().length === 23, 'Reset clears selection, horizon, and paper filters');
+    const imageBefore = atlas().querySelector('canvas').toDataURL();
+    stage().focus(); stage().dispatchEvent(new win.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
+    await nextPaint();
+    check(atlas().querySelector('canvas').toDataURL() !== imageBefore, 'Arrow keys rotate the rendered map');
+    await delay(80); check(pending.size === 0, 'Keyboard rotation stops after drawing');
+    await close(); check(main.innerHTML === before && assets().length === 2, 'Exploration preserves the source page and reuses assets');
     win.requestAnimationFrame = originalRAF; win.cancelAnimationFrame = originalCancel;
 
-    reducedMotion(); doc.querySelector('.easter-egg-footnote').click(); await until(() => state() === 'blocked');
-    check(lab().open, 'Touch entry does not require the password');
-    press('Enter'); await until(() => state() === 'solved');
-    lab().querySelector('[data-revised]').click(); await until(() => state() === 'solved');
-    check(lab().querySelector('[data-agent-version]').textContent === 'v2', 'Reduced motion retains the complete puzzle and revised behavior');
+    reducedMotion(); doc.querySelector('.easter-egg-footnote').click(); await until(() => atlas()?.open); await nextPaint();
+    check(atlas().open, 'Touch entry does not require the password');
+    threads()[1].click(); threads()[4].click(); await nextPaint();
+    check(question().includes('actions') && atlas().classList.contains('has-pair'), 'Reduced motion retains the paired-question interaction');
     for (const [width, height] of [[1440, 900], [768, 1024], [700, 800], [390, 844], [320, 568], [844, 390]]) {
       frame.style.width = `${width}px`; frame.style.height = `${height}px`;
-      await until(() => Math.abs(scene().getBoundingClientRect().width - scene().querySelector('svg').viewBox.baseVal.width) < 1);
-      await new Promise(resolve => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve)));
-      check(lab().scrollWidth <= width + 1, `${width}×${height}: no horizontal overflow`);
-      const s = scene().getBoundingClientRect(); const r = rule().getBoundingClientRect();
-      check(r.left >= s.left && r.right <= s.right && r.top >= s.top && r.bottom <= s.bottom, `${width}×${height}: bridge stays in scene after resizing`);
-      check(r.width >= 44 && r.height >= 44, `${width}×${height}: instruction has a usable touch target`);
-      const a = lab().querySelector('[data-agent]').getBoundingClientRect();
-      check(a.left >= s.left && a.right <= s.right, `${width}×${height}: the agent stays visible`);
-      const z = lab().querySelector('.lab-drop-zone').getBoundingClientRect();
-      check(Math.abs(r.x-z.x)<1 && Math.abs(r.y-z.y)<1, `${width}×${height}: the installed bridge remains aligned`);
+      await until(() => Math.abs(atlas().querySelector('canvas').width - stage().getBoundingClientRect().width * Math.min(win.devicePixelRatio, 2)) < 1);
+      await nextPaint();
+      check(atlas().scrollWidth <= width + 1, `${width}×${height}: no horizontal overflow`);
+      const s = stage().getBoundingClientRect();
+      const rectangles = threads().map(b => b.getBoundingClientRect());
+      check(rectangles.every(r => r.left >= s.left - 1 && r.right <= s.right + 1 && r.top >= s.top && r.bottom <= s.bottom + 1), `${width}×${height}: all thread controls stay in the scene`);
+      check(rectangles.every(r => r.width >= 44 && r.height >= 44), `${width}×${height}: touch targets meet 44px`);
+      const overlap = (a,b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+      check(!rectangles.some((a,i) => rectangles.some((b,j) => i < j && overlap(a,b))), `${width}×${height}: thread controls do not overlap`);
+      const label = atlas().querySelector('.atlas-frontier-label').getBoundingClientRect();
+      check(!rectangles.some(r => overlap(r,label)), `${width}×${height}: the open-question label is not covered`);
     }
     await close();
     await load('/blogs/agents-that-learn-after-deployment.html'); reducedMotion(); await open();
     check([...assets()].every(asset => new URL(asset.src || asset.href).pathname.startsWith('/easter-egg.')), 'Nested articles load the assets from the site root');
-    check(lab().querySelector('a').pathname === '/papers/godel-agent.html', 'The paper link also resolves from nested articles');
+    check(workLinks().every(a => a.pathname.startsWith('/papers/')) && atlas().querySelector('[data-readout-link]').pathname.startsWith('/blogs/'), 'Paper and research-direction links resolve from nested articles');
     await close();
 
     await load();
@@ -147,10 +164,10 @@
       else append(...nodes);
     };
     type(); await delay(150);
-    check(!lab() && assets().length === 0, 'Download failure removes partial assets');
+    check(!atlas() && assets().length === 0, 'Download failure removes partial assets');
     doc.head.append = append; reducedMotion(); await open();
-    check(lab().open, 'A failed download can be retried');
-    lab().querySelector('[data-lab-close]').click(); await until(() => !lab());
+    check(atlas().open, 'A failed download can be retried');
+    atlas().querySelector('[data-close]').click(); await until(() => !atlas());
     check(!doc.body.style.overflow, 'The close button restores an originally absent overflow style');
   } catch (error) { failures.push(error.stack); }
   finally { frame.remove(); if (storedTheme === null) localStorage.removeItem('theme'); else localStorage.setItem('theme', storedTheme); }
