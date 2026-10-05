@@ -56,15 +56,18 @@
   const assets = () => doc.querySelectorAll('script[src*="easter-egg.js"],link[href*="easter-egg.css"]');
   const nextPaint = () => new Promise(resolve => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve)));
   const openFast = async (scale = 4) => { win.SiteEasterEgg.open({ timeScale: scale }); await until(() => egg()?.open, 'the dialog'); };
-  const dismiss = async () => { egg().dispatchEvent(new win.Event('cancel', { cancelable: true })); await until(() => !egg(), 'the dialog to close'); };
-  const keepStats = () => {
-    const stats = egg()?.spira?.frameStats;
-    if (!stats) return;
-    for (const [name, entry] of Object.entries(stats.byPhase)) {
-      if (!entry.frames) continue;
-      const kept = frameStats[name] || { frames: 0, avgMs: 0, maxMs: 0 };
-      const frames = kept.frames + entry.frames;
-      frameStats[name] = { frames, avgMs: +((kept.avgMs * kept.frames + entry.avgMs * entry.frames) / frames).toFixed(2), maxMs: +Math.max(kept.maxMs, entry.maxMs).toFixed(2) };
+  const dismiss = async () => { keepStats(); egg().dispatchEvent(new win.Event('cancel', { cancelable: true })); await until(() => !egg(), 'the dialog to close'); };
+  // Each dialog's frameStats object stays live until it closes, so closing frames count too.
+  const statObjects = new Set();
+  const keepStats = () => { const stats = egg()?.spira?.frameStats; if (stats) statObjects.add(stats); };
+  const mergeStats = () => {
+    for (const stats of statObjects) {
+      for (const [name, entry] of Object.entries(stats.byPhase)) {
+        if (!entry.frames) continue;
+        const kept = frameStats[name] || { frames: 0, avgMs: 0, maxMs: 0 };
+        const frames = kept.frames + entry.frames;
+        frameStats[name] = { frames, avgMs: +((kept.avgMs * kept.frames + entry.avgMs * entry.frames) / frames).toFixed(2), maxMs: +Math.max(kept.maxMs, entry.maxMs).toFixed(2) };
+      }
     }
   };
   const normalise = text => text.replace(/\s+/g, ' ').trim();
@@ -80,6 +83,15 @@
     }
     for (const extra of [{ ctrlKey: true }, { metaKey: true }, { altKey: true }, { repeat: true }]) type('yxjgogogo', doc.body, extra);
     check(assets().length === 0, 'Editable fields, repeated keys and modifier shortcuts are ignored');
+
+    /* The key sentence of the bio is found among the captured words (top of '/'). */
+    win.scrollTo({ top: 0, behavior: 'instant' });
+    type();
+    await until(() => egg()?.open, 'the password to open the egg');
+    check(assets().length === 2, 'The full password loads the script and stylesheet once');
+    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v2')), 'Asset URLs carry v=spira-v2');
+    check(egg().spira.keyCount === 24, `The key sentence is found in full (${egg().spira.keyCount} of 24 tokens)`);
+    await dismiss();
 
     const main = doc.querySelector('#main-content');
     const focus = doc.querySelector('#theme-toggle'); focus.focus();
@@ -100,10 +112,9 @@
       check(pending.size === 0, `${label}: no pending animation frame`);
     };
 
-    type();
-    await until(() => egg()?.open, 'the password to open the egg');
-    check(assets().length === 2, 'The full password loads the script and stylesheet once');
-    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v1')), 'Asset URLs carry v=spira-v1');
+    win.SiteEasterEgg.open();
+    await until(() => egg()?.open, 'the egg to reopen');
+    check(assets().length === 2, 'Reopening does not load the assets again');
     check(egg().matches(':modal'), 'The egg is a native modal dialog');
 
     /* 2. Capture: words from the real page, glyphs hidden by one class, DOM untouched. */
@@ -128,7 +139,7 @@
     await dismiss();
 
     /* 3. Phases in order; the chart UI is inert until the chart. */
-    await openFast(4);
+    await openFast(6);
     const inertBlocks = () => ['.spira-plate', '.spira-themes', '.spira-actions'].map(selector => egg().querySelector(selector));
     check(inertBlocks().every(el => el.inert), 'Plate, themes and actions are inert during the opening');
     const seen = [phase()];
@@ -189,7 +200,7 @@
     restored('Escape in the chart');
 
     /* 4. Skip by button and by Enter. */
-    await openFast(1);
+    await openFast(4);
     await until(() => phase() === 'gather', 'gather before skipping');
     egg().querySelector('[data-skip]').click();
     check(phase() === 'chart' && doc.activeElement === egg().querySelector('[data-close]'), 'Skip button reaches the chart and focuses Close');
@@ -197,15 +208,61 @@
     check(!egg().classList.contains('is-fading-skip'), 'The skip fade finishes');
     keepStats();
     await dismiss();
-    await openFast(1);
+    await openFast(4);
     egg().dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
     check(phase() === 'chart' && doc.activeElement === egg().querySelector('[data-close]'), 'Enter skips to the chart and focuses Close');
     await dismiss();
     restored('Escape after Enter skip');
 
+    /* Closing is a bookend: a 'closing' phase, glyphs back at once, full restoration after. */
+    await openFast(8);
+    egg().querySelector('[data-skip]').click();
+    await delay(150);
+    egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
+    check(phase() === 'closing' && !doc.documentElement.classList.contains('spira-hide-text'), 'Close enters the closing phase with the page glyphs restored first');
+    await until(() => !egg(), 'the closing to finish');
+    restored('After the closing animation');
+    await openFast(1);
+    egg().querySelector('[data-skip]').click();
+    await delay(100);
+    egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
+    check(phase() === 'closing', 'A first Escape starts the closing');
+    egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
+    check(!egg(), 'A second Escape during the closing finishes it immediately');
+    restored('Second Escape during the closing');
+
+    /* Core view: the page at the centre of the galaxy. */
+    await openFast(8);
+    egg().querySelector('[data-skip]').click();
+    await delay(450);
+    const core = egg().spira.projectCore();
+    const coreStage = egg().querySelector('.spira-stage');
+    const press = (x, y) => {
+      for (const type of ['pointerdown', 'pointerup']) coreStage.dispatchEvent(new win.PointerEvent(type, { pointerId: 9, pointerType: 'mouse', button: 0, clientX: x, clientY: y, bubbles: true, cancelable: true }));
+    };
+    press(core.x, core.y);
+    const detail = () => egg().querySelector('.spira-plate-detail');
+    check(egg().spira.view === 'core' && !detail().hidden && detail().textContent.includes('The page you came from.'), 'Clicking the centre opens the core view and its plate');
+    check(doc.activeElement && doc.activeElement.textContent === 'Back out', 'Focus moves to Back out');
+    await delay(500);
+    egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
+    check(!!egg() && egg().open && phase() === 'chart', 'Escape in the core view backs out instead of closing');
+    await until(() => egg().spira.view === 'chart', 'the flight back to the chart');
+    check(!egg().querySelector('#spira-text').closest('[hidden]'), 'Backing out restores the default plate');
+    egg().querySelector('.spira-centre').click();
+    check(egg().spira.view === 'core', 'The centre control opens the core view too');
+    egg().querySelector('.spira-back').click();
+    await until(() => egg().spira.view === 'chart', 'Back out');
+    check(doc.activeElement === egg().querySelector('.spira-centre'), 'Back out returns focus to the centre control');
+    keepStats();
+    egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
+    check(phase() === 'closing', 'A second Escape (back in the chart) closes');
+    await until(() => !egg(), 'the closing after core view');
+    restored('Escape after the core view');
+
     /* 5. Escape during each phase restores everything. */
     for (const target of ['dusk', 'gather', 'wind', 'ignite', 'chart']) {
-      await openFast(target === 'dusk' ? 1 : 4);
+      await openFast(target === 'dusk' ? 2 : 8);
       await until(() => phase() === target, `phase ${target}`, 15000);
       keepStats();
       await dismiss();
@@ -213,7 +270,7 @@
     }
 
     /* Replay restarts the opening from the chart. */
-    await openFast(4);
+    await openFast(8);
     egg().querySelector('[data-skip]').click();
     await delay(400);
     egg().querySelector('[data-replay]').click();
@@ -234,7 +291,16 @@
     await nextPaint(); await nextPaint();
     check(pending.size === 0, 'Reduced motion leaves no pending animation frame after two frames');
     check(egg().querySelector('[data-replay]').hidden, 'Replay is hidden under reduced motion');
-    await dismiss();
+    const rmCore = egg().spira.projectCore();
+    const rmStage = egg().querySelector('.spira-stage');
+    for (const type of ['pointerdown', 'pointerup']) rmStage.dispatchEvent(new win.PointerEvent(type, { pointerId: 11, pointerType: 'mouse', button: 0, clientX: rmCore.x, clientY: rmCore.y, bubbles: true, cancelable: true }));
+    check(egg().spira.view === 'core', 'Reduced motion: the core opens at once');
+    await nextPaint(); await nextPaint();
+    check(pending.size === 0, 'Reduced motion: the core view keeps no running loop');
+    egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
+    check(egg().spira.view === 'chart', 'Reduced motion: Escape backs out of the core at once');
+    egg().dispatchEvent(new win.Event('cancel', { cancelable: true }));
+    check(!egg(), 'Reduced motion: closing is instant');
     setReduced(false);
     await openFast(1);
     await until(() => phase() === 'gather', 'gather before reduced motion');
@@ -247,7 +313,7 @@
     restored('Escape after reduced motion');
 
     /* 8. Resize during the gather skips to the chart. */
-    await openFast(1);
+    await openFast(4);
     await until(() => phase() === 'gather', 'gather before resizing');
     const errorsBefore = errors.length;
     frame.style.width = '390px'; frame.style.height = '844px';
@@ -297,5 +363,6 @@
   /* 11. No uncaught errors or console.error calls. */
   assertions++;
   if (errors.length) failures.push(`Errors: ${errors.join(' | ')}`);
+  mergeStats();
   return { assertions, failures, frameStats };
 })();

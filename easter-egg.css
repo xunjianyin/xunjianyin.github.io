@@ -52,7 +52,9 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
 #spira.is-lift::before { opacity: 1; transition-duration: 800ms; }
 #spira.is-fading-skip { transition: background-color 350ms linear; }
 #spira.is-fading-replay { transition: background-color 250ms linear; }
-#spira.is-leaving { opacity: 0; transition: opacity 280ms ease; }
+/* Closing: the canvas paints the night (and the lift) itself while its iris closes. */
+#spira.is-closing { background-color: transparent !important; transition: none !important; }
+#spira.is-closing::before { opacity: 0 !important; transition: none !important; }
 
 #spira *, #spira *::before, #spira *::after { box-sizing: border-box; }
 #spira .spira-canvas { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
@@ -64,6 +66,10 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
 #spira .spira-stage.is-over { cursor: pointer; }
 #spira .spira-stage:focus-visible { outline: 1px solid var(--spira-focus); outline-offset: -8px; }
 #spira .spira-head, #spira .spira-plate, #spira .spira-note, #spira .spira-themes, #spira .spira-actions { position: relative; z-index: 2; }
+/* The centre of the spiral is a control: a 44 px target on the origin (positioned by JS). */
+#spira .spira-centre { position: absolute; z-index: 2; width: 44px; height: 44px; min-height: 0; padding: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+#spira .spira-centre[hidden] { display: none; }
+#spira .spira-centre:focus-visible { outline-offset: -6px; }
 
 /* Type */
 #spira p, #spira h2, #spira h3 {
@@ -109,6 +115,8 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
   font-family: var(--spira-serif); font-size: 19px; font-weight: 400; line-height: 1.32; letter-spacing: 0; text-transform: none;
 }
 #spira .spira-venue { color: var(--spira-muted); font-size: 13px; }
+#spira .spira-core-text { color: #d7dde5; }
+#spira .spira-back { margin-top: 6px; padding: 0; color: var(--spira-text); font-size: 13px; border-bottom: 1px solid rgba(207, 217, 230, 0.38); min-height: 44px; }
 #spira .spira-link { display: inline-block; margin-top: 10px; font-size: 13px; border-bottom: 1px solid rgba(207, 217, 230, 0.38); padding-bottom: 1px; }
 #spira .spira-row { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding: 5px 0; border-top: 1px solid var(--spira-line); font-size: 13px; line-height: 1.55; }
 #spira .spira-row:first-of-type { margin-top: 6px; }
@@ -197,8 +205,10 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
   #spira #spira-title { margin: 4px 0 4px; font-size: 24px; }
   #spira .spira-translation { font-size: 12px; }
   /* One wrapping row with even gaps; its width breaks it 3 + 2, so no label is left alone. */
-  #spira .spira-themes { flex-direction: row; flex-wrap: wrap; justify-self: start; gap: 4px 16px; margin-top: 0; max-width: 300px; }
-  #spira .spira-theme { min-height: 44px; line-height: 1.2; font-size: 12px; gap: 6px; }
+  #spira .spira-themes { flex-direction: row; flex-wrap: wrap; justify-self: start; gap: 0 16px; margin: -6px 0 -4px; max-width: 300px; }
+  /* 32 px hit areas (above the WCAG 2.2 24 px minimum) come from padding around a short
+     line, with no row gap, so the two rows sit close together. */
+  #spira .spira-theme { min-height: 0; padding: 7px 0; line-height: 18px; font-size: 12px; gap: 6px; }
   #spira .spira-plate { max-width: none; max-height: 27vh; overflow-y: auto; font-size: 13px; line-height: 1.62; padding-top: 6px; border-top: 1px solid var(--spira-line); }
   #spira .spira-note { max-width: none; margin-top: 6px; padding-top: 6px; }
   #spira .spira-index { top: 48px; left: 0; right: 0; bottom: 0; width: auto; max-height: none; padding: 4px 16px 16px; background: var(--spira-night); border-left: 0; border-top: 1px solid var(--spira-line); }
@@ -211,7 +221,7 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
 @media (max-width: 380px) {
   #spira .spira-actions { gap: 12px; }
   #spira .spira-themes { gap: 0 12px; }
-  #spira .spira-theme { min-height: 40px; font-size: 11.5px; gap: 5px; }
+  #spira .spira-theme { font-size: 11.5px; gap: 5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

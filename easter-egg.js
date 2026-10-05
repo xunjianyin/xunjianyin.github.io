@@ -23,30 +23,40 @@
   const FLIGHT_TIME = 1.3;
   const FLIGHT_JITTER = 0.15;
   const T_LAND = 5.2;                  // the last word lands; the text spiral is complete
-  const T_WIND = 5.9;                  // after a 0.7 s hero hold the text spiral winds in
-  const T_COLLAPSED = 7.7;             // the text spiral is a point; the core inhales
-  const T_IGNITE = 8.0;                // ignition
-  const T_HEAD = [8.05, 11.3];         // research head: inner start -> end of 2026
+  const HOLD = 1.3;                    // the hero frame holds this long; the key sentence glints in it
+  const T_GLINT = [5.4, 6.3];          // a warm light sweeps the key sentence in reading order
+  // Everything below follows the hold (each time is HOLD - 0.7 = 0.6 s later than in v6).
+  const T_WIND = T_LAND + HOLD;        // 6.5: the text spiral winds in
+  const T_COLLAPSED = 8.3;             // the text spiral is a point; the core inhales
+  const T_IGNITE = 8.6;                // ignition
+  const T_HEAD = [8.65, 11.9];         // research head: inner start -> end of 2026
   const T_HEAD_RAMP = 0.3;             // head accelerates for this long
-  const T_STOP = 12.0;                 // head fades out on the unwritten turn
-  const T_PITCH = [8.5, 11.6];
-  const T_CENTRE = [8.9, 11.6];
-  const T_SCALE_REST = [11.5, 12.0];   // camera scale settles exactly on the chart fit
-  const T_MOTTO = [9.5, 10.5];
-  const T_UI = [11.4, 12.2];
-  const T_GHOST = [11.4, 12.3];
-  const T_AXIS = [8.5, 9.5];
-  const T_SPOKES = [9.7, 10.9];
-  const T_THEME_LABELS = [10.3, 11.3];
-  const T_HEAD_FADE = [11.5, 12.0];
-  const T_NEAR_STARS = [8.0, 8.6];     // the near-field star layer fades in at ignition
+  const T_STOP = 12.6;                 // head fades out on the unwritten turn
+  const T_PITCH = [9.1, 12.2];
+  const T_CENTRE = [9.5, 12.2];
+  const T_SCALE_REST = [12.1, 12.6];   // camera scale settles exactly on the chart fit
+  const T_MOTTO = [10.1, 11.1];
+  const T_UI = [12.0, 12.8];
+  const T_GHOST = [12.0, 12.9];
+  const T_AXIS = [9.1, 10.1];
+  const T_SPOKES = [10.3, 11.5];
+  const T_THEME_LABELS = [10.9, 11.9];
+  const T_HEAD_FADE = [12.1, 12.6];
+  const T_NEAR_STARS = [8.6, 9.2];     // the near-field star layer fades in at ignition
   const T_CONTROLS_IN = [1.2, 1.7];
-  const T_CONTROLS_OUT = [11.6, 12.0];
-  const T_CHART = 12.0;                // phase 'chart'; the UI becomes interactive
-  const T_SETTLED = 12.8;              // every opening fade has finished
+  const T_CONTROLS_OUT = [12.2, 12.6];
+  const T_CHART = 12.6;                // phase 'chart'; the UI becomes interactive
+  const T_SETTLED = 13.4;              // every opening fade has finished
   const SKIP_FADE_MS = 350;
   const REPLAY_FADE_MS = 250;
-  const CLOSE_FADE_MS = 280;
+
+  // Closing: the bookend. The page rises again from the edges while the galaxy collapses.
+  const CLOSE_UI = [0, 0.25];          // s from the close request: UI blocks fade out
+  const CLOSE_COLLAPSE = [0.1, 1.1];   // galaxy collapses into its origin; the iris closes on it
+  const CLOSE_GLINT = [1.0, 1.3];      // the last point of light glints where the iris closes
+  const CLOSE_TOTAL = 1.3;
+  const CLOSE_DUSK = 0.4;              // during the dusk the iris simply reverses, this fast
+  const CLOSE_TURNS = 0.35;            // extra clockwise turns while the galaxy collapses
 
   // Dusk: an iris of night opening from the viewport centre
   const NIGHT_RGB = [5, 7, 12];
@@ -77,7 +87,21 @@
   const FLIGHT_LIFT = 0.05;            // brief scale lift at the start of a flight
   const FLIGHT_LIFT_PEAK = 0.12;
   const RADIAL_SHARE = 0.6;            // a flight's radius settles by this fraction of it
-  const FLIGHT_DIM = 0.12;             // words in mid-flight dim slightly, so landed lines read first
+  const WAIT_ALPHA = 0.55;             // words still on the page (in night colour) recede ...
+  const FLIGHT_ALPHA = 0.9;            // ... words in flight are clearer, landed words full
+  // The key sentence of the bio, found among the captured words by token matching.
+  const KEY_SENTENCE = 'I study how AI systems can recursively self-improve over long horizons to solve open-ended problems, with a focus on self-referential agents and world models.';
+  const KEY_MIN_TOKENS = 5;            // shorter matches are ignored (other pages)
+  const WARM = '#ffe9c7';              // the glint and its lingering tint
+  const GLINT_WIDTH = 0.14;            // s; how long the light dwells on a word
+  const GLINT_TINT = 0.35;             // share of warm tint a word keeps after the light has passed
+  const GLINT_GLOW = 34;               // px radius of the travelling light
+  // Wind: fast words leave short streaks of light
+  const TRAIL_DT = 0.16;               // s of motion a streak spans (a long exposure)
+  const TRAIL_SPEED = 90;              // px/s above which a word or dot streaks
+  const TRAIL_MAX_FONT = 5;            // px; legible sprites (larger on screen) never streak
+  const TRAIL_ALPHA = [0.18, 0.1, 0.035]; // per segment, head to tail
+  const TRAIL_WIDTH = 0.7;
   const TRAVEL = [0.1 * Math.PI, 1.1 * Math.PI]; // clockwise travel window around the centre
 
   // Wind and collapse
@@ -130,12 +154,24 @@
   const GHOST_AT = [0.12, 0.36, 0.6, 0.84];   // preferred fractions of the unwritten turn
   const GHOST_SLIDE = 0.03;            // ... from which a blocked phrase slides in these steps
   const GHOST_SLIDE_STEPS = 21;
+  const GHOST_MAX_TILT = 50 * Math.PI / 180; // ghost words sit well clear of vertical (60-120 deg)
   const GHOST_ORDER = [3, 0, 1, 2];    // placement priority: 'open-ended problems' (from the bio) first
   const LABEL_TAU = 0.15;              // s; canvas labels fade with this time constant
   const LABEL_SLIDE_TAU = 0.35;        // s; ... and slide to a new free spot with this one
   const THEME_SLIDE = [0, 0.07, -0.07, 0.14, -0.14, 0.21]; // world offsets tried along a spoke
   const GHOST_ALPHA = 0.55;
   const FUTURE_ALPHA = 0.35;
+  const PATH_FADE = 0.4;               // s; a selected paper's path along the spiral fades in and out
+  const PATH_ALPHA = [0.06, 0.5];      // alpha from the inner start to just before the paper
+  const PATH_WIDTH = 1.1;
+  const PATH_CHUNK = 8;                // samples per stroke of the alpha gradient
+  // The page at the centre: the text spiral lies in the disk at the origin
+  const CORE_WORLD_R = 0.06;           // world outer radius of the text spiral in the chart
+  const CORE_VIEW_R = 0.42;            // ... in core view: x min(w, h) on screen
+  const CORE_FLIGHT = 1.4;             // s; camera flight into the core and back
+  const CORE_SPIN = 0.03;              // rad/s while in core view
+  const CORE_HIT = 22;                 // px around the origin that opens the core
+  const CORE_REST_ALPHA = 0.3;         // texture alpha of the text spiral at rest (a soft nucleus under the bulge)
 
   // Camera: yaw psi about the disk normal, pitch alpha, perspective distance D
   const CAM_D = 3.4;
@@ -234,9 +270,14 @@
   const COPY = {
     stage: 'The research spiral. Drag or use arrow keys to turn it; plus and minus to zoom.',
     text: 'A logarithmic spiral keeps its shape as it grows: each turn is the last one, enlarged. Here each turn is a year of my research, passing through the same five questions, a little further out every time. The next turns are not drawn yet.',
-    hintPointer: 'Drag to turn · Scroll to move closer · Select a star',
-    hintTouch: 'Drag to turn · Tap a star',
-    note: 'Jacob Bernoulli asked for this curve and motto on his tombstone. The mason carved the wrong spiral.'
+    hintPointer: 'Drag to turn · Scroll to move closer · Select a star or the centre',
+    hintTouch: 'Drag to turn · Tap a star or the centre',
+    note: 'Jacob Bernoulli asked for this curve and motto on his tombstone. The mason carved the wrong spiral.',
+    centre: 'The centre of the spiral: the page you came from',
+    coreKicker: 'At the centre',
+    coreTitle: 'The page you came from.',
+    coreText: 'Every turn of the spiral starts here.',
+    backOut: 'Back out'
   };
 
   /* ---------------------------------------------------------------------------
@@ -430,7 +471,7 @@
           const r = range.getBoundingClientRect();
           if (!r.width || !r.height || r.bottom < 0 || r.top > vh || r.right < 0 || r.left > vw) return;
           words.push({ text: transform(node.data.slice(start, end), style.transform, atStart),
-            left: r.left, top: r.top, width: r.width, height: r.height, style, block });
+            left: r.left, top: r.top, width: r.width, height: r.height, style, block, cont: !atStart, key: -1 });
         };
         for (const match of node.data.matchAll(/\S+/gu)) {
           const from = match.index; const to = from + match[0].length;
@@ -463,7 +504,43 @@
   }
 
   /**
-   * Shelf-pack a day and a night sprite per word into 2048 px atlases, drawn in
+   * Find the bio's key sentence among the captured words: the longest run of tokens
+   * (case-insensitive, punctuation-trimmed; pieces of a word wrapped across lines are
+   * joined) that also occurs, contiguously, in KEY_SENTENCE. Marks each word of the run
+   * with its order in the run and returns the run's length in tokens (0 when absent).
+   */
+  const normaliseToken = text => text.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+  const KEY_TOKENS = KEY_SENTENCE.split(/\s+/).map(normaliseToken);
+  function markKeySentence(words) {
+    const tokens = []; const firstWord = []; const lastWord = [];
+    for (let i = 0; i < words.length; i++) {
+      if (words[i].cont && tokens.length) { tokens[tokens.length - 1] += words[i].text; lastWord[lastWord.length - 1] = i; continue; }
+      tokens.push(words[i].text); firstWord.push(i); lastWord.push(i);
+    }
+    for (let i = 0; i < tokens.length; i++) tokens[i] = normaliseToken(tokens[i]);
+    // Longest common contiguous run: run[j] is the length of the match ending at token i, key j.
+    let best = 0; let bestEnd = -1; let previous = new Uint16Array(KEY_TOKENS.length + 1);
+    for (let i = 0; i < tokens.length; i++) {
+      const current = new Uint16Array(KEY_TOKENS.length + 1);
+      for (let j = 0; j < KEY_TOKENS.length; j++) {
+        if (tokens[i] && tokens[i] === KEY_TOKENS[j]) {
+          current[j + 1] = previous[j] + 1;
+          if (current[j + 1] > best) { best = current[j + 1]; bestEnd = i; }
+        }
+      }
+      previous = current;
+    }
+    if (best < KEY_MIN_TOKENS) return 0;
+    let order = 0;
+    for (let k = bestEnd - best + 1; k <= bestEnd; k++) {
+      for (let i = firstWord[k]; i <= lastWord[k]; i++) words[i].key = order++;
+    }
+    return best;
+  }
+
+  /**
+   * Shelf-pack a day and a night sprite per word (and a warm one for the key sentence)
+   * into 2048 px atlases, drawn in
    * device pixels so that at t = 0 each sprite is blitted 1:1 onto its glyphs.
    */
   function buildWordSprites(words, dpr) {
@@ -493,12 +570,15 @@
       if (word.sw > ATLAS_SIZE || word.sh > ATLAS_SIZE) continue;
       word.daySpot = place(word.sw, word.sh);
       word.nightSpot = place(word.sw, word.sh);
+      word.warmSpot = word.key >= 0 ? place(word.sw, word.sh) : null;
       kept.push(word);
     }
     const atlases = heights.map(h => makeCanvas(ATLAS_SIZE, Math.max(1, h)));
     const contexts = atlases.map(c => c.getContext('2d'));
     for (const word of kept) {
-      for (const [spot, colour] of [[word.daySpot, word.style.day], [word.nightSpot, word.style.night]]) {
+      const spots = [[word.daySpot, word.style.day], [word.nightSpot, word.style.night]];
+      if (word.warmSpot) spots.push([word.warmSpot, WARM]);
+      for (const [spot, colour] of spots) {
         const g = contexts[spot[0]];
         g.save();
         g.beginPath(); g.rect(spot[1], spot[2], word.sw, word.sh); g.clip();
@@ -642,6 +722,7 @@
     dialog.innerHTML = `
       <canvas class="spira-canvas" aria-hidden="true"></canvas>
       <div class="spira-stage" tabindex="0" role="group" aria-label="${escapeHTML(COPY.stage)}"></div>
+      <button type="button" class="spira-centre" aria-label="${escapeHTML(COPY.centre)}"></button>
       <header class="spira-head">
         <p class="spira-kicker">Spira mirabilis</p>
         <h2 id="spira-title">Eadem mutata resurgo.</h2>
@@ -685,13 +766,14 @@
     const actionsEl = $('.spira-actions');
     const indexEl = $('.spira-index');
     const openingEl = $('.spira-opening');
+    const centreButton = $('.spira-centre');
     const themeButtons = [...dialog.querySelectorAll('.spira-theme')];
     const indexButton = $('[data-index]');
     const replayButton = $('[data-replay]');
     const closeButton = $('[data-close]');
     const skipButton = $('[data-skip]');
     const chartBlocks = [plateEl, noteEl, themesEl, actionsEl];
-    const inertBlocks = [stage, headEl, plateEl, noteEl, themesEl, actionsEl, indexEl];
+    const inertBlocks = [stage, centreButton, headEl, plateEl, noteEl, themesEl, actionsEl, indexEl];
     let ctx = null;
     try { ctx = canvas.getContext('2d'); } catch (error) { ctx = null; }
 
@@ -700,19 +782,29 @@
     let phase = 'dusk';
     let t = 0;                         // active opening time
     let raf = 0; let lastNow = 0;
-    let closed = false; let leaving = false; let closeTimer = 0;
+    let closed = false; let leaving = false;
     let W = 0; let H = 0; let DPR = 1; let narrow = false;
     let chartX = 0; let chartY = 0; let sFit = 1; let sMax = 1; let focal = 1; let headRho = 1; let restPitch = CAM_PITCH;
+    let coreX = 0; let coreY = 0; let coreRadius = 1;   // where and how large the core view shows the page
     let apMax = 1;                     // aperture radius when dusk completes
     let skipStart = -1; let remnantT = -1; let replayStart = -1;
+    // Closing: 'dusk' reverses the iris; 'galaxy' collapses everything into its origin.
+    let closeKind = ''; let closeT = 0; let closeFromMode = ''; let closeFromT = 0;
+    let closeX = 0; let closeY = 0; let closeCover = 1; let closeR0 = 0; let closeExtent = 1;
+    let closeLift = 0; let liftSprite = null; let collapseOn = false; let collapseK = 1; let collapsePhi = 0;
+    const closeUIFrom = new Map();
     let wordCount = 0; let atlases = [];
     // Chart state
     let yaw = YAW_REST; let pitch = CAM_PITCH; let zoom = 1; let zoomTarget = 1;
     let vYaw = 0; let vPitch = 0; let lastInteraction = -Infinity;
     let selectedPaper = -1; let hoverPaper = -1; let selectedTheme = -1; let indexOpen = false;
+    let pathPaper = -1; let pathAlpha = 0;   // the selected paper's path along the spiral
+    // Core view: a camera flight into the origin, where the page's text spiral lies.
+    let coreTarget = 0; let coreU = 0; let coreSpin = 0; let centreHover = false;
+    const coreFrom = { yaw: 0, yawTo: 0, pitch: 0, zoom: 1 };
     const stats = { frames: 0, avgMs: 0, maxMs: 0, byPhase: {} };
     const travelStats = { clockwise: 0, counter: 0 };
-    for (const name of ['dusk', 'gather', 'wind', 'ignite', 'chart']) stats.byPhase[name] = { frames: 0, avgMs: 0, maxMs: 0 };
+    for (const name of ['dusk', 'gather', 'wind', 'ignite', 'chart', 'core', 'closing']) stats.byPhase[name] = { frames: 0, avgMs: 0, maxMs: 0 };
     const uiOpacity = new Map();
     const ui = new Float32Array(4 * 8); let uiCount = 0;
     const MAX_PLACED = 48;
@@ -731,6 +823,7 @@
     const paperSX = new Float32Array(NP); const paperSY = new Float32Array(NP);
     const paperZ = new Float32Array(NP); const paperVis = new Uint8Array(NP);
     const labelWidth = new Float32Array(NP); const labelScore = new Float32Array(NP); const labelOrder = new Int16Array(NP);
+    const FOCUS_LABELS = PAPERS.map(paper => `${paper.name} · ${paper.year}`); const focusWidth = new Float32Array(NP);
     const sampleSX = new Float32Array(SAMPLE_COUNT); const sampleSY = new Float32Array(SAMPLE_COUNT);
     const sampleDepth = new Float32Array(SAMPLE_COUNT);
     // Starfield: a box around the disk, nothing within 0.2 of its plane.
@@ -802,7 +895,10 @@
     // Words (filled by prepareWords): typed arrays sized to the capture.
     let W_N = 0;
     let wHomeX, wHomeY, wHomeR, wHomeA, wAnchorX, wAnchorY, wSpriteW, wSpriteH, wDayX, wDayY, wNightX, wNightY;
-    let wDevW, wDevH, wPage, wSize, wSlotR, wSlotA, wSlotS, wSlotRot, wLift, wDur, wTravel, wTurn, wTone, wX, wY;
+    let wDevW, wDevH, wPage, wNightPage, wSize, wSlotR, wSlotA, wSlotS, wSlotRot, wLift, wDur, wTravel, wTurn, wTone, wX, wY;
+    let wKey, wWarmPage, wWarmX, wWarmY, wGlintAt; let keyCount = 0;
+    // Streak polylines: 4 points per streak (now, and 1/3, 2/3, 3/3 of TRAIL_DT earlier).
+    let trailPX = new Float32Array(0); let trailPY = trailPX; let trailTone = new Uint8Array(0); let trailCount = 0;
     let wordTones = []; let dotList = new Int32Array(0); let dotSize = new Float32Array(0); let dotAlpha = new Float32Array(0);
     let sepPhi = new Float32Array(0); let sepWord = new Int32Array(0); let sepCount = 0;
     let contPhi = new Float32Array(0); let contCount = 0;
@@ -865,7 +961,17 @@
       const scale = Math.exp(lerp(Math.log(trackScale(headTheta(time))), Math.log(sFit), smooth(span(time, T_SCALE_REST))));
       setCamera(lerp(W / 2, chartX, m), lerp(H / 2, chartY, m), yawAt(time), restPitch * easeInOutSine(span(time, T_PITCH)), scale);
     }
-    function chartCamera() { setCamera(chartX, chartY, yaw, pitch, sFit * zoom); }
+    function coreScale() { return coreRadius / CORE_WORLD_R; }
+    function chartCamera() {
+      if (coreU <= 0) { setCamera(chartX, chartY, yaw, pitch, sFit * zoom); return; }
+      // Flight into the core: the origin moves to the middle of the free area (clear of the
+      // UI), pitch to face-on, yaw to the nearest whole turn (the text spiral as it was in the
+      // hero frame), scale in log space.
+      const e = easeInOutCubic(coreU);
+      const from = Math.log(sFit * coreFrom.zoom); const to = Math.log(coreScale());
+      setCamera(lerp(chartX, coreX, e), lerp(chartY, coreY, e), lerp(coreFrom.yaw, coreFrom.yawTo, e),
+        lerp(coreFrom.pitch, 0, e), Math.exp(lerp(from, to, e)));
+    }
 
     /* ---- Layout ---------------------------------------------------------- */
     function measureUI() {
@@ -939,8 +1045,14 @@
       let fit = fitAt(chartY, target);
       if (fit < target) { chartY = centreFor(fit); fit = fitAt(chartY, fit); }
       sFit = Math.max(40, fit);
+      // Core view: the text spiral's outer radius is CORE_VIEW_R x min(w, h), kept inside the
+      // free area and centred in it.
+      coreX = chartX; coreY = (top + bottom) / 2;
+      coreRadius = Math.min(CORE_VIEW_R * Math.min(W, H), 0.46 * Math.min(freeW, freeH));
       // The CSS lift of the chart's night is centred on the chart (one write per layout).
       dialog.style.setProperty('--spira-cx', `${Math.round(chartX)}px`); dialog.style.setProperty('--spira-cy', `${Math.round(chartY)}px`);
+      // The origin always projects to the chart centre, so its control can stay put.
+      centreButton.style.left = `${Math.round(chartX - CORE_HIT)}px`; centreButton.style.top = `${Math.round(chartY - CORE_HIT)}px`;
       hintEl.textContent = coarse || narrow ? COPY.hintTouch : COPY.hintPointer;
       focal = sFit * CAM_D;
       const minSide = Math.min(W, H);
@@ -956,7 +1068,7 @@
         maskImage = maskCtx.createImageData(maskW, maskH);
         maskU32 = new Uint32Array(maskImage.data.buffer);
         ctx.font = LABEL_FONT;
-        for (let p = 0; p < NP; p++) labelWidth[p] = ctx.measureText(PAPERS[p].name).width;
+        for (let p = 0; p < NP; p++) { labelWidth[p] = ctx.measureText(PAPERS[p].name).width; focusWidth[p] = ctx.measureText(FOCUS_LABELS[p]).width; }
         ctx.font = YEAR_FONT;
         for (let m = 0; m < YEAR_MARKS.length; m++) yearWidth[m] = ctx.measureText(YEAR_MARKS[m].label).width;
         ctx.font = THEME_FONT;
@@ -977,6 +1089,7 @@
     }
     function prepareWords(captured) {
       releaseWords();
+      keyCount = markKeySentence(captured);
       const built = buildWordSprites(captured, DPR);
       atlases = built.atlases;
       const words = built.words;
@@ -985,9 +1098,11 @@
       wHomeX = new Float64Array(n); wHomeY = new Float64Array(n); wHomeR = f32(); wHomeA = f32();
       wAnchorX = new Float64Array(n); wAnchorY = new Float64Array(n); wSpriteW = f32(); wSpriteH = f32();
       wDayX = f32(); wDayY = f32(); wNightX = f32(); wNightY = f32(); wDevW = f32(); wDevH = f32();
-      wPage = new Uint8Array(n); wSize = f32(); wSlotR = f32(); wSlotA = f32(); wSlotS = f32(); wSlotRot = f32();
+      wPage = new Uint8Array(n); wNightPage = new Uint8Array(n); wSize = f32(); wSlotR = f32(); wSlotA = f32(); wSlotS = f32(); wSlotRot = f32();
+      wKey = new Int16Array(n).fill(-1); wWarmPage = new Uint8Array(n); wWarmX = f32(); wWarmY = f32(); wGlintAt = f32();
       wLift = f32(); wDur = f32(); wTravel = f32(); wTurn = f32(); wTone = new Uint8Array(n);
       dotList = new Int32Array(n); dotSize = f32(); dotAlpha = f32(); wX = f32(); wY = f32();
+      trailPX = new Float32Array(n * 4); trailPY = new Float32Array(n * 4); trailTone = new Uint8Array(n);
       const tones = new Map();
       const cx = W / 2; const cy = H / 2;
       for (let i = 0; i < n; i++) {
@@ -997,7 +1112,8 @@
         wAnchorX[i] = wHomeX[i] - w.ox / DPR; wAnchorY[i] = wHomeY[i] - w.oy / DPR;
         wSpriteW[i] = w.sw / DPR; wSpriteH[i] = w.sh / DPR; wDevW[i] = w.sw; wDevH[i] = w.sh;
         wPage[i] = w.daySpot[0]; wDayX[i] = w.daySpot[1]; wDayY[i] = w.daySpot[2];
-        wNightX[i] = w.nightSpot[1]; wNightY[i] = w.nightSpot[2];
+        wNightPage[i] = w.nightSpot[0]; wNightX[i] = w.nightSpot[1]; wNightY[i] = w.nightSpot[2];
+        if (w.warmSpot) { wKey[i] = w.key; wWarmPage[i] = w.warmSpot[0]; wWarmX[i] = w.warmSpot[1]; wWarmY[i] = w.warmSpot[2]; }
         wSize[i] = w.style.size;
         if (!tones.has(w.style.night)) tones.set(w.style.night, tones.size);
         wTone[i] = tones.get(w.style.night);
@@ -1005,6 +1121,16 @@
         wHomeR[i] = Math.max(1, Math.hypot(dx, dy)); wHomeA[i] = Math.atan2(dy, dx);
       }
       wordTones = [...tones.keys()];
+      // The glint reaches each key word at a time proportional to the text width before it,
+      // so the light moves at an even speed along the sentence.
+      let keyWidth = 0;
+      for (let i = 0; i < n; i++) if (wKey[i] >= 0) keyWidth += words[i].width;
+      let before = 0;
+      for (let i = 0; i < n; i++) {
+        if (wKey[i] < 0) continue;
+        wGlintAt[i] = lerp(T_GLINT[0], T_GLINT[1], keyWidth ? (before + words[i].width / 2) / keyWidth : 0);
+        before += words[i].width;
+      }
       // Slots on r = R0 e^(-B phi), theta = start + phi. A word of width w at scale
       // s0 e^(-B phi) spans arc length s0 e^(-B phi) w, and arc length per radian is
       // r sqrt(1 + B^2) = R0 e^(-B phi) sqrt(1 + B^2): the e^(-B phi) cancels, so every
@@ -1060,18 +1186,43 @@
       ghostSprites = GHOST_WORDS.map(text => {
         const w = Math.ceil(g.measureText(text).width) + 8; const h = 22;
         const c = makeCanvas(Math.ceil(w * DPR), Math.ceil(h * DPR)); const gc = c.getContext('2d');
-        gc.scale(DPR, DPR); gc.font = font; gc.fillStyle = LABEL_COLOUR; gc.textBaseline = 'middle'; gc.textAlign = 'center';
+        // Ghost words share the key sentence's warm tint: the sentence that glinted becomes the unwritten turn.
+        gc.scale(DPR, DPR); gc.font = font; gc.fillStyle = WARM; gc.textBaseline = 'middle'; gc.textAlign = 'center';
         gc.fillText(text, w / 2, h / 2);
         return { canvas: c, w, h };
       });
     }
 
+    /* ---- Transforms -------------------------------------------------------- */
+    // A screen-space base transform (CSS px) under DPR: the identity, except while closing,
+    // when the galaxy collapses about its origin. Local transforms compose onto it.
+    let baseA = 1; let baseB = 0; let baseC = 0; let baseD = 1; let baseE = 0; let baseF = 0;
+    function setBase(a, b, c, d, e, f) {
+      baseA = a; baseB = b; baseC = c; baseD = d; baseE = e; baseF = f;
+      resetTransform();
+    }
+    function resetTransform() {
+      ctx.setTransform(DPR * baseA, DPR * baseB, DPR * baseC, DPR * baseD, DPR * baseE, DPR * baseF);
+    }
+    function setLocal(a, b, c, d, e, f) {
+      ctx.setTransform(DPR * (baseA * a + baseC * b), DPR * (baseB * a + baseD * b),
+        DPR * (baseA * c + baseC * d), DPR * (baseB * c + baseD * d),
+        DPR * (baseA * e + baseC * f + baseE), DPR * (baseB * e + baseD * f + baseF));
+    }
+
     /* ---- Drawing: opening ------------------------------------------------ */
-    function drawAperture(radius, edge, layer) {
-      const cx = W / 2; const cy = H / 2; const corner = Math.hypot(cx, cy);
+    /**
+     * The iris of night around (cx, cy). Normally it paints the night (source-over); with
+     * `cut` it instead keeps what is already drawn only inside the iris (destination-in),
+     * which is how the closing lets the page reappear from the edges.
+     */
+    function drawAperture(radius, edge, layer, cx = W / 2, cy = H / 2, cut = false) {
+      const corner = Math.max(Math.hypot(cx, cy), Math.hypot(W - cx, cy), Math.hypot(cx, H - cy), Math.hypot(W - cx, H - cy));
       ctx.globalCompositeOperation = 'source-over';
       if (radius - edge / 2 >= corner + MASK_CELL) {
-        ctx.globalAlpha = layer; ctx.fillStyle = '#05070c'; ctx.fillRect(0, 0, W, H);
+        if (!cut) { ctx.globalAlpha = layer; ctx.fillStyle = '#05070c'; ctx.fillRect(0, 0, W, H); }
+      } else if (cut && radius + edge / 2 <= 0) {
+        ctx.clearRect(0, 0, W, H);
       } else {
         // A low-resolution alpha mask of the iris, smoothly upscaled. Texel i covers CSS
         // [(i - 1) cell, i cell] (centre (i - 0.5) cell). Rows are filled as spans: clear
@@ -1098,12 +1249,14 @@
           }
         }
         maskCtx.putImageData(maskImage, 0, 0);
-        ctx.globalAlpha = layer; ctx.imageSmoothingEnabled = true;
+        ctx.globalAlpha = cut ? 1 : layer; ctx.imageSmoothingEnabled = true;
+        if (cut) ctx.globalCompositeOperation = 'destination-in';
         ctx.drawImage(mask, 0, 0, maskW, maskH, -MASK_CELL, -MASK_CELL, maskW * MASK_CELL, maskH * MASK_CELL);
+        ctx.globalCompositeOperation = 'source-over';
       }
       // A luminous rim: a crisp 1 px line over a faint halo, fading once the iris passes the corners.
       const rim = 1 - smooth((radius - corner) / (edge + 8));
-      if (rim > 0.01) {
+      if (rim > 0.01 && radius > 0.5) {
         ctx.beginPath(); ctx.arc(cx, cy, radius, 0, TAU);
         ctx.globalAlpha = layer * rim; ctx.strokeStyle = RIM_HALO; ctx.lineWidth = RIM_HALO_WIDTH; ctx.stroke();
         ctx.strokeStyle = RIM_COLOUR; ctx.lineWidth = 1; ctx.stroke();
@@ -1202,22 +1355,34 @@
         ctx.fillRect(cx + r * Math.cos(a) - size / 2, cy + r * Math.sin(a) - size / 2, size, size);
       }
     }
-    /** Words: page -> polar flight -> text spiral -> rigid wind. Returns the collapsed fraction. */
-    function drawWords(time, layer, nightRadius, nightEdge) {
+    /**
+     * Words: page -> polar flight -> text spiral -> rigid wind. Returns the collapsed fraction.
+     * Layering: words still on the page recede (WAIT_ALPHA), words in flight are clearer
+     * (FLIGHT_ALPHA), landed words are full. `closing` (a close during the dusk) drops the
+     * day sprites, since the page's own glyphs are already back underneath.
+     */
+    function drawWords(time, layer, nightRadius, nightEdge, closing) {
       const cx = W / 2; const cy = H / 2;
       const spin = spinAt(time); const k = windScale(time);
       const dusk = nightRadius !== undefined;
-      let dots = 0;
+      // Wind streaks: the wind transform at three earlier instants gives each word's recent
+      // path, so a streak curves with the rotation and the inward pull (a long exposure).
+      const streaks = time > T_WIND && time < T_COLLAPSED;
+      const spin1 = streaks ? spinAt(time - TRAIL_DT / 3) : 0; const k1 = streaks ? windScale(time - TRAIL_DT / 3) : 0;
+      const spin2 = streaks ? spinAt(time - TRAIL_DT * 2 / 3) : 0; const k2 = streaks ? windScale(time - TRAIL_DT * 2 / 3) : 0;
+      const spin3 = streaks ? spinAt(time - TRAIL_DT) : 0; const k3 = streaks ? windScale(time - TRAIL_DT) : 0;
+      const tintLeft = 1 - smooth(span(time, [T_WIND, T_WIND + 0.4]));
+      let dots = 0; trailCount = 0;
       ctx.globalCompositeOperation = 'source-over';
       ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'medium';
       for (let i = 0; i < W_N; i++) {
-        let x; let y; let s; let rot; let dim = 1;
+        let x; let y; let s; let rot; let presence = 1; let landed = false;
         const age = time - wLift[i];
-        if (age <= 0) { x = wHomeX[i]; y = wHomeY[i]; s = 1; rot = 0; }
+        if (age <= 0) { x = wHomeX[i]; y = wHomeY[i]; s = 1; rot = 0; presence = -1; }
         else {
           const u = age / wDur[i];
           if (u >= 1) {
-            const r = wSlotR[i] * k; const a = wSlotA[i] + spin;
+            const r = wSlotR[i] * k; const a = wSlotA[i] + spin; landed = true;
             x = cx + r * Math.cos(a); y = cy + r * Math.sin(a); s = wSlotS[i] * k; rot = wSlotRot[i] + spin;
           } else {
             // Polar interpolation about the centre. Log-radius eases ahead of the angle
@@ -1231,15 +1396,32 @@
             // Upright at home, riding the lane's tangent once the radius has settled:
             // a + tilt is the tangent angle here; wTurn (the home tangent) is unwound by er.
             rot = a + SLOT_TILT - wTurn[i] * (1 - er);
-            dim = 1 - FLIGHT_DIM * Math.sin(Math.PI * u);
+            presence = lerp(WAIT_ALPHA, FLIGHT_ALPHA, smooth(u / 0.15)) + (1 - FLIGHT_ALPHA) * smooth((u - 0.85) / 0.15);
           }
         }
         wX[i] = x; wY[i] = y;
-        let alpha = layer * dim;
         const dist = Math.hypot(x - cx, y - cy);
+        const night = dusk ? nightAt(dist, nightRadius, nightEdge) : 1;
+        // A waiting word recedes as the night reaches it (full alpha at t = 0 for the swap).
+        if (presence < 0) presence = lerp(1, WAIT_ALPHA, night);
+        let alpha = layer * presence;
         if (dist < COLLAPSE_RADIUS) alpha *= clamp01((dist - 1) / (COLLAPSE_RADIUS - 1));
         if (alpha <= 0.004) continue;
         const px = wSize[i] * s;
+        // Only words that are no longer legible (dots, or tiny and fast) leave a streak.
+        if (streaks && landed && px < TRAIL_MAX_FONT && trailCount < trailTone.length) {
+          const r3 = wSlotR[i] * k3; const a3 = wSlotA[i] + spin3;
+          const x3 = cx + r3 * Math.cos(a3); const y3 = cy + r3 * Math.sin(a3);
+          if (Math.hypot(x - x3, y - y3) > TRAIL_SPEED * TRAIL_DT) {
+            const b = trailCount * 4; const r1 = wSlotR[i] * k1; const a1 = wSlotA[i] + spin1;
+            const r2 = wSlotR[i] * k2; const a2 = wSlotA[i] + spin2;
+            trailPX[b] = x; trailPY[b] = y;
+            trailPX[b + 1] = cx + r1 * Math.cos(a1); trailPY[b + 1] = cy + r1 * Math.sin(a1);
+            trailPX[b + 2] = cx + r2 * Math.cos(a2); trailPY[b + 2] = cy + r2 * Math.sin(a2);
+            trailPX[b + 3] = x3; trailPY[b + 3] = y3;
+            trailTone[trailCount++] = wTone[i];
+          }
+        }
         // Below DOT_SWITCH_PX a word is a dot in its night colour; a short band crossfades.
         const asDot = 1 - clamp01((px - DOT_SWITCH_PX) / DOT_BLEND_PX);
         if (asDot > 0) {
@@ -1248,20 +1430,28 @@
         }
         if (asDot >= 1) continue;
         const sa = alpha * (1 - asDot);
-        const night = dusk ? nightAt(dist, nightRadius, nightEdge) : 1;
-        const cos = Math.cos(rot) * s * DPR; const sin = Math.sin(rot) * s * DPR;
-        ctx.setTransform(cos, sin, -sin, cos, x * DPR, y * DPR);
-        const atlas = atlases[wPage[i]];
-        if (night < 1) {
+        // The key sentence: a warm light passes each word, which then keeps a warm tint.
+        let warm = 0;
+        if (wKey[i] >= 0) {
+          const d = (time - wGlintAt[i]) / GLINT_WIDTH;
+          warm = Math.max(Math.exp(-d * d), GLINT_TINT * smooth(d / 1.5) * tintLeft);
+        }
+        const cos = Math.cos(rot) * s; const sin = Math.sin(rot) * s;
+        setLocal(cos, sin, -sin, cos, x, y);
+        if (night < 1 && !closing) {
           ctx.globalAlpha = sa * (1 - night);
-          ctx.drawImage(atlas, wDayX[i], wDayY[i], wDevW[i], wDevH[i], -wAnchorX[i], -wAnchorY[i], wSpriteW[i], wSpriteH[i]);
+          ctx.drawImage(atlases[wPage[i]], wDayX[i], wDayY[i], wDevW[i], wDevH[i], -wAnchorX[i], -wAnchorY[i], wSpriteW[i], wSpriteH[i]);
         }
         if (night > 0) {
-          ctx.globalAlpha = sa * night;
-          ctx.drawImage(atlas, wNightX[i], wNightY[i], wDevW[i], wDevH[i], -wAnchorX[i], -wAnchorY[i], wSpriteW[i], wSpriteH[i]);
+          ctx.globalAlpha = sa * night * (1 - warm);
+          ctx.drawImage(atlases[wNightPage[i]], wNightX[i], wNightY[i], wDevW[i], wDevH[i], -wAnchorX[i], -wAnchorY[i], wSpriteW[i], wSpriteH[i]);
+          if (warm > 0.003) {
+            ctx.globalAlpha = sa * night * warm;
+            ctx.drawImage(atlases[wWarmPage[i]], wWarmX[i], wWarmY[i], wDevW[i], wDevH[i], -wAnchorX[i], -wAnchorY[i], wSpriteW[i], wSpriteH[i]);
+          }
         }
       }
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      resetTransform();
       // Dots, grouped by night colour so the fill style changes only a few times.
       for (let tone = 0; tone < wordTones.length; tone++) {
         ctx.fillStyle = wordTones[tone];
@@ -1272,6 +1462,36 @@
           ctx.fillRect(wX[i] - size / 2, wY[i] - size / 2, size, size);
         }
       }
+      ctx.globalCompositeOperation = 'lighter';
+      // The travelling light of the glint, centred on each key word as it passes.
+      if (keyCount && time > T_GLINT[0] - 0.5 && time < T_GLINT[1] + 0.5) {
+        for (let i = 0; i < W_N; i++) {
+          if (wKey[i] < 0) continue;
+          const d = (time - wGlintAt[i]) / GLINT_WIDTH; const g = Math.exp(-d * d);
+          if (g < 0.01) continue;
+          const radius = GLINT_GLOW * Math.max(0.5, wSlotS[i]);
+          ctx.globalAlpha = 0.32 * g * layer;
+          ctx.drawImage(sprites.warm, wX[i] - radius, wY[i] - radius, radius * 2, radius * 2);
+        }
+      }
+      // Wind streaks: faint curved polylines whose alpha falls to nothing at the tail, so the
+      // overlapping streaks merge into a whirl. One path per night colour and segment.
+      if (trailCount) {
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = TRAIL_WIDTH;
+        for (let seg = 0; seg < 3; seg++) {
+          ctx.globalAlpha = TRAIL_ALPHA[seg] * layer;
+          for (let tone = 0; tone < wordTones.length; tone++) {
+            ctx.strokeStyle = wordTones[tone]; ctx.beginPath(); let any = false;
+            for (let j = 0; j < trailCount; j++) {
+              if (trailTone[j] !== tone) continue;
+              const b = j * 4 + seg;
+              ctx.moveTo(trailPX[b], trailPY[b]); ctx.lineTo(trailPX[b + 1], trailPY[b + 1]); any = true;
+            }
+            if (any) ctx.stroke();
+          }
+        }
+      }
+      ctx.globalCompositeOperation = 'source-over';
       // Collapsed fraction: the share of the spiral's log-radius span already inside the
       // collapse radius. Words are uniform in phi, hence in log r, so this tracks the share
       // of collapsed words, but it rises smoothly instead of waiting for the innermost word.
@@ -1370,7 +1590,11 @@
       const head = chart ? THETA_STOP : headTheta(time);
       const done = chart ? 1 : 0;
       const theme = chart ? selectedTheme : -1;
+      // In core view (and while flying in or out) only the starfield, the bulge and the text
+      // spiral remain: the research layers fade out by the middle of the flight.
+      const research = layer * (1 - smooth(coreU / 0.5));
       drawStars(layer);
+      applyCollapse();
       // Project every sample up to the head.
       const last = Math.min(SAMPLE_COUNT - 1, Math.floor((head - THETA_IN) / D_THETA));
       for (let i = 0; i <= last; i++) {
@@ -1378,11 +1602,13 @@
         sampleSX[i] = PX; sampleSY[i] = PY; sampleDepth[i] = depthFactor(PZ);
       }
       projectAt(head, 1); const headX = PX; const headY = PY;
+      if (chart) drawCoreText(time, layer);
       // A soft core bulge at the origin, lit by the ignition and kept in the chart.
       const bulge = (done || smooth(span(time, [T_HEAD[0], T_HEAD[0] + 0.6]))) * BULGE.alpha * layer;
       if (bulge > 0 && project(0, 0, 0)) {
-        // The sprite's visible core is about 0.6 of its extent; its radius is capped on screen.
-        const radius = 1.6 * Math.min(BULGE.radius * focal / camDist, BULGE.maxPx);
+        // The sprite's visible core is about 0.6 of its extent; its radius is capped on screen
+        // (and shrinks in core view, so the page reads clearly).
+        const radius = 1.6 * Math.min(BULGE.radius * focal / camDist, BULGE.maxPx) * (1 - 0.6 * easeInOutCubic(coreU));
         const squash = 0.55 + 0.45 * cPitch;
         ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = bulge;
         ctx.drawImage(sprites.bulge, PX - radius, PY - radius * squash, radius * 2, radius * 2 * squash);
@@ -1397,37 +1623,38 @@
         for (let i = 0; i < dustN; i++) {
           if (dustTone[i] !== tone || dustKnot[i]) continue;
           const seen = done || clamp01((time - dustAt[i]) / 0.3);
-          if (seen <= 0 || !project(dustX[i], dustY[i], dustZ[i])) continue;
-          ctx.globalAlpha = dustAlpha[i] * seen * depthFactor(PZ) * dim * layer;
-          const size = dustSize[i]; ctx.fillRect(PX - size / 2, PY - size / 2, size, size);
+          if (seen <= 0 || !project(dustX[i], dustY[i], dustZ[i]) || PX < -4 || PX > W + 4 || PY < -4 || PY > H + 4) continue;
+          const size = dustSize[i];
+          ctx.globalAlpha = dustAlpha[i] * seen * depthFactor(PZ) * dim * (size > 1 ? research : layer);
+          ctx.fillRect(PX - size / 2, PY - size / 2, size, size);
         }
       }
-      for (let i = 0; i < dustN; i++) {
+      for (let i = 0; i < dustN && research > 0.004; i++) {
         if (!dustKnot[i]) continue;
         const seen = done || clamp01((time - dustAt[i]) / 0.3);
-        if (seen <= 0 || !project(dustX[i], dustY[i], dustZ[i])) continue;
+        if (seen <= 0 || !project(dustX[i], dustY[i], dustZ[i]) || PX < -8 || PX > W + 8 || PY < -8 || PY > H + 8) continue;
         const dim = theme >= 0 && dustTone[i] > 0 && dustTone[i] - 1 !== theme ? 0.4 : 1;
-        ctx.globalAlpha = dustAlpha[i] * seen * depthFactor(PZ) * dim * layer;
+        ctx.globalAlpha = dustAlpha[i] * seen * depthFactor(PZ) * dim * research;
         const size = dustSize[i] * 1.6;
         ctx.drawImage(dustTone[i] ? sprites.themeDots[dustTone[i] - 1] : sprites.cool, PX - size / 2, PY - size / 2, size, size);
       }
       // Year axis (growing with the head), sector spokes and year ticks.
       const axis = done || smooth(span(time, T_AXIS));
       ctx.lineWidth = 1;
-      if (axis > 0) {
+      if (axis > 0 && research > 0.004) {
         const reach = Math.min(AXIS_RADII[1], radiusAt(head) * 1.08);
-        ctx.setLineDash(DASH_AXIS); ctx.strokeStyle = MUTED_COLOUR; ctx.globalAlpha = 0.22 * axis * layer;
+        ctx.setLineDash(DASH_AXIS); ctx.strokeStyle = MUTED_COLOUR; ctx.globalAlpha = 0.22 * axis * research;
         ctx.beginPath();
         project(AXIS_RADII[0] * Math.cos(THETA0), AXIS_RADII[0] * Math.sin(THETA0), 0); ctx.moveTo(PX, PY);
         project(reach * Math.cos(THETA0), reach * Math.sin(THETA0), 0); ctx.lineTo(PX, PY);
         ctx.stroke();
       }
       const spokes = done || smooth(span(time, T_SPOKES));
-      if (spokes > 0) {
+      if (spokes > 0 && research > 0.004) {
         ctx.setLineDash(DASH_SPOKE);
         for (let j = 0; j < THEMES.length; j++) {
           const a = sectorCentre(j); const emphasis = theme < 0 ? 0.2 : theme === j ? 0.55 : 0.06;
-          ctx.strokeStyle = THEME_RGBA[j]; ctx.globalAlpha = emphasis * spokes * layer;
+          ctx.strokeStyle = THEME_RGBA[j]; ctx.globalAlpha = emphasis * spokes * research;
           ctx.beginPath();
           project(SPOKE_RADII[0] * Math.cos(a), SPOKE_RADII[0] * Math.sin(a), 0); ctx.moveTo(PX, PY);
           project(SPOKE_RADII[1] * Math.cos(a), SPOKE_RADII[1] * Math.sin(a), 0); ctx.lineTo(PX, PY);
@@ -1435,40 +1662,57 @@
         }
       }
       ctx.setLineDash(NO_DASH);
-      drawYearTicks(time, chart, layer);
+      if (research > 0.004) drawYearTicks(time, chart, research);
       // The curve: one soft 3 px pass, then chunks that are thinner and dimmer on the inner
       // turns and brightest on the outermost written turn, with alpha following depth.
       const solidLast = Math.min(last, INDEX_END);
       const solidHead = head <= THETA_END;
       ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = CURVE_COLOUR;
-      ctx.lineWidth = 3; ctx.globalAlpha = 0.06 * layer;
-      if (last >= INDEX_2022) {
+      ctx.lineWidth = 3; ctx.globalAlpha = 0.06 * research;
+      if (last >= INDEX_2022 && research > 0.004) {
         ctx.beginPath(); ctx.moveTo(sampleSX[INDEX_2022], sampleSY[INDEX_2022]);
         for (let i = INDEX_2022 + 1; i <= solidLast; i++) ctx.lineTo(sampleSX[i], sampleSY[i]);
         if (solidHead) ctx.lineTo(headX, headY);
         ctx.stroke();
       }
-      for (let c = 0; c <= solidLast; c += CURVE_CHUNK) {
+      for (let c = 0; c <= solidLast && research > 0.004; c += CURVE_CHUNK) {
         const end = Math.min(c + CURVE_CHUNK, solidLast); const mid = (c + end) >> 1;
         const weight = clamp01(mid / INDEX_END);
         const tail = mid < INDEX_2022 ? 0.6 : 1;
         ctx.lineWidth = lerp(0.55, 1.15, weight);
-        ctx.globalAlpha = lerp(0.24, 0.66, Math.pow(weight, 1.4)) * sampleDepth[mid] * tail * layer;
+        ctx.globalAlpha = lerp(0.24, 0.66, Math.pow(weight, 1.4)) * sampleDepth[mid] * tail * research;
         ctx.beginPath(); ctx.moveTo(sampleSX[c], sampleSY[c]);
         for (let i = c + 1; i <= end; i++) ctx.lineTo(sampleSX[i], sampleSY[i]);
         if (end === solidLast && solidHead) ctx.lineTo(headX, headY);
         ctx.stroke();
         if (end === solidLast) break;
       }
+      // A selected paper's path, "the road here": a thin stroke in its theme colour whose alpha
+      // grows along the spiral from the inner start to just before the paper.
+      if (chart && pathPaper >= 0 && pathAlpha > 0.005 && research > 0.004) {
+        const paper = PAPERS[pathPaper];
+        const end = Math.min(last, Math.floor((paper.theta - THETA_IN) / D_THETA));
+        project(paper.x, paper.y, 0); const ex = PX; const ey = PY;
+        ctx.strokeStyle = THEME_RGBA[paper.theme]; ctx.lineWidth = PATH_WIDTH;
+        for (let c = 0; c <= end; c += PATH_CHUNK) {
+          const stop = Math.min(c + PATH_CHUNK, end);
+          ctx.globalAlpha = lerp(PATH_ALPHA[0], PATH_ALPHA[1], ((c + stop) / 2) / Math.max(1, end)) * pathAlpha * research;
+          ctx.beginPath(); ctx.moveTo(sampleSX[c], sampleSY[c]);
+          for (let i = c + 1; i <= stop; i++) ctx.lineTo(sampleSX[i], sampleSY[i]);
+          if (stop === end) ctx.lineTo(ex, ey);
+          ctx.stroke();
+          if (stop === end) break;
+        }
+      }
       // The unwritten turn: dashed, fading to nothing where the head comes to rest.
       ctx.lineWidth = 1;
-      if (head > THETA_END) {
+      if (head > THETA_END && research > 0.004) {
         ctx.setLineDash(DASH_FUTURE);
         const total = THETA_STOP - THETA_END;
         for (let c = INDEX_END; c <= last; c += 12) {
           const end = Math.min(c + 12, last); const mid = (c + end) >> 1;
           const along = (THETA_IN + mid * D_THETA - THETA_END) / total;
-          ctx.globalAlpha = FUTURE_ALPHA * (1 - along) * sampleDepth[mid] * layer;
+          ctx.globalAlpha = FUTURE_ALPHA * (1 - along) * sampleDepth[mid] * research;
           ctx.beginPath(); ctx.moveTo(sampleSX[c], sampleSY[c]);
           for (let i = c + 1; i <= end; i++) ctx.lineTo(sampleSX[i], sampleSY[i]);
           if (end === last) ctx.lineTo(headX, headY);
@@ -1478,10 +1722,65 @@
         ctx.setLineDash(NO_DASH);
       }
       if (!chart) drawComet(time, head, headX, headY, layer);
-      drawPapers(time, chart, layer);
+      drawPapers(time, chart, research);
+      if (chart && centreHover && coreU <= 0 && project(0, 0, 0)) {
+        // The centre is selectable: a quiet ring while it is hovered or focused.
+        ctx.globalAlpha = 0.4 * layer; ctx.strokeStyle = CURVE_COLOUR; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(PX, PY, 15, 0, TAU); ctx.stroke();
+      }
       drawNearStars(time, chart, layer);
-      drawLabels(time, chart, head, layer);
+      drawLabels(time, chart, head, research);
       if (!chart) drawIgnition(time, layer);
+    }
+    /**
+     * The page at the centre: the text spiral (same slots and sprites) lies in the disk at
+     * the origin with outer radius CORE_WORLD_R. At that size perspective barely varies, so
+     * one affine map serves: the projected disk basis at the origin, b_x and b_y (screen px
+     * per world unit). A word at world (wx, wy) sits at O + b_x wx + b_y wy, and its sprite
+     * axes are the images of its tangent and normal. At rest it is fine texture (dots).
+     */
+    function drawCoreText(time, layer) {
+      if (!W_N || !project(0, 0, 0)) return;
+      const e = easeInOutCubic(coreU);
+      const show = smooth(span(time, T_UI)) * lerp(CORE_REST_ALPHA, 1, e) * layer;
+      if (show <= 0.01) return;
+      const ox = PX; const oy = PY; const step = CORE_WORLD_R;
+      project(step, 0, 0); const bxx = (PX - ox) / step; const bxy = (PY - oy) / step;
+      project(0, step, 0); const byx = (PX - ox) / step; const byy = (PY - oy) / step;
+      const kw = CORE_WORLD_R / spiralR0;   // world units per text-spiral px
+      let dots = 0;
+      ctx.globalCompositeOperation = 'source-over';
+      for (let i = 0; i < W_N; i++) {
+        const r = wSlotR[i] * kw; const a = wSlotA[i] + coreSpin;
+        const wx = r * Math.cos(a); const wy = r * Math.sin(a);
+        const x = ox + bxx * wx + byx * wy; const y = oy + bxy * wx + byy * wy;
+        if (x < -60 || x > W + 60 || y < -60 || y > H + 60) continue;
+        const rho = wSlotRot[i] + coreSpin; const sw = wSlotS[i] * kw;
+        const c = Math.cos(rho) * sw; const sn = Math.sin(rho) * sw;
+        const ax = bxx * c + byx * sn; const ay = bxy * c + byy * sn;      // image of the sprite's x axis
+        const nx = -bxx * sn + byx * c; const ny = -bxy * sn + byy * c;    // ... and of its y axis
+        const px = wSize[i] * Math.hypot(ax, ay);
+        const asDot = 1 - clamp01((px - DOT_SWITCH_PX) / DOT_BLEND_PX);
+        if (asDot > 0) { dotList[dots] = i; dotAlpha[dots] = show * asDot; wX[i] = x; wY[i] = y; dots++; }
+        if (asDot >= 1) continue;
+        const sa = show * (1 - asDot);
+        const warm = wKey[i] >= 0 ? GLINT_TINT : 0;
+        setLocal(ax, ay, nx, ny, x, y);
+        ctx.globalAlpha = sa * (1 - warm);
+        ctx.drawImage(atlases[wNightPage[i]], wNightX[i], wNightY[i], wDevW[i], wDevH[i], -wAnchorX[i], -wAnchorY[i], wSpriteW[i], wSpriteH[i]);
+        if (warm) {
+          ctx.globalAlpha = sa * warm;
+          ctx.drawImage(atlases[wWarmPage[i]], wWarmX[i], wWarmY[i], wDevW[i], wDevH[i], -wAnchorX[i], -wAnchorY[i], wSpriteW[i], wSpriteH[i]);
+        }
+      }
+      resetTransform();
+      for (let tone = 0; tone < wordTones.length; tone++) {
+        ctx.fillStyle = wordTones[tone];
+        for (let d = 0; d < dots; d++) {
+          const i = dotList[d]; if (wTone[i] !== tone) continue;
+          ctx.globalAlpha = dotAlpha[d]; ctx.fillRect(wX[i] - 0.5, wY[i] - 0.5, 1, 1);
+        }
+      }
     }
     function drawYearTicks(time, chart, layer) {
       ctx.strokeStyle = MUTED_COLOUR; ctx.lineWidth = 1;
@@ -1526,8 +1825,9 @@
         project(paper.x, paper.y, 0);
         paperSX[p] = PX; paperSY[p] = PY; paperZ[p] = PZ;
         const age = chart ? 99 : time - paper.at;
-        paperVis[p] = age >= 0 ? 1 : 0;
-        if (age < 0) continue;
+        const onScreen = PX > -60 && PX < W + 60 && PY > -60 && PY < H + 60;
+        paperVis[p] = age >= 0 && onScreen ? 1 : 0;
+        if (age < 0 || !onScreen) continue;
         const focus = chart && (p === selectedPaper || p === hoverPaper);
         const dim = theme >= 0 && paper.theme !== theme && !focus ? 0.3 : 1;
         const a = depthFactor(PZ) * dim * layer;
@@ -1613,8 +1913,8 @@
       return labelPrimary ? current + (target - current) * labelSlideEase : target;
     }
     let labelX = 0; let labelY = 0;
-    function paperLabelBox(p) {
-      const w = labelWidth[p] + 2;
+    function paperLabelBox(p, focus) {
+      const w = (focus ? focusWidth[p] : labelWidth[p]) + 2;
       labelX = paperSX[p] + 9; if (labelX + w > W - EDGE_INSET) labelX = paperSX[p] - 9 - w;
       labelY = paperSY[p] - 7;
     }
@@ -1629,13 +1929,15 @@
       projectAt(theta - 0.03, 0.93); const ax = PX; const ay = PY;
       projectAt(theta + 0.03, 0.93); const bx = PX; const by = PY;
       let angle = Math.atan2(by - ay, bx - ax);
+      // Readable: never upside down (rotate by pi), and the slot search below rejects steep slots.
       if (angle > Math.PI / 2) angle -= Math.PI; else if (angle < -Math.PI / 2) angle += Math.PI;
+      ghostAngle = angle;
       const sprite = ghostSprites[g];
       ghostX = (ax + bx) / 2; ghostY = (ay + by) / 2; ghostCos = Math.cos(angle); ghostSin = Math.sin(angle);
       ghostW = Math.abs(sprite.w * ghostCos) + Math.abs(sprite.h * ghostSin) * 0.6;
       ghostH = Math.abs(sprite.w * ghostSin) + Math.abs(sprite.h * ghostCos) * 0.6;
     }
-    let ghostX = 0; let ghostY = 0; let ghostCos = 1; let ghostSin = 0; let ghostW = 0; let ghostH = 0;
+    let ghostX = 0; let ghostY = 0; let ghostCos = 1; let ghostSin = 0; let ghostW = 0; let ghostH = 0; let ghostAngle = 0;
     /**
      * All canvas text shares one collision pass, in priority order: selected star >
      * hovered star > theme labels > year labels > paper labels (nearer first) > ghost
@@ -1644,6 +1946,9 @@
      */
     function drawLabels(time, chart, head, layer) {
       placedCount = 0;
+      // No labels in core view; they fade out early in the flight towards it.
+      layer *= 1 - smooth(coreU * 3);
+      if (layer <= 0.004) return;
       // Fades run on time in the chart as well (t keeps counting to T_SETTLED), so the
       // hand-over at T_CHART cannot snap.
       const paperShow = smooth(span(time, T_UI)) * layer;
@@ -1655,9 +1960,10 @@
         const p = pass === 0 ? selectedPaper : hoverPaper;
         if (!chart || p < 0 || !paperVis[p] || paperDone[p]) continue;
         paperDone[p] = 1; if (labelPrimary) paperFade[p] = 1;
-        paperLabelBox(p);
-        addObstacle(labelX - 3, labelY - 1, labelX + labelWidth[p] + 5, labelY + 15);
-        drawPaperLabel(p, layer);
+        // A focused star is named with its year: "Short name · year".
+        paperLabelBox(p, true);
+        addObstacle(labelX - 3, labelY - 1, labelX + focusWidth[p] + 5, labelY + 15);
+        ctx.globalAlpha = layer; ctx.fillText(FOCUS_LABELS[p], labelX + 1, paperSY[p]);
       }
       // 3. Theme labels, clamped inside the viewport; a blocked label slides along its spoke.
       const themeShow = smooth(span(time, T_THEME_LABELS)) * layer;
@@ -1745,6 +2051,7 @@
             const at = GHOST_AT[g] + (k % 2 ? -1 : 1) * Math.ceil(k / 2) * GHOST_SLIDE;
             if (at < 0.04 || at > 0.97 || at > reveal) continue;
             ghostPose(g, at);
+            if (Math.abs(ghostAngle) > GHOST_MAX_TILT) continue;
             if (!blocked(ghostX - ghostW / 2, ghostY - ghostH / 2, ghostW, ghostH, -2)) found = at;
           }
           const placedHere = !Number.isNaN(found);
@@ -1754,11 +2061,11 @@
           ghostPose(g, labelPrimary ? ghostAt[g] : found);
           if (placedHere) addObstacle(ghostX - ghostW / 2, ghostY - ghostH / 2, ghostX + ghostW / 2, ghostY + ghostH / 2);
           const sprite = ghostSprites[g];
-          ctx.setTransform(ghostCos * DPR, ghostSin * DPR, -ghostSin * DPR, ghostCos * DPR, ghostX * DPR, ghostY * DPR);
+          setLocal(ghostCos, ghostSin, -ghostSin, ghostCos, ghostX, ghostY);
           ctx.globalAlpha = GHOST_ALPHA * ghostShow * fade * (1 - 0.35 * GHOST_AT[g]);
           ctx.drawImage(sprite.canvas, -sprite.w / 2, -sprite.h / 2, sprite.w, sprite.h);
         }
-        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        resetTransform();
       }
     }
 
@@ -1783,6 +2090,7 @@
       if (dusk) drawAperture(radius, edge, layer);
       if (time < T_IGNITE) {
         if (dusk) drawStars(layer, radius, edge); else drawStars(layer);
+        applyCollapse();
         drawSpiralDots(time, layer);
         const collapsed = dusk ? drawWords(time, layer, radius, edge) : drawWords(time, layer);
         drawCore(time, collapsed, layer);
@@ -1793,9 +2101,10 @@
       drawWords(0, layer, apertureRadius(0), edgeOf(0));
     }
     function render(now) {
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      setBase(1, 0, 0, 1, 0, 0);
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.setLineDash(NO_DASH);
       ctx.clearRect(0, 0, W, H);
+      if (mode === 'closing') { renderClosing(); return; }
       if (mode === 'opening') { renderOpening(t, 1); return; }
       if (mode === 'replay-out') {
         const u = clamp01((now - replayStart) / REPLAY_FADE_MS);
@@ -1805,12 +2114,13 @@
       }
       const u = skipStart >= 0 ? clamp01((now - skipStart) / SKIP_FADE_MS) : 1;
       if (u < 1 && remnantT >= 0) { labelPrimary = false; renderOpening(remnantT, 1 - u); labelPrimary = true; }
+      if (motion.matches) updatePath(0);
       chartCamera(); drawScene(t, true, u);
     }
 
     function frame(now) {
       raf = 0;
-      if (closed || leaving) return;
+      if (closed || (leaving && mode !== 'closing')) return;
       if (document.hidden) { lastNow = 0; return; }
       const real = lastNow ? Math.max(0, now - lastNow) / 1000 : 0;
       lastNow = now;
@@ -1818,9 +2128,9 @@
       step(dt, now);
       labelEase = motion.matches ? 1 : 1 - Math.exp(-dt / LABEL_TAU);
       labelSlideEase = motion.matches ? 1 : 1 - Math.exp(-dt / LABEL_SLIDE_TAU);
-      if (ctx && !closed && !leaving) {
+      if (ctx && !closed) {
         const began = performance.now();
-        if (mode === 'chart') {
+        if (mode === 'chart' || mode === 'closing') {
           try { render(now); } catch (error) { console.warn('The spiral could not be drawn.', error); cleanup(); return; }
         } else {
           // remnantT = -2 asks skip() not to redraw the failing opening as a remnant.
@@ -1832,11 +2142,18 @@
       schedule();
     }
     function record(ms) {
-      const entry = stats.byPhase[phase] || stats.byPhase.chart;
+      const entry = stats.byPhase[phase === 'chart' && (coreU > 0 || coreTarget) ? 'core' : phase] || stats.byPhase.chart;
       entry.frames++; entry.avgMs += (ms - entry.avgMs) / entry.frames; entry.maxMs = Math.max(entry.maxMs, ms);
       stats.frames++; stats.avgMs += (ms - stats.avgMs) / stats.frames; stats.maxMs = Math.max(stats.maxMs, ms);
     }
     function step(dt, now) {
+      if (mode === 'closing') {
+        closeT += dt * timeScale;
+        const fade = 1 - smooth(span(closeT, CLOSE_UI));
+        for (const [el, from] of closeUIFrom) setOpacity(el, from * fade);
+        if (closeT >= (closeKind === 'dusk' ? CLOSE_DUSK : CLOSE_TOTAL)) cleanup();
+        return;
+      }
       if (mode === 'opening') {
         t += dt * timeScale;
         setPhase(phaseAt(t));
@@ -1847,7 +2164,6 @@
         setOpacity(headEl, smooth(span(t, T_MOTTO)));
         const fade = smooth(span(t, T_UI));
         for (const el of chartBlocks) setOpacity(el, fade);
-        if (t >= T_IGNITE && W_N) releaseWords();
         if (t >= T_CHART) enterChart(false);
         return;
       }
@@ -1869,11 +2185,15 @@
         const u = clamp01((now - skipStart) / SKIP_FADE_MS);
         setOpacity(headEl, u); for (const el of chartBlocks) setOpacity(el, u);
         if (u >= 1) {
-          skipStart = -1; remnantT = -1; releaseWords();
+          skipStart = -1; remnantT = -1;
           dialog.classList.remove('is-fading-skip');
           setOpacity(headEl, 1); for (const el of chartBlocks) setOpacity(el, 1);
         }
       }
+      updatePath(dt);
+      if (coreTarget !== coreU) coreU = motion.matches ? coreTarget : clamp01(coreU + (coreTarget ? 1 : -1) * dt / CORE_FLIGHT);
+      if (coreTarget && !motion.matches) coreSpin += CORE_SPIN * dt;
+      if (coreU > 0) return;   // the chart camera is held while the core is open
       if (!motion.matches) {
         if (drag.id < 0 && (vYaw || vPitch)) {
           yaw += vYaw * dt; pitch = clamp(pitch + vPitch * dt, PITCH_RANGE[0], PITCH_RANGE[1]);
@@ -1885,8 +2205,17 @@
         if (Math.abs(zoom - zoomTarget) < 1e-4) zoom = zoomTarget;
       } else zoom = zoomTarget;
     }
+    function updatePath(dt) {
+      // The path fades in over PATH_FADE for a newly selected paper and out on deselect.
+      if (selectedPaper >= 0 && pathPaper !== selectedPaper) { pathPaper = selectedPaper; pathAlpha = 0; }
+      const target = selectedPaper >= 0 ? 1 : 0;
+      pathAlpha = motion.matches ? target : clamp01(pathAlpha + (target ? 1 : -1) * dt / PATH_FADE);
+      if (!pathAlpha && !target) pathPaper = -1;
+    }
     function needsFrame() {
-      if (closed || leaving || !ctx) return false;
+      if (closed || !ctx) return false;
+      if (mode === 'closing') return true;
+      if (leaving) return false;
       if (mode !== 'chart') return true;
       return skipStart >= 0 || t < T_SETTLED || !motion.matches;
     }
@@ -1942,7 +2271,7 @@
       enterChart(true);
       t = T_SETTLED;
       if (instant) {
-        skipStart = -1; remnantT = -1; releaseWords();
+        skipStart = -1; remnantT = -1;
         setOpacity(headEl, 1); for (const el of chartBlocks) setOpacity(el, 1);
       } else {
         skipStart = performance.now();
@@ -1971,7 +2300,6 @@
       closed = true;
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
-      clearTimeout(closeTimer);
       events.abort();
       html.classList.remove('spira-hide-text');
       releaseWords();
@@ -1983,16 +2311,96 @@
       if (scrollX !== scroll.x || scrollY !== scroll.y) window.scrollTo({ left: scroll.x, top: scroll.y, behavior: 'instant' });
       active = false;
     }
+    /**
+     * Close as a bookend: the page's glyphs return first, underneath. From the dusk the iris
+     * simply reverses; later, the UI fades, the galaxy collapses into its origin (an
+     * accelerating scale-down with some spin, as the wind did) while the iris of night closes
+     * on that point, so the page reappears from the edges inward. A second request, a hidden
+     * tab, reduced motion or pagehide finish at once; restoration happens only at the end.
+     */
     function close() {
-      if (closed || leaving) return;
-      leaving = true;
-      if (raf) cancelAnimationFrame(raf);
-      raf = 0;
-      // Glyphs return first, under the fading dialog.
+      if (closed) return;
+      if (leaving) { cleanup(); return; }
       html.classList.remove('spira-hide-text');
-      if (motion.matches) { cleanup(); return; }
-      dialog.classList.add('is-leaving');
-      closeTimer = setTimeout(cleanup, CLOSE_FADE_MS);
+      if (motion.matches || !ctx || document.hidden) { cleanup(); return; }
+      leaving = true;
+      if (drag.id >= 0) endDrag(true);
+      closeT = 0; closeFromMode = mode === 'opening' ? 'opening' : 'chart'; closeFromT = mode === 'replay-out' ? T_SETTLED : t;
+      if (mode === 'opening' && t < T_DUSK) {
+        closeKind = 'dusk'; closeR0 = apertureRadius(t);
+      } else {
+        closeKind = 'galaxy';
+        if (closeFromMode === 'opening' && closeFromT < T_IGNITE) { closeX = W / 2; closeY = H / 2; }
+        else {
+          if (closeFromMode === 'opening') openingCamera(closeFromT); else chartCamera();
+          project(0, 0, 0); closeX = PX; closeY = PY;
+        }
+        closeCover = Math.max(Math.hypot(closeX, closeY), Math.hypot(W - closeX, closeY), Math.hypot(closeX, H - closeY), Math.hypot(W - closeX, H - closeY)) + EDGE_MAX;
+        closeExtent = Math.max(W, H);
+        closeLift = dialog.classList.contains('is-lift') ? 1 : 0;
+        if (closeLift && !liftSprite) liftSprite = buildLift();
+      }
+      closeUIFrom.clear();
+      for (const el of [headEl, ...chartBlocks, indexEl, openingEl]) closeUIFrom.set(el, uiOpacity.has(el) ? uiOpacity.get(el) : 1);
+      mode = 'closing'; setPhase('closing');
+      stage.inert = true; centreButton.inert = true;
+      // The canvas takes over the night in the same paint as the dialog's background leaves.
+      dialog.classList.add('is-closing');
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0; lastNow = 0;
+      try { render(performance.now()); } catch (error) { cleanup(); return; }
+      schedule();
+    }
+    function buildLift() {
+      // The CSS lift of the chart's night, painted once at quarter resolution, so the canvas
+      // can stand in for the dialog background while the iris closes.
+      const w = Math.max(1, Math.ceil(W / 4)); const h = Math.max(1, Math.ceil(H / 4));
+      const c = makeCanvas(w, h); const g = c.getContext('2d');
+      const stack = (W < 900 && H >= 560) || W < 600;
+      const rx = (stack ? 0.8 : 0.55) * W / 4; const ry = (stack ? 0.5 : 0.62) * H / 4;
+      g.setTransform(rx, 0, 0, ry, chartX / 4, chartY / 4);
+      const grad = g.createRadialGradient(0, 0, 0, 0, 0, 1);
+      grad.addColorStop(0, 'rgba(36,54,86,0.22)'); grad.addColorStop(0.72, 'rgba(36,54,86,0)');
+      g.fillStyle = grad; g.fillRect(-chartX / rx * 0.25 - 4, -chartY / ry * 0.25 - 4, W / rx + 8, H / ry + 8);
+      return c;
+    }
+    function applyCollapse() {
+      if (!collapseOn) return;
+      const c = Math.cos(collapsePhi) * collapseK; const sn = Math.sin(collapsePhi) * collapseK;
+      // Scale and turn about the origin's screen position.
+      setBase(c, sn, -sn, c, closeX - (c * closeX - sn * closeY), closeY - (sn * closeX + c * closeY));
+    }
+    function renderClosing() {
+      if (closeKind === 'dusk') {
+        const u = clamp01(closeT / CLOSE_DUSK);
+        const radius = lerp(closeR0, -EDGE_MIN, easeInOutSine(u)); const edge = edgeOf(Math.max(0, radius));
+        openingCamera(closeFromT);
+        drawAperture(radius, edge, 1);
+        drawStars(1, radius, edge);
+        drawWords(closeFromT, 1, radius, edge, true);
+        return;
+      }
+      const u = span(closeT, CLOSE_COLLAPSE); const e = easeInCubic(u);
+      // The canvas stands in for the night: flat night, plus the chart's lift if it was shown.
+      ctx.globalAlpha = 1; ctx.fillStyle = '#05070c'; ctx.fillRect(0, 0, W, H);
+      if (closeLift && liftSprite) ctx.drawImage(liftSprite, 0, 0, W, H);
+      collapseK = Math.exp(-Math.log(closeExtent / 1.5) * e); collapsePhi = CLOSE_TURNS * TAU * e; collapseOn = true;
+      if (closeFromMode === 'opening') renderOpening(closeFromT, 1);
+      else { chartCamera(); drawScene(t, true, 1); }
+      collapseOn = false; setBase(1, 0, 0, 1, 0, 0);
+      ctx.globalCompositeOperation = 'source-over'; ctx.setLineDash(NO_DASH);
+      // The iris closes on the origin: everything outside it is cut back to the page.
+      const radius = lerp(closeCover, -EDGE_MIN, easeInOutSine(u));
+      drawAperture(radius, edgeOf(Math.max(0, radius)), 1, closeX, closeY, true);
+      // The last point of light: a tiny glint where the iris closes.
+      const g = span(closeT, CLOSE_GLINT);
+      if (g > 0 && g < 1) {
+        const a = Math.sin(Math.PI * g);
+        ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a;
+        ctx.drawImage(sprites.glint, closeX - 11, closeY - 11, 22, 22);
+        ctx.drawImage(sprites.white, closeX - 6, closeY - 6, 12, 12);
+        ctx.globalCompositeOperation = 'source-over';
+      }
     }
 
     /* ---- Plate, themes, index -------------------------------------------- */
@@ -2005,9 +2413,15 @@
     }
     function updatePlate() {
       plateDetail.replaceChildren();
-      const detail = selectedPaper >= 0 || selectedTheme >= 0;
+      const detail = coreTarget === 1 || selectedPaper >= 0 || selectedTheme >= 0;
       plateDefault.hidden = detail; plateDetail.hidden = !detail;
-      if (selectedPaper >= 0) {
+      if (coreTarget === 1) {
+        const back = element('button', 'spira-back', COPY.backOut); back.type = 'button';
+        on(back, 'click', backOut);
+        plateDetail.append(element('p', 'spira-plate-kicker', COPY.coreKicker), element('h3', 'spira-plate-title', COPY.coreTitle),
+          element('p', 'spira-core-text', COPY.coreText), back);
+        announce(`${COPY.coreKicker}. ${COPY.coreTitle}`);
+      } else if (selectedPaper >= 0) {
         const p = PAPERS[selectedPaper];
         const link = element('a', 'spira-link', 'Read the paper page →'); link.href = paperURL(p.slug);
         plateDetail.append(element('p', 'spira-plate-kicker', `${p.year} · ${THEMES[p.theme].label}`),
@@ -2051,9 +2465,34 @@
       hoverPaper = p; stage.classList.toggle('is-over', p >= 0); redraw();
     }
 
+    function enterCore() {
+      if (mode !== 'chart' || coreTarget === 1 || leaving) return;
+      // Remember the chart camera; the flight back returns to it exactly.
+      coreFrom.yaw = yaw; coreFrom.pitch = pitch; coreFrom.zoom = zoom;
+      coreFrom.yawTo = yaw - (((yaw % TAU) + TAU + Math.PI) % TAU - Math.PI);
+      coreTarget = 1; coreSpin = 0; vYaw = 0; vPitch = 0; zoomTarget = zoom;
+      if (drag.id >= 0) endDrag(true);
+      setHover(-1); setIndex(false);
+      centreButton.hidden = true; centreHover = false;
+      if (motion.matches) coreU = 1;
+      updatePlate();
+      const back = plateDetail.querySelector('.spira-back');
+      if (back) back.focus({ preventScroll: true });
+      interact(); redraw();
+    }
+    function backOut() {
+      if (coreTarget !== 1) return;
+      coreTarget = 0;
+      if (motion.matches) { coreU = 0; coreSpin = 0; }
+      centreButton.hidden = false;
+      updatePlate();
+      centreButton.focus({ preventScroll: true });
+      interact(); redraw();
+    }
     /* ---- Pointer, wheel and keyboard on the stage ------------------------ */
     const drag = { id: -1, x0: 0, y0: 0, x: 0, y: 0, moved: false, at: 0, type: '' };
     const pinch = { id: -1, x: 0, y: 0, distance: 0 };
+    let coreClick = false;
     function interact() { lastInteraction = performance.now(); }
     function nearestPaper(x, y, radius) {
       let best = -1; let bestD = radius;
@@ -2072,8 +2511,12 @@
       stage.classList.remove('is-dragging');
       if (cancelled || motion.matches || (event && event.timeStamp - drag.at > 80)) { vYaw = 0; vPitch = 0; }
       if (!cancelled && !moved && event) {
-        const p = nearestPaper(event.clientX, event.clientY, drag.type === 'mouse' ? HOVER_RADIUS : TAP_RADIUS);
-        if (p >= 0) selectPaper(p);
+        const radius = drag.type === 'mouse' ? HOVER_RADIUS : TAP_RADIUS;
+        const p = nearestPaper(event.clientX, event.clientY, radius);
+        // The centre opens the core, unless a star is nearer to the pointer.
+        const toCentre = Math.hypot(event.clientX - chartX, event.clientY - chartY);
+        if (toCentre < CORE_HIT && (p < 0 || Math.hypot(paperSX[p] - event.clientX, paperSY[p] - event.clientY) > toCentre)) enterCore();
+        else if (p >= 0) selectPaper(p);
         else if (selectedPaper >= 0) selectPaper(-1);
         else if (selectedTheme >= 0) { selectedTheme = -1; updatePlate(); }
       }
@@ -2081,6 +2524,7 @@
     }
     on(stage, 'pointerdown', event => {
       if (mode !== 'chart' || event.button > 0) return;
+      if (coreTarget === 1 || coreU > 0) { coreClick = true; return; }
       if (drag.id >= 0) {
         if (event.pointerType === 'touch' && pinch.id < 0 && drag.type === 'touch') {
           pinch.id = event.pointerId; pinch.x = event.clientX; pinch.y = event.clientY;
@@ -2095,7 +2539,7 @@
       try { stage.setPointerCapture(event.pointerId); } catch (error) { /* synthetic pointer */ }
     });
     on(stage, 'pointermove', event => {
-      if (mode !== 'chart') return;
+      if (mode !== 'chart' || coreU > 0 || coreTarget) return;
       if (event.pointerId === pinch.id || (pinch.id >= 0 && event.pointerId === drag.id)) {
         if (event.pointerId === pinch.id) { pinch.x = event.clientX; pinch.y = event.clientY; } else { drag.x = event.clientX; drag.y = event.clientY; }
         const distance = Math.hypot(pinch.x - drag.x, pinch.y - drag.y) || 1;
@@ -2120,6 +2564,8 @@
       if (event.pointerType === 'mouse' && drag.id < 0) setHover(nearestPaper(event.clientX, event.clientY, HOVER_RADIUS));
     });
     on(stage, 'pointerup', event => {
+      // In core view a click on empty space backs out.
+      if (coreClick) { coreClick = false; if (coreTarget === 1) backOut(); return; }
       if (event.pointerId === pinch.id) { pinch.id = -1; return; }
       if (event.pointerId === drag.id) endDrag(false, event);
     });
@@ -2129,13 +2575,15 @@
     on(stage, 'wheel', event => {
       if (mode !== 'chart') return;
       event.preventDefault();
+      // In core view, scrolling outward backs out.
+      if (coreTarget === 1 || coreU > 0) { if (event.deltaY > 0 && coreTarget === 1) backOut(); return; }
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? H : 1;
       zoomTarget = clamp(zoomTarget * Math.exp(-event.deltaY * unit * (event.ctrlKey ? 0.01 : 0.0015)), ZOOM_RANGE[0], ZOOM_RANGE[1]);
       if (motion.matches) zoom = zoomTarget;
       interact(); redraw();
     }, { passive: false });
     on(stage, 'keydown', event => {
-      if (mode !== 'chart' || event.target !== stage || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (mode !== 'chart' || coreTarget || coreU > 0 || event.target !== stage || event.altKey || event.ctrlKey || event.metaKey) return;
       switch (event.key) {
         case 'ArrowLeft': yaw -= 0.15; break;
         case 'ArrowRight': yaw += 0.15; break;
@@ -2156,6 +2604,11 @@
     on(replayButton, 'click', replay);
     on(closeButton, 'click', close);
     on(skipButton, 'click', skip);
+    on(centreButton, 'click', enterCore);
+    on(centreButton, 'pointerenter', () => { centreHover = true; redraw(); });
+    on(centreButton, 'pointerleave', () => { centreHover = false; redraw(); });
+    on(centreButton, 'focus', () => { centreHover = true; redraw(); });
+    on(centreButton, 'blur', () => { centreHover = false; redraw(); });
     on($('[data-opening-close]'), 'click', close);
     const hoverFromLink = event => {
       const link = event.target.closest && event.target.closest('[data-paper]');
@@ -2174,19 +2627,22 @@
         event.preventDefault(); skip();
       }
     });
-    on(dialog, 'cancel', event => { event.preventDefault(); close(); });
+    // Esc backs out of the core view first; otherwise it closes (a second Esc while closing finishes).
+    on(dialog, 'cancel', event => { event.preventDefault(); if (coreTarget === 1 && !leaving) backOut(); else close(); });
     on(dialog, 'close', cleanup);
     on(window, 'pagehide', cleanup);
     on(window, 'resize', () => {
-      if (closed || leaving) return;
+      if (closed) return;
+      if (leaving) { cleanup(); return; }
       if (mode !== 'chart') { remnantT = -2; skip(); }
       layout(); redraw();
     });
     on(document, 'visibilitychange', () => {
-      if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; lastNow = 0; }
+      if (document.hidden) { if (leaving) { cleanup(); return; } if (raf) cancelAnimationFrame(raf); raf = 0; lastNow = 0; }
       else { lastNow = 0; redraw(); }
     });
     on(motion, 'change', () => {
+      if (leaving) { cleanup(); return; }
       replayButton.hidden = motion.matches;
       if (motion.matches) { vYaw = 0; vPitch = 0; zoom = zoomTarget; if (mode !== 'chart') skip(); }
       redraw();
@@ -2196,6 +2652,9 @@
     dialog.spira = {
       get phase() { return phase; },
       get wordCount() { return wordCount; },
+      get keyCount() { return keyCount; },
+      get view() { return coreTarget === 1 || coreU > 0 ? 'core' : 'chart'; },
+      projectCore() { return { x: chartX, y: chartY }; },
       frameStats: stats,
       projectStar(slug) {
         const p = PAPERS.findIndex(paper => paper.slug === slug);
@@ -2223,6 +2682,8 @@
         schedule();
       } else {
         phase = ''; setPhase('chart'); mode = 'chart'; t = T_SETTLED;
+        // The page still lies at the centre (core view); its glyphs are never hidden here.
+        if (ctx) { try { prepareWords(captureWords()); } catch (error) { releaseWords(); } }
         dialog.classList.add('is-night', 'is-lift');
         openingEl.hidden = true; setInert(false);
         closeButton.focus({ preventScroll: true });
