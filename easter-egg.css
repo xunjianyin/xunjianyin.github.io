@@ -1,13 +1,13 @@
-/* A botanical plate in the margins. All styles stay inside the modal. */
-#secret-garden {
-  --garden-paper: #f7f5ef;
-  --garden-ink: #30392f;
-  --garden-muted: #686f62;
-  --garden-gold: #86683f;
-  --garden-rule: #d8d9cb;
-  box-sizing: border-box;
+/* A playable research footnote, using the homepage's ink and blue. */
+#self-reference-lab {
+  --lab-paper: #fcfcf9;
+  --lab-ink: #25322f;
+  --lab-muted: #67736e;
+  --lab-blue: #0065b8;
+  --lab-line: #cbd3ce;
   position: fixed;
   inset: 0;
+  box-sizing: border-box;
   width: 100%;
   max-width: none;
   height: 100%;
@@ -16,263 +16,119 @@
   margin: 0;
   padding: 0;
   border: 0;
-  color: var(--garden-ink);
-  background: var(--garden-paper);
-  overscroll-behavior: contain;
+  background: var(--lab-paper);
+  color: var(--lab-ink);
   overflow: auto;
+  overscroll-behavior: contain;
+  font-family: Lato, 'Helvetica Neue', Arial, sans-serif;
   opacity: 0;
-  transition: opacity 600ms ease;
-  font-family: 'Lato', Helvetica, sans-serif;
+  transition: opacity 320ms ease;
 }
-
-#secret-garden.is-visible { opacity: 1; }
-#secret-garden.is-leaving { opacity: 0; transition-duration: 240ms; }
-#secret-garden::backdrop { background: transparent; }
-#secret-garden *, #secret-garden *::before, #secret-garden *::after { box-sizing: border-box; }
-
-#secret-garden .garden-sheet {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  padding: 28px clamp(24px, 5.2vw, 88px) 22px;
+#self-reference-lab.is-visible { opacity: 1; }
+#self-reference-lab.is-leaving { opacity: 0; transition-duration: 180ms; }
+#self-reference-lab::backdrop { background: transparent; }
+#self-reference-lab *, #self-reference-lab *::before { box-sizing: border-box; }
+#self-reference-lab p { color: inherit; font-family: inherit; }
+#self-reference-lab button { font-family: inherit; border-radius: 0; box-shadow: none; cursor: pointer; }
+#self-reference-lab button:focus { outline: none; }
+#self-reference-lab button:focus-visible, #self-reference-lab a:focus-visible { outline: 2px solid var(--lab-blue); outline-offset: 5px; }
+#self-reference-lab button:disabled { cursor: default; }
+#self-reference-lab .lab-sheet { max-width: 1220px; margin: 0 auto; padding: 24px 54px 22px; }
+#self-reference-lab .lab-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--lab-line); }
+#self-reference-lab .lab-signature { font-size: 13px; font-weight: 700; }
+#self-reference-lab .lab-signature span { margin-left: 12px; font-size: 11px; font-weight: 400; color: var(--lab-muted); }
+#self-reference-lab .lab-link { padding: 8px 0; min-height: 44px; border: 0; background: transparent; font-size: 12px; color: var(--lab-muted); }
+#self-reference-lab .lab-link:hover { color: var(--lab-blue); }
+#self-reference-lab .lab-link span { margin-left: 14px; font-size: 10px; }
+#self-reference-lab .lab-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; padding: 39px 0 0; }
+#self-reference-lab .lab-eyebrow { margin: 0 0 15px; color: var(--lab-muted); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+#self-reference-lab h2 { margin: 0; padding: 0; border: 0; font-size: clamp(32px, 3.5vw, 48px); font-weight: 400; line-height: 1.12; letter-spacing: -.035em; text-transform: none; color: var(--lab-ink); }
+#self-reference-lab h2 em { color: var(--lab-blue); font-family: Georgia, serif; font-weight: 400; }
+#self-reference-lab #lab-description { margin: 0 0 3px; font-size: 14px; line-height: 1.75; }
+#self-reference-lab #lab-description span { display: block; margin-top: 10px; color: var(--lab-muted); font-size: 12px; }
+#self-reference-lab .lab-scene { position: relative; height: clamp(350px, 45vh, 470px); margin-top: 16px; isolation: isolate; }
+#self-reference-lab .lab-drawing { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+#self-reference-lab .lab-paper { fill: var(--lab-paper); stroke: var(--lab-ink); stroke-width: 1; }
+#self-reference-lab .lab-paper-back { fill: url(#lab-hatch); stroke: var(--lab-line); stroke-width: 1; color: #cbd3ce; }
+#self-reference-lab .lab-paper-label { font: 18px Georgia, serif; fill: var(--lab-ink); }
+#self-reference-lab .lab-paper-subtitle { font: 10px Lato, Arial, sans-serif; fill: var(--lab-muted); letter-spacing: .02em; }
+#self-reference-lab .lab-paper-grain, #self-reference-lab .lab-world-edge, #self-reference-lab .lab-world-ticks { stroke: var(--lab-line); stroke-width: .7; fill: none; }
+#self-reference-lab .lab-start-mark { stroke: var(--lab-blue); fill: none; stroke-width: 1; }
+#self-reference-lab .lab-goal { stroke: var(--lab-blue); stroke-width: 1.5; fill: #e2edf5; }
+#self-reference-lab .lab-agent { stroke: var(--lab-ink); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+#self-reference-lab .lab-agent-head { fill: var(--lab-paper); }
+#self-reference-lab .lab-agent-body { fill: #e7efea; }
+#self-reference-lab .lab-eye { fill: var(--lab-blue); stroke: none; }
+#self-reference-lab .lab-agent-letter { font: italic 20px Georgia, serif; fill: var(--lab-ink); stroke: none; }
+#self-reference-lab .lab-agent-version { position: absolute; top: 0; left: 0; font: 9px ui-monospace, monospace; color: var(--lab-blue); pointer-events: none; }
+#self-reference-lab .lab-bubble { opacity: 0; }
+#self-reference-lab .lab-bubble path { fill: var(--lab-paper); stroke: var(--lab-line); stroke-width: .8; }
+#self-reference-lab .lab-bubble text { font: 11px Lato, Arial, sans-serif; fill: var(--lab-muted); }
+#self-reference-lab .lab-plan { stroke: var(--lab-blue); stroke-width: 1; opacity: .5; }
+#self-reference-lab .lab-rule-home { position: absolute; border: 1px dashed var(--lab-line); }
+#self-reference-lab .lab-rule-home span { position: absolute; left: 0; top: -23px; color: var(--lab-muted); font-size: 10px; letter-spacing: .025em; }
+#self-reference-lab .lab-rule {
+  position: absolute; left: 0; top: 0; z-index: 2;
+  display: flex; align-items: center; gap: 12px;
+  min-height: 54px; padding: 0 12px;
+  border: 1px solid var(--lab-blue); border-top-width: 2px;
+  background: #edf4f8; color: var(--lab-blue);
+  touch-action: none; user-select: none; -webkit-user-select: none;
+  font-size: 13px; text-align: left; cursor: grab;
 }
-
-#secret-garden .garden-header,
-#secret-garden .garden-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-#secret-garden .garden-header {
-  padding-bottom: 17px;
-  border-bottom: 1px solid var(--garden-rule);
-}
-
-#secret-garden .garden-eyebrow,
-#secret-garden .garden-index {
-  margin: 0;
-  color: var(--garden-muted);
-  font-size: 10px;
-  line-height: 1.5;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-}
-
-#secret-garden .garden-eyebrow span { margin-right: 24px; color: var(--garden-gold); }
-
-#secret-garden button {
-  font-family: inherit;
-  font-weight: 400;
-  border-radius: 0;
-  box-shadow: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-#secret-garden .garden-text-button {
-  min-height: 44px;
-  padding: 8px 0 8px 12px;
-  border: 0;
-  color: var(--garden-ink);
-  background: transparent;
-  font-size: 12px;
-  letter-spacing: .02em;
-}
-
-#secret-garden .garden-text-button:hover { color: var(--garden-gold); }
-#secret-garden button:focus { outline: none; }
-#secret-garden button:focus-visible { outline: 1px solid var(--garden-gold); outline-offset: 5px; }
-#secret-garden .garden-escape { margin-left: 12px; color: var(--garden-muted); font-size: 10px; }
-
-#secret-garden .garden-stage {
-  position: relative;
-  flex: 1;
-  min-height: 480px;
-  isolation: isolate;
-}
-
-#secret-garden .garden-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  pointer-events: none;
-}
-
-#secret-garden .garden-copy {
-  position: relative;
-  width: 39%;
-  padding-top: clamp(55px, 11vh, 120px);
-  pointer-events: none;
-}
-
-#secret-garden .garden-kicker {
-  margin: 0 0 20px;
-  color: var(--garden-muted);
-  font-size: 11px;
-  letter-spacing: .04em;
-}
-
-#secret-garden .garden-title {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: var(--garden-ink);
-  font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
-  font-size: clamp(40px, 4.5vw, 76px);
-  font-weight: 400;
-  letter-spacing: -.045em;
-  line-height: 1.08;
-  text-transform: none;
-}
-
-#secret-garden .garden-title em { color: var(--garden-gold); font-weight: 400; }
-
-#secret-garden .garden-description {
-  max-width: 240px;
-  margin: 25px 0 0;
-  color: var(--garden-muted);
-  font-size: 13px;
-  line-height: 1.9;
-}
-
-#secret-garden .garden-note {
-  position: absolute;
-  bottom: 44px;
-  left: 0;
-  max-width: 290px;
-  min-height: 90px;
-  padding-left: 16px;
-  border-left: 1px solid var(--garden-rule);
-}
-
-#secret-garden .garden-name {
-  margin: 9px 0 5px;
-  color: var(--garden-ink);
-  font-family: 'Iowan Old Style', Palatino, Georgia, serif;
-  font-size: 25px;
-  font-weight: 400;
-  letter-spacing: -.015em;
-  line-height: 1.25;
-}
-
-#secret-garden .garden-note-caption {
-  margin: 0;
-  color: var(--garden-muted);
-  font-size: 11px;
-  line-height: 1.7;
-}
-
-#secret-garden .garden-seed {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  transform: translate(-50%, -50%);
-  border: 0;
-  background: transparent;
-  color: var(--garden-gold);
-  opacity: 0;
-  transition: opacity 500ms ease;
-}
-
-#secret-garden.is-bloomed .garden-seed,
-#secret-garden .garden-seed:focus-visible { opacity: 1; }
-
-#secret-garden .garden-seed::before {
-  content: '';
-  width: 5px;
-  height: 5px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  background: var(--garden-paper);
-  transition: transform 250ms ease, background-color 250ms ease;
-}
-
-#secret-garden .garden-seed:hover::before,
-#secret-garden .garden-seed:focus-visible::before,
-#secret-garden .garden-seed[aria-pressed='true']::before {
-  background: currentColor;
-  transform: scale(1.4);
-}
-
-#secret-garden .garden-seed-label {
-  position: absolute;
-  top: 36px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: var(--garden-muted);
-  font-size: 9px;
-  letter-spacing: .08em;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-#secret-garden .garden-plate-label {
-  position: absolute;
-  right: 0;
-  bottom: 45px;
-  text-align: right;
-  pointer-events: none;
-}
-
-#secret-garden .garden-plate-label p {
-  margin: 6px 0 0;
-  color: var(--garden-muted);
-  font-family: 'Iowan Old Style', Palatino, Georgia, serif;
-  font-size: 13px;
-  font-style: italic;
-}
-
-#secret-garden .garden-footer {
-  min-height: 58px;
-  padding-top: 12px;
-  border-top: 1px solid var(--garden-rule);
-}
-
-#secret-garden .garden-instruction {
-  margin: 0;
-  color: var(--garden-muted);
-  font-size: 11px;
-  line-height: 1.6;
-}
-
-#secret-garden .garden-instruction span { display: block; font-size: 10px; color: var(--garden-gold); }
-#secret-garden .garden-sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
+#self-reference-lab .lab-rule:hover { background: #e2edf5; }
+#self-reference-lab.is-dragging .lab-rule { cursor: grabbing; }
+#self-reference-lab .lab-rule[aria-disabled='true'] { cursor: default; }
+#self-reference-lab .lab-rule-number { font: 9px ui-monospace, monospace; opacity: .8; }
+#self-reference-lab .lab-rule-text { flex: 1; line-height: 1.35; }
+#self-reference-lab .lab-rule-grip { font-size: 18px; }
+#self-reference-lab.has-bridge .lab-rule-grip { opacity: 0; }
+#self-reference-lab .lab-drop-zone { position: absolute; opacity: 0; border: 1px dashed var(--lab-blue); background: #edf4f8; pointer-events: none; }
+#self-reference-lab.is-dragging .lab-drop-zone { opacity: .35; }
+#self-reference-lab.is-near .lab-drop-zone { opacity: 1; }
+#self-reference-lab .lab-gap-note { position: absolute; margin: 0; font: italic 12px Georgia, serif; color: var(--lab-muted); text-align: center; }
+#self-reference-lab.has-bridge .lab-gap-note { opacity: 0; }
+#self-reference-lab .lab-caption-row { display: flex; align-items: center; justify-content: space-between; gap: 30px; min-height: 103px; padding: 8px 0 25px; }
+#self-reference-lab .lab-step { color: var(--lab-blue); font-size: 10px; letter-spacing: .025em; }
+#self-reference-lab .lab-caption p { max-width: 570px; margin: 8px 0 0; color: var(--lab-ink); font-size: 14px; line-height: 1.6; }
+#self-reference-lab .lab-actions { display: flex; gap: 22px; align-items: center; flex-shrink: 0; }
+#self-reference-lab .lab-action { padding: 11px 15px; min-height: 44px; border: 1px solid var(--lab-blue); color: var(--lab-blue); background: transparent; font-size: 12px; }
+#self-reference-lab .lab-action:hover:enabled:not([aria-disabled='true']) { color: var(--lab-paper); background: var(--lab-blue); }
+#self-reference-lab .lab-action:is(:disabled, [aria-disabled='true']) { color: #7e8985; border-color: var(--lab-line); cursor: default; }
+#self-reference-lab .lab-action span { margin-left: 12px; }
+#self-reference-lab .lab-footer { display: flex; justify-content: space-between; align-items: flex-start; gap: 28px; border-top: 1px solid var(--lab-line); padding-top: 18px; }
+#self-reference-lab .lab-footer p { margin: 0; color: var(--lab-muted); font-size: 11px; line-height: 1.7; }
+#self-reference-lab .lab-footer p:last-child { text-align: right; }
+#self-reference-lab .lab-footer p > span { display: block; font-size: 10px; }
+#self-reference-lab .lab-footer a { color: var(--lab-blue); font-size: inherit; text-decoration: none; border-bottom: 1px solid #b9cedb; }
+#self-reference-lab .lab-footer a:hover { border-color: var(--lab-blue); }
 
 @media (max-width: 700px) {
-  #secret-garden .garden-sheet { padding: 12px 24px 12px; }
-  #secret-garden .garden-header { padding-bottom: 8px; gap: 10px; }
-  #secret-garden .garden-eyebrow { font-size: 9px; letter-spacing: .12em; }
-  #secret-garden .garden-eyebrow span { margin-right: 12px; }
-  #secret-garden .garden-escape { display: none; }
-  #secret-garden .garden-stage { min-height: 570px; }
-  #secret-garden .garden-copy { width: 100%; padding-top: 30px; }
-  #secret-garden .garden-kicker { font-size: 10px; margin-bottom: 12px; }
-  #secret-garden .garden-title { font-size: clamp(37px, 10vw, 54px); }
-  #secret-garden .garden-title br { display: none; }
-  #secret-garden .garden-description { max-width: none; margin-top: 12px; font-size: 12px; }
-  #secret-garden .garden-note { bottom: 22px; min-height: 76px; padding-left: 12px; }
-  #secret-garden .garden-name { font-size: 22px; }
-  #secret-garden .garden-plate-label { display: none; }
-  #secret-garden .garden-footer { gap: 12px; }
-  #secret-garden .garden-instruction { font-size: 10px; }
-  #secret-garden .garden-text-button { font-size: 11px; white-space: nowrap; }
+  #self-reference-lab .lab-sheet { padding: 12px 22px 22px; }
+  #self-reference-lab .lab-header { padding-bottom: 8px; }
+  #self-reference-lab .lab-signature { font-size: 12px; }
+  #self-reference-lab .lab-signature span { display: block; margin: 4px 0 0; font-size: 9px; }
+  #self-reference-lab .lab-link { font-size: 11px; }
+  #self-reference-lab .lab-link span { display: none; }
+  #self-reference-lab .lab-intro { display: block; padding-top: 27px; }
+  #self-reference-lab .lab-eyebrow { font-size: 9px; margin-bottom: 12px; }
+  #self-reference-lab h2 { font-size: 34px; }
+  #self-reference-lab #lab-description { margin-top: 17px; font-size: 12px; }
+  #self-reference-lab #lab-description br { display: none; }
+  #self-reference-lab #lab-description span { display: inline; margin: 0 0 0 5px; font-size: 11px; }
+  #self-reference-lab .lab-scene { height: 330px; margin-top: 23px; }
+  #self-reference-lab .lab-rule { gap: 7px; padding: 0 8px; font-size: 11px; }
+  #self-reference-lab .lab-rule-number { display: none; }
+  #self-reference-lab .lab-rule-grip { font-size: 14px; }
+  #self-reference-lab .lab-paper-label { font-size: 14px; }
+  #self-reference-lab .lab-paper-subtitle { font-size: 8px; }
+  #self-reference-lab .lab-caption-row { display: block; min-height: 155px; padding: 14px 0 18px; }
+  #self-reference-lab .lab-caption p { font-size: 12px; }
+  #self-reference-lab .lab-actions { margin-top: 14px; justify-content: space-between; }
+  #self-reference-lab .lab-action { font-size: 11px; }
+  #self-reference-lab .lab-footer { display: block; padding-top: 15px; }
+  #self-reference-lab .lab-footer p:last-child { text-align: left; margin-top: 12px; }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  #secret-garden, #secret-garden *, #secret-garden *::before { transition: none !important; }
+  #self-reference-lab, #self-reference-lab * { transition: none !important; }
 }

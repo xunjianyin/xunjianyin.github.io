@@ -137,7 +137,7 @@
     <footer class="site-footer">
       <div class="footer-social">${socialLinks}
       </div>
-      <p class="footer-copyright">${getFooterCopy()} <button class="easter-egg-footnote" aria-label="Explore the margins" title="A small detour">*</button></p>
+      <p class="footer-copyright">${getFooterCopy()} <button class="easter-egg-footnote" aria-label="Try a small experiment" title="A playable footnote">*</button></p>
     </footer>
   </div>
   <button id="back-to-top" class="back-to-top" aria-label="Back to top">
