@@ -95,7 +95,7 @@
     type();
     await until(() => egg()?.open, 'the password to open the egg');
     check(assets().length === 2, 'The full password loads the script and stylesheet once');
-    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v4')), 'Asset URLs carry v=spira-v4');
+    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v5')), 'Asset URLs carry v=spira-v5');
     check(egg().spira.keyCount === 24, `The key sentence is found in full (${egg().spira.keyCount} of 24 tokens)`);
     await dismiss();
 
@@ -157,7 +157,7 @@
     const order = cues.map(c => c.cue).filter((name, i, all) => name !== all[i - 1]);
     check(JSON.stringify(order) === JSON.stringify(['dusk', 'gather', 'glint', 'wind', 'hush', 'inhale', 'ignite', 'paper', 'ghost', 'ambient']),
       `Opening cues fire in order (saw ${order.join(' > ')})`);
-    check(cues.filter(c => c.cue === 'paper').length === 23 && cues.filter(c => c.cue === 'gather').length > 10, 'Each of the 23 papers rings once; the gather plucks a cascade');
+    check(cues.filter(c => c.cue === 'paper').length === 29 && cues.filter(c => c.cue === 'gather').length > 10, 'Each of the 29 papers rings once; the gather plucks a cascade');
     const cueAt = name => cues.find(c => c.cue === name);
     const igniteGap = (cueAt('ignite').at - cueAt('dusk').at) * 6 / 1000;
     check(Math.abs(cueAt('ignite').t - 8.6) < 0.05 && Math.abs(igniteGap - 8.6) < 0.9, `The ignition cue fires at timeline 8.6 s, ${igniteGap.toFixed(2)} s at 6x`);
@@ -173,7 +173,7 @@
     /* 6. The chart: index, themes and star selection. */
     const links = [...egg().querySelectorAll('.spira-index-link')];
     const slugs = links.map(a => new URL(a.href).pathname.split('/').pop().replace('.html', ''));
-    check(links.length === 23 && new Set(slugs).size === 23, 'The index lists 23 distinct papers');
+    check(links.length === 29 && new Set(slugs).size === 29, 'The index lists 29 distinct papers');
     const metadata = await (await fetch('/papers/content/metadata.json')).json();
     check(JSON.stringify([...slugs].sort()) === JSON.stringify(Object.keys(metadata).sort()), 'The index covers the complete local paper corpus');
     const takeawaysMatch = [];
@@ -185,7 +185,7 @@
       return response.status === 200 && normalise(page.querySelector('h1')?.textContent || '') === normalise(a.title);
     }));
     check(pages.every(Boolean), 'Every index link returns 200 and its title matches the paper page');
-    check(takeawaysMatch.length === 23 && takeawaysMatch.every(Boolean), 'The takeaway snapshot matches the takeaway on every paper page');
+    check(takeawaysMatch.length === 29 && takeawaysMatch.every(Boolean), 'The takeaway snapshot matches the takeaway on every paper page');
     check(links.every(a => new URL(a.href).pathname.startsWith('/papers/')), 'Index links resolve under /papers/');
     const themes = [...egg().querySelectorAll('.spira-theme')];
     check(themes.length === 5, 'Five theme buttons');
@@ -286,8 +286,9 @@
       for (let c = 0; c < buffer.numberOfChannels; c++) { const data = buffer.getChannelData(c); for (let i = 0; i < data.length; i++) { const v = Math.abs(data[i]); if (v > peak) peak = v; } }
       return { peak: +peak.toFixed(4), scheduled };
     };
-    const melody = [[2022, 0], [2023, 0], [2023, 1], [2024, 0], [2024, 0], [2024, 1], [2024, 1], [2024, 2], [2024, 2], [2024, 3], [2025, 0], [2025, 0],
-      [2025, 0], [2025, 1], [2025, 2], [2025, 2], [2025, 3], [2025, 4], [2025, 4], [2025, 4], [2026, 2], [2026, 3], [2026, 3]];
+    const melody = [[2022, 0], [2023, 0], [2023, 0], [2023, 1], [2024, 0], [2024, 0], [2024, 1], [2024, 1], [2024, 2], [2024, 2], [2024, 3],
+      [2025, 0], [2025, 0], [2025, 0], [2025, 1], [2025, 2], [2025, 2], [2025, 3], [2025, 4], [2025, 4], [2025, 4],
+      [2026, 0], [2026, 0], [2026, 2], [2026, 2], [2026, 2], [2026, 3], [2026, 3], [2026, 4]];
     const renders = {
       ignition: await render(3, audio => audio.cue.ignite(0.05)),
       melody: await render(5.5, audio => melody.forEach(([year, theme], i) => audio.cue.paper(0.05 + i * 0.14, theme, year, (i % 5) / 2.5 - 0.8))),
@@ -304,7 +305,7 @@
       audioPeaks[name] = result.peak;
       check(result.peak > 0.01 && result.peak < 0.9, `Offline ${name}: audible and unclipped (peak ${result.peak})`);
     }
-    check(renders.melody.scheduled === 23, 'The research melody schedules one bell per paper');
+    check(renders.melody.scheduled === 29, 'The research melody schedules one bell per paper');
     const silent = await render(0.5, audio => { audio.setEnabled(false); audio.cue.ignite(0.05); audio.cue.paper(0.1, 0, 2022, 0); });
     check(silent.scheduled === 0 && silent.peak === 0, 'With sound off the synthesizer schedules no voices');
 
@@ -458,7 +459,7 @@
     check(JSON.stringify(scoreYears) === JSON.stringify([2022, 2023, 2024, 2025, 2026]), `The score walks 2022 > 2026 (saw ${scoreYears.join(' > ')})`);
     check(!egg().querySelector('#spira-text').closest('[hidden]') && listen.textContent.startsWith('Listen'), 'After the score the default plate returns');
     const scoreCues = egg().spira.audioCues;
-    check(scoreCues.filter(c => c.cue === 'ring').length === 23 && scoreCues.filter(c => c.cue === 'year').length === 5 && scoreCues.some(c => c.cue === 'resolve'),
+    check(scoreCues.filter(c => c.cue === 'ring').length === 29 && scoreCues.filter(c => c.cue === 'year').length === 5 && scoreCues.some(c => c.cue === 'resolve'),
       'Every paper rings, every year plays its chord, and a final chord resolves');
     egg().querySelector('.spira-stage').dispatchEvent(new win.KeyboardEvent('keydown', { key: 'l', bubbles: true, cancelable: true }));
     check(egg().spira.score?.state === 'playing', 'The L key starts the score');

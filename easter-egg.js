@@ -374,6 +374,7 @@
   // Year = venue year on the paper page. Within a (year, theme) cell this order is kept.
   const PAPERS = [
     [2022, 'evaluation', 'seq2seq-data2text', 'Evaluating Data-to-Text', 'How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?', 'ACL 2022'],
+    [2023, 'evaluation', 'chatgpt-summarization-evaluation', 'ChatGPT as Summary Evaluator', 'Human-like Summarization Evaluation with ChatGPT', 'arXiv preprint 2023'],
     [2023, 'evaluation', 'context-aware-evaluation', 'Cont-COMET', 'Exploring Context-Aware Evaluation Metrics for Machine Translation', 'EMNLP 2023 Findings'],
     [2023, 'knowledge', 'alcuna', 'ALCUNA', 'ALCUNA: Large Language Models Meet New Knowledge', 'EMNLP 2023'],
     [2024, 'evaluation', 'themis', 'Themis', 'Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability', 'EMNLP 2024'],
@@ -393,19 +394,28 @@
     [2025, 'improvement', 'chemagent', 'ChemAgent', 'ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning', 'ICLR 2025'],
     [2025, 'improvement', 'godel-agent', 'Gödel Agent', 'Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement', 'ACL 2025 · Main Conference'],
     [2025, 'improvement', 'derl', 'DERL', 'Differentiable Evolutionary Reinforcement Learning', 'arXiv preprint 2025'],
+    [2026, 'evaluation', 'auditing-health-llms', 'Challenges of Auditing', 'Challenges of Auditing: Variability in Outputs of Large Language Models for Health', 'arXiv preprint 2026'],
+    [2026, 'evaluation', 'agent-x', 'AGENT-X', 'AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection', 'EMNLP 2026'],
     [2026, 'grounding', 'eama', 'EAMA', 'EAMA: Entity-Aware Multimodal Alignment Based Approach for News Image Captioning', 'TOMM 2026'],
+    [2026, 'grounding', 'coding-agents-long-context', 'Coding Agents for Long Context', 'Coding Agents are Effective Long-Context Processors', 'arXiv preprint 2026'],
+    [2026, 'grounding', 'lazy-grounding', 'Lazy Grounding', 'Lazy Grounding: Attacking Search Agents with Factual Evidence', 'EMNLP 2026'],
     [2026, 'reasoning', 'geometry-of-reasoning', 'The Geometry of Reasoning', 'The Geometry of Reasoning: Flowing Logics in Representation Space', 'ICLR 2026'],
-    [2026, 'reasoning', 'reverse-lm', 'LEDOM', 'LEDOM: Reverse Language Model', 'ACL 2026']
+    [2026, 'reasoning', 'reverse-lm', 'LEDOM', 'LEDOM: Reverse Language Model', 'ACL 2026'],
+    [2026, 'improvement', 'epistemic-context-learning', 'Epistemic Context Learning', 'Epistemic Context Learning: Building Trust the Right Way in LLM-Based Multi-Agent Systems', 'Agentic AI in the Wild Workshop, ICLR 2026']
   ].map(([year, theme, slug, name, title, venue]) => ({
     year, slug, name, title, venue, theme: THEMES.findIndex(t => t.id === theme)
   }));
 
   // One-sentence takeaways, a verbatim snapshot of the `takeaway` fields in
-  // papers/content/{evaluation,knowledge,reasoning,ledom}.json (the paper pages show the same text).
+  // papers/content/*.json (the paper pages show the same text).
   const TAKEAWAYS = Object.freeze({
+    "agent-x": "LLM agents judge a text against routed stylistic guidelines, and a meta agent merges their calibrated verdicts, so no detection threshold is tuned. AGENT-X has the highest average accuracy for all four source models tested; Fast-DetectGPT keeps the higher average AUROC.",
     "alcuna": "ALCUNA creates fictional organisms to test knowledge that models have not memorized, exposing a gap between reading new facts and connecting them to existing knowledge.",
     "atomic-to-composite": "In a controlled reasoning setting, RL helps models combine internal knowledge with new context when supervised training has first established both component skills.",
+    "auditing-health-llms": "API-based health evaluations may not describe what chatbot users see. With the model version fixed, GPT answers to the same 50 consumer health questions differed between the API and ChatGPT, and several differences reversed between GPT-5.3 and GPT-5.4.",
+    "chatgpt-summarization-evaluation": "Given the instructions that human annotators follow, ChatGPT completed four summarization evaluation protocols. In this early-2023 study it agreed with human judgments better than common automatic metrics on SummEval but not on Newsroom, and its system-level agreement shifted sharply with the prompt.",
     "chemagent": "ChemAgent turns solved chemistry subproblems into reusable memory, helping an LLM plan, calculate, and refine new solutions with experience retained outside its model weights.",
+    "coding-agents-long-context": "Off-the-shelf coding agents can process long contexts as files. With only a path and a question, Codex and Claude Code search, slice and script through the text, and exceed the best published scores on four of five long-context benchmarks.",
     "context-aware-evaluation": "Adding document context to a translation metric only at inference trades sentence-level accuracy for system-level gains. Cont-COMET trains COMET with selected context, as human annotators see it, and largely removes that trade-off.",
     "contextual-asr": "A transcript can contain clues to its own recognition errors. Retrieving context from the document and related documents helps a correction model use those clues.",
     "contrasolver": "A model's preferences can contradict each other; ContraSolver finds cycles in those judgments and selects reliable comparisons to improve alignment through DPO.",
@@ -414,12 +424,14 @@
     "derl": "DERL learns how to combine simple reward signals: a meta-optimizer proposes rewards, trains a policy with them, and improves from that policy's validation performance.",
     "dsgram": "Good grammatical correction must preserve meaning, avoid unnecessary edits, and read fluently. DSGram scores these dimensions separately and adapts their importance to each sentence.",
     "eama": "News captions need names and events that an image alone cannot reveal. EAMA teaches a multimodal LLM, InstructBLIP, to find the relevant sentences and entities in the article before writing the caption.",
+    "epistemic-context-learning": "An agent that cannot verify a peer's answer can still judge the peer's track record. ECL estimates from earlier rounds which peer is reliable before it answers, and is misled less by persuasive wrong peers than aggregation that ignores history.",
     "error-robust-retrieval": "A misspelled character is a poor retrieval query. RERIC combines pronunciation, shape, and surrounding context to find useful training examples without retraining the correction model.",
     "geometry-of-reasoning": "When the same logical argument is expressed across topics and languages, changes along its representation trajectory reveal more shared logical structure than embedding positions alone.",
     "godel-agent": "Gödel Agent can inspect and rewrite its own running code, using task feedback to revise both its problem-solving policy and the procedure that improves it.",
     "history-matters": "Updating a model with today's facts can erase yesterday's answers; METO edits current and historical knowledge together so that facts remain associated with their time periods.",
     "knowledge-boundary": "A wrong answer may reflect the prompt rather than missing knowledge; searching for alternative wording reveals facts a model can answer but a fixed benchmark misses.",
     "knowledge-interplay": "Providing relevant context can make a model less willing to use facts it already knows; EchoQA tests when internal knowledge and external information work together or interfere.",
+    "lazy-grounding": "A search agent can be misled by evidence that is entirely true. Records that correctly answer a nearby variant of the question pull agents toward the variant’s answer: across 12 agent–benchmark settings, accuracy falls by 5.9 pp on average.",
     "mc-mke": "Correcting one multimodal answer does not ensure related answers change consistently; MC-MKE checks whether edits agree across image recognition, textual facts, and questions about images.",
     "nlg-evaluation-survey": "LLMs can evaluate generated text in several distinct ways. This survey organizes the methods and explains the reliability, cost, and control trade-offs behind each choice.",
     "reverse-lm": "Train a language model to predict the past. Then use its backward probabilities to help forward models choose better answers.",
@@ -3060,7 +3072,7 @@
       }
       // Wish stars keep paper labels and ghost words off them (theme and year labels come first).
       if (chart) for (let q = 0; q < NQ; q++) if (wishVis[q]) addObstacle(wishSX[q] - 6, wishSY[q] - 6, wishSX[q] + 6, wishSY[q] + 6);
-      // 5. Paper labels: the selected theme's, else all; nearer stars first (at most 23 sorted).
+      // 5. Paper labels: the selected theme's, else all; nearer stars first (insertion sort over all papers).
       ctx.font = LABEL_FONT; ctx.textAlign = 'left'; ctx.fillStyle = LABEL_COLOUR;
       let count = 0;
       for (let p = 0; p < NP; p++) {
