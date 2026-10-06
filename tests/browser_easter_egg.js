@@ -95,8 +95,8 @@
     type();
     await until(() => egg()?.open, 'the password to open the egg');
     check(assets().length === 2, 'The full password loads the script and stylesheet once');
-    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v7')), 'Asset URLs carry v=spira-v7');
-    check(egg().spira.keyCount === 24, `The key sentence is found in full (${egg().spira.keyCount} of 24 tokens)`);
+    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v8')), 'Asset URLs carry v=spira-v8');
+    check(egg().spira.keyCount === 37, `The key sentence is found in full (${egg().spira.keyCount} of 37 tokens)`);
     await dismiss();
 
     const main = doc.querySelector('#main-content');

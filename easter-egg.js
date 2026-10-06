@@ -109,7 +109,7 @@
   const WAIT_ALPHA = 0.55;             // words still on the page (in night colour) recede ...
   const FLIGHT_ALPHA = 0.9;            // ... words in flight are clearer, landed words full
   // The key sentence of the bio, found among the captured words by token matching.
-  const KEY_SENTENCE = 'I study how AI systems can recursively self-improve over long horizons to solve open-ended problems, with a focus on self-referential agents and world models.';
+  const KEY_SENTENCE = 'My research asks how AI systems can keep improving themselves over long horizons: agents that rewrite their own logic, learn from experience, and stay reliable when their environment changes. I focus on self-referential agents and world models.';
   const KEY_MIN_TOKENS = 5;            // shorter matches are ignored (other pages)
   const WARM = '#ffe9c7';              // the glint and its lingering tint
   const GLINT_WIDTH = 0.14;            // s; how long the light dwells on a word
@@ -169,12 +169,12 @@
   const PAPER_SPARK_DRAG = 3;
   const PAPER_SPARK_TRAIL = 0.08;
   const COMET_TRAIL = 0.7;             // rad of curve behind the head
-  const GHOST_WORDS = ['self-referential agents', 'world models', 'long horizons', 'open-ended problems'];
+  const GHOST_WORDS = ['self-referential agents', 'world models', 'long horizons', 'learn from experience'];
   const GHOST_AT = [0.12, 0.36, 0.6, 0.84];   // preferred fractions of the unwritten turn
   const GHOST_SLIDE = 0.03;            // ... from which a blocked phrase slides in these steps
   const GHOST_SLIDE_STEPS = 21;
   const GHOST_MAX_TILT = 50 * Math.PI / 180; // ghost words sit well clear of vertical (60-120 deg)
-  const GHOST_ORDER = [3, 0, 1, 2];    // placement priority: 'open-ended problems' (from the bio) first
+  const GHOST_ORDER = [3, 0, 1, 2];    // placement priority: 'learn from experience' (from the bio) first
   const LABEL_TAU = 0.15;              // s; canvas labels fade with this time constant
   const LABEL_SLIDE_TAU = 0.35;        // s; ... and slide to a new free spot with this one
   const THEME_SLIDE = [0, 0.07, -0.07, 0.14, -0.14, 0.21]; // world offsets tried along a spoke
