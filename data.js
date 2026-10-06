@@ -559,7 +559,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
   },
   {
     title: "DSGram: Dynamic Weighting Sub-Metrics for Grammatical Error Correction in the Era of Large Language Models",
-    authors: "Jinxiang Xie, Yilin Li, <b>Xunjian Yin</b> (as Mentor), Xiaojun Wan",
+    authors: "Jinxiang Xie, Yilin Li, <b>Xunjian Yin</b>, Xiaojun Wan",
     venue: "AAAI 2025",
     links: [
       { text: "Paper", url: "https://ojs.aaai.org/index.php/AAAI/article/view/34746/36901" },
