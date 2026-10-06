@@ -1,0 +1,193 @@
+{
+  "epistemic-context-learning": {
+    "short_name": "Epistemic Context Learning",
+    "topic": "Trust in multi-agent LLM systems",
+    "takeaway": "An agent that cannot verify a peer's answer can still judge the peer's track record. ECL estimates from earlier rounds which peer is reliable before it answers, and is misled less by persuasive wrong peers than aggregation that ignores history.",
+    "question": "When an agent cannot check a peer's answer itself, can it learn from earlier rounds which peers are reliable, and rely on them when it is unsure?",
+    "glance": {
+      "result": "With three of four peers arguing for wrong answers, ECL (E) beats history-agnostic aggregation (AG) in 31 of 32 comparisons (Table 6).",
+      "prior": "Debate and aggregation judge peers by the current round alone; ECL also reads their past rounds and learns to name the reliable peer first.",
+      "limitation": "Exactly one peer is reliable throughout; if it turns wrong at test time, ECL follows it (Gemini 3 Flash, GPQA: 97.5% → 35.0%)."
+    },
+    "method": [
+      {
+        "title": "Estimate trust from history alone",
+        "text": "Stage 1 reads only the past rounds (each past question with every peer's answer, but no answer key) and writes a profile of the peers. In ECL (E) the profile must end by naming the most reliable peer."
+      },
+      {
+        "title": "Answer with the profile, not the history",
+        "text": "Stage 2 receives the profile in place of the raw history, together with the current question and peer responses. Because Stage 1 never sees the current round, its trust estimate cannot copy current-round cues."
+      },
+      {
+        "title": "Reward each stage for its own output",
+        "text": "RL training (GRPO) rewards Stage 2 for a correct final answer. ECL (I) passes the same outcome reward to Stage 1; ECL (E) instead pays Stage 1 a peer recognition reward: 1 if it named the peer that is reliable by construction, otherwise 0."
+      }
+    ],
+    "findings": [
+      {
+        "value": "100.0% vs 90.0%",
+        "label": "GPQA, adversarial peers, answers only · Gemini 3 Pro with ECL (E) vs AG",
+        "detail": "ECL (E) is above AG for 7 of 8 models in this view; GPT-5-mini is the exception (85.0% vs 87.5%). GPQA has 40 test questions, so each question is worth 2.5 pp (Tables 6 and 7)."
+      },
+      {
+        "value": "97.5% → 35.0%",
+        "label": "Same view · Gemini 3 Flash with ECL (E) after the reliable peer flips",
+        "detail": "When the peer that was right throughout the history answers wrongly, accuracy falls below AG's 87.5%: the gain depends on following the identified peer. GPT-5-mini falls less, from 85.0% to 75.0% (Table 10)."
+      }
+    ],
+    "scope": "The peers are constructed: four peers, five history rounds and exactly one peer that is reliable throughout, either four different LLMs (natural) or four copies of Qwen3-30B-A3B-Thinking, three of them arguing for wrong answers (adversarial). Test sets are small (90 MMLU-Pro and 40 GPQA questions) and no variance across runs is reported. Only Qwen 3-4B and 8B are RL-trained; the larger models are prompted. Peers whose reliability changes over time are left to future work.",
+    "diagram": {
+      "title": "Judge the track record, then the answer",
+      "steps": [
+        {
+          "label": "Past rounds",
+          "text": "Peers' answers to earlier questions, without answer keys."
+        },
+        {
+          "label": "Trust profile",
+          "text": "Which peer has been reliable so far."
+        },
+        {
+          "label": "Current answer",
+          "text": "Weigh the current peer answers by that profile."
+        }
+      ],
+      "caption": "ECL separates estimating trust from using it."
+    },
+    "results_table": {
+      "caption": "Table 4, transposed so that methods are rows. Final-answer accuracy (%) in the two-peer diagnostic of Section 4 (one peer always right, one always wrong, five history rounds); higher is better. All rows are RL-trained: 1S (RL) in one stage with the outcome reward, ECL (I) in two stages with the outcome reward on both, ECL (E) in two stages with the peer recognition reward on Stage 1. MA-Outcome peers show answers only; MA-Reasoning peers also show their reasoning. Table 4 does not name its model; its 1S (RL) values equal Qwen 2.5-3B's RL results in Table 1. Test-set sizes for Math500 and LiveCode are not reported.",
+      "headings": [
+        "Method",
+        "Math500 · MA-Outcome",
+        "Math500 · MA-Reasoning",
+        "LiveCode · MA-Outcome",
+        "LiveCode · MA-Reasoning"
+      ],
+      "rows": [
+        [
+          "1S (RL)",
+          "73.0%",
+          "86.5%",
+          "75.7%",
+          "86.5%"
+        ],
+        [
+          "ECL (I)",
+          "75.7%",
+          "94.6%",
+          "77.0%",
+          "91.9%"
+        ],
+        [
+          "ECL (E)",
+          "81.1%",
+          "100.0%",
+          "89.2%",
+          "100.0%"
+        ]
+      ],
+      "highlight": [
+        1,
+        2
+      ],
+      "source_url": "https://arxiv.org/html/2601.21742v1"
+    },
+    "figure_local": "assets/epistemic-context-learning-overview.png",
+    "figure_url": "https://arxiv.org/e-print/2601.21742 (file figures/ECL.pdf; Figure 2 on page 5 of https://arxiv.org/pdf/2601.21742v1; rendered with pdftoppm at 300 dpi)",
+    "figure_caption": "ECL's two-stage pipeline. Stage 1, the critic, reviews the peers' past answers and estimates trust; it is supervised by the outcome reward (OR) in ECL (I) or by the peer recognition reward (PRR) in ECL (E). Stage 2, the final reasoner, combines that estimate with the current question's candidate answers and is supervised by OR. Original Figure 2 from the paper.",
+    "primary_figure": true,
+    "source_url": "https://arxiv.org/html/2601.21742v1",
+    "source_note": "Read the arXiv v1 LaTeX source (e-print 2601.21742: main.tex lines 84-153 for title, authors and abstract; contents/3-data.tex for the Section 3 formulation; contents/4-method.tex lines 1-212 for Sections 4-5 and Tables 1-5; contents/5-exp.tex lines 1-126 for Section 6 and Tables 6-7; contents/6-analysis.tex; contents/8-appendix.tex for Appendices B-F and Tables 8-15) and the 26-page arXiv v1 PDF. Results table: Table 4 (label tab:two-stage-rl-two-peer, 4-method.tex lines 170-188; PDF page 6), transposed; every cell re-checked against both the LaTeX and the PDF text. Table 4 does not name its model; its 1S (RL) values equal the Qwen 2.5-3B RL values of Table 1 (PDF page 4), and Section 5.2 states that 1S equals RL in Table 1. Figure: figures/ECL.pdf from the source (Figure 2, PDF page 5), rendered with pdftoppm at 300 dpi (2167 x 813 px). Authors, equal contribution (Ruiwen Zhou, Maojia Song) and affiliation numbering from main.tex lines 104-130 and the PDF first page. Abstract: verbatim from the arXiv abstract page (the LaTeX abstract adds a repository sentence). Venue: the ICLR listing iclr.cc/virtual/2026/10021090 and OpenReview forum w65sdTnOUw both place the paper in the ICLR 2026 workshop 'Agentic AI in the Wild: From Hallucinations to Reliable Autonomy'; it does not appear on the 'Principled Design for Trustworthy AI' workshop page (iclr.cc/virtual/2026/workshop/10000808). Demo values: Tables 6, 8, 10, 11 and 14, 414 cells checked against the LaTeX by script. Derived counts in the prose (31 of 32 adversarial and 23 of 32 natural comparisons, 18 of 20 Flip cells below AG, 5 of 8 views for the Qwen 3-4B vs Qwen 3-30B claim) were computed from those transcriptions. Consistency notes: Table 8 prints 42.0% for Qwen 3-8B (GPQA, MA-Reasoning), which is not a whole number of the 40 test questions; Table 11's accuracies fit 17 of 40 (42.5%). For Gemini 3 Flash (GPQA, MA-Reasoning), Tables 8 and 11 imply 39 of 40 correct (97.5%) while Table 10 prints 95.0%. Table 10's unflipped ECL (E) value for Qwen 3-4B (GPQA, MA-Outcome) is 62.5%, while Table 6 prints 67.5% for the same cell (Tables 8 and 11 imply 25 of 40, 62.5%); all other Table 10 Normal and Table 14 Acc. values equal Table 6, and the demo shows each table's own value and states the difference. Appendix D.3 says GPT-5-mini drops less than 5% under Flip on MMLU-Pro; that holds for ECL (I) with MA-Outcome (85.6 to 81.1) but not for ECL (E) (87.8 to 78.9), so the page does not repeat it. Tables 12-13 do not name their benchmark; their 4-peer and 5-round columns equal the adversarial MMLU-Pro MA-Reasoning values of Table 6.",
+    "affiliations": [
+      "National University of Singapore",
+      "Singapore University of Technology and Design",
+      "Nanyang Technological University",
+      "University of Waterloo",
+      "Duke University",
+      "University of Pennsylvania",
+      "Microsoft",
+      "Peking University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Ruiwen Zhou",
+        "affiliations": [
+          1
+        ],
+        "equal": true
+      },
+      {
+        "name": "Maojia Song",
+        "affiliations": [
+          2
+        ],
+        "equal": true
+      },
+      {
+        "name": "Xiaobao Wu",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Sitao Cheng",
+        "affiliations": [
+          4
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          5
+        ],
+        "equal": false
+      },
+      {
+        "name": "Yuxi Xie",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Zhuoqun Hao",
+        "affiliations": [
+          6
+        ],
+        "equal": false
+      },
+      {
+        "name": "Wenyue Hua",
+        "affiliations": [
+          7
+        ],
+        "equal": false
+      },
+      {
+        "name": "Liangming Pan",
+        "affiliations": [
+          8
+        ],
+        "equal": false
+      },
+      {
+        "name": "Soujanya Poria",
+        "affiliations": [
+          3
+        ],
+        "equal": false
+      },
+      {
+        "name": "Min-Yen Kan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "prior_work": "Multi-agent debate (Du et al., 2024; Liang et al., 2024) lets agents correct one another, and answer aggregation (Zhao et al., 2025) and step-level reward models (Lightman et al., 2024) score candidate solutions; the paper notes that these methods judge a response by its content, without regard to who produced it. Studies of sycophancy and conformity (Sharma et al., 2024; Zhu et al., 2025; Cho et al., 2025) show that LLMs follow majorities or confident peers, Amayuelas et al. (2024) show that one persuasive, deceptive agent can mislead a group, and the KAIROS benchmark (Song et al., 2025) finds that LLMs struggle to separate reliable from misleading peers even when they share an interaction history. Multi-agent RL methods such as MAPoRL and MARFT assume fully cooperative peers. ECL treats the interaction history as an input to learn from and trains the agent to estimate peer reliability before it aggregates.",
+    "abstract_label": "Read the abstract"
+  }
+}

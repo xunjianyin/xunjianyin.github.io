@@ -1,0 +1,292 @@
+{
+  "story": {
+    "title": "Long contexts are easy to access but hard to process",
+    "paragraphs": [
+      "Frontier models now accept millions of tokens, and drop-in long-context models can outperform retrieval-augmented generation. The paper argues that this scales access rather than processing: accuracy falls as inputs grow, and attention leaves little trace of which parts of the context produced an answer. Retrieval pipelines make access explicit, but a fixed retrieval stage cannot easily let one finding shape the next query, which multi-hop questions need.",
+      "The paper starts from an observation about coding agents: they are trained on repositories with long files and nested directories, and they already search, slice and transform text with programs. In the paper’s Figure 2, asked for the last spell Vax’ildan casts in each episode of a 385K-token Oolong-Real transcript, the agent wrote a script that split the transcript into episodes, kept lines spoken by or mentioning the character, and matched a list of spell keywords. Many episodes came back “Unknown”, so it printed lines from the failing episodes, found phrasings such as “uses Lay on Hands”, added 12 domain-specific spells and new patterns, and re-ran the extraction.",
+      "The question is whether this transfers from one case to long-context tasks in general. If a corpus or a long document is laid out as files, can an off-the-shelf coding agent, with no task-specific training and only a minimal prompt, outperform long-context models, retrieval pipelines and search agents?"
+    ]
+  },
+  "mechanism": {
+    "title": "Text becomes a file system the agent already knows how to use",
+    "paragraphs": [
+      "Each task pairs a query with either a large corpus or a single long document. A corpus above 100M tokens is split into one text file per document inside a directory, so BrowseComp-Plus becomes a folder of 100K files; a single long document, as in LongBench and Oolong, goes into one text file. The NQ Wikipedia corpus, too large for per-document files, is stored as one JSONL file. The agent receives only the path and the question: the BrowseComp-Plus prompt asks it to answer by iterating through the files under a folder and notes that some of the 100K files contain the needed information.",
+      "Nothing constrains how the agent proceeds. It can run terminal commands such as grep, rg, head, nl and sed, write and execute Python scripts, keep partial results in files, and change its approach based on what it finds. In the retriever settings it also receives a command-line BM25 or Gemini-embedding retriever with instructions on how to call it, but whether and how to use it remains its decision. RAG, by contrast, always retrieves its top 10 documents or chunks before answering, and the ReAct baseline can act only through predefined retrieve and get-document tools.",
+      "The paper attributes the agent’s effectiveness to two capabilities. Native tool proficiency lets it issue exact, executable operations, such as regular expressions, line ranges, counters and parsers, instead of semantic queries. File system familiarity, acquired from code repositories, gives it priors for navigating a directory of documents. With one file per document, the agent can number lines with nl and read a chosen range with sed, so that a file name and a line number locate each piece of evidence; the paper calls this an index-and-slice strategy.",
+      "The main agent is Codex v0.46.0 with GPT-5 and its default system prompt, run without a retriever, with BM25, or with Gemini embeddings. Claude Code with Sonnet 4.5 and BM25 is added on Oolong-Real and LongBench to test whether the findings depend on one agent implementation. The baselines run GPT-5 with the full context (a random 100K-token sample of the corpus for BrowseComp-Plus and NQ, and 200K-token windows with 50K overlap for longer documents), standard RAG, and a ReAct agent with Gemini-embedding search; Recursive Language Models (RLM) run in their original paper’s setting."
+    ]
+  },
+  "evidence": {
+    "title": "Large gains where search or code helps; parity where reading suffices",
+    "paragraphs": [
+      "Table 1 compares all methods on the same random 200 questions per benchmark. Codex without a retriever beats every re-run baseline on all five benchmarks, but the margins differ widely: 16.00 pp over the ReAct agent on BrowseComp-Plus (88.50 vs 72.50) and 10.66 points over RLM on Oolong-Real (33.73 vs 23.07), against 0.50 pp over full-context GPT-5 on LongBench (61.50 vs 61.00) and 0.67 pp over RLM on NQ (56.00 vs 55.33). The abstract’s 17.3% instead averages relative changes over the best published scores, three of them measured on full test sets, and its largest term is Oolong-Real, where Claude Code with BM25 scores 37.46 against 24.09.",
+      "The file-structure ablation tests the role of the corpus layout directly. On a 100-question BrowseComp-Plus subset, one file per document instead of a single JSON dictionary raises accuracy from 83.0 to 89.0 without a retriever and from 86.0 to 90.0 with Gemini embeddings, and makes no difference with BM25 (82.0 for both; Table 2, below). Command counts suggest why: with folders, the agent runs sed 4.48 times per query instead of 0.61 and rg 18.46 times instead of 31.05 (Table 3), reading selected line ranges instead of repeatedly scanning the whole corpus.",
+      "Retrieval tools rarely help the agent. In Table 1, adding a retriever to Codex lowers its score in eight of nine comparisons and ties once, on LongBench with Gemini embeddings; on BrowseComp-Plus, BM25 costs 10.00 pp. With a retriever available, the agent issues fewer native search commands per query (14.92 without, 9.84 with BM25, 8.33 with Gemini embeddings; Table 4). The paper hypothesizes that the retriever becomes the default discovery tool and displaces broader exploration, so ranking errors hide relevant context, and leaves the mechanism to future work.",
+      "The agent’s behavior also changes with the task (Figure 5): BrowseComp-Plus accounts for most of the text read, the two Oolong benchmarks for nearly all generated code, and LongBench draws little tool use, with accuracy close to full-context GPT-5 (61.50 vs 61.00). The extra work has a price. Codex without a retriever costs $0.703 per BrowseComp-Plus query, against $0.237 for the ReAct agent and $0.111 for RAG, but on Oolong-Syn it costs $0.194 against $1.421 for full-context GPT-5 (Table 5)."
+    ]
+  },
+  "sources": [
+    {
+      "label": "File-system formulation and agent interface · Section 2",
+      "url": "https://arxiv.org/html/2603.20432v1#S2"
+    },
+    {
+      "label": "Main results, ablations and cost · Sections 4–5, Tables 1–5",
+      "url": "https://arxiv.org/html/2603.20432v1#S4"
+    },
+    {
+      "label": "Prompts, agent scripts and trajectories · Appendices A–C",
+      "url": "https://arxiv.org/html/2603.20432v1#A1"
+    },
+    {
+      "label": "Experiment runner · code repository",
+      "url": "https://github.com/weilicao/Coding_Agents_are_Effective_Long_Context_Processors"
+    }
+  ],
+  "reading_notes": "Read arXiv 2603.20432v1 (2026-10-05): LaTeX example_paper.tex and appendix.tex, PDF (20 pages) and HTML. Sections 1-5 and 7, Tables 1-5, Figures 1-5, Appendices A-C. Verified: the abstract’s 17.3% is the mean of relative changes of the best coding agent over Best Published per benchmark (10.63, 11.45, 55.50, -1.26, 10.02%), which needs Claude Code + BM25 on Oolong-Real and LongBench; Figure 1’s labels (+11, +11, +56, -1, +10%) match. Codex (No Retriever) alone beats every re-run baseline on all five benchmarks. Retriever comparisons: 8 of 9 lower, 1 tie (LongBench, Gemini). Not verifiable or unexplained in the paper: Table 1 prints 64.38 for both RLM and Best Published on Oolong-Syn, and Section 4 says the RLM paper used the trec_coarse subset; RLM NQ 55.33 and Codex + BM25 LongBench 60.80 are not multiples of 0.5, so they cannot come from one pass over exactly 200 binary-scored questions; Table 3 (rg 18.46, folder, no retriever) and Table 4 (native search 14.92, no retriever) are not reconciled and are not presented as the same quantity; Section 5.3 says BrowseComp-Plus has the highest Search Intensity, but Figure 5 shows BrowseComp and NQ at about the same share, so the page does not repeat that claim. Figure 2 does not name the agent; Appendix B scripts are from Claude Code. Table 1 gives NQ as 3T tokens; the official code README says three billion. The * in the author block means Equal Advising. The demo’s rows, differences, relative changes and costs are computed from Tables 1 and 5; the trajectories and scripts quoted in prose come from Figure 2, Figure 4 and Appendices B-C.",
+  "demo": {
+    "type": "headline-composition",
+    "placement": "evidence",
+    "eyebrow": "Measured · Tables 1 and 5 · Computed · differences and relative changes",
+    "title": "What does the 17.3% average compare?",
+    "description": "The abstract reports that coding agents outperform the published state of the art by 17.3% on average, a mean of per-benchmark relative changes. Choose a coding-agent row and a reference row from Table 1: each benchmark shows both scores, their difference, the relative change and the cost per query from Table 5, and the summary recomputes the average.",
+    "benchmarks": [
+      {
+        "key": "browsecomp",
+        "label": "BrowseComp-Plus",
+        "context": "750M",
+        "metric": "accuracy",
+        "unit": "pp"
+      },
+      {
+        "key": "oolong-syn",
+        "label": "Oolong-Syn",
+        "context": "536K",
+        "metric": "score",
+        "unit": "points"
+      },
+      {
+        "key": "oolong-real",
+        "label": "Oolong-Real",
+        "context": "385K",
+        "metric": "score",
+        "unit": "points"
+      },
+      {
+        "key": "longbench",
+        "label": "LongBench",
+        "context": "188K",
+        "metric": "accuracy",
+        "unit": "pp"
+      },
+      {
+        "key": "nq",
+        "label": "NQ",
+        "context": "3T",
+        "metric": "exact match",
+        "unit": "pp"
+      }
+    ],
+    "agents": [
+      {
+        "key": "codex",
+        "label": "Codex (No Retriever)",
+        "scores": [
+          "88.50",
+          "71.75",
+          "33.73",
+          "61.50",
+          "56.00"
+        ],
+        "costs": [
+          "0.703",
+          "0.194",
+          "0.419",
+          "0.128",
+          "0.111"
+        ]
+      },
+      {
+        "key": "codex-gemini",
+        "label": "Codex + Gemini Emb.",
+        "scores": [
+          "84.00",
+          "68.03",
+          "32.40",
+          "61.50",
+          null
+        ],
+        "costs": [
+          "0.628",
+          "0.149",
+          "0.371",
+          "0.129",
+          null
+        ]
+      },
+      {
+        "key": "codex-bm25",
+        "label": "Codex + BM25",
+        "scores": [
+          "78.50",
+          "71.07",
+          "30.86",
+          "60.80",
+          "53.00"
+        ],
+        "costs": [
+          "0.828",
+          "0.161",
+          "0.368",
+          "0.124",
+          "0.094"
+        ]
+      },
+      {
+        "key": "claude-bm25",
+        "label": "Claude Code + BM25",
+        "scores": [
+          null,
+          null,
+          "37.46",
+          "62.50",
+          null
+        ],
+        "costs": [
+          null,
+          null,
+          "0.380",
+          "0.319",
+          null
+        ]
+      }
+    ],
+    "references": [
+      {
+        "key": "published",
+        "label": "Best Published",
+        "scores": [
+          "80.00",
+          "64.38",
+          "24.09",
+          "63.30",
+          "50.90"
+        ],
+        "costs": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "full_set": [
+          true,
+          false,
+          false,
+          true,
+          true
+        ],
+        "cited": [
+          "openJiuwen, 2025",
+          "Zhang et al., 2025a",
+          "Singh et al., 2025",
+          "Comanici et al., 2025",
+          "Hui et al., 2025"
+        ]
+      },
+      {
+        "key": "full-context",
+        "label": "GPT-5 Full Context",
+        "rerun": true,
+        "scores": [
+          "20.00",
+          "59.22",
+          "22.45",
+          "61.00",
+          "27.00"
+        ],
+        "costs": [
+          "0.275",
+          "1.421",
+          "0.770",
+          "0.432",
+          "0.129"
+        ]
+      },
+      {
+        "key": "rag",
+        "label": "RAG",
+        "rerun": true,
+        "scores": [
+          "65.00",
+          "45.53",
+          "13.38",
+          "50.50",
+          "47.00"
+        ],
+        "costs": [
+          "0.111",
+          "0.045",
+          "0.026",
+          "0.024",
+          "0.006"
+        ]
+      },
+      {
+        "key": "react",
+        "label": "ReAct Agent",
+        "rerun": true,
+        "scores": [
+          "72.50",
+          "31.39",
+          "19.06",
+          "59.00",
+          "49.00"
+        ],
+        "costs": [
+          "0.237",
+          "0.092",
+          "0.168",
+          "0.056",
+          "0.027"
+        ]
+      },
+      {
+        "key": "rlm",
+        "label": "RLM",
+        "rerun": true,
+        "scores": [
+          null,
+          "64.38",
+          "23.07",
+          "54.00",
+          "55.33"
+        ],
+        "costs": [
+          null,
+          "0.920",
+          "0.094",
+          "0.360",
+          "0.630"
+        ]
+      }
+    ],
+    "choice_labels": {
+      "best": "Best per benchmark",
+      "strongest": "Strongest re-run baseline"
+    },
+    "initial": {
+      "agent": "best",
+      "reference": "published"
+    },
+    "headline": "17.3",
+    "figure1_labels": [
+      "+11%",
+      "+11%",
+      "+56%",
+      "−1%",
+      "+10%"
+    ],
+    "source_url": "https://arxiv.org/html/2603.20432v1#S2.T1"
+  }
+}

@@ -2,6 +2,75 @@
 const publications = [
   // Preprints
   {
+    title: "X-Tree: Tokenizing Reusable Experience for Efficient Agent Generalization",
+    authors: "Sitao Cheng, <b>Xunjian Yin</b>, Zhiyuan Sun, Yuxuan Li, Ruiwen Zhou, Xiangru Jian, Victor Zhong",
+    venue: "ArXiv:2609",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2609.32993" },
+      { text: "Code", url: "https://github.com/sitaocheng/X-Tree" },
+      { text: "Page", url: "https://sitaocheng.github.io/xtree/" }
+    ],
+    abstract: "Multi-step agents are trained on flat action streams: SFT and RLVR weight every token uniformly and ignore the sub-procedures that recur across tasks, the hierarchy that lets humans plan top-down from reusable routines. This structure sits unused, and flat training uses each scarce trajectory less fully than its content allows. Recent agents do use that structure, but only as LLM-written skills in context, never in the weights, so their gains do not generalize beyond retrieval. We instead recover this hierarchy from the data itself and train on it, with no LLM calls. Following text tokenizers, which build a vocabulary by counting alone, we score action spans by reusability and merge canonicalized actions into a reusable eXperience tree (X-Tree). Each X-Tree node captures how a frequent and success-bearing skill is composed from sub-skills, guiding efficient generalization. We integrate X-Tree into three training settings: offline RL, with each node as a training instance; online RLVR, with an adaptive skill bonus; and on-policy self-distillation, with X-Tree as the self-teacher's privileged context. Across WebArena, ScienceWorld, and WebShop at three model scales, X-Tree improves over standard recipes at matched data and budget by up to 4.5% SR on WebArena, 5.8% SR on ScienceWorld and 4.1% success on WebShop. Matched analyses attribute the gains to the X-Tree structure and the three integrations.",
+    citation: `<pre><code>@misc{cheng2026xtreetokenizingreusableexperience,
+      title={X-Tree: Tokenizing Reusable Experience for Efficient Agent Generalization},
+      author={Sitao Cheng and Xunjian Yin and Zhiyuan Sun and Yuxuan Li and Ruiwen Zhou and Xiangru Jian and Victor Zhong},
+      year={2026},
+      eprint={2609.32993},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2609.32993},
+}</code></pre>`,
+    isNew: false,
+    isPreprint: true,
+    isSelected: false
+  },
+  {
+    title: "Challenges of Auditing: Variability in Outputs of Large Language Models for Health",
+    authors: "Yuan Pu, Yewon Chang, Furong Jia, <b>Xunjian Yin</b>, Jessica Ma, Ayman Ali, Monica Agrawal",
+    venue: "ArXiv:2609",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2609.16590" },
+      { text: "Code", url: "https://github.com/yuan-pu/health-llm-variability" },
+      { text: "Page", url: "papers/auditing-health-llms.html" }
+    ],
+    abstract: "People increasingly use frontier AI models for health advice, but via different access modes (e.g., ChatGPT, ChatGPT Health, APIs) with varying settings. Here, we find systematic differences across access modes. Because evaluations typically rely on APIs while consumers interact through chatbot interfaces, these discrepancies limit evaluation validity. Our findings underscore an urgent need for model providers to enable faithful replication of consumer experiences and settings for rigorous audits.",
+    citation: `<pre><code>@misc{pu2026challengesauditingvariabilityoutputs,
+      title={Challenges of Auditing: Variability in Outputs of Large Language Models for Health},
+      author={Yuan Pu and Yewon Chang and Furong Jia and Xunjian Yin and Jessica Ma and Ayman Ali and Monica Agrawal},
+      year={2026},
+      eprint={2609.16590},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2609.16590},
+}</code></pre>`,
+    isNew: false,
+    isPreprint: true,
+    isSelected: false
+  },
+  {
+    title: "Coding Agents are Effective Long-Context Processors",
+    authors: "Weili Cao, <b>Xunjian Yin</b>, Bhuwan Dhingra, Shuyan Zhou",
+    venue: "ArXiv:2603",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2603.20432" },
+      { text: "Code", url: "https://github.com/weilicao/Coding_Agents_are_Effective_Long_Context_Processors" },
+      { text: "Page", url: "papers/coding-agents-long-context.html" }
+    ],
+    abstract: "Large Language Models (LLMs) have demonstrated remarkable progress in scaling to access massive contexts. However, the access is via the latent and uninterpretable attention mechanisms, and LLMs fail to effective process long context, exhibiting significant performance degradation as context length increases. In this work, we study whether long-context processing can be externalized from latent attention into explicit, executable interactions, by allowing coding agents to organize text in file systems and manipulate it using its native tools. We evaluate off-the-shelf frontier coding agents as the general interface for tasks that require processing long contexts, including long-context reasoning, retrieval-augmented generation, and open-domain question answering with large-scale corpus contains up to three trillion tokens. Across multiple benchmarks, these agents outperform published state-of-the-art by 17.3% on average. We attribute this efficacy to two key factors: native tool proficiency, which enables agents to leverage executable code and terminal commands rather than passive semantic queries, and file system familiarity, which allows them to navigate massive text corpora as directory structures. These findings suggest that delegating long-context processing to coding agents offers an effective alternative to semantic search or context window scaling, opening new directions for long-context processing in LLMs.",
+    citation: `<pre><code>@misc{cao2026codingagentseffectivelongcontext,
+      title={Coding Agents are Effective Long-Context Processors},
+      author={Weili Cao and Xunjian Yin and Bhuwan Dhingra and Shuyan Zhou},
+      year={2026},
+      eprint={2603.20432},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2603.20432},
+}</code></pre>`,
+    isNew: false,
+    isPreprint: true,
+    isSelected: false
+  },
+  {
     title: "From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning",
     authors: "Sitao Cheng, <b>Xunjian Yin</b>, Ruiwen Zhou, Yuxuan Li, Xinyi Wang, Liangming Pan, William Yang Wang, Victor Zhong",
     venue: "ArXiv:2510",
@@ -89,6 +158,28 @@ const publications = [
     isPreprint: true,
     isSelected: false
   },
+  {
+    title: "Human-like Summarization Evaluation with ChatGPT",
+    authors: "Mingqi Gao, Jie Ruan, Renliang Sun, <b>Xunjian Yin</b>, Shiping Yang, Xiaojun Wan",
+    venue: "ArXiv:2304",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2304.02554" },
+      { text: "Page", url: "papers/chatgpt-summarization-evaluation.html" }
+    ],
+    abstract: "Evaluating text summarization is a challenging problem, and existing evaluation metrics are far from satisfactory. In this study, we explored ChatGPT's ability to perform human-like summarization evaluation using four human evaluation methods on five datasets. We found that ChatGPT was able to complete annotations relatively smoothly using Likert scale scoring, pairwise comparison, Pyramid, and binary factuality evaluation. Additionally, it outperformed commonly used automatic evaluation metrics on some datasets. Furthermore, we discussed the impact of different prompts, compared its performance with that of human evaluation, and analyzed the generated explanations and invalid responses.",
+    citation: `<pre><code>@misc{gao2023humanlikesummarizationevaluationchatgpt,
+      title={Human-like Summarization Evaluation with ChatGPT},
+      author={Mingqi Gao and Jie Ruan and Renliang Sun and Xunjian Yin and Shiping Yang and Xiaojun Wan},
+      year={2023},
+      eprint={2304.02554},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2304.02554},
+}</code></pre>`,
+    isNew: false,
+    isPreprint: true,
+    isSelected: false
+  },
   // Publications
   {
     title: "Constructing Challenging Browser-Use Tasks by Controlled Environment Interventions",
@@ -96,7 +187,7 @@ const publications = [
     venue: "NeurIPS 2026",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2609.35814" },
-      { text: "Project", url: "https://www.breakingweb.app" }
+      { text: "Page", url: "https://www.breakingweb.app" }
     ],
     abstract: "As browser-use agents improve, benchmarks keep pace by collecting new tasks, websites, and applications, often making tasks longer or more novel. This makes difficulty expensive to refresh and difficult to control: when many aspects change at once, it is unclear what actually makes a task challenging. We instead construct challenging instances from tasks agents already solve, turning difficulty into a programmable property of the environment. BreakingWeb pairs every base task with an intervention condition that preserves the user instruction, latent target, and backend success criterion while changing the environment at different web stack layers. Each intervention is deterministic, detectable, and recoverable, and is annotated with the cognitive primitive it primarily loads. The benchmark contains 519 clean/intervention task pairs across seven self-hosted websites and 29 intervention families, all graded against outcomes. We evaluate six strong browser-use agents, three GUI-only agents that see only screenshots, and humans. The construction is effective: interventions cut agent pass rate by 22.9% on average and overturn nearly half of the tasks each agent solves cleanly, whereas humans lose 10.0% on a first attempt and 5.7% after one familiarisation attempt. The dominant failure is belief failure: 75% of the six agents' failures end with a declared success although the required change never happened. Our code, data and environment are publicly available at www.breakingweb.app.",
     citation: `<pre><code>@misc{yin2026constructingchallengingbrowserusetasks,
@@ -111,6 +202,73 @@ const publications = [
     isNew: true,
     isPreprint: false,
     isSelected: true
+  },
+  {
+    title: "Lazy Grounding: Attacking Search Agents with Factual Evidence",
+    authors: "Yulin Zhang, Yukun Huang, Sanxing Chen, Tianyi Lin, Ziang Yang, <b>Xunjian Yin</b>, Bhuwan Dhingra",
+    venue: "EMNLP 2026",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2608.30303" },
+      { text: "Code", url: "https://github.com/frankyzha/lazy-grounding" },
+      { text: "Page", url: "papers/lazy-grounding.html" }
+    ],
+    abstract: "Search agents mitigate hallucination by grounding their answers in retrieved web results. However, retrieval-based approaches also introduce an attack surface: agents may cite misinformation from poisoned search corpora containing false or malicious documents. We demonstrate that, in some cases, search agents' reasoning and responses may be steered by completely factual but distracting information. We refer to this failure as lazy grounding. We expose lazy grounding by injecting nearby evidence from answer-changing rewrites of benchmark questions into the search corpora. Each document contains factual evidence that supports a neighboring rewritten question but is retrieved for the original question. Across 12 model-benchmark pairs, the attack causes the accuracy of search agents' responses to drop by 5.9 points on average and by up to 17.3 points, while inducing nearby-answer adoption in every setting. The effect is even stronger when nearby evidence appears later or is more answer-shaped. Our results show that robust search agents must defend against not only misinformation but also the misapplication of factual evidence. The code is publicly available at https://github.com/frankyzha/lazy-grounding.",
+    citation: `<pre><code>@misc{zhang2026lazygroundingattackingsearch,
+      title={Lazy Grounding: Attacking Search Agents with Factual Evidence},
+      author={Yulin Zhang and Yukun Huang and Sanxing Chen and Tianyi Lin and Ziang Yang and Xunjian Yin and Bhuwan Dhingra},
+      year={2026},
+      eprint={2608.30303},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2608.30303},
+}</code></pre>`,
+    isNew: false,
+    isPreprint: false,
+    isSelected: false
+  },
+  {
+    title: "AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection",
+    authors: "Jiatao Li, Mao Ye, Cheng Peng, <b>Xunjian Yin</b>, Xiaojun Wan",
+    venue: "EMNLP 2026",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2505.15261" },
+      { text: "Page", url: "papers/agent-x.html" }
+    ],
+    abstract: "Existing AI-generated text detection methods heavily depend on large annotated datasets and external threshold tuning, restricting interpretability, adaptability, and zero-shot effectiveness. To address these limitations, we propose AGENT-X, a zero-shot multi-agent framework informed by classical rhetoric and systemic functional linguistics. Specifically, we organize detection guidelines into semantic, stylistic, and structural dimensions, each independently evaluated by specialized linguistic agents that provide explicit reasoning and robust calibrated confidence via semantic steering. A meta agent integrates these assessments through confidence-aware aggregation, enabling threshold-free, interpretable classification. Additionally, an adaptive Mixture-of-Agent router dynamically selects guidelines based on inferred textual characteristics. Experiments on diverse datasets demonstrate that AGENT-X substantially surpasses state-of-the-art supervised and zero-shot approaches in accuracy, interpretability, and generalization.",
+    citation: `<pre><code>@misc{li2025agentxadaptiveguidelinebasedexpert,
+      title={AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection},
+      author={Jiatao Li and Mao Ye and Cheng Peng and Xunjian Yin and Xiaojun Wan},
+      year={2025},
+      eprint={2505.15261},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2505.15261},
+}</code></pre>`,
+    isNew: false,
+    isPreprint: false,
+    isSelected: false
+  },
+  {
+    title: "CEER: Compliant End-Effector and Root Control as a Unified Interface for Hierarchical Humanoid Loco-Manipulation",
+    authors: "Xinyuan Luo, Xingrui Chen, <b>Xunjian Yin</b>, Hongxuan Wu, Boxi Xia, Zhuoqun Chen, Jinzhou Li, Boyuan Chen, Xianyi Cheng",
+    venue: "IROS 2026",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2605.19981" },
+      { text: "Page", url: "https://robotproject8.github.io/ceer_page/" }
+    ],
+    abstract: "Humanoid robots have achieved impressive locomotion performance, yet contact-rich and long-horizon manipulation remains a major bottleneck. Manipulation is inherently contact-rich and demands compliant whole-body control for stable interaction, while its diversity and long-horizon nature favor modular, planner-compatible interfaces over joint-space tracking. We propose CEER, a compliant end-effector-root (EE-root) control abstraction for modular humanoid loco-manipulation within a hierarchical planning framework. CEER enables compliance-aware whole-body control in an interpretable task space defined by root motion commands and end-effector pose targets, and supports plug-and-play integration with heterogeneous high-level planners. A teacher-student framework is adopted to distill a general motion-tracking controller into a low-level policy that consumes only EE-root commands. We further construct a hierarchical system that integrates heterogeneous planners and task modules through the EE-root interface, enabling diverse manipulation tasks without retraining the underlying whole-body policy. Experiments in simulation and on hardware demonstrate 3.3 cm end-effector tracking accuracy with substantially reduced jerk compared to baselines, stable contact-rich manipulation under teleoperation, and up to 70% success in simulated single-object loco-manipulation tasks within a room-scale environment. These results indicate that compliant EE-root control provides a practical abstraction for humanoid loco-manipulation, enabling modular and scalable integration of diverse skills.",
+    citation: `<pre><code>@misc{luo2026ceercompliantendeffectorroot,
+      title={CEER: Compliant End-Effector and Root Control as a Unified Interface for Hierarchical Humanoid Loco-Manipulation},
+      author={Xinyuan Luo and Xingrui Chen and Xunjian Yin and Hongxuan Wu and Boxi Xia and Zhuoqun Chen and Jinzhou Li and Boyuan Chen and Xianyi Cheng},
+      year={2026},
+      eprint={2605.19981},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2605.19981},
+}</code></pre>`,
+    isNew: false,
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "LEDOM: Reverse Language Model",
@@ -232,6 +390,29 @@ const publications = [
     isNew: false,
     isPreprint: false,
     isSelected: true
+  },
+  {
+    title: "Epistemic Context Learning: Building Trust the Right Way in LLM-Based Multi-Agent Systems",
+    authors: "Ruiwen Zhou, Maojia Song, Xiaobao Wu, Sitao Cheng, <b>Xunjian Yin</b>, Yuxi Xie, Zhuoqun Hao, Wenyue Hua, Liangming Pan, Soujanya Poria, Min-Yen Kan",
+    venue: "Agentic AI in the Wild Workshop, ICLR 2026",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2601.21742" },
+      { text: "Code", url: "https://github.com/skyriver-2000/epistemic-context-learning" },
+      { text: "Page", url: "papers/epistemic-context-learning.html" }
+    ],
+    abstract: "Individual agents in multi-agent (MA) systems often lack robustness, tending to blindly conform to misleading peers. We show this weakness stems from both sycophancy and inadequate ability to evaluate peer reliability. To address this, we first formalize the learning problem of history-aware reference, introducing the historical interactions of peers as additional input, so that agents can estimate peer reliability and learn from trustworthy peers when uncertain. This shifts the task from evaluating peer reasoning quality to estimating peer reliability based on interaction history. We then develop Epistemic Context Learning (ECL): a reasoning framework that conditions predictions on explicitly-built peer profiles from history. We further optimize ECL by reinforcement learning using auxiliary rewards. Our experiments reveal that our ECL enables small models like Qwen 3-4B to outperform a history-agnostic baseline 8x its size (Qwen 3-30B) by accurately identifying reliable peers. ECL also boosts frontier models to near-perfect (100%) performance. We show that ECL generalizes well to various MA configurations and we find that trust is modeled well by LLMs, revealing a strong correlation in trust modeling accuracy and final answer quality.",
+    citation: `<pre><code>@misc{zhou2026epistemiccontextlearningbuilding,
+      title={Epistemic Context Learning: Building Trust the Right Way in LLM-Based Multi-Agent Systems},
+      author={Ruiwen Zhou and Maojia Song and Xiaobao Wu and Sitao Cheng and Xunjian Yin and Yuxi Xie and Zhuoqun Hao and Wenyue Hua and Liangming Pan and Soujanya Poria and Min-Yen Kan},
+      year={2026},
+      eprint={2601.21742},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2601.21742},
+}</code></pre>`,
+    isNew: false,
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",

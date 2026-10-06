@@ -1,6 +1,6 @@
 # Research pages
 
-These 23 pages share a restrained, light academic design. They are generated as
+These 29 pages share a restrained, light academic design. They are generated as
 complete static HTML: no framework, external fonts, or client-side data fetching
 is required. Existing paper URLs remain unchanged.
 
@@ -112,7 +112,7 @@ at build time. The v4 tables were extracted and then verified cell by cell by
 independent readers; `source_note` records each table's source location.
 
 Use `primary_figure: true` for original figures, or original lead illustrations
-(`assets/*-lead.*`), that explain the method clearly; 19 pages have one. Use a
+(`assets/*-lead.*`), that explain the method clearly; 25 pages have one. Use a
 concise three-step conceptual diagram when the paper's figure is dense or
 unavailable; it is shown only on pages without a demo. Figures are clickable at
 full resolution and locally hosted.
@@ -151,14 +151,20 @@ build fails if two modules claim one slug or none does. A file without
 | --- | --- |
 | `godel` | godel-agent (overview hook, method + `render_method`, evidence + `render_evidence`) |
 | `agents` | derl, chemagent (method) |
+| `attacks` | lazy-grounding (evidence) |
+| `auditing` | auditing-health-llms (method and evidence) |
 | `benchmarks` | alcuna (method); knowledge-boundary, self-generated-documents (evidence) |
 | `decoding` | coral, reverse-lm (method and evidence) |
+| `detection` | agent-x (method and evidence) |
 | `evaluation` | dsgram, context-aware-evaluation, error-robust-retrieval (method); seq2seq-data2text (method and evidence) |
 | `flows` | geometry-of-reasoning (method) |
 | `judges` | contextual-asr (method); themis, eama, nlg-evaluation-survey (evidence) |
 | `knowledge` | knowledge-interplay (method); history-matters, mc-mke (method and evidence) |
+| `longcontext` | coding-agents-long-context (evidence) |
 | `reasoning` | contrasolver, atomic-to-composite (method and evidence) |
 | `safety` | damon (method) |
+| `summeval` | chatgpt-summarization-evaluation (evidence) |
+| `trust` | epistemic-context-learning (evidence) |
 
 ### Interface
 
@@ -278,13 +284,14 @@ agent-browser --session papers close
 agent-browser --session papers open http://127.0.0.1:8765/papers/reverse-lm.html
 agent-browser --session papers eval --stdin < tests/browser_papers.js
 agent-browser --session papers eval --stdin < tests/browser_demos.js
-for group in evaluation reasoning decoding knowledge benchmarks judges agents flows_safety; do
+for group in evaluation reasoning decoding knowledge benchmarks judges agents flows_safety \
+    attacks auditing detection longcontext summeval trust; do
   agent-browser --session papers eval --stdin < tests/browser_demo_$group.js
 done
 agent-browser --session papers close
 ```
 
-- `tests/browser_papers.js` exercises all 23 routes at 1440, 390, and 320
+- `tests/browser_papers.js` exercises all 29 routes at 1440, 390, and 320
   pixels: expanded figures, text overflow, citation links, copy success and
   failure, LEDOM's direction comparison, and a lead visual that precedes
   section 01 and starts within the first 900px at 1440 pixels.
@@ -294,7 +301,8 @@ agent-browser --session papers close
   algorithm outputs, exact measured values, published text, replay controls,
   keyboard behavior, 320px layout, and the no-script state. `flows_safety`
   covers Geometry of Reasoning and DAMON.
-- Run `browser_demo_agents.js` and `browser_demo_reasoning.js` once more after
+- Run `browser_demo_agents.js`, `browser_demo_reasoning.js`, and the six newer
+  demo suites once more after
   `agent-browser --session papers set media light reduced-motion`; their motion
   checks switch to the reduced-motion expectations.
 

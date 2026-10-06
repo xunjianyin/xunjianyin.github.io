@@ -1,4 +1,19 @@
 {
+  "agent-x": {
+    "title": "AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection",
+    "authors": "Jiatao Li, Mao Ye, Cheng Peng, Xunjian Yin, Xiaojun Wan",
+    "venue": "EMNLP 2026",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2505.15261"
+      }
+    ],
+    "abstract": "Existing AI-generated text detection methods heavily depend on large annotated datasets and external threshold tuning, restricting interpretability, adaptability, and zero-shot effectiveness. To address these limitations, we propose AGENT-X, a zero-shot multi-agent framework informed by classical rhetoric and systemic functional linguistics. Specifically, we organize detection guidelines into semantic, stylistic, and structural dimensions, each independently evaluated by specialized linguistic agents that provide explicit reasoning and robust calibrated confidence via semantic steering. A meta agent integrates these assessments through confidence-aware aggregation, enabling threshold-free, interpretable classification. Additionally, an adaptive Mixture-of-Agent router dynamically selects guidelines based on inferred textual characteristics. Experiments on diverse datasets demonstrate that AGENT-X substantially surpasses state-of-the-art supervised and zero-shot approaches in accuracy, interpretability, and generalization.",
+    "citation": "@misc{li2025agentxadaptiveguidelinebasedexpert,\n      title={AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection},\n      author={Jiatao Li and Mao Ye and Cheng Peng and Xunjian Yin and Xiaojun Wan},\n      year={2025},\n      eprint={2505.15261},\n      archivePrefix={arXiv},\n      primaryClass={cs.CL},\n      url={https://arxiv.org/abs/2505.15261},\n}",
+    "figures": [],
+    "original_words": 0
+  },
   "alcuna": {
     "title": "ALCUNA: Large Language Models Meet New Knowledge",
     "authors": "Xunjian Yin* , Baizhou Huang*, Xiaojun Wan",
@@ -83,6 +98,40 @@
     ],
     "original_words": 1195
   },
+  "auditing-health-llms": {
+    "title": "Challenges of Auditing: Variability in Outputs of Large Language Models for Health",
+    "authors": "Yuan Pu, Yewon Chang, Furong Jia, Xunjian Yin, Jessica Ma, Ayman Ali, Monica Agrawal",
+    "venue": "arXiv preprint 2026",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2609.16590"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/yuan-pu/health-llm-variability"
+      }
+    ],
+    "abstract": "People increasingly use frontier AI models for health advice, but via different access modes (e.g., ChatGPT, ChatGPT Health, APIs) with varying settings. Here, we find systematic differences across access modes. Because evaluations typically rely on APIs while consumers interact through chatbot interfaces, these discrepancies limit evaluation validity. Our findings underscore an urgent need for model providers to enable faithful replication of consumer experiences and settings for rigorous audits.",
+    "citation": "@misc{pu2026challengesauditingvariabilityoutputs,\n    title={Challenges of Auditing: Variability in Outputs of Large Language Models for Health},\n    author={Yuan Pu and Yewon Chang and Furong Jia and Xunjian Yin and Jessica Ma and Ayman Ali and Monica Agrawal},\n    year={2026},\n    eprint={2609.16590},\n    archivePrefix={arXiv},\n    primaryClass={cs.CL},\n    url={https://arxiv.org/abs/2609.16590}\n}",
+    "figures": [],
+    "original_words": 0
+  },
+  "chatgpt-summarization-evaluation": {
+    "title": "Human-like Summarization Evaluation with ChatGPT",
+    "authors": "Mingqi Gao, Jie Ruan, Renliang Sun, Xunjian Yin, Shiping Yang, Xiaojun Wan",
+    "venue": "arXiv preprint 2023",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2304.02554"
+      }
+    ],
+    "abstract": "Evaluating text summarization is a challenging problem, and existing evaluation metrics are far from satisfactory. In this study, we explored ChatGPT's ability to perform human-like summarization evaluation using four human evaluation methods on five datasets. We found that ChatGPT was able to complete annotations relatively smoothly using Likert scale scoring, pairwise comparison, Pyramid, and binary factuality evaluation. Additionally, it outperformed commonly used automatic evaluation metrics on some datasets. Furthermore, we discussed the impact of different prompts, compared its performance with that of human evaluation, and analyzed the generated explanations and invalid responses.",
+    "citation": "@misc{gao2023humanlikesummarizationevaluationchatgpt,\n    title={Human-like Summarization Evaluation with ChatGPT},\n    author={Mingqi Gao and Jie Ruan and Renliang Sun and Xunjian Yin and Shiping Yang and Xiaojun Wan},\n    year={2023},\n    eprint={2304.02554},\n    archivePrefix={arXiv},\n    primaryClass={cs.CL},\n    url={https://arxiv.org/abs/2304.02554}\n}",
+    "figures": [],
+    "original_words": 0
+  },
   "chemagent": {
     "title": "ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning",
     "authors": "Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao, Xunjian Yin , Siru Ouyang, Wangchunshu Zhou, Pan Lu, Zhuosheng Zhang, Yilun Zhao, Arman Cohan, Mark Gerstein",
@@ -111,6 +160,25 @@
       }
     ],
     "original_words": 951
+  },
+  "coding-agents-long-context": {
+    "title": "Coding Agents are Effective Long-Context Processors",
+    "authors": "Weili Cao, Xunjian Yin, Bhuwan Dhingra, Shuyan Zhou",
+    "venue": "arXiv preprint 2026",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2603.20432"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/weilicao/Coding_Agents_are_Effective_Long_Context_Processors"
+      }
+    ],
+    "abstract": "Large Language Models (LLMs) have demonstrated remarkable progress in scaling to access massive contexts. However, the access is via the latent and uninterpretable attention mechanisms, and LLMs fail to effective process long context, exhibiting significant performance degradation as context length increases. In this work, we study whether long-context processing can be externalized from latent attention into explicit, executable interactions, by allowing coding agents to organize text in file systems and manipulate it using its native tools. We evaluate off-the-shelf frontier coding agents as the general interface for tasks that require processing long contexts, including long-context reasoning, retrieval-augmented generation, and open-domain question answering with large-scale corpus contains up to three trillion tokens. Across multiple benchmarks, these agents outperform published state-of-the-art by 17.3% on average. We attribute this efficacy to two key factors: native tool proficiency, which enables agents to leverage executable code and terminal commands rather than passive semantic queries, and file system familiarity, which allows them to navigate massive text corpora as directory structures. These findings suggest that delegating long-context processing to coding agents offers an effective alternative to semantic search or context window scaling, opening new directions for long-context processing in LLMs.",
+    "citation": "@misc{cao2026codingagentseffectivelongcontext,\n    title={Coding Agents are Effective Long-Context Processors},\n    author={Weili Cao and Xunjian Yin and Bhuwan Dhingra and Shuyan Zhou},\n    year={2026},\n    eprint={2603.20432},\n    archivePrefix={arXiv},\n    primaryClass={cs.CL},\n    url={https://arxiv.org/abs/2603.20432}\n}",
+    "figures": [],
+    "original_words": 0
   },
   "context-aware-evaluation": {
     "title": "Exploring Context-Aware Evaluation Metrics for Machine Translation",
@@ -360,6 +428,25 @@
     ],
     "original_words": 870
   },
+  "epistemic-context-learning": {
+    "title": "Epistemic Context Learning: Building Trust the Right Way in LLM-Based Multi-Agent Systems",
+    "authors": "Ruiwen Zhou, Maojia Song, Xiaobao Wu, Sitao Cheng, Xunjian Yin, Yuxi Xie, Zhuoqun Hao, Wenyue Hua, Liangming Pan, Soujanya Poria, Min-Yen Kan",
+    "venue": "Agentic AI in the Wild Workshop, ICLR 2026",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2601.21742"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/skyriver-2000/epistemic-context-learning"
+      }
+    ],
+    "abstract": "Individual agents in multi-agent (MA) systems often lack robustness, tending to blindly conform to misleading peers. We show this weakness stems from both sycophancy and inadequate ability to evaluate peer reliability. To address this, we first formalize the learning problem of history-aware reference, introducing the historical interactions of peers as additional input, so that agents can estimate peer reliability and learn from trustworthy peers when uncertain. This shifts the task from evaluating peer reasoning quality to estimating peer reliability based on interaction history. We then develop Epistemic Context Learning (ECL): a reasoning framework that conditions predictions on explicitly-built peer profiles from history. We further optimize ECL by reinforcement learning using auxiliary rewards. Our experiments reveal that our ECL enables small models like Qwen 3-4B to outperform a history-agnostic baseline 8x its size (Qwen 3-30B) by accurately identifying reliable peers. ECL also boosts frontier models to near-perfect (100%) performance. We show that ECL generalizes well to various MA configurations and we find that trust is modeled well by LLMs, revealing a strong correlation in trust modeling accuracy and final answer quality.",
+    "citation": "@misc{zhou2026epistemiccontextlearningbuilding,\n    title={Epistemic Context Learning: Building Trust the Right Way in LLM-Based Multi-Agent Systems},\n    author={Ruiwen Zhou and Maojia Song and Xiaobao Wu and Sitao Cheng and Xunjian Yin and Yuxi Xie and Zhuoqun Hao and Wenyue Hua and Liangming Pan and Soujanya Poria and Min-Yen Kan},\n    year={2026},\n    eprint={2601.21742},\n    archivePrefix={arXiv},\n    primaryClass={cs.AI},\n    url={https://arxiv.org/abs/2601.21742}\n}",
+    "figures": [],
+    "original_words": 0
+  },
   "error-robust-retrieval": {
     "title": "Error-Robust Retrieval for Chinese Spelling Check",
     "authors": "Xunjian Yin , Xinyu Hu, Xiaojun Wan",
@@ -585,6 +672,25 @@
       }
     ],
     "original_words": 922
+  },
+  "lazy-grounding": {
+    "title": "Lazy Grounding: Attacking Search Agents with Factual Evidence",
+    "authors": "Yulin Zhang, Yukun Huang, Sanxing Chen, Tianyi Lin, Ziang Yang, Xunjian Yin, Bhuwan Dhingra",
+    "venue": "EMNLP 2026",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2608.30303"
+      },
+      {
+        "label": "Code",
+        "url": "https://github.com/frankyzha/lazy-grounding"
+      }
+    ],
+    "abstract": "Search agents mitigate hallucination by grounding their answers in retrieved web results. However, retrieval-based approaches also introduce an attack surface: agents may cite misinformation from poisoned search corpora containing false or malicious documents. We demonstrate that, in some cases, search agents' reasoning and responses may be steered by completely factual but distracting information. We refer to this failure as lazy grounding. We expose lazy grounding by injecting nearby evidence from answer-changing rewrites of benchmark questions into the search corpora. Each document contains factual evidence that supports a neighboring rewritten question but is retrieved for the original question. Across 12 model-benchmark pairs, the attack causes the accuracy of search agents' responses to drop by 5.9 points on average and by up to 17.3 points, while inducing nearby-answer adoption in every setting. The effect is even stronger when nearby evidence appears later or is more answer-shaped. Our results show that robust search agents must defend against not only misinformation but also the misapplication of factual evidence. The code is publicly available at https://github.com/frankyzha/lazy-grounding.",
+    "citation": "@misc{zhang2026lazygroundingattackingsearch,\n    title={Lazy Grounding: Attacking Search Agents with Factual Evidence},\n    author={Yulin Zhang and Yukun Huang and Sanxing Chen and Tianyi Lin and Ziang Yang and Xunjian Yin and Bhuwan Dhingra},\n    year={2026},\n    eprint={2608.30303},\n    archivePrefix={arXiv},\n    primaryClass={cs.CL},\n    url={https://arxiv.org/abs/2608.30303}\n}",
+    "figures": [],
+    "original_words": 0
   },
   "mc-mke": {
     "title": "MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",

@@ -1,0 +1,113 @@
+/* Epistemic Context Learning evidence explorer: flat, square, 1px rules, no shadows.
+ * There is no motion at all: every control change redraws the view at once, so the
+ * reduced-motion path is identical. */
+.trust-demo {
+  --tr-ink: var(--ink, #202a26);
+  --tr-muted: var(--muted, #626b66);
+  --tr-line: var(--line, #dce2dc);
+  --tr-accent: var(--accent, #2b6151);
+  --tr-wash: var(--wash, #f0f4ee);
+  --tr-warm: #8a4b1f;
+  --tr-warm-wash: #f6ece1;
+  --tr-rule: #b8c5bc;
+  border: 1px solid var(--tr-line);
+  background: #fff;
+  padding: 28px;
+  margin: 28px 0;
+  color: var(--tr-ink);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.trust-demo *, .trust-demo *::before, .trust-demo *::after { border-radius: 0; box-shadow: none; animation: none; transition: none; }
+.trust-demo [hidden] { display: none !important; }
+.trust-demo .tr-heading { margin-bottom: 20px; }
+.trust-demo .tr-kicker { color: var(--tr-accent); font-size: 10px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 7px; }
+.trust-demo h3 { font: 400 25px/1.3 Georgia, "Times New Roman", serif; letter-spacing: -.02em; margin: 0 0 10px; }
+.trust-demo .tr-heading > p:last-child { margin: 0; color: var(--tr-muted); max-width: 76ch; }
+.trust-demo h4 { font: 400 15px/1.4 Georgia, "Times New Roman", serif; margin: 0 0 10px; }
+
+/* Controls */
+.trust-demo .tr-controls { border-top: 1px solid var(--tr-line); padding-top: 18px; margin-bottom: 6px; }
+.trust-demo .tr-button-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.trust-demo .tr-group-label { flex: 0 0 auto; min-width: 104px; font-size: 11px; color: var(--tr-muted); }
+.trust-demo button { font: inherit; font-size: 12px; line-height: 1.35; border: 1px solid var(--tr-rule); background: #fff; color: var(--tr-ink); min-height: 40px; padding: 6px 12px; cursor: pointer; text-align: left; }
+.trust-demo button small { display: block; font-size: 10px; color: var(--tr-muted); }
+.trust-demo button[aria-pressed="true"] { background: var(--tr-accent); border-color: var(--tr-accent); color: #fff; }
+.trust-demo button[aria-pressed="true"] small { color: #dfe9e4; }
+.trust-demo button:hover:not(:disabled) { border-color: var(--tr-accent); }
+.trust-demo button:disabled { color: #9aa29c; background: #f6f7f5; border-color: var(--tr-line); cursor: default; }
+.trust-demo :is(button, [tabindex]):focus-visible { outline: 2px solid var(--tr-accent); outline-offset: 3px; }
+.trust-demo .tr-help { font-size: 11px; color: var(--tr-muted); margin: 0; max-width: 76ch; }
+
+/* Shared result elements */
+.trust-demo .tr-state + .tr-state { margin-top: 30px; }
+.trust-demo .tr-block { margin-top: 22px; min-width: 0; }
+.trust-demo .tr-caption { font-size: 11px; line-height: 1.6; color: var(--tr-muted); margin: 8px 0 0; max-width: 82ch; }
+.trust-demo .tr-tag { font-size: 9.5px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; margin-right: 3px; white-space: nowrap; }
+.trust-demo .tr-tag.is-measured { color: var(--tr-accent); }
+.trust-demo .tr-tag.is-computed { color: var(--tr-muted); }
+.trust-demo .tr-verdict { margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--tr-line); font-size: 13px; }
+.trust-demo .tr-disclosure { margin: 24px 0 0; padding-top: 15px; border-top: 1px solid var(--tr-line); font-size: 11px; line-height: 1.6; color: var(--tr-muted); }
+.trust-demo .tr-source-links { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.trust-demo .tr-source-links a { color: var(--tr-accent); }
+
+/* Part A: accuracy table */
+.trust-demo .tr-table-scroll { overflow-x: auto; max-width: 100%; }
+.trust-demo .tr-table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.trust-demo .tr-table th, .trust-demo .tr-table td { border-bottom: 1px solid var(--tr-line); padding: 7px 10px; vertical-align: top; text-align: left; }
+.trust-demo .tr-table thead th { font-size: 10px; color: var(--tr-muted); font-weight: 550; vertical-align: bottom; border-bottom-color: var(--tr-rule); }
+.trust-demo .tr-table .num { text-align: right; }
+.trust-demo .tr-table tbody th { font-weight: 400; white-space: nowrap; }
+.trust-demo .tr-table small { display: block; font-size: 10px; line-height: 1.35; color: var(--tr-muted); white-space: nowrap; }
+.trust-demo .tr-table td.is-ecl { color: var(--tr-accent); font-weight: 650; }
+.trust-demo .tr-table td.is-ecl small { font-weight: 400; }
+.trust-demo .tr-table td.is-below-sa { color: var(--tr-warm); }
+.trust-demo .tr-table td.is-below-sa small { color: var(--tr-warm); }
+.trust-demo .tr-diff { width: 34%; min-width: 150px; }
+.trust-demo .tr-diff-text { font-weight: 650; }
+.trust-demo tr.is-gain .tr-diff-text { color: var(--tr-accent); }
+.trust-demo tr.is-loss .tr-diff-text { color: var(--tr-warm); }
+.trust-demo tr.is-level .tr-diff-text { color: var(--tr-muted); }
+.trust-demo .tr-diff small { display: inline; margin-left: 6px; }
+.trust-demo .tr-bar { position: relative; display: block; height: 10px; margin: 3px 0 4px; background: #f4f6f3; }
+.trust-demo .tr-bar-zero { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--tr-rule); }
+.trust-demo .tr-bar-fill { position: absolute; top: 1px; bottom: 1px; background: #9aa89f; }
+.trust-demo tr.is-gain .tr-bar-fill { background: var(--tr-accent); }
+.trust-demo tr.is-loss .tr-bar-fill { background: var(--tr-warm); }
+
+/* Part B: one square per GPQA test question */
+.trust-demo .tr-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 10px; font-size: 11px; color: var(--tr-muted); }
+.trust-demo .tr-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.trust-demo .tr-legend i, .trust-demo .tr-strip i { display: inline-block; box-sizing: border-box; border: 1px solid var(--tr-accent); background: #fff; }
+.trust-demo .tr-legend i { width: 10px; height: 10px; }
+.trust-demo :is(.tr-legend, .tr-strip) i.is-named.is-right { background: var(--tr-accent); }
+.trust-demo :is(.tr-legend, .tr-strip) i.is-other { border-color: var(--tr-warm); }
+.trust-demo :is(.tr-legend, .tr-strip) i.is-other.is-right { background: var(--tr-warm); }
+.trust-demo .tr-strips { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--tr-line); }
+.trust-demo .tr-strips li { padding: 9px 0; border-bottom: 1px solid var(--tr-line); }
+.trust-demo .tr-strip-name { margin: 0 0 5px; font-size: 12.5px; }
+.trust-demo .tr-strip-name small { font-size: 10px; color: var(--tr-muted); margin-left: 4px; }
+.trust-demo .tr-strip { display: flex; align-items: flex-start; gap: 1px; max-width: 560px; }
+.trust-demo .tr-strip i { flex: 1 1 0; min-width: 0; max-width: 13px; aspect-ratio: 1; }
+.trust-demo .tr-strip i.tr-gap { flex: 0 0 8px; max-width: 8px; height: 1px; aspect-ratio: auto; border: 0; background: transparent; }
+.trust-demo .tr-strip-text { margin: 6px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--tr-muted); }
+.trust-demo .tr-strip-text strong { color: var(--tr-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 700px) {
+  .trust-demo { padding: 20px 16px; }
+  .trust-demo h3 { font-size: 21px; }
+  .trust-demo .tr-group-label { min-width: 100%; }
+  /* Phones: each model becomes a block with four labelled values and the difference bar below,
+   * so ECL (E) and its difference stay on screen without sideways scrolling. */
+  .trust-demo .tr-table { min-width: 0; }
+  .trust-demo .tr-table, .trust-demo .tr-table tbody { display: block; }
+  .trust-demo .tr-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .trust-demo .tr-table tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px 8px; padding: 9px 0; border-bottom: 1px solid var(--tr-line); }
+  .trust-demo .tr-table tbody th, .trust-demo .tr-table td { border: 0; padding: 0; min-width: 0; }
+  .trust-demo .tr-table tbody th { grid-column: 1 / -1; margin-bottom: 4px; white-space: normal; }
+  .trust-demo .tr-table tbody th small { display: inline; margin-left: 6px; }
+  .trust-demo .tr-table td.num { text-align: left; }
+  .trust-demo .tr-table td::before { content: attr(data-label); display: block; font-size: 9.5px; font-weight: 400; color: var(--tr-muted); }
+  .trust-demo .tr-table td small { white-space: normal; }
+  .trust-demo .tr-diff { grid-column: 1 / -1; width: auto; min-width: 0; margin-top: 4px; }
+}

@@ -29,12 +29,14 @@ AUTHOR_FIELDS = {"name", "affiliations", "equal"}
 # neighbours in a thread are the most closely related papers.
 RESEARCH_THREADS: dict[str, list[str]] = {
     "Agents, self-improvement, and reasoning": [
-        "godel-agent", "derl", "chemagent", "contrasolver", "atomic-to-composite", "geometry-of-reasoning"],
+        "godel-agent", "derl", "chemagent", "coding-agents-long-context", "epistemic-context-learning",
+        "contrasolver", "atomic-to-composite", "geometry-of-reasoning"],
     "Language modeling and decoding": ["reverse-lm", "coral"],
     "Knowledge in language models": [
         "knowledge-boundary", "alcuna", "knowledge-interplay", "history-matters", "mc-mke", "self-generated-documents"],
     "Evaluation and red-teaming": [
-        "themis", "nlg-evaluation-survey", "dsgram", "context-aware-evaluation", "seq2seq-data2text", "damon"],
+        "themis", "nlg-evaluation-survey", "chatgpt-summarization-evaluation", "dsgram", "context-aware-evaluation",
+        "seq2seq-data2text", "agent-x", "auditing-health-llms", "lazy-grounding", "damon"],
     "Retrieval and multimodal generation": ["error-robust-retrieval", "contextual-asr", "eama"],
 }
 # Figures wider than this aspect ratio keep a legible minimum width on phones.

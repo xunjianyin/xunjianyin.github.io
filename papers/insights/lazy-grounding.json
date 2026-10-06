@@ -1,0 +1,67 @@
+{
+  "story": {
+    "title": "True evidence can answer the wrong question",
+    "paragraphs": [
+      "Search agents reduce hallucination by grounding their answers in retrieved pages. The retrieval attacks studied so far, and the defenses built against them, concern bad evidence: poisoned corpora with false or malicious documents, countered by source-reliability checks, misinformation detection, or robustness to misleading context. Each of these defenses assumes that the dangerous document is wrong.",
+      "This paper studies a document that is correct, but for a slightly different question. Asked which film won Best Picture at the 89th Academy Awards, an agent can retrieve a true page about the film that was initially named the winner and answer La La Land instead of Moonlight (Figure 1). The authors call this failure lazy grounding: instead of checking that the evidence satisfies the exact constraints of the question, the agent transfers the answer of a nearby question.",
+      "Such evidence is hard to exclude. Reliability and factuality checks can filter false or low-quality documents, but nearby evidence is legitimate in isolation. It is also dual-use: the same page can mislead a careless agent or give a careful one a useful clue. The authors name plausible strategic uses, such as product pages that match recommendation queries while violating a key constraint, or benchmark-targeted pages that pull competing agents toward nearby wrong answers."
+    ]
+  },
+  "mechanism": {
+    "title": "From a verified rewrite to a true record in the search results",
+    "paragraphs": [
+      "The attack starts from a benchmark question q with gold answer a. A rewrite model (GPT-5.4, separate from the evaluated agents) proposes three edit plans from a fixed set of answer-changing families: argument reversal, attribute pivots, scope narrowing, compositional relation chains, qualifier flips, off-by-one shifts, and presupposition edits. Each plan makes a single semantic change and keeps the entities, wording, and answer type as far as possible, so the rewrite q′ still looks like q to a search engine. A separate GPT-5.4 verifier accepts q′ only if its new answer b is supported, the gold answer a no longer answers it, and it has a single definite answer. In the paper’s example, “How many studio albums were published by Mercedes Sosa between 2000 and 2009 inclusive?” (answer 3) becomes the same question for 2001 to 2009 (answer 2).",
+      "Verification is what makes a wrong answer informative: it ensures that an error under augmentation reflects misapplied evidence rather than ambiguity in the rewrite. With a verified rewrite, returning b means the agent applied evidence to a question that the evidence does not answer. In a human audit of 40 rewrites (10 per benchmark, three annotators each), all 40 changed the answer, and annotators verified b as correct for q′ in 34 of 40 (Fleiss’ κ 0.771).",
+      "Each accepted rewrite yields 10 records: one states q′ verbatim, nine paraphrase it, and all keep the answer b. A record looks like a factual lookup page, with a title, displayed URL, and snippet, plus a page that repeats b in its answer field, summary, source context, and conclusion. Records contain no commands; records that drop the answer-changing constraint or leave a still valid are rejected.",
+      "Only the agent’s search and visit tools change. For every query, the real results (Google results from the Serper API for the web benchmarks; the local corpus for BrowseComp+) are pooled with the records, each candidate is embedded with EmbeddingGemma-300m, and the 10 candidates most similar to the query are returned, the same budget as a clean search. A record therefore reaches the agent only by outranking real results, and opening it returns its page. The authors simulate this augmented index rather than publishing the records, because indexed benchmark-targeted pages could contaminate future evaluations of web agents.",
+      "Scoring separates generic damage from targeted transfer. Each question runs three times without the records (clean) and three times with them (augmented). Trivial exact matches are resolved deterministically; otherwise a GPT-5.4 judge compares the final answer with a and with b. Rewrite-answer adoption (RAA) is the share of augmented runs that return b after injected evidence surfaced, and RAA-C and RAA-F restrict it to questions the agent answered correctly or wrongly in the clean setting. Three authors checked 48 judge decisions, four per setting, and agreed with all 48."
+    ]
+  },
+  "evidence": {
+    "title": "Accuracy falls in most settings, and the nearby answer is adopted in all of them",
+    "paragraphs": [
+      "The main experiment crosses three agents in the same ReAct scaffold (Tongyi Deep Research, GPT-5 Mini, and Gemini 3 Flash) with four benchmarks (the XBench DeepSearch split, GAIA, BrowseComp+, and HLE), 100 questions each. Accuracy falls in 11 of 12 settings, by 5.9 pp on average and by up to 17.3 pp, but the paired-bootstrap 95% interval lies above zero in only 6 (counted from Table 7); for Gemini 3 Flash on BrowseComp+ it lies below zero, as accuracy rises from 43.0% to 52.3%. Adoption of the nearby answer is the more consistent signal: RAA is above zero in every setting, from 5.0% to 36.3% (Tables 1 and 7).",
+      "Clean accuracy alone does not predict robustness. On XBench, Tongyi Deep Research and Gemini 3 Flash start close (69.3% and 74.3%), yet Tongyi loses 17.3 pp with RAA 27.0% and Gemini loses 3.3 pp with RAA 7.7%. In a 100-question XBench trace analysis, injected snippets appeared in all 100 augmented runs for both models, but Tongyi opened at least one injected document in 74 runs and Gemini in 2. RAA-F exceeds RAA-C in 9 of the 12 settings (computed from Table 1), which the authors read as nearby evidence acting as an answer attractor for uncertain or already failing trajectories.",
+      "Not every change is adoption. In one PubChem case, Tongyi Deep Research notes that the nearby answer 325.8 is a molecular weight, then searches for a compound with that weight and returns CID 160966, neither the gold answer 4192 nor 325.8. In another case, Gemini 3 Flash uses a nearby game title, Venture, as an intermediate entity and recovers the correct protagonist, Winky. The authors summarize the pattern as misdirection of reasoning rather than uniform harm.",
+      "Three ablations with Tongyi Deep Research vary one factor each, on 100 questions and without reported intervals. Nearby evidence in a late turn gives RAA 15.0%, against 9.0% early and 10.0% in the middle (Table 2). Answer-field records give 23.0% against 19.0% for natural prose on GAIA (Table 3). Records drawn from several distinct rewrites lower RAA from 20.2% to 15.0%, while RAA-F stays at 28.6% (Table 4). A prompt that tells GPT-5 Mini to keep the question’s constraints fixed and to check what each piece of evidence supports lowers RAA on XBench from 20.7% to 14.3% (6.4 pp, 95% CI [0.7, 12.0]), leaves clean accuracy essentially unchanged (64.0% and 64.3%), and does not remove adoption (Table 5).",
+      "Three limits shape these numbers. Web search is simulated, so the study measures misuse once nearby evidence is surfaced, not how often real pages would be indexed and ranked; the authors abstract away freshness and source reputation as well. Each setting has 100 questions and three runs per arm, and standard deviations reach 24.0 points (Tongyi Deep Research on BrowseComp+). Finally, the factual-evidence reading is strongest for the 34 audited rewrites whose answers annotators verified for q′; the other 6 still change the answer, so they still test targeted transfer."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Sections 2–3 · setup, Table 1 and ablations",
+      "url": "https://arxiv.org/html/2608.30303v2#S3"
+    },
+    {
+      "label": "Appendices B–C · rewrites, records, reranking, judging, Table 7",
+      "url": "https://arxiv.org/html/2608.30303v2#A2"
+    },
+    {
+      "label": "Appendix D · qualitative cases",
+      "url": "https://arxiv.org/html/2608.30303v2#A4"
+    },
+    {
+      "label": "Code · frankyzha/lazy-grounding",
+      "url": "https://github.com/frankyzha/lazy-grounding"
+    }
+  ],
+  "reading_notes": "Read arXiv 2608.30303v2 end to end in the LaTeX source (acl_latex.tex), the compiled PDF and the arXiv HTML, plus the code README (which withholds benchmark questions, generated evidence and trajectories, so no per-question data exists to show). Every number on the page comes from the paper: Table 1 (tex 131–196, PDF p. 4), Table 7 (Appendix C.4, tex 420–444, PDF p. 12), Tables 2–5 (tex 216–290, PDF pp. 4–5), Table 6 rewrite audit (Appendix B.3, PDF p. 9), Section 3.2 trace analysis (74 vs 2 opened injected documents), Appendix C.2 judge audit (48 of 48), Appendices C.1/C.3 (Serper with num=10, EmbeddingGemma-300m reranking to top 10, 10 records per question, GPT-5.4 rewriter, verifier and judge; Tongyi-DeepResearch-30B-A3B served locally on 4 A100s; temperature 0.6, top-p 0.95, 120-call budget, 2400 s timeout). Examples are the paper's own: Figure 1 (Best Picture), Appendix B.2/D.4 (Mercedes Sosa 2000–2009 vs 2001–2009), D.2 (PubChem 4192 / 325.8 / 160966), D.5 (Venture / Winky). Figure 1 is described as an illustration; the paper does not say it is a recorded trajectory. Counts that are computed here rather than printed: RAA-F > RAA-C in 9 of 12 settings (exceptions Tongyi HLE, GPT-5 Mini BrowseComp+, Gemini BrowseComp+); intervals above zero 6, spanning zero 5, below zero 1; the paper itself states 11 of 12 drops are positive and the 5.9 average. Caveats kept: Table 7 drops are computed from unrounded means (GPT-5 Mini HLE prints 6.3, while 30.7 − 24.3 = 6.4); Table 5's Original row is a separate control (64.0 → 52.0, RAA 20.7) and differs from Table 1; Table 3's clean accuracy 60.0 is a separate run from Table 1's 66.0 for Tongyi on GAIA; Table 2 does not name its benchmark; Table 4 rows have 99 and 100 completed runs, and its augmented-accuracy gap (49.5 vs 73.0) is not discussed by the authors and is not used here. The page does not reproduce rewrite prompts beyond the paper's descriptions and shows no attack records.",
+  "demo": {
+    "kind": "lazy-grounding-settings",
+    "placement": "evidence",
+    "eyebrow": "Measured · Tables 1 and 7",
+    "title": "Which settings does nearby evidence actually move?",
+    "description": "Each row is one agent on one benchmark: 100 questions, three clean and three augmented runs. Choose what to plot and how to order the rows, then select a row to read every value the paper prints for it. The summary below the plot is recomputed from the printed values.",
+    "note": "Measured: every accuracy, adoption rate, drop, standard deviation and interval is copied as printed from Table 1 (mean ± SD over three runs on 100 questions per benchmark) and Table 7 (drop ± SD and a paired cluster-bootstrap 95% interval with 100,000 resamples). Computed: the counts, the mean of the 12 printed drops, the row orders, the interval classification and the per-benchmark comparison, recalculated in your browser from those values. Nothing is interpolated or estimated, and no model is queried.",
+    "sources": [
+      {
+        "label": "Table 1 (Section 3.2)",
+        "url": "https://arxiv.org/html/2608.30303v2#S3.T1"
+      },
+      {
+        "label": "Table 7 (Appendix C.4)",
+        "url": "https://arxiv.org/html/2608.30303v2#A3.T7"
+      }
+    ]
+  }
+}

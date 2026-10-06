@@ -1,0 +1,88 @@
+{
+  "lazy-grounding": {
+    "short_name": "Lazy Grounding",
+    "topic": "Search agents · Red-teaming",
+    "takeaway": "A search agent can be misled by evidence that is entirely true. Records that correctly answer a nearby variant of the question pull agents toward the variant’s answer: across 12 agent–benchmark settings, accuracy falls by 5.9 pp on average.",
+    "question": "If every document a search agent retrieves is true, can the agent still be steered to a wrong answer? The paper tests whether agents check that a piece of evidence answers the exact question they were asked, rather than a closely related one.",
+    "glance": {
+      "result": "Across 12 agent–benchmark settings, nearby evidence lowers accuracy by 5.9 pp on average (up to 17.3 pp), and agents return the nearby answer in 5.0–36.3% of augmented runs.",
+      "prior": "Corpus-poisoning attacks such as PoisonedRAG plant false or malicious text; here every planted record is true, but for a nearby question with a different answer.",
+      "limitation": "Web search is simulated by reranking the records into real Google results, so the study measures misuse once evidence surfaces, not real-world indexing or ranking."
+    },
+    "method": [
+      {
+        "title": "Rewrite the question",
+        "text": "Turn a benchmark question q with answer a into a nearby question q′ with a different answer b, keeping q’s entities, topic, and answer type. A separate verifier keeps only unambiguous rewrites for which b answers q′ and the gold answer a does not."
+      },
+      {
+        "title": "Write true records for the rewrite",
+        "text": "Build 10 lookup-style records per question that state q′, or a paraphrase of it, with the answer b. Each record is factual for q′ and contains no instructions, but it does not answer q."
+      },
+      {
+        "title": "Surface them and score the answer",
+        "text": "Pool the records with the real search results for every query, rerank by embedding similarity, return the top 10, and measure accuracy on q and how often the agent returns b."
+      }
+    ],
+    "findings": [
+      {
+        "value": "69.3% → 52.0%",
+        "label": "XBench accuracy, Tongyi Deep Research: clean → with nearby evidence",
+        "detail": "The largest of the 12 drops, 17.3 pp (paired-bootstrap 95% CI [10.7, 24.0]). Gemini 3 Flash starts at a similar 74.3% and drops 3.3 pp (Tables 1 and 7)."
+      },
+      {
+        "value": "5.0–36.3%",
+        "label": "Nearby-answer adoption (RAA) across all 12 settings",
+        "detail": "Share of augmented runs whose final answer is the nearby answer b. Lowest for Gemini 3 Flash on BrowseComp+, where accuracy instead rises 9.3 pp; highest for Tongyi Deep Research on BrowseComp+, with an SD of 24.0 over three runs (Table 1)."
+      }
+    ],
+    "scope": "Web-search results are simulated by reranking the injected records into real Google results, so the study measures whether agents misapply nearby evidence once it is surfaced, not how often such pages would be indexed and retrieved on the open web. Each setting uses 100 questions with three runs per arm; 6 of 40 audited rewrites were not verified as correct for the nearby question, and the constraint-checking prompt is the only defense tested.",
+    "diagram": {
+      "title": "True evidence for a nearby question",
+      "steps": [
+        {
+          "label": "Nearby question",
+          "text": "Rewrite q into q′, whose verified answer b differs from a."
+        },
+        {
+          "label": "Factual evidence",
+          "text": "Add true records for (q′, b) to the agent’s search results."
+        },
+        {
+          "label": "Lazy grounding",
+          "text": "The agent, still asked q, returns b instead of a."
+        }
+      ],
+      "caption": "The planted evidence is true for q′; the error is applying it to q."
+    },
+    "source_url": "https://arxiv.org/html/2608.30303v2",
+    "source_note": "Read arXiv 2608.30303v2 in full in three renderings: the LaTeX source (e-print tarball, acl_latex.tex, 779 lines), the compiled PDF (15 pages), and the arXiv HTML. The abstract equals the arXiv API summary character for character. Venue from the arXiv comment ('Accepted to EMNLP 2026 (Main Conference)'); authors and the equal-contribution mark from the LaTeX author block (lines 38–48, footnote line 55), all at Duke University. Figure 1: figure/lazy_grounding_example.pdf (tex line 77; PDF p. 1), rendered with pdftoppm -r 200. Main results: Table 1 (tex lines 131–196; PDF p. 4) and accuracy-drop intervals Table 7 (Appendix C.4, tex lines 420–444; PDF p. 12); ablations Tables 2–5 (tex lines 216–290; PDF pp. 4–5); rewrite audit Table 6 (Appendix B.3; PDF p. 9); judge audit Appendix C.2; implementation Appendix C.1 and C.3; qualitative cases Appendix D. All 12 rows of Tables 1 and 7 were compared programmatically between the HTML tables and the PDF text layer and matched. Results table: Table 5 (constraint-checking prompt ablation; tex lines 276–290; PDF p. 5; HTML table S3.T5), copied cell by cell and re-verified against the LaTeX source, the PDF text layer, and the HTML table.",
+    "affiliations": [
+      "Duke University"
+    ],
+    "authors_detail": [
+      {"name": "Yulin Zhang", "affiliations": [1], "equal": true},
+      {"name": "Yukun Huang", "affiliations": [1], "equal": true},
+      {"name": "Sanxing Chen", "affiliations": [1], "equal": false},
+      {"name": "Tianyi Lin", "affiliations": [1], "equal": false},
+      {"name": "Ziang Yang", "affiliations": [1], "equal": false},
+      {"name": "Xunjian Yin", "affiliations": [1], "equal": false},
+      {"name": "Bhuwan Dhingra", "affiliations": [1], "equal": false}
+    ],
+    "prior_work": "Corpus-poisoning attacks such as PoisonedRAG (Zou et al., 2025) and blocker documents (Shafran et al., 2025) plant false or malicious passages to force attacker-chosen answers or suppress responses, so defenses check source reliability, detect misinformation, or make models robust to misleading context. Distractor studies, including query-agnostic triggers (Rajeev et al., 2025), OverThink (Kumar et al., 2025), and TruthTrap (Shafiei et al., 2026), add irrelevant or factual auxiliary text, and prompt-injection attacks on web agents such as WASP and EIA hide instructions in page content. The paper’s nearby evidence differs from all of these: it is factual, carries no instructions, and closely matches the agent’s search intent, so it is retrieved for the question and can act either as a trap or as a legitimate clue.",
+    "abstract_label": "Read the abstract",
+    "results_table": {
+      "caption": "Table 5. Constraint-checking prompt ablation: GPT-5 Mini on the same 100 XBench questions, three runs per condition; accuracy and nearby-answer adoption (RAA) in %, Drop = Clean − Aug. in pp; lower Drop and RAA mean less lazy grounding. RAA-C/F is adoption among clean-correct / clean-wrong runs. The Original row is a separate contemporaneous control, so it differs from Table 1 (65.0 → 52.7, RAA 23.0). The 6.4 pp RAA reduction has a paired-bootstrap 95% CI of [0.7, 12.0] (Section 3.3).",
+      "headings": ["Prompt", "Clean", "Aug.", "Drop", "RAA", "RAA-C/F"],
+      "rows": [
+        ["Original", "64.0", "52.0", "12.0", "20.7", "19.3/23.1"],
+        ["Constraint checking", "64.3", "53.7", "10.7", "14.3", "11.4/19.6"]
+      ],
+      "highlight": [],
+      "source_url": "https://arxiv.org/pdf/2608.30303v2"
+    },
+    "figure_local": "assets/lazy-grounding-overview.png",
+    "figure_url": "https://arxiv.org/e-print/2608.30303v2 (file figure/lazy_grounding_example.pdf; Figure 1 on page 1 of https://arxiv.org/pdf/2608.30303v2; rendered with pdftoppm -png -r 200)",
+    "figure_caption": "The paper’s example of lazy grounding. Asked which film won Best Picture at the 89th Academy Awards, the agent searches for the mix-up, retrieves a true question–answer pair about the film initially named Best Picture, and answers La La Land; the gold answer is Moonlight. Original Figure 1 from the paper.",
+    "primary_figure": true
+  }
+}

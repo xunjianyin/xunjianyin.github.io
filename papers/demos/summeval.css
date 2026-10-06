@@ -1,0 +1,112 @@
+/* ChatGPT versus automatic metrics (arXiv 2304.02554): flat, square, 1px rules, no shadows.
+ * Nothing moves: every state change is an immediate redraw, so reduced motion needs no override. */
+.summeval-demo {
+  --se-ink: var(--ink, #202a26);
+  --se-muted: var(--muted, #626b66);
+  --se-line: var(--line, #dce2dc);
+  --se-accent: var(--accent, #2b6151);
+  --se-wash: var(--wash, #f0f4ee);
+  --se-warm: #8a4b1f;
+  --se-warm-wash: #f6ece1;
+  --se-rule: #b8c5bc;
+  border: 1px solid var(--se-line);
+  background: #fff;
+  padding: 28px;
+  margin: 28px 0;
+  color: var(--se-ink);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.summeval-demo *, .summeval-demo *::before, .summeval-demo *::after { border-radius: 0; box-shadow: none; animation: none; transition: none; }
+.summeval-demo [hidden] { display: none !important; }
+.summeval-demo .se-heading { margin-bottom: 20px; }
+.summeval-demo .se-kicker { color: var(--se-accent); font-size: 10px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 7px; }
+.summeval-demo h3 { font: 400 25px/1.3 Georgia, "Times New Roman", serif; letter-spacing: -.02em; margin: 0 0 10px; }
+.summeval-demo .se-heading > p:last-child { margin: 0; color: var(--se-muted); max-width: 76ch; }
+.summeval-demo h4 { font: 400 15px/1.4 Georgia, "Times New Roman", serif; margin: 0 0 10px; }
+
+/* Controls */
+.summeval-demo .se-controls { border-top: 1px solid var(--se-line); padding-top: 18px; margin-bottom: 22px; }
+.summeval-demo .se-button-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.summeval-demo .se-group-label { flex: 0 0 auto; min-width: 128px; font-size: 11px; color: var(--se-muted); }
+.summeval-demo button { font: inherit; font-size: 12px; line-height: 1.45; border: 1px solid var(--se-rule); background: #fff; color: var(--se-ink); min-height: 40px; padding: 8px 12px; cursor: pointer; }
+.summeval-demo button[aria-pressed="true"] { background: var(--se-accent); border-color: var(--se-accent); color: #fff; }
+.summeval-demo button:hover:not(:disabled) { border-color: var(--se-accent); }
+.summeval-demo :is(button, [tabindex]):focus-visible { outline: 2px solid var(--se-accent); outline-offset: 3px; }
+.summeval-demo .se-help { font-size: 11px; color: var(--se-muted); margin: 4px 0 0; max-width: 76ch; }
+
+/* Shared result elements */
+.summeval-demo .se-results > :first-child { margin-top: 0; }
+.summeval-demo .se-block { margin-top: 26px; min-width: 0; }
+.summeval-demo .se-caption { font-size: 11px; line-height: 1.6; color: var(--se-muted); margin: 8px 0 0; max-width: 80ch; }
+.summeval-demo .se-caution { font-size: 11px; line-height: 1.6; color: var(--se-warm); margin: 8px 0 0; padding-left: 10px; border-left: 2px solid var(--se-warm); max-width: 80ch; }
+.summeval-demo .se-tag { font-size: 9.5px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; margin-right: 3px; white-space: nowrap; }
+.summeval-demo .se-tag-measured { color: var(--se-accent); }
+.summeval-demo .se-tag-computed, .summeval-demo .se-tag-derived { color: var(--se-muted); }
+.summeval-demo .se-verdict { margin: 22px 0 0; padding-top: 14px; border-top: 1px solid var(--se-line); font-size: 13px; }
+.summeval-demo .se-disclosure { margin: 20px 0 0; padding-top: 15px; border-top: 1px solid var(--se-line); font-size: 11px; line-height: 1.6; color: var(--se-muted); }
+.summeval-demo .se-source-links { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.summeval-demo .se-source-links a { color: var(--se-accent); }
+
+/* Margin grid: two 4 x 3 matrices (Likert datasets) and four accuracy cells */
+.summeval-demo .se-matrices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; }
+.summeval-demo .se-matrix-wrap { min-width: 0; }
+.summeval-demo .se-matrix { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+.summeval-demo .se-matrix caption { text-align: left; font-size: 12px; font-weight: 600; padding: 0 0 6px; }
+.summeval-demo .se-matrix :is(th, td) { border-bottom: 0; vertical-align: middle; }
+.summeval-demo .se-matrix thead :is(th, td) { background: none; font-size: 10px; font-weight: 550; color: var(--se-muted); text-align: left; padding: 0 0 4px 6px; }
+.summeval-demo .se-matrix thead td { width: 31%; padding-left: 0; }
+.summeval-demo .se-matrix tbody th { font-size: 11.5px; font-weight: 400; text-align: left; padding: 3px 8px 3px 0; overflow-wrap: anywhere; border-top: 1px solid var(--se-line); }
+.summeval-demo .se-matrix td { padding: 3px 0 3px 4px; border-top: 1px solid var(--se-line); }
+.summeval-demo .se-cell { display: flex; flex-direction: column; align-items: flex-start; width: 100%; min-height: 40px; padding: 4px 8px; border: 1px solid var(--se-line); background: #fff; font-size: 11px; line-height: 1.3; text-align: left; color: var(--se-ink); }
+.summeval-demo .se-cell strong { font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--se-accent); }
+.summeval-demo .se-matrix .se-cell-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.summeval-demo .se-matrix .se-cell { justify-content: center; }
+.summeval-demo .se-cell.is-behind { background: var(--se-warm-wash); border-color: #e0c7ac; }
+.summeval-demo .se-cell.is-behind strong { color: var(--se-warm); }
+.summeval-demo button.se-cell[aria-pressed="true"], .summeval-demo .se-cell.is-current { outline: 2px solid var(--se-ink); outline-offset: -2px; }
+.summeval-demo button.se-cell[aria-pressed="true"]:not(.is-behind) { background: #fff; color: var(--se-ink); }
+.summeval-demo button.se-cell[aria-pressed="true"].is-behind { background: var(--se-warm-wash); color: var(--se-ink); }
+.summeval-demo .se-singles { list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 14px; }
+.summeval-demo .se-singles li { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.summeval-demo .se-single-name { font-size: 12px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.summeval-demo .se-single-name small { display: block; font-size: 10.5px; font-weight: 400; color: var(--se-muted); }
+
+/* Bars of printed values, highest first */
+.summeval-demo .se-axis { display: flex; justify-content: space-between; margin: 0 0 4px; padding-left: 196px; padding-right: 66px; font-size: 10px; color: var(--se-muted); font-variant-numeric: tabular-nums; }
+.summeval-demo .se-bars { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--se-line); }
+.summeval-demo .se-bar-row { display: grid; grid-template-columns: 186px minmax(0, 1fr) 56px; gap: 10px; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--se-line); }
+.summeval-demo .se-bar-name { font-size: 12px; line-height: 1.3; overflow-wrap: anywhere; }
+.summeval-demo .se-bar-name small { display: block; font-size: 10px; color: var(--se-muted); }
+.summeval-demo .se-bar-track { position: relative; height: 12px; background: #f4f6f3; }
+.summeval-demo .se-bar-zero { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--se-rule); }
+.summeval-demo .se-bar-fill { position: absolute; top: 2px; bottom: 2px; background: #9aa89f; }
+.summeval-demo .se-bar-value { text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; }
+.summeval-demo .se-bar-row.is-chatgpt .se-bar-fill { background: var(--se-accent); }
+.summeval-demo .se-bar-row.is-best .se-bar-fill { background: var(--se-warm); }
+.summeval-demo .se-bar-row.is-chatgpt :is(.se-bar-name, .se-bar-value) { color: var(--se-accent); font-weight: 650; }
+.summeval-demo .se-bar-row.is-best :is(.se-bar-name, .se-bar-value) { color: var(--se-warm); font-weight: 650; }
+.summeval-demo .se-bar-row :is(.se-bar-name small) { font-weight: 400; }
+.summeval-demo .se-key { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 10px 0 0; font-size: 11px; color: var(--se-muted); }
+.summeval-demo .se-key span { display: inline-flex; align-items: center; gap: 6px; }
+.summeval-demo .se-swatch { display: inline-block; width: 14px; height: 8px; background: #9aa89f; }
+.summeval-demo .se-swatch.is-chatgpt { background: var(--se-accent); }
+.summeval-demo .se-swatch.is-best { background: var(--se-warm); }
+
+@media (max-width: 860px) {
+  .summeval-demo .se-matrices { grid-template-columns: minmax(0, 1fr); }
+  .summeval-demo .se-singles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .summeval-demo { padding: 19px 15px; }
+  .summeval-demo h3 { font-size: 23px; }
+  .summeval-demo .se-group-label { min-width: 100%; }
+  .summeval-demo .se-button-row { gap: 6px; }
+  .summeval-demo button { padding: 8px 10px; }
+  .summeval-demo .se-axis { padding-left: 136px; padding-right: 58px; }
+  /* Wide enough for the longest printed row name, BARTScore_cnn_s_h, on one line. */
+  .summeval-demo .se-bar-row { grid-template-columns: 128px minmax(0, 1fr) 50px; gap: 8px; }
+  .summeval-demo .se-bar-name { font-size: 11px; }
+  .summeval-demo .se-cell { padding: 4px 6px; }
+  .summeval-demo .se-tag { white-space: normal; }
+}

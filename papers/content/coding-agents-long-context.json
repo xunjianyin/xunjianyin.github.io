@@ -1,0 +1,130 @@
+{
+  "coding-agents-long-context": {
+    "short_name": "Coding Agents for Long Context",
+    "topic": "Long-context processing",
+    "takeaway": "Off-the-shelf coding agents can process long contexts as files. With only a path and a question, Codex and Claude Code search, slice and script through the text, and exceed the best published scores on four of five long-context benchmarks.",
+    "question": "Long-context models can take in millions of tokens but process them less reliably as inputs grow, and retrieval pipelines search in fixed, shallow steps. Can a coding agent process long text better by treating it as files to search, read and transform with code?",
+    "method": [
+      {
+        "title": "Store the text as files",
+        "text": "Put each document of a large corpus in its own text file inside one directory, or a single long document in one file. The agent receives only the path and the question."
+      },
+      {
+        "title": "Let the agent choose its tools",
+        "text": "Codex (GPT-5) or Claude Code (Sonnet 4.5) runs terminal commands such as rg, nl and sed, writes and executes Python scripts, and saves intermediate files. A BM25 or Gemini-embedding retriever is optional."
+      },
+      {
+        "title": "Refine from what it finds",
+        "text": "The agent reads its intermediate results and uses them to refine the next search or fix its script, as in the paper’s recorded trajectories."
+      }
+    ],
+    "findings": [
+      {
+        "value": "88.50 vs 80.00",
+        "label": "BrowseComp-Plus accuracy (%) · Codex without a retriever vs best published",
+        "detail": "The 100K-document corpus holds 750M tokens. The published 80.00 was measured on the full set; on the paper’s 200-question sample, a GPT-5 ReAct search agent scores 72.50 and RAG 65.00 (Table 1)."
+      },
+      {
+        "value": "88.50 → 78.50",
+        "label": "BrowseComp-Plus accuracy (%) · Codex without vs with a BM25 retriever",
+        "detail": "Across the nine Codex retriever comparisons in Table 1, a retriever lowers the score eight times and ties once. With a retriever, native search commands per query fall from 14.92 to 9.84 (BM25) or 8.33 (Gemini embeddings; Table 4)."
+      }
+    ],
+    "scope": "Each benchmark is a single random sample of 200 questions (100 in the file-structure ablation), and no run-to-run variance is reported. Three of the five best published scores were measured on full test sets, and Claude Code was run only on Oolong-Real and LongBench. The folder-versus-single-file ablation changes only the corpus layout; that the benefit comes from familiarity acquired in code training is a hypothesis the paper does not test directly. Table 1 lists the NQ corpus as 3T tokens, while the authors’ code README gives three billion.",
+    "diagram": {
+      "title": "Long context as a file system",
+      "steps": [
+        {
+          "label": "Files",
+          "text": "Store the corpus or document as text files"
+        },
+        {
+          "label": "Native tools",
+          "text": "Search, slice and script from the terminal"
+        },
+        {
+          "label": "Iterate",
+          "text": "Refine queries and code from intermediate results"
+        }
+      ],
+      "caption": "The paper recasts long-context processing as file-system navigation by a coding agent."
+    },
+    "source_url": "https://arxiv.org/html/2603.20432v1",
+    "source_note": "Read arXiv 2603.20432v1 (the only version, 20 Mar 2026): LaTeX source example_paper.tex and appendix.tex from https://arxiv.org/e-print/2603.20432, the PDF and the HTML. Abstract copied verbatim from the arXiv abstract page; the LaTeX/PDF abstract adds a sentence linking the code repository, which confirms the Code link. Results table: Table 2 (label tab:file_system_ablation), example_paper.tex lines 283-297, PDF page 4, HTML #S3.T2; three rows copied cell by cell and re-checked against the PDF text; the change column is computed. Demo values: Table 1 (tab:main_results, lines 175-201, PDF page 4) and Table 5 (tab:cost_analysis, lines 446-467, PDF page 8), each re-checked cell by cell against the PDF and HTML. The abstract’s 17.3% equals the mean of (best coding agent - best published) / best published over the five benchmarks, with Claude Code + BM25 on Oolong-Real and LongBench and Codex (No Retriever) elsewhere; rounded, the five terms equal Figure 1’s labels (figures/main_results_bar.pdf). Primary figure: figures/main_figure.png, Figure 3 (lines 156-161, PDF page 3). Author block: lines 76-92; the * on Dhingra and Zhou is printed as Equal Advising, so no equal-contribution marks are shown.",
+    "results_table": {
+      "caption": "Table 2. Accuracy (%) of Codex with GPT-5 on a 100-question subset of BrowseComp-Plus, with the corpus stored as one text file per document in a folder or as a single JSON dictionary keyed by document id; higher is better. Change (folder minus single file) is computed here. The subset is smaller than Table 1’s 200-question sample, so the no-retriever folder score (89.0) differs from Table 1 (88.50).",
+      "headings": [
+        "Retriever",
+        "Folder structure",
+        "Single file",
+        "Change"
+      ],
+      "rows": [
+        [
+          "No Retriever",
+          "89.0",
+          "83.0",
+          "+6.0 pp"
+        ],
+        [
+          "Gemini Emb.",
+          "90.0",
+          "86.0",
+          "+4.0 pp"
+        ],
+        [
+          "BM25",
+          "82.0",
+          "82.0",
+          "0.0 pp"
+        ]
+      ],
+      "highlight": [],
+      "highlight_columns": [
+        3
+      ],
+      "source_url": "https://arxiv.org/html/2603.20432v1#S3.T2"
+    },
+    "figure_local": "assets/coding-agents-long-context-overview.png",
+    "figure_url": "https://arxiv.org/e-print/2603.20432v1 (file figures/main_figure.png, 9130 × 4010 px; Figure 3 on page 3 of the PDF; resized to 2400 px wide and reduced to a 256-color palette)",
+    "figure_caption": "Text processing as file-system navigation. A standard full-attention model reads web pages, conversations, transcripts, stories and wiki pages as one long input (left). Here the same text becomes a navigable file system: the coding agent writes scripts and shell commands that search, slice and aggregate the files in an execution environment, reads the intermediate results and refines iteratively (right). Original Figure 3 from the paper.",
+    "primary_figure": true,
+    "figure_scroll": true,
+    "affiliations": [
+      "Duke University"
+    ],
+    "authors_detail": [
+      {
+        "name": "Weili Cao",
+        "affiliations": [
+          1
+        ]
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ]
+      },
+      {
+        "name": "Bhuwan Dhingra",
+        "affiliations": [
+          1
+        ]
+      },
+      {
+        "name": "Shuyan Zhou",
+        "affiliations": [
+          1
+        ]
+      }
+    ],
+    "glance": {
+      "result": "The best coding-agent configuration exceeds the best published score on four of five benchmarks, e.g. BrowseComp-Plus accuracy 88.50 vs 80.00; LongBench is the exception (62.50 vs 63.30).",
+      "prior": "RAG and ReAct agents reach the text through fixed retrieval tools, and Recursive Language Models prompt a model to call itself over snippets; here an unmodified coding agent explores the text as files with its own commands and scripts.",
+      "limitation": "Scores come from 200-question samples without reported variance, and three of the five best published scores were measured on full test sets."
+    },
+    "prior_work": "Standard RAG retrieves through a fixed, shallow pipeline that struggles with multi-hop questions, and code-executing agents such as CodeAct reason with code but, according to Zhang et al. (2025a), handle long-context tasks poorly. Agentic RAG systems reformulate queries iteratively but are typically fine-tuned or trained with reinforcement learning for web search or open-domain QA. The closest, concurrent work is Recursive Language Models (Zhang et al., 2025a), which also treats long text as an external environment, explored from a Python REPL through recursive LLM sub-calls under a specialized system prompt. This paper instead hands the text to an unmodified coding agent with no task-specific prompting and lets it use file-system tools such as grep and sed and scripts of its own.",
+    "abstract_label": "Read the abstract"
+  }
+}

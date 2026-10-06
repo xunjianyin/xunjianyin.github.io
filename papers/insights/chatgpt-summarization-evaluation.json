@@ -1,0 +1,55 @@
+{
+  "story": {
+    "title": "Can ChatGPT take the place of a human annotator?",
+    "paragraphs": [
+      "Summaries are usually scored automatically with ROUGE, which counts n-gram overlap with a reference summary, or with model-based metrics such as BERTScore and BARTScore. The paper notes that surface word matching misses much of what makes a summary good, that factual accuracy is hard to judge without the source document, and that even the newer metrics remain unsatisfactory in performance, usability, and interpretability. Human evaluation is the reference standard, but it is expensive, slow, and hard to reproduce.",
+      "Human annotators work from written instructions and examples. Because instruction-tuned language models can follow instructions and learn from examples in context, the authors ask whether ChatGPT can take the annotator's place: read the same instructions, return the same kind of judgment, and agree with people. They call this human-like automatic evaluation. Its appeal is flexibility: the reply can carry a score, a choice between summaries, a label, or an explanation, so one model can imitate several different human protocols."
+    ]
+  },
+  "mechanism": {
+    "title": "Four annotator protocols become four prompts",
+    "paragraphs": [
+      "Each prompt stays as close as possible to the original human instructions (Figures 1–4). Likert scale scoring asks for 1–5 ratings on four dimensions in a single prompt: relevance, faithfulness, fluency, and coherence for SummEval, and relevance, informativeness, fluency, and coherence for Newsroom. SummEval's consistency dimension is called faithfulness because the prompt gives no definitions. Pairwise comparison (TLDR) asks which of two summaries is better and requests the answer \"Summary 0\" or \"Summary 1\" without an explanation. Pyramid (REALSumm) lists the semantic content units (SCUs) extracted from the reference summary, up to 16, and asks for Yes or No on whether each can be inferred from the summary. Binary factuality evaluation (QAGS) asks whether one sentence of a generated summary is supported by the article.",
+      "Every query goes to the ChatGPT API model gpt-3.5-turbo-0301 with temperature 0, to reduce randomness, and max_tokens 256. Simple rules extract the score or label from the reply, and a reply without one is marked invalid. Likert scores are compared with the human scores by Spearman correlation at three levels, sample, system, and dataset, which the paper names but does not define; the other three protocols are scored by accuracy against the human labels. As baselines, ROUGE-1/2/L, BERTScore, MoverScore, and six BARTScore variants are scored on the Likert and pairwise datasets, and the classifiers FactCC and DAE, which split a summary into sentences with NLTK and label each one as factual or not, on REALSumm and QAGS.",
+      "Section 4 then varies the SummEval prompt in three ways (Table 6). +def adds the definitions of the four dimensions from the original human evaluation; +def+ins adds those definitions together with step-by-step instructions (Figure 5, which opens with \"Imagine you are a human annotator now.\"); +sys_prompt sets the API system prompt to \"You are a human annotator that rates the quality of summaries.\" The same table gives a human reference point: the correlation of each of the three expert annotators with the average of all three."
+    ]
+  },
+  "evidence": {
+    "title": "Ahead on SummEval, behind on Newsroom, and sensitive to the prompt",
+    "paragraphs": [
+      "With the base prompt, ChatGPT beats all eleven automatic metrics in every SummEval column (Table 1); its narrowest lead is at system-level consistency, 0.833 against 0.800 for BARTScore_s_h, and BARTScore_cnn_s_h is the strongest metric in the other eleven columns. On Newsroom (Table 2) ChatGPT ranks third in every column, behind BARTScore_s_h and BARTScore_cnn_s_h. The accuracy protocols show smaller margins: +0.27 pp over the best metric on TLDR, +1.32 pp over DAE on REALSumm, +0.29 pp on QAGS_CNN, and +12.13 pp on QAGS_XSUM, the one large lead. The paper reports no significance tests or confidence intervals for these differences.",
+      "Prompt changes move system-level correlation much more than the other two levels (Table 6). With definitions and step instructions, system-level ρ falls from 0.833 to −0.149 for consistency and from 0.901 to −0.079 for relevance, while sample- and dataset-level values fall by at most 0.123; the system prompt alone lowers system-level consistency to 0.007. Definitions alone raise sample- and dataset-level ρ for consistency, relevance, and coherence but lower all three fluency values, which the paper summarizes as a modest improvement in a few cases. An inference that the paper does not test: system-level correlation is usually computed over per-system averages and therefore rests on far fewer points, and on Newsroom four to six metrics print identical system-level values in each dimension; both point to this level as the least stable.",
+      "Expert annotators stay ahead. Each annotator's correlation with the three-annotator average exceeds ChatGPT's in 35 of the 36 annotator-column pairs; the exception is system-level fluency, where ChatGPT's 0.889 exceeds Annotator_1's 0.843. Because each annotator is part of the average they are compared with, the human figures are likely somewhat inflated. The paper's two practical arguments rest on estimates rather than experiments: fixing the decoding temperature should make the judgments reproducible, and the cost is lower. For SummEval it computes 0.002 × 1600 = 3.2 USD at about 1,000 tokens per summary, against 12 × 5 = 60 USD for one annotator assumed to need 5 hours, and puts human evaluation at 10 to 20 times the cost.",
+      "ChatGPT often adds an explanation even when the prompt does not ask for one. In the Table 7 example both the base prompt and +def give low faithfulness or consistency scores and point to a factual error in the summary, but the paper notes that the correctness of such explanations was not tested. The explanations also show how ChatGPT reads the dimensions: without definitions it explains fluency and coherence together, and its fluency and coherence scores correlate at 0.960 at dataset level; with definitions the explanations separate and the correlation drops to 0.843. Invalid replies, such as refusing to evaluate, writing a new summary, or continuing the given one, stay at about 1% or less: 0 with the base prompt and 0.0106 with +def+ins (Table 9)."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Paper · Section 3, Experiments (arXiv v1 HTML)",
+      "url": "https://arxiv.org/html/2304.02554v1#S3"
+    },
+    {
+      "label": "Section 4 · prompts, human comparison, explanations",
+      "url": "https://arxiv.org/html/2304.02554v1#S4"
+    },
+    {
+      "label": "PDF · arXiv v1",
+      "url": "https://arxiv.org/pdf/2304.02554v1"
+    }
+  ],
+  "reading_notes": "Read the complete arXiv v1 LaTeX source (emnlp2023.tex) and PDF; v1 of 5 April 2023 is the only version and its arXiv comment reads 'in process'. Settings: gpt-3.5-turbo-0301, temperature 0, max_tokens 256, other parameters default (Section 3.1). Prompts: Figures 1–4 (Section 3.2) and Figure 5 for +def+ins. Tables 1–5 (Section 3.5) re-checked cell by cell against PDF page 4; Table 6 against PDF page 5 and arXiv HTML S4.T6. Derived from printed values: ChatGPT ranks first in all 12 SummEval columns and third in all 12 Newsroom columns; accuracy margins TLDR +0.27 pp (over BARTScore_h_r), REALSumm +1.32 pp, QAGS_CNN +0.29 pp, QAGS_XSUM +12.13 pp (over DAE); annotators exceed ChatGPT in 35 of 36 annotator-column pairs. Caveats kept visible: no significance tests or confidence intervals; correlation levels are not defined in the paper; Table 3 prints a 'BARTScore' row where Tables 1–2 list BERTScore; each annotator is part of the average they are correlated with; cost assumes 5 annotator hours at 12 USD; reproducibility is argued, not tested; explanation correctness is not tested. The work is an empirical study of one ChatGPT snapshot, not a new metric or model.",
+  "demo": {
+    "kind": "chatgpt-vs-metrics",
+    "placement": "evidence",
+    "eyebrow": "Measured · Tables 1–5",
+    "title": "Where does ChatGPT lead the automatic metrics?",
+    "description": "Tables 1–5 compare ChatGPT with automatic metrics in 28 columns: Spearman ρ with human Likert scores for four dimensions at three levels on SummEval and Newsroom, and accuracy against human labels on TLDR, REALSumm, QAGS_CNN, and QAGS_XSUM. Pick a dataset, dimension, and correlation level: the bars rank every row the paper prints for that column, and the grid shows ChatGPT minus the strongest other row in all 28 columns at once.",
+    "note": "Measured: every value is copied as printed from Tables 1–5 of arXiv v1 (gpt-3.5-turbo-0301, temperature 0). Computed: the ranking, ChatGPT's rank, and its margin over the strongest other row; correlation margins are differences in ρ and accuracy margins are percentage points. Derived: the TLDR chance level of 0.5. The paper reports no significance tests or confidence intervals and does not define the three correlation levels. Row names are printed as in the paper; Section 2.1 describes BARTScore's generation directions (from the source or the reference to the summary, or from the summary to the reference) but does not explain the suffixes.",
+    "sources": [
+      {
+        "label": "Tables 1–5 · Section 3.5",
+        "url": "https://arxiv.org/html/2304.02554v1#S3.SS5"
+      }
+    ]
+  }
+}

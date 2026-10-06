@@ -1,0 +1,188 @@
+{
+  "agent-x": {
+    "short_name": "AGENT-X",
+    "topic": "Detecting AI-generated text",
+    "takeaway": "LLM agents judge a text against routed stylistic guidelines, and a meta agent merges their calibrated verdicts, so no detection threshold is tuned. AGENT-X has the highest average accuracy for all four source models tested; Fast-DetectGPT keeps the higher average AUROC.",
+    "question": "Score-based detectors such as Fast-DetectGPT need a threshold, tuned on labeled data, before they can call a text AI-generated or human-written, and the threshold may not transfer to a new domain. Can a detector reach the label directly, explain it, and stay accurate without a calibration set?",
+    "glance": {
+      "result": "Highest average accuracy for all four source models; on GPT-4 texts, 0.8592 vs 0.6800 for the best baseline, Likelihood.",
+      "prior": "Likelihood, LogRank, and Fast-DetectGPT output scores that need a tuned threshold; AGENT-X returns a label with a rationale.",
+      "limitation": "By AUROC, which needs no threshold, Fast-DetectGPT averages higher for all four source models (GPT-4: 0.9061 vs 0.9007)."
+    },
+    "prior_work": "Zero-shot detectors score a text with a language model. Likelihood, Rank, LogRank, Entropy, and LRR use token statistics; DetectGPT and NPR compare the text with perturbed copies; DNA-GPT compares it with regenerated continuations; Fast-DetectGPT (Bao et al., 2024) replaces DetectGPT's perturbations with a cheaper sampling step. Supervised classifiers such as the RoBERTa detectors and GPTZero need labeled training data, and watermarking needs control over generation. A score becomes a label only after a threshold is chosen. AGENT-X prompts an LLM with explicit guidelines instead, and calibrates the model's verbalized confidence with SteeringConf (Zhou et al., 2025), a method that queries the same model under several confidence-steering prompts.",
+    "diagram": {
+      "title": "From guidelines to a label without a threshold",
+      "steps": [
+        {
+          "label": "Route",
+          "text": "Infer the text's domain and style; activate only the guidelines that match."
+        },
+        {
+          "label": "Judge",
+          "text": "One agent per guideline; five steering prompts calibrate its confidence."
+        },
+        {
+          "label": "Aggregate",
+          "text": "A meta agent weighs the reports by confidence and returns the label."
+        }
+      ],
+      "caption": "Every stage is an LLM call; the final label is the meta agent's decision, not a thresholded score."
+    },
+    "method": [
+      {
+        "title": "Route guidelines to the text",
+        "text": "An LLM infers the text's domain and stylistic features, then activates only the matching guidelines in each of the semantic, stylistic, and structural dimensions (25 guidelines in total)."
+      },
+      {
+        "title": "Judge each guideline five times",
+        "text": "A base agent labels the text under one guideline with each steering prompt, from very cautious to very confident. Answer agreement and confidence spread shrink the mean confidence into a calibrated score."
+      },
+      {
+        "title": "Aggregate with a meta agent",
+        "text": "A meta agent reads all guideline reports, gives more weight to confident agents, and returns the final label, a rationale, and a confidence calibrated with the same five steering prompts."
+      }
+    ],
+    "findings": [
+      {
+        "value": "0.8446 vs 0.5267",
+        "label": "GPT-4 · PubMed accuracy: AGENT-X vs Fast-DetectGPT",
+        "detail": "Fast-DetectGPT's threshold was tuned on SQuAD texts from GPT-Neo-2.7B. By AUROC, which needs no threshold, it scores slightly higher than AGENT-X (0.8503 vs 0.8447; Tables 1 and 5)."
+      },
+      {
+        "value": "0.8592 vs 0.6800",
+        "label": "GPT-4 average accuracy: AGENT-X vs the best baseline, Likelihood",
+        "detail": "AGENT-X has the highest average accuracy for all four source models; its smallest margin is on Claude-3-Sonnet (0.8000 vs 0.7856 for Likelihood, +1.44 pp; Tables 1 and 2)."
+      },
+      {
+        "value": "−24.53 pp",
+        "label": "GPT-4 average accuracy without the guidelines",
+        "detail": "Replacing the guidelines with randomly selected prompts lowers accuracy from 0.8592 to 0.6139, the largest drop among five ablations; uncalibrated confidences cost 6.01 pp (Table 3)."
+      }
+    ],
+    "scope": "All agents run on one LLM, deepseek-chat-v3-0324, and the evaluation covers three datasets from the Fast-DetectGPT benchmark (XSum, WritingPrompts, PubMedQA) with texts from four commercial source models. Baseline thresholds come from a single out-of-domain validation set. The paper reports no sample counts, run-to-run variance, or cost, supports its interpretability claim with one worked case, and announces but does not link a code and guideline release in v1.",
+    "results_table": {
+      "caption": "Table 3 (all rows; the per-dataset AUROC columns are omitted). Ablations of AGENT-X on GPT-4-generated texts: accuracy (ACC) per dataset and averaged, and average AUROC; higher is better. The change column is computed here as the difference in average accuracy from the full system. On XSum, two variants are more accurate than the full system (0.8691 vs 0.8624).",
+      "headings": [
+        "Variant",
+        "XSum ACC",
+        "Writing ACC",
+        "PubMed ACC",
+        "Avg. ACC",
+        "Avg. AUROC",
+        "Change in avg. ACC"
+      ],
+      "rows": [
+        [
+          "Full AGENT-X",
+          "0.8624",
+          "0.8705",
+          "0.8446",
+          "0.8592",
+          "0.9007",
+          "–"
+        ],
+        [
+          "w/o Multi-Agent",
+          "0.8691",
+          "0.7967",
+          "0.6946",
+          "0.7868",
+          "0.8785",
+          "−7.24 pp"
+        ],
+        [
+          "w/o Guidelines",
+          "0.7785",
+          "0.5633",
+          "0.5000",
+          "0.6139",
+          "0.7825",
+          "−24.53 pp"
+        ],
+        [
+          "w/o LLM Router",
+          "0.8054",
+          "0.8067",
+          "0.5470",
+          "0.7197",
+          "0.7738",
+          "−13.95 pp"
+        ],
+        [
+          "w/o Adaptive Routing",
+          "0.8691",
+          "0.8267",
+          "0.5805",
+          "0.7588",
+          "0.8665",
+          "−10.04 pp"
+        ],
+        [
+          "w/o Steer Calibration",
+          "0.8590",
+          "0.8100",
+          "0.7282",
+          "0.7991",
+          "0.8480",
+          "−6.01 pp"
+        ]
+      ],
+      "highlight": [
+        0
+      ],
+      "highlight_columns": [
+        6
+      ],
+      "source_url": "https://arxiv.org/pdf/2505.15261v1"
+    },
+    "figure_local": "assets/agent-x-overview.png",
+    "figure_url": "https://arxiv.org/e-print/2505.15261v1 (file figures/workflow.png, Figure 1; flattened onto white and re-saved losslessly at the original 2734 x 1042 pixels)",
+    "figure_caption": "The router agent reads the text and switches guidelines on or off within the semantic, stylistic, and structural dimensions (left). Each activated guideline agent returns a decision, a reason, and a confidence calibrated by five steering prompts (right), and the meta agent aggregates these assessments into the final decision (centre). Original Figure 1 from the paper.",
+    "primary_figure": true,
+    "authors_detail": [
+      {
+        "name": "Jiatao Li",
+        "affiliations": [
+          1,
+          2
+        ],
+        "equal": false
+      },
+      {
+        "name": "Mao Ye",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Cheng Peng",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "affiliations": [
+      "Wangxuan Institute of Computer Technology, Peking University",
+      "Information Management Department, Peking University"
+    ],
+    "abstract_label": "Read the abstract",
+    "source_url": "https://arxiv.org/abs/2505.15261",
+    "source_note": "Read the complete arXiv 2505.15261v1 LaTeX source (acl_latex.tex; v1 of 2025-05-21 is the only version, and no ACL Anthology entry for EMNLP 2026 exists yet) and checked it against the v1 PDF. Author block and affiliations: acl_latex.tex lines 143-156, no equal-contribution marks. Method: Section 4 (lines 256-318), including the SteeringConf equations of Section 4.2 (lines 276-313); router, steering, and meta-agent prompts in Appendix G (lines 945-1247); guideline list in Appendix A (25 guidelines: 6 semantic, 10 stylistic, 9 structural; lines 541-653); worked case in Appendix B (lines 656-755). Baseline threshold protocol: Table 1 and 2 captions and Appendix C (line 761). Results table: Table 3 (tab:ablation_study, lines 449-484; PDF page 8), all six rows; the per-dataset AUROC columns are omitted and the change column is computed. Every cell was parsed from the LaTeX and re-verified cell by cell against the PDF text layer (pdftotext -layout). The evidence demo transcribes Tables 1, 2, 5, and 6 (lines 341-429 and 848-936; PDF pages 6, 18, and 19); all 55 rows matched the PDF text layer. Figure: figures/workflow.png from the source tarball (Figure 1, lines 181-186). No official code link exists: the paper only states that code and guidelines will be released (footnote, line 188)."
+  }
+}

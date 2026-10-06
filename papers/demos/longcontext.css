@@ -1,0 +1,128 @@
+/* Coding Agents for Long Context: which rows of Table 1 the 17.3% average compares.
+ * Same shell as the other demo families: serif heading, green eyebrow, 1px rules, square
+ * corners, no shadows or gradients. The only motion is a short bar-width transition after
+ * the reader picks a row; it is removed under prefers-reduced-motion. */
+.longcontext-demo {
+  --lc-ink: var(--ink, #202a26);
+  --lc-muted: var(--muted, #626b66);
+  --lc-accent: var(--accent, #2b6151);
+  --lc-line: var(--line, #dce2dc);
+  --lc-wash: var(--wash, #f0f4ee);
+  --lc-ref: #9aa5a0;
+  --lc-warm: #9a5a3c;
+  margin-block: 28px;
+  padding: 28px;
+  border: 1px solid var(--lc-line);
+  background: #fff;
+  color: var(--lc-ink);
+  font-size: 14px;
+  line-height: 1.65;
+  min-width: 0;
+}
+.longcontext-demo [hidden] { display: none !important; }
+.longcontext-demo *, .longcontext-demo *::before, .longcontext-demo *::after { border-radius: 0; }
+.longcontext-demo p { margin: 0; }
+.longcontext-demo :focus-visible { outline: 2px solid var(--lc-accent); outline-offset: 3px; }
+.longcontext-demo .lc-heading { margin-bottom: 22px; }
+.longcontext-demo .lc-eyebrow { margin: 0 0 7px; color: var(--lc-accent); font-size: 10px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; }
+.longcontext-demo h3 { margin: 0 0 10px; font: 400 25px/1.3 Georgia, "Times New Roman", serif; letter-spacing: -.02em; }
+.longcontext-demo .lc-heading > p:last-child { max-width: 78ch; color: var(--lc-muted); font-size: 14px; line-height: 1.75; }
+.longcontext-demo .lc-label { margin: 0 0 6px; color: var(--lc-muted); font-size: 10.5px; font-weight: 600; letter-spacing: .07em; line-height: 1.5; text-transform: uppercase; }
+.longcontext-demo .lc-small { margin-top: 12px; color: var(--lc-muted); font-size: 12px; }
+
+/* Row choices. */
+.longcontext-demo .lc-controls { display: grid; gap: 14px; margin: 0 0 20px; padding-top: 18px; border-top: 1px solid var(--lc-line); }
+.longcontext-demo fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.longcontext-demo legend { margin-bottom: 7px; padding: 0; font-size: 12px; font-weight: 600; }
+.longcontext-demo .lc-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.longcontext-demo .lc-buttons button {
+  min-height: 36px; padding: 6px 11px; border: 1px solid #b8c5bc; background: #fff; color: var(--lc-ink);
+  font: inherit; font-size: 12.5px; line-height: 1.4; text-align: left; cursor: pointer;
+}
+.longcontext-demo .lc-buttons button:hover { border-color: var(--lc-accent); }
+.longcontext-demo .lc-buttons button[aria-pressed="true"] { border-color: var(--lc-accent); background: var(--lc-wash); color: var(--lc-accent); font-weight: 600; }
+
+/* Headline numbers. */
+.longcontext-demo .lc-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 18px; margin: 0 0 18px; padding: 12px 0; border-block: 1px solid var(--lc-line); }
+.longcontext-demo .lc-stats > div { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+.longcontext-demo .lc-stats dt { color: var(--lc-muted); font-size: 10.5px; font-weight: 600; letter-spacing: .07em; line-height: 1.5; text-transform: uppercase; }
+.longcontext-demo .lc-stats dd { margin: 2px 0 0; font: 400 26px/1.25 Georgia, "Times New Roman", serif; font-variant-numeric: tabular-nums; }
+.longcontext-demo .lc-stats dd[data-lc-stat="mean"] { color: var(--lc-accent); }
+
+/* Per-benchmark rows: a five-column grid on wide screens. */
+.longcontext-demo .lc-head,
+.longcontext-demo .lc-row {
+  display: grid;
+  grid-template-columns: minmax(0, 9.5rem) minmax(0, 1fr) 6.6rem 4.8rem 8.6rem;
+  column-gap: 18px;
+  align-items: center;
+}
+.longcontext-demo .lc-head { padding-bottom: 6px; color: var(--lc-muted); font-size: 10.5px; font-weight: 600; letter-spacing: .05em; line-height: 1.4; text-transform: uppercase; }
+.longcontext-demo .lc-head span:nth-child(n+3) { text-align: right; }
+.longcontext-demo .lc-rows { margin: 0; padding: 0; list-style: none; border-bottom: 1px solid var(--lc-line); }
+.longcontext-demo .lc-row { padding: 11px 0; border-top: 1px solid var(--lc-line); }
+.longcontext-demo .lc-bench { display: grid; min-width: 0; }
+.longcontext-demo .lc-bench-name { font-weight: 600; font-size: 13.5px; line-height: 1.4; }
+.longcontext-demo .lc-bench-meta { color: var(--lc-muted); font-size: 11.5px; line-height: 1.45; }
+.longcontext-demo .lc-pair { display: grid; gap: 4px; min-width: 0; }
+.longcontext-demo .lc-line { display: grid; grid-template-columns: minmax(0, 9.6rem) minmax(0, 1fr) 3.9rem; column-gap: 10px; align-items: center; font-size: 12.5px; line-height: 1.35; }
+.longcontext-demo .lc-who { min-width: 0; color: var(--lc-muted); overflow-wrap: anywhere; }
+.longcontext-demo .is-agent .lc-who { color: var(--lc-ink); }
+.longcontext-demo .lc-track { display: block; height: 9px; background: var(--lc-wash); }
+.longcontext-demo .lc-track i { display: block; height: 100%; background: var(--lc-ref); transition: width 250ms ease-out; }
+.longcontext-demo .is-agent .lc-track i { background: var(--lc-accent); }
+.longcontext-demo .lc-value { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.longcontext-demo .lc-line .lc-value { font-size: 13px; }
+.longcontext-demo .is-agent .lc-value { font-weight: 600; }
+.longcontext-demo .lc-cell { display: grid; min-width: 0; text-align: right; font-size: 13.5px; }
+.longcontext-demo .lc-cell .lc-value { white-space: normal; }
+.longcontext-demo .lc-row[data-outcome="higher"] .lc-rel { color: var(--lc-accent); font-weight: 600; }
+.longcontext-demo .lc-row[data-outcome="lower"] .lc-rel { color: var(--lc-warm); font-weight: 600; }
+/* Column labels are visual only on wide screens (the header row); each cell keeps its own
+ * label for screen readers, and shows it on narrow screens where the header is hidden. */
+.longcontext-demo .lc-cell-label {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* Summary, key and provenance. */
+.longcontext-demo .lc-readout { margin-top: 18px; }
+.longcontext-demo .lc-status { max-width: 92ch; font-size: 13.5px; line-height: 1.7; }
+.longcontext-demo .lc-key { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 14px; color: var(--lc-muted); font-size: 11.5px; }
+.longcontext-demo .lc-key span { display: inline-flex; align-items: center; gap: 6px; }
+.longcontext-demo .lc-key-agent::before,
+.longcontext-demo .lc-key-ref::before { content: ""; display: inline-block; width: 16px; height: 9px; background: var(--lc-accent); }
+.longcontext-demo .lc-key-ref::before { background: var(--lc-ref); }
+.longcontext-demo .lc-provenance { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--lc-line); color: var(--lc-muted); font-size: 11.5px; line-height: 1.7; }
+.longcontext-demo .lc-provenance a { color: var(--lc-accent); }
+
+@media (max-width: 760px) {
+  .longcontext-demo { padding: 20px 16px; }
+  .longcontext-demo h3 { font-size: 23px; }
+  .longcontext-demo .lc-heading > p:last-child { font-size: 13px; }
+  .longcontext-demo .lc-head { display: none; }
+  .longcontext-demo .lc-row { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 8px; column-gap: 12px; }
+  .longcontext-demo .lc-bench,
+  .longcontext-demo .lc-pair { grid-column: 1 / -1; }
+  .longcontext-demo .lc-bench { grid-template-columns: auto minmax(0, 1fr); column-gap: 8px; align-items: baseline; }
+  .longcontext-demo .lc-line { grid-template-columns: minmax(0, 7rem) minmax(0, 1fr) 3.7rem; }
+  /* Labels may wrap to two lines; keep the three values on one baseline. */
+  .longcontext-demo .lc-row { align-items: stretch; }
+  .longcontext-demo .lc-cell { display: flex; flex-direction: column; justify-content: space-between; text-align: left; font-size: 13px; }
+  .longcontext-demo .lc-cell .lc-value { text-align: left; }
+  .longcontext-demo .lc-cell-label {
+    position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal;
+    color: var(--lc-muted); font-size: 10px; font-weight: 600; letter-spacing: .06em; line-height: 1.5; text-transform: uppercase;
+  }
+  .longcontext-demo .lc-stats dd { font-size: 21px; }
+}
+@media (max-width: 400px) {
+  .longcontext-demo .lc-line { grid-template-columns: minmax(0, 5.6rem) minmax(0, 1fr) 3.5rem; column-gap: 8px; font-size: 12px; }
+  .longcontext-demo .lc-stats { column-gap: 10px; }
+  .longcontext-demo .lc-stats dt { font-size: 9.5px; letter-spacing: .05em; }
+  .longcontext-demo .lc-stats dd { font-size: 19px; }
+  .longcontext-demo .lc-buttons button { padding: 6px 9px; font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .longcontext-demo .lc-track i { transition: none; }
+}

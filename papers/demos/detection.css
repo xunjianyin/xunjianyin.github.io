@@ -1,0 +1,160 @@
+/* Scoped styles for the AGENT-X demos: flat, square, 1px rules, no shadows and no motion.
+ * State changes are immediate, so prefers-reduced-motion needs no separate rules. */
+.detection-demo {
+  --dt-ink: var(--ink, #202a26);
+  --dt-muted: var(--muted, #626b66);
+  --dt-line: var(--line, #dce2dc);
+  --dt-accent: var(--accent, #2b6151);
+  --dt-wash: var(--wash, #f0f4ee);
+  --dt-warm: #8a4b1f;
+  --dt-warm-wash: #f6ece1;
+  --dt-rule: #b8c5bc;
+  --dt-neutral: #9aa89f;
+  border: 1px solid var(--dt-line);
+  background: #fff;
+  padding: 28px;
+  margin: 28px 0;
+  color: var(--dt-ink);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.detection-demo *, .detection-demo *::before, .detection-demo *::after { border-radius: 0; box-shadow: none; animation: none; transition: none; }
+.detection-demo [hidden] { display: none !important; }
+.detection-demo .dt-heading { margin-bottom: 20px; }
+.detection-demo .dt-kicker { color: var(--dt-accent); font-size: 10px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 7px; }
+.detection-demo h3 { font: 400 25px/1.3 Georgia, "Times New Roman", serif; letter-spacing: -.02em; margin: 0 0 10px; }
+.detection-demo .dt-heading > p:last-child { margin: 0; color: var(--dt-muted); max-width: 76ch; }
+.detection-demo h4 { font: 400 15px/1.45 Georgia, "Times New Roman", serif; margin: 0 0 10px; }
+.detection-demo sub { font-size: .72em; line-height: 0; }
+
+/* Controls */
+.detection-demo .dt-controls { border-top: 1px solid var(--dt-line); padding-top: 18px; margin-bottom: 22px; }
+.detection-demo .dt-button-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.detection-demo .dt-group-label { flex: 0 0 auto; min-width: 110px; font-size: 11px; color: var(--dt-muted); }
+.detection-demo button { font: inherit; font-size: 12px; line-height: 1.45; border: 1px solid var(--dt-rule); background: #fff; color: var(--dt-ink); min-height: 40px; padding: 8px 12px; cursor: pointer; }
+.detection-demo button[aria-pressed="true"] { background: var(--dt-accent); border-color: var(--dt-accent); color: #fff; }
+.detection-demo button:hover { border-color: var(--dt-accent); }
+.detection-demo :is(button, input, [tabindex]):focus-visible { outline: 2px solid var(--dt-accent); outline-offset: 3px; }
+.detection-demo .dt-help { font-size: 11px; color: var(--dt-muted); margin: 10px 0 0; max-width: 76ch; }
+.detection-demo .dt-inputs { border-top: 1px solid var(--dt-line); }
+.detection-demo .dt-input-row { display: grid; grid-template-columns: 112px auto minmax(0, 1fr); align-items: center; gap: 6px 16px; padding: 6px 0; border-bottom: 1px solid var(--dt-line); font-size: 12px; }
+.detection-demo .dt-input-name { font-weight: 600; }
+.detection-demo .dt-toggle { display: inline-flex; }
+.detection-demo .dt-toggle button { min-width: 64px; min-height: 36px; padding: 6px 10px; }
+.detection-demo .dt-toggle button + button { margin-left: -1px; }
+.detection-demo .dt-range { display: block; min-width: 0; font-size: 11px; color: var(--dt-muted); }
+.detection-demo .dt-range > span { display: flex; justify-content: space-between; gap: 8px; }
+.detection-demo output { font-variant-numeric: tabular-nums; color: var(--dt-accent); font-weight: 650; }
+.detection-demo input[type="range"] { -webkit-appearance: none; appearance: none; display: block; width: 100%; min-height: 28px; margin: 0; background: transparent; cursor: pointer; }
+.detection-demo input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: var(--dt-rule); }
+.detection-demo input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 18px; margin-top: -8px; background: var(--dt-accent); border: 1px solid var(--dt-accent); }
+.detection-demo input[type="range"]::-moz-range-track { height: 2px; background: var(--dt-rule); }
+.detection-demo input[type="range"]::-moz-range-thumb { width: 14px; height: 18px; background: var(--dt-accent); border: 1px solid var(--dt-accent); border-radius: 0; }
+
+/* Shared result elements */
+.detection-demo .dt-results > :first-child { margin-top: 0; }
+.detection-demo .dt-block { margin-top: 26px; min-width: 0; }
+.detection-demo .dt-caption { font-size: 11px; line-height: 1.6; color: var(--dt-muted); margin: 8px 0 0; max-width: 78ch; }
+.detection-demo .dt-tag { font: 650 9.5px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: .08em; text-transform: uppercase; margin-left: 6px; white-space: nowrap; }
+.detection-demo .dt-tag-measured { color: var(--dt-accent); }
+.detection-demo .dt-tag-published { color: var(--dt-ink); }
+.detection-demo .dt-tag-illustrative { color: var(--dt-warm); }
+.detection-demo .dt-tag-computed { color: var(--dt-muted); }
+.detection-demo .dt-verdict { margin: 22px 0 0; padding-top: 14px; border-top: 1px solid var(--dt-line); font-size: 13px; }
+.detection-demo .dt-disclosure { margin: 20px 0 0; padding-top: 15px; border-top: 1px solid var(--dt-line); font-size: 11px; line-height: 1.6; color: var(--dt-muted); }
+.detection-demo .dt-source-links { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.detection-demo .dt-source-links a { color: var(--dt-accent); }
+
+/* Calibration: one row per steered output on a shared 0-1 axis */
+.detection-demo .dt-steer { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--dt-line); }
+.detection-demo .dt-steer-row, .detection-demo .dt-steer-axis { display: grid; grid-template-columns: 170px minmax(0, 1fr) 76px 170px; gap: 4px 16px; align-items: center; }
+.detection-demo .dt-steer-row { padding: 7px 0; border-bottom: 1px solid var(--dt-line); font-size: 12px; }
+.detection-demo .dt-steer-row.is-selected { background: var(--dt-wash); }
+.detection-demo .dt-steer-name { font-weight: 600; line-height: 1.35; padding-left: 6px; }
+.detection-demo .dt-steer-name small { display: block; font-weight: 400; font-size: 10.5px; color: var(--dt-muted); }
+.detection-demo .dt-track { position: relative; height: 24px; margin: 0 7px; }
+.detection-demo .dt-track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--dt-rule); }
+.detection-demo .dt-tick { position: absolute; top: 0; bottom: 0; width: 0; }
+.detection-demo .dt-tick-mean { border-left: 1px solid var(--dt-muted); }
+.detection-demo .dt-tick-cal { border-left: 2px dashed var(--dt-accent); margin-left: -1px; }
+.detection-demo .dt-mark { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border: 2px solid var(--dt-ink); background: var(--dt-ink); box-sizing: border-box; }
+.detection-demo .dt-mark.is-human { background: #fff; }
+.detection-demo .dt-steer-row.is-selected .dt-mark { border-color: var(--dt-accent); }
+.detection-demo .dt-steer-row.is-selected .dt-mark.is-ai { background: var(--dt-accent); }
+.detection-demo .dt-steer-value { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.detection-demo .dt-steer-dist { font-size: 11px; color: var(--dt-muted); font-variant-numeric: tabular-nums; }
+.detection-demo .dt-chosen { display: block; color: var(--dt-accent); font-weight: 650; }
+.detection-demo .dt-steer-axis { padding-top: 4px; }
+.detection-demo .dt-axis { position: relative; height: 16px; margin: 0 7px; font-size: 10px; color: var(--dt-muted); }
+.detection-demo .dt-axis i { position: absolute; top: 0; font-style: normal; transform: translateX(-50%); }
+.detection-demo .dt-axis i:first-child { transform: none; }
+.detection-demo .dt-axis i:last-child { transform: translateX(-100%); }
+.detection-demo .dt-key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 0; font-size: 11px; color: var(--dt-muted); }
+.detection-demo .dt-key > span { display: inline-flex; align-items: center; gap: 6px; }
+.detection-demo .dt-key .dt-mark { position: static; margin: 0; }
+.detection-demo .dt-key-mean, .detection-demo .dt-key-cal { display: inline-block; width: 0; height: 14px; }
+.detection-demo .dt-key-mean { border-left: 1px solid var(--dt-muted); }
+.detection-demo .dt-key-cal { border-left: 2px dashed var(--dt-accent); }
+.detection-demo .dt-readout { margin: 0; border-top: 1px solid var(--dt-line); max-width: 760px; }
+.detection-demo .dt-readout > div { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 2px 16px; padding: 6px 0; border-bottom: 1px solid var(--dt-line); font-size: 12px; }
+.detection-demo .dt-readout dt { color: var(--dt-muted); }
+.detection-demo .dt-readout dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.detection-demo .dt-readout .is-key dd { color: var(--dt-accent); font-weight: 650; }
+
+/* Metrics: rank grid and paired bars */
+.detection-demo .dt-board-wrap { max-width: 100%; overflow-x: auto; }
+.detection-demo .dt-board { border-collapse: collapse; font-size: 12px; min-width: 100%; max-width: 640px; }
+.detection-demo .dt-board th, .detection-demo .dt-board td { border-bottom: 1px solid var(--dt-line); padding: 7px 10px; text-align: left; }
+.detection-demo .dt-board thead th { font-size: 10px; font-weight: 550; color: var(--dt-muted); border-bottom-color: var(--dt-rule); }
+.detection-demo .dt-board tbody th { font-weight: 400; white-space: nowrap; }
+.detection-demo .dt-board td { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.detection-demo .dt-board td.is-selected { outline: 2px solid var(--dt-accent); outline-offset: -2px; background: var(--dt-wash); }
+.detection-demo .dt-rank-acc.is-first { font-weight: 700; color: var(--dt-accent); }
+.detection-demo .dt-rank-sep { color: var(--dt-muted); }
+.detection-demo .dt-bars-head, .detection-demo .dt-bar-row { display: grid; grid-template-columns: 230px minmax(0, 1fr) minmax(0, 1fr); gap: 4px 18px; align-items: center; }
+.detection-demo .dt-bars-head { font-size: 10px; color: var(--dt-muted); padding-bottom: 6px; border-bottom: 1px solid var(--dt-rule); }
+.detection-demo .dt-bars { list-style: none; padding: 0; margin: 0; }
+.detection-demo .dt-bar-row { padding: 5px 0; border-bottom: 1px solid var(--dt-line); }
+.detection-demo .dt-bar-name { font-size: 12px; line-height: 1.3; overflow-wrap: anywhere; }
+.detection-demo .dt-bar-name small { display: block; font-size: 10px; color: var(--dt-muted); }
+.detection-demo .dt-metric { display: grid; grid-template-columns: minmax(0, 1fr) 62px; gap: 8px; align-items: center; min-width: 0; }
+.detection-demo .dt-metric-label { display: none; }
+.detection-demo .dt-bar-track { position: relative; height: 12px; background: #f4f6f3; }
+.detection-demo .dt-bar-fill { position: absolute; left: 0; top: 2px; bottom: 2px; background: var(--dt-neutral); }
+.detection-demo .dt-bar-chance { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--dt-muted); }
+.detection-demo .dt-bar-value { text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; }
+.detection-demo .dt-metric.is-missing .dt-bar-value { font-size: 10.5px; color: var(--dt-muted); }
+.detection-demo .dt-bar-row.is-ours .dt-bar-fill { background: var(--dt-accent); }
+.detection-demo .dt-bar-row.is-ours .dt-bar-name, .detection-demo .dt-bar-row.is-ours .dt-bar-value { color: var(--dt-accent); font-weight: 650; }
+.detection-demo .dt-bar-row.is-contrast .dt-bar-fill { background: var(--dt-warm); }
+.detection-demo .dt-bar-row.is-contrast .dt-bar-name, .detection-demo .dt-bar-row.is-contrast .dt-bar-value { color: var(--dt-warm); font-weight: 650; }
+.detection-demo .dt-bar-row.is-contrast .dt-bar-name small { color: var(--dt-warm); }
+
+@media (max-width: 860px) {
+  .detection-demo .dt-steer-row, .detection-demo .dt-steer-axis { grid-template-columns: 140px minmax(0, 1fr) 70px 132px; gap: 4px 12px; }
+  .detection-demo .dt-bars-head, .detection-demo .dt-bar-row { grid-template-columns: 170px minmax(0, 1fr) minmax(0, 1fr); gap: 4px 12px; }
+}
+@media (max-width: 640px) {
+  .detection-demo { padding: 20px 16px; }
+  .detection-demo h3 { font-size: 23px; }
+  .detection-demo .dt-heading > p:last-child { font-size: 13px; }
+  .detection-demo .dt-group-label { width: 100%; min-width: 0; }
+  .detection-demo .dt-input-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .detection-demo .dt-input-row .dt-range { grid-column: 1 / -1; }
+  .detection-demo .dt-steer-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name value" "track track" "dist dist"; }
+  .detection-demo .dt-steer-row .dt-steer-name { grid-area: name; }
+  .detection-demo .dt-steer-row .dt-track { grid-area: track; }
+  .detection-demo .dt-steer-row .dt-steer-value { grid-area: value; padding-right: 6px; }
+  .detection-demo .dt-steer-row .dt-steer-dist { grid-area: dist; padding-left: 6px; }
+  .detection-demo .dt-steer-row .dt-chosen { display: inline; margin-left: 8px; }
+  .detection-demo .dt-steer-axis { grid-template-columns: minmax(0, 1fr); }
+  .detection-demo .dt-steer-axis > span:not(.dt-axis) { display: none; }
+  .detection-demo .dt-readout > div { grid-template-columns: minmax(0, 1fr); }
+  .detection-demo .dt-bars-head { display: none; }
+  .detection-demo .dt-bar-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2px 12px; padding: 7px 0; }
+  .detection-demo .dt-bar-name { grid-column: 1 / -1; }
+  .detection-demo .dt-metric { grid-template-columns: minmax(0, 1fr) auto; gap: 0 6px; }
+  .detection-demo .dt-metric-label { display: block; grid-column: 1 / -1; font-size: 10px; color: var(--dt-muted); }
+  .detection-demo .dt-board th, .detection-demo .dt-board td { padding: 6px 6px; }
+  .detection-demo .dt-board tbody th { white-space: normal; }
+}

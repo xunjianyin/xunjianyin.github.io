@@ -1,0 +1,200 @@
+/* Access-mode auditing demos (auditing-health-llms).
+ * Same shell as the other demo families: serif heading, green eyebrow, 1px rules,
+ * square corners, no shadows, and no motion. Green marks a first-named mode that is
+ * higher, brown one that is lower; text labels always carry the same information. */
+.auditing-demo {
+  --au-ink: var(--ink, #202a26);
+  --au-muted: var(--muted, #626b66);
+  --au-faint: #8b938e;
+  --au-accent: var(--accent, #2b6151);
+  --au-line: var(--line, #dce2dc);
+  --au-soft-line: #edf0eb;
+  --au-wash: var(--wash, #f0f4ee);
+  --au-pos: #2b6151;
+  --au-pos-wash: #e2ede6;
+  --au-neg: #8f4f31;
+  --au-neg-wash: #f6ebe4;
+  margin-block: 28px;
+  padding: 28px;
+  border: 1px solid var(--au-line);
+  background: #fff;
+  color: var(--au-ink);
+  font-size: 14px;
+  line-height: 1.65;
+  min-width: 0;
+}
+.auditing-demo [hidden] { display: none !important; }
+.auditing-demo p { margin: 0; }
+.auditing-demo :focus-visible { outline: 2px solid var(--au-accent); outline-offset: 2px; }
+.auditing-demo .au-heading { margin-bottom: 22px; }
+.auditing-demo .au-eyebrow { margin: 0 0 7px; color: var(--au-accent); font-size: 10px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; }
+.auditing-demo h3 { margin: 0 0 10px; font: 400 25px/1.3 Georgia, "Times New Roman", serif; letter-spacing: -.02em; }
+.auditing-demo .au-heading > p:last-child { max-width: 78ch; color: var(--au-muted); font-size: 14px; line-height: 1.75; }
+.auditing-demo h4 { margin: 0 0 8px; font-size: 13.5px; font-weight: 650; line-height: 1.45; }
+.auditing-demo h4 small { margin-left: 4px; color: var(--au-muted); font-size: 12px; font-weight: 400; }
+.auditing-demo .au-small { color: var(--au-muted); font-size: 12px; line-height: 1.65; }
+.auditing-demo .au-status { max-width: 88ch; font-size: 13.5px; line-height: 1.7; }
+.auditing-demo .au-measured { max-width: 88ch; margin-top: 10px; color: var(--au-muted); font-size: 12.5px; line-height: 1.65; }
+.auditing-demo .au-provenance { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--au-line); color: var(--au-muted); font-size: 11.5px; line-height: 1.7; }
+.auditing-demo .au-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Shared table reset: the page's global table rules use wide padding and a wash header. */
+.auditing-demo table { width: auto; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.auditing-demo th, .auditing-demo td { padding: 5px 8px; border-bottom: 1px solid var(--au-soft-line); vertical-align: middle; text-align: left; }
+.auditing-demo thead th { background: none; color: var(--au-muted); font-size: 11.5px; font-weight: 600; vertical-align: bottom; }
+.auditing-demo caption { padding: 0 0 6px; color: var(--au-muted); font-size: 11.5px; text-align: left; caption-side: top; }
+.auditing-demo .au-table-wrap { position: relative; max-width: 100%; min-width: 0; overflow-x: auto; }
+.auditing-demo .au-num { text-align: right; white-space: nowrap; }
+.auditing-demo .au-num small { color: var(--au-muted); font-size: 11px; }
+
+/* Controls. */
+.auditing-demo .au-controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 28px; margin: 0 0 16px; padding-top: 16px; border-top: 1px solid var(--au-line); }
+.auditing-demo .au-controls fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.auditing-demo .au-controls legend { margin-bottom: 7px; padding: 0; font-size: 12px; font-weight: 600; }
+.auditing-demo .au-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.auditing-demo .au-buttons button { min-height: 36px; padding: 7px 12px; border: 1px solid #b8c5bc; border-radius: 0; background: #fff; color: var(--au-ink); font: inherit; font-size: 12.5px; line-height: 1.4; text-align: left; cursor: pointer; }
+.auditing-demo .au-buttons button:hover { border-color: var(--au-accent); }
+.auditing-demo .au-buttons button[aria-pressed="true"] { border-color: var(--au-accent); background: var(--au-wash); color: var(--au-accent); font-weight: 600; }
+.auditing-demo .au-hint { padding-bottom: 8px; color: var(--au-muted); font-size: 12px; }
+
+/* Legends: small square keys. */
+.auditing-demo .au-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 10px; color: var(--au-muted); font-size: 11.5px; }
+.auditing-demo .au-legend span[class]::before { content: ""; display: inline-block; width: 11px; height: 11px; margin-right: 6px; vertical-align: -1px; border: 1px solid transparent; }
+.auditing-demo .au-key-pos::before { background: var(--au-pos-wash); border-color: var(--au-pos) !important; }
+.auditing-demo .au-key-neg::before { background: var(--au-neg-wash); border-color: var(--au-neg) !important; }
+.auditing-demo .au-key-ns::before { background: #fff; border-color: var(--au-line) !important; }
+.auditing-demo .au-key-within::before { background: rgb(43 97 81 / .35); }
+.auditing-demo .au-key-cross::before { background: rgb(143 79 49 / .35); }
+.auditing-demo .au-key-dot-within::before { width: 9px !important; height: 9px !important; background: #fff; border: 2px solid var(--au-pos) !important; }
+.auditing-demo .au-key-dot-cross::before { width: 9px !important; height: 9px !important; background: var(--au-neg); }
+
+/* Section 5.5: citation lists, pair matrix, readout. */
+.auditing-demo .au-calc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 32px; align-items: start; }
+.auditing-demo .au-cites th, .auditing-demo .au-cites td { padding: 2px; border-bottom: 0; text-align: center; }
+.auditing-demo .au-cites tbody th { padding-right: 10px; font-weight: 600; text-align: left; white-space: nowrap; }
+.auditing-demo .au-cites tr.is-chatgpt:nth-child(4) > * { padding-top: 10px; }
+.auditing-demo .au-cites .au-count { padding-left: 8px; color: var(--au-muted); text-align: right; }
+.auditing-demo .au-cite, .auditing-demo .au-mark { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid #c4cec6; border-radius: 0; background: #fff; color: var(--au-faint); font: inherit; font-size: 14px; line-height: 1; }
+.auditing-demo .au-cite { cursor: pointer; padding: 0; }
+.auditing-demo .au-cite:hover { border-color: var(--au-accent); }
+.auditing-demo .is-on .au-cite, .auditing-demo .is-on .au-mark { border-color: var(--au-accent); background: var(--au-accent); color: #fff; }
+.auditing-demo .au-pairs th, .auditing-demo .au-pairs td { padding: 0; border-bottom: 0; text-align: center; }
+.auditing-demo .au-pairs thead th { padding: 0 2px 4px; font-size: 10.5px; font-weight: 600; white-space: nowrap; }
+.auditing-demo .au-pairs tbody th { padding-right: 8px; font-size: 11.5px; font-weight: 600; text-align: right; white-space: nowrap; }
+.auditing-demo .au-pair { width: 46px; height: 32px; border: 1px solid #fff; font-size: 12px; }
+.auditing-demo .au-pair.is-within { background: rgb(43 97 81 / calc(var(--au-shade, 0) * .5)); }
+.auditing-demo .au-pair.is-cross { background: rgb(143 79 49 / calc(var(--au-shade, 0) * .5)); }
+.auditing-demo .au-empty { width: 46px; }
+.auditing-demo .au-readout { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 18px 0 14px; border-block: 1px solid var(--au-line); }
+.auditing-demo .au-readout > div { min-width: 0; padding: 10px 12px; border-left: 1px solid var(--au-line); }
+.auditing-demo .au-readout > div:first-child { border-left: 0; padding-left: 0; }
+.auditing-demo .au-readout dt { color: var(--au-muted); font-size: 11.5px; font-weight: 600; line-height: 1.4; }
+.auditing-demo .au-readout dt small { display: block; font-weight: 400; }
+.auditing-demo .au-readout dd { margin: 4px 0 0; font: 400 22px/1.2 Georgia, "Times New Roman", serif; font-variant-numeric: tabular-nums; }
+.auditing-demo .au-readout .is-delta dd { color: var(--au-accent); }
+
+/* Tables A1–A3: contrast grid, means, overlap. */
+.auditing-demo .au-summary { margin-bottom: 14px; }
+.auditing-demo .au-grid { min-width: 100%; }
+.auditing-demo .au-grid thead tr:first-child th[colspan] { border-bottom: 1px solid var(--au-line); text-align: center; color: var(--au-ink); }
+.auditing-demo .au-grid tbody th { position: sticky; left: 0; z-index: 1; min-width: 150px; max-width: 220px; padding: 0; background: #fff; font-weight: 400; }
+.auditing-demo .au-grid .au-row-label, .auditing-demo .au-grid .au-row-button { display: block; width: 100%; padding: 5px 8px 5px 10px; border: 0; border-left: 3px solid transparent; background: none; color: inherit; font: inherit; line-height: 1.4; text-align: left; }
+.auditing-demo .au-grid .au-row-button { cursor: pointer; }
+.auditing-demo .au-grid .au-row-button:hover { color: var(--au-accent); }
+.auditing-demo .au-grid small { display: block; color: var(--au-muted); font-size: 11px; }
+.auditing-demo .au-grid tr.is-selected > th { background: var(--au-wash); }
+.auditing-demo .au-grid tr.is-selected .au-row-button, .auditing-demo .au-grid tr.is-selected .au-row-label { border-left-color: var(--au-accent); font-weight: 650; }
+.auditing-demo .au-grid .au-group th { position: static; padding: 12px 8px 4px 10px; border-bottom: 1px solid var(--au-line); color: var(--au-muted); font-size: 10.5px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; }
+.auditing-demo .au-grid .au-group-start { border-left: 1px solid var(--au-line); }
+.auditing-demo .au-grid thead .au-cell-head { text-align: right; }
+.auditing-demo .au-cell { min-width: 84px; text-align: right; white-space: nowrap; }
+.auditing-demo .au-cell .au-delta { display: block; font-size: 13px; }
+.auditing-demo .au-cell .au-p { display: block; color: var(--au-muted); font-size: 10.5px; }
+.auditing-demo .au-cell[data-state="pos"] { background: var(--au-pos-wash); color: var(--au-pos); }
+.auditing-demo .au-cell[data-state="neg"] { background: var(--au-neg-wash); color: var(--au-neg); }
+.auditing-demo .au-cell[data-state="pos"] .au-delta, .auditing-demo .au-cell[data-state="neg"] .au-delta { font-weight: 650; }
+.auditing-demo .au-cell[data-state="ns"] .au-delta { color: var(--au-muted); }
+.auditing-demo .au-cell[data-state="nt"], .auditing-demo .au-cell[data-state="absent"] { color: var(--au-faint); font-style: italic; }
+.auditing-demo .au-direction { min-width: 92px; white-space: nowrap; }
+.auditing-demo thead .au-direction { white-space: nowrap; }
+.auditing-demo td.au-direction { color: var(--au-faint); }
+.auditing-demo td.au-direction[data-state="reverses"], .auditing-demo td.au-direction[data-state="same"] { color: var(--au-ink); font-weight: 650; }
+.auditing-demo td.au-direction[data-state="old"], .auditing-demo td.au-direction[data-state="new"] { color: var(--au-muted); }
+.auditing-demo .au-detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 32px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--au-line); }
+.auditing-demo .au-detail > h4, .auditing-demo .au-detail > .au-small { grid-column: 1 / -1; }
+.auditing-demo .au-detail > .au-small { max-width: 88ch; margin-bottom: 8px; }
+.auditing-demo .au-means { width: 100%; }
+.auditing-demo .au-means th { width: 34%; font-weight: 400; white-space: nowrap; }
+.auditing-demo .au-means td:nth-child(2) { width: 46%; }
+.auditing-demo .au-means tr.is-absent th { color: var(--au-faint); }
+.auditing-demo .au-bar { display: block; height: 9px; background: var(--au-soft-line); }
+.auditing-demo .au-bar i { display: block; height: 100%; min-width: 1px; background: var(--au-accent); }
+.auditing-demo .au-overlap { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--au-line); }
+.auditing-demo .au-overlap-table { min-width: 100%; }
+.auditing-demo .au-overlap-table tbody th { min-width: 170px; font-weight: 400; line-height: 1.4; }
+.auditing-demo .au-overlap-table tbody th small { display: block; color: var(--au-muted); font-size: 11px; }
+.auditing-demo .au-overlap-table tr[data-state="sig"] .au-strong { color: var(--au-accent); font-weight: 650; }
+.auditing-demo .au-overlap-table tr[data-state="ns"] .au-strong { color: var(--au-muted); }
+.auditing-demo .au-track-cell { min-width: 150px; }
+.auditing-demo .au-track { position: relative; display: block; width: 100%; min-width: 140px; height: 14px; }
+.auditing-demo .au-track::before { content: ""; position: absolute; top: 50%; right: 0; left: 0; border-top: 1px solid var(--au-line); }
+.auditing-demo .au-track i { position: absolute; top: 50%; display: block; }
+.auditing-demo .au-gap { height: 3px; margin-top: -1.5px; background: var(--au-faint); }
+.auditing-demo tr[data-state="sig"] .au-gap { background: var(--au-ink); }
+.auditing-demo .au-dot { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; }
+.auditing-demo .au-dot.is-cross { background: var(--au-neg); }
+.auditing-demo .au-dot.is-within { border: 2px solid var(--au-pos); background: #fff; }
+.auditing-demo .au-overlap .au-status { margin-top: 10px; }
+
+/* Original Figure 1 in Method: legible width, scrolls sideways on phones. */
+.au-figure { margin: 0; padding: 22px 24px 16px; border: 1px solid var(--line, #dce2dc); background: #fff; }
+.au-figure img { display: block; width: 100%; max-width: 760px; height: auto; margin-inline: auto; }
+.au-figure figcaption { max-width: 800px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line, #dce2dc); font-size: 12px; line-height: 1.7; }
+.au-figure .au-scroll-hint { display: none; }
+
+@media (max-width: 760px) {
+  .auditing-demo .au-calc { grid-template-columns: 1fr; }
+  .auditing-demo .au-detail { grid-template-columns: 1fr; }
+  .auditing-demo .au-readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .auditing-demo .au-readout > div { padding-left: 12px; border-left: 0; border-top: 1px solid var(--au-soft-line); }
+  .auditing-demo .au-readout > div:nth-child(odd) { padding-left: 0; }
+  .auditing-demo .au-readout > div:nth-child(-n+2) { border-top: 0; }
+  .auditing-demo .au-readout .is-delta { grid-column: 1 / -1; padding-left: 0; }
+}
+@media (max-width: 700px) {
+  .auditing-demo { padding: 20px 16px; }
+  .auditing-demo h3 { font-size: 23px; }
+  .auditing-demo .au-heading > p:last-child { font-size: 13px; }
+  .auditing-demo .au-readout dd { font-size: 20px; }
+  /* Phones: the ChatGPT-vs-API group (both versions and the direction) fits beside the labels;
+     the ChatGPT Health group scrolls into view. */
+  .auditing-demo .au-grid th, .auditing-demo .au-grid td { padding-inline: 6px; }
+  .auditing-demo .au-grid tbody th { min-width: 108px; max-width: 118px; padding: 0; }
+  .auditing-demo .au-grid .au-row-label, .auditing-demo .au-grid .au-row-button { padding: 5px 4px 5px 7px; font-size: 12px; }
+  .auditing-demo .au-cell { min-width: 58px; }
+  .auditing-demo .au-cell .au-delta { font-size: 12.5px; }
+  .auditing-demo .au-direction { min-width: 62px; font-size: 12px; }
+  .au-figure { padding: 14px 12px; }
+  .au-figure-scroll { overflow-x: auto; }
+  .au-figure-scroll img { width: 600px; max-width: none; }
+  .au-figure .au-scroll-hint { display: inline; }
+}
+@media (max-width: 560px) {
+  /* The printed numbers matter more than the dot track on narrow screens. */
+  .auditing-demo .au-overlap-table .au-track-cell { display: none; }
+  .auditing-demo .au-overlap-table tbody th { min-width: 112px; padding-left: 0; }
+  .auditing-demo .au-overlap-table th, .auditing-demo .au-overlap-table td { padding-inline: 4px; }
+}
+@media (max-width: 420px) {
+  .auditing-demo .au-cites .au-count { display: none; }
+  .auditing-demo .au-cites th, .auditing-demo .au-cites td { padding: 1px; }
+  .auditing-demo .au-cites tbody th { padding-right: 6px; font-size: 12px; }
+  .auditing-demo .au-cite, .auditing-demo .au-mark { width: 26px; height: 26px; font-size: 13px; }
+}
+@media (max-width: 360px) {
+  .auditing-demo .au-cite, .auditing-demo .au-mark { width: 22px; height: 24px; font-size: 12px; }
+  .auditing-demo .au-pair, .auditing-demo .au-empty { width: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auditing-demo *, .au-figure * { animation: none !important; transition: none !important; }
+}

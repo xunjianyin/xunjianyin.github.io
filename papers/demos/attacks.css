@@ -1,0 +1,130 @@
+/* Scoped styles for the attack-paper demos: flat, square, 1px rules, no shadows.
+ * Nothing moves: every state change is an immediate re-render after a reader action,
+ * so there are no transitions to remove under prefers-reduced-motion. */
+.attacks-demo {
+  --at-ink: var(--ink, #202a26);
+  --at-muted: var(--muted, #626b66);
+  --at-line: var(--line, #dce2dc);
+  --at-accent: var(--accent, #2b6151);
+  --at-wash: var(--wash, #f0f4ee);
+  --at-warm: #8a4b1f;
+  --at-warm-wash: #f6ece1;
+  --at-rule: #b8c5bc;
+  --at-grey: #9aa29c;
+  --at-name: 176px;
+  --at-value: 118px;
+  border: 1px solid var(--at-line);
+  background: #fff;
+  padding: 28px;
+  margin: 28px 0;
+  color: var(--at-ink);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.attacks-demo *, .attacks-demo *::before, .attacks-demo *::after { border-radius: 0; box-shadow: none; animation: none; transition: none; }
+.attacks-demo [hidden] { display: none !important; }
+.attacks-demo .at-heading { margin-bottom: 20px; }
+.attacks-demo .at-kicker { color: var(--at-accent); font-size: 10px; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 7px; }
+.attacks-demo h3 { font: 400 25px/1.3 Georgia, "Times New Roman", serif; letter-spacing: -.02em; margin: 0 0 10px; }
+.attacks-demo .at-heading > p:last-child { margin: 0; color: var(--at-muted); max-width: 76ch; }
+.attacks-demo h4 { font: 400 15px/1.4 Georgia, "Times New Roman", serif; margin: 0 0 8px; }
+
+/* Controls */
+.attacks-demo .at-controls { border-top: 1px solid var(--at-line); padding-top: 18px; margin-bottom: 22px; }
+.attacks-demo .at-button-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.attacks-demo .at-group-label { flex: 0 0 auto; min-width: 64px; font-size: 11px; color: var(--at-muted); }
+.attacks-demo .at-controls button { font: inherit; font-size: 12px; line-height: 1.45; border: 1px solid var(--at-rule); background: #fff; color: var(--at-ink); min-height: 40px; padding: 8px 12px; cursor: pointer; }
+.attacks-demo .at-controls button[aria-pressed="true"] { background: var(--at-accent); border-color: var(--at-accent); color: #fff; }
+.attacks-demo .at-controls button:hover { border-color: var(--at-accent); }
+.attacks-demo :is(button, [tabindex]):focus-visible { outline: 2px solid var(--at-accent); outline-offset: 2px; }
+.attacks-demo .at-help { font-size: 11px; color: var(--at-muted); margin: 2px 0 0; max-width: 76ch; }
+
+/* Plot: one row per setting, a shared axis in tenths of a point */
+.attacks-demo .at-results > :first-child { margin-top: 0; }
+.attacks-demo .at-block { min-width: 0; }
+.attacks-demo .at-key { font-size: 11px; line-height: 1.6; color: var(--at-muted); margin: 0 0 12px; max-width: 80ch; }
+.attacks-demo .at-axis, .attacks-demo .at-row { display: grid; grid-template-columns: var(--at-name) minmax(0, 1fr) var(--at-value); gap: 12px; align-items: center; }
+.attacks-demo .at-axis { font-size: 10px; color: var(--at-muted); font-variant-numeric: tabular-nums; padding-bottom: 4px; border-left: 2px solid transparent; }
+.attacks-demo .at-axis-track { position: relative; height: 16px; }
+.attacks-demo .at-axis-label { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.attacks-demo .at-axis-label.is-first { transform: none; }
+.attacks-demo .at-axis-label.is-last { transform: translateX(-100%); }
+.attacks-demo .at-axis-unit { font-size: 10px; }
+.attacks-demo .at-rows { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--at-line); }
+.attacks-demo .at-rows > li { border-bottom: 1px solid var(--at-line); }
+.attacks-demo .at-row { width: 100%; padding: 5px 0; margin: 0; border: 0; border-left: 2px solid transparent; background: transparent; color: var(--at-ink); font: inherit; text-align: left; }
+.attacks-demo button.at-row { cursor: pointer; }
+.attacks-demo button.at-row:hover { background: #f7f8f6; }
+.attacks-demo .at-row.is-selected { background: var(--at-wash); border-left-color: var(--at-accent); }
+.attacks-demo .at-row-name { font-size: 12px; line-height: 1.3; padding-left: 8px; min-width: 0; }
+.attacks-demo .at-row-name small { display: block; font-size: 10.5px; color: var(--at-muted); }
+.attacks-demo .at-row.is-selected .at-row-name { font-weight: 650; }
+.attacks-demo .at-row-value { text-align: right; padding-right: 8px; font-variant-numeric: tabular-nums; line-height: 1.3; min-width: 0; }
+.attacks-demo .at-row-value strong { display: block; font-size: 12.5px; font-weight: 600; }
+.attacks-demo .at-row-value small { display: block; font-size: 10.5px; color: var(--at-muted); }
+.attacks-demo .at-track { position: relative; display: block; height: 22px; }
+/* The plot is inset so that marks at the domain edges stay inside the row. */
+.attacks-demo .at-plot { position: absolute; top: 0; bottom: 0; left: 7px; right: 7px; display: block; }
+.attacks-demo .at-plot > i { position: absolute; display: block; }
+.attacks-demo .at-grid { top: 0; bottom: 0; width: 1px; background: #edf0ec; }
+.attacks-demo .at-grid.at-zero { background: var(--at-ink); }
+.attacks-demo .at-line { top: 10px; height: 2px; background: var(--at-ink); }
+.attacks-demo .at-mark { top: 6px; width: 10px; height: 10px; margin-left: -5px; border: 1.5px solid var(--at-ink); background: #fff; box-sizing: border-box; }
+.attacks-demo .at-mark.at-fill { background: var(--at-ink); }
+.attacks-demo .at-tick { top: 3px; height: 16px; width: 2px; margin-left: -1px; background: var(--at-accent); }
+
+/* Drop view: dark when the interval lies above zero, grey when it includes zero, warm below zero */
+.attacks-demo .at-row.is-spans .at-line { background: var(--at-grey); }
+.attacks-demo .at-row.is-spans .at-mark { border-color: var(--at-grey); background: var(--at-grey); }
+.attacks-demo .at-row.is-spans .at-row-value strong { color: var(--at-muted); }
+.attacks-demo .at-row.is-below .at-line { background: var(--at-warm); }
+.attacks-demo .at-row.is-below .at-mark { border-color: var(--at-warm); background: var(--at-warm); }
+.attacks-demo .at-row.is-below .at-row-value strong { color: var(--at-warm); }
+/* Accuracy view: a gain is warm; the connecting line is light */
+.attacks-demo .at-row.is-loss .at-line, .attacks-demo .at-row.is-gain .at-line { background: var(--at-rule); }
+.attacks-demo .at-row.is-gain .at-mark { border-color: var(--at-warm); }
+.attacks-demo .at-row.is-gain .at-mark.at-fill { background: var(--at-warm); }
+.attacks-demo .at-row.is-gain .at-row-value strong { color: var(--at-warm); }
+/* Adoption view: the C-F span is light; rows where clean-correct adoption is higher are warm */
+.attacks-demo .at-row.is-f-higher .at-line, .attacks-demo .at-row.is-c-higher .at-line { background: var(--at-rule); }
+.attacks-demo .at-row.is-c-higher .at-mark { border-color: var(--at-warm); }
+.attacks-demo .at-row.is-c-higher .at-mark.at-fill { background: var(--at-warm); }
+.attacks-demo .at-row.is-c-higher .at-row-value strong { color: var(--at-warm); }
+
+/* Captions, selected setting, summary */
+.attacks-demo .at-caption { font-size: 11px; line-height: 1.6; color: var(--at-muted); margin: 8px 0 0; max-width: 80ch; }
+.attacks-demo .at-caution { font-size: 11px; line-height: 1.6; color: var(--at-warm); margin: 8px 0 0; padding-left: 10px; border-left: 2px solid var(--at-warm); max-width: 80ch; }
+.attacks-demo .at-tag { font-size: 9.5px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; margin-right: 3px; white-space: nowrap; }
+.attacks-demo .at-tag-measured { color: var(--at-accent); }
+.attacks-demo .at-tag-computed { color: var(--at-muted); }
+.attacks-demo .at-detail { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--at-line); }
+.attacks-demo .at-detail dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 18px; margin: 0; }
+.attacks-demo .at-detail dl > div { padding: 7px 0; border-bottom: 1px solid var(--at-line); min-width: 0; }
+.attacks-demo .at-detail dt { font-size: 10.5px; color: var(--at-muted); }
+.attacks-demo .at-detail dd { margin: 0; font-size: 13px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.attacks-demo .at-verdict { margin: 22px 0 0; padding-top: 14px; border-top: 1px solid var(--at-line); font-size: 13px; }
+.attacks-demo .at-disclosure { margin: 20px 0 0; padding-top: 15px; border-top: 1px solid var(--at-line); font-size: 11px; line-height: 1.6; color: var(--at-muted); }
+.attacks-demo .at-source-links { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.attacks-demo .at-source-links a { color: var(--at-accent); }
+
+@media (max-width: 760px) {
+  .attacks-demo .at-detail dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .attacks-demo { padding: 19px 15px; }
+  .attacks-demo h3 { font-size: 23px; }
+  .attacks-demo .at-group-label { min-width: 100%; }
+  .attacks-demo .at-button-row { gap: 6px; }
+  .attacks-demo .at-controls button { padding: 8px 10px; }
+  /* Name and value share the first line; the plot takes the full width below them. */
+  .attacks-demo .at-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name value" "track track"; gap: 2px 10px; padding: 6px 0 4px; }
+  .attacks-demo .at-row-name { grid-area: name; }
+  .attacks-demo .at-row-value { grid-area: value; }
+  .attacks-demo .at-row .at-track { grid-area: track; margin: 0 8px; }
+  .attacks-demo .at-row-value strong, .attacks-demo .at-row-value small { display: inline; }
+  .attacks-demo .at-row-value small { margin-left: 4px; }
+  .attacks-demo .at-axis { grid-template-columns: minmax(0, 1fr); }
+  .attacks-demo .at-axis-spacer, .attacks-demo .at-axis-unit { display: none; }
+  .attacks-demo .at-axis-track { margin: 0 8px; }
+  .attacks-demo .at-detail dl { grid-template-columns: minmax(0, 1fr); }
+}

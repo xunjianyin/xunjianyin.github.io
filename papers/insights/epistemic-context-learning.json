@@ -1,0 +1,53 @@
+{
+  "story": {
+    "title": "Judge who is speaking when you cannot judge what is said",
+    "paragraphs": [
+      "In a multi-agent system, an agent can read its peers' answers before it gives its own. That helps only if the agent can tell good answers from bad ones. When it lacks the knowledge to check a claim, it has to judge plausibility, and a confident, fluent but wrong explanation can outweigh a short correct one. LLMs also tend to conform to majorities and to confident peers.",
+      "The paper reframes the task as history-aware reference. Besides the current question and the peers' current responses, the agent receives the peers' earlier rounds: past questions and each peer's answer, with no answer key (Section 3). It must infer who has been reliable and lean on that peer when it is unsure. The authors argue that a peer's record over several questions is often easier to judge than a single hard reasoning trace.",
+      "A controlled diagnostic shows that putting the history in the prompt is not enough (Section 4). With two peers, one always right and one always wrong, Qwen 2.5-3B and Llama 3.2-3B trained by RL with the history in context reach 83.8–86.5% when the peers' reasoning is visible (Table 1). But when the two peers swap roles at test time (Flip), that accuracy changes by only −5.4 to +2.7 pp: the models read the current answers and ignore the history. When both peers answer wrongly (All-W), accuracy falls to 5.4–48.7% (Table 2), which the paper calls blind conformity."
+    ]
+  },
+  "mechanism": {
+    "title": "Separate estimating trust from using it, and reward each part",
+    "paragraphs": [
+      "ECL runs the same model twice (Figure 2). In Stage 1 it sees only the history and writes a profile of the peers, such as each peer's count of correct past answers; an example in Appendix D.5 lists 5 of 5 for one peer and 0 of 5 for the other three. The current question and responses are withheld, so the profile cannot be built from current-round cues; the paper calls this an information bottleneck. In Stage 2 the profile replaces the raw history, and the model reads the current question and peer responses and answers.",
+      "The split helps even without training. On the diagnostic tasks, two-stage prompting raises base-model accuracy in all eight combinations of model, dataset and peer context, by 6.7 to 25.7 pp; for example, Qwen 2.5-3B on LiveCode with answer-only peers goes from 50.0% to 75.7% (Table 3).",
+      "With RL, the choice of reward decides how much Stage 1 learns. Passing the final-answer reward (outcome reward, OR) to both stages gives ECL (I), which improves on single-stage RL by 1.3 to 8.1 pp, for example 77.0% vs 75.7% on LiveCode with answer-only peers. ECL (E) asks Stage 1 to end with “The most reliable peer is: <PEER_NAME>” and rewards that sentence with the peer recognition reward (PRR): 1 if the named peer is the one that is reliable by construction, 0 otherwise. With each stage rewarded for its own output, accuracy reaches 81.1–100.0% across the four diagnostic settings (Table 4).",
+      "The split is also what makes PRR safe to use. Adding PRR to single-stage RL lowers accuracy, from 73.0% to 62.2% on Math500 and from 75.7% to 55.4% on LiveCode with answer-only peers (Table 5). The paper attributes this to reward hacking: the model exploits spurious correlations in the current round to guess the reliable peer instead of reading the history. Stage 1 of ECL never sees the current round, so that shortcut is closed."
+    ]
+  },
+  "evidence": {
+    "title": "Gains are largest against misleading peers, and they rest on trusting the right one",
+    "paragraphs": [
+      "The main evaluation (Section 6) uses MMLU-Pro (90 test questions) and GPQA (40), four peers and five history rounds. Natural peers are four different LLMs, with Gemini 3 Flash as the strong one; adversarial peers are four copies of Qwen3-30B-A3B-Thinking, one justifying the correct answer and three arguing confidently for wrong ones. Qwen 3-4B and 8B are trained with RL; six larger models are only prompted. The baseline AG (history-agnostic aggregator) reads the current peer responses but no history.",
+      "Counted cell by cell in Table 6, ECL (E) beats AG in 31 of 32 adversarial comparisons (eight models, two benchmarks, two peer contexts) but in 23 of 32 natural ones, with 4 ties and 5 losses. Misleading peers also hurt AG itself: in 10 of the 32 adversarial cells, AG scores below the same model answering alone. In the natural setting, Gemini 3 Flash and Pro gain little or lose; the authors suggest that these models share knowledge with the strong peer, which is itself Gemini 3 Flash. The abstract's comparison of RL-trained Qwen 3-4B with ECL (E) against prompted Qwen 3-30B with AG holds in 5 of the 8 views.",
+      "The stress tests show where the gains come from. When the historically reliable peer answers wrongly at test time (Flip, Table 10), ECL (E) loses accuracy in all 20 reported cells and falls below AG in 18; the paper reads this as evidence that the agent follows the peer it identified. On GPQA, the agent is more often right after naming the reliable peer (Table 11), but the prompted models named another peer on only 3 to 6 of the 40 questions, so those conditional accuracies rest on very few cases. When every peer answers wrongly (All-W, Table 14), ECL (E) is at or below AG for all three tested models in both peer contexts. Adding the agent's own independent answer as an input (decoupled belief, Appendix E) lifts ECL (E) above AG in 4 of these 6 cells, but All-W accuracy stays below normal accuracy in every cell.",
+      "RL matters most for the small models on hard tasks: without it, Qwen 3-8B with ECL falls below AG on adversarial GPQA with answer-only peers (37.5% and 35.0% vs 42.5%, Table 9), while the RL-trained model reaches 50.0% vs 45.0%. For three models on adversarial MMLU-Pro with peer reasoning (the benchmark is inferred from values that match Table 6), ECL stays above AG with two to four peers and two to eight history rounds (Tables 12 and 13)."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Paper · Sections 3–6, Appendices D–F (arXiv v1)",
+      "url": "https://arxiv.org/html/2601.21742v1"
+    },
+    {
+      "label": "Code and data",
+      "url": "https://github.com/skyriver-2000/epistemic-context-learning"
+    }
+  ],
+  "reading_notes": "Read the full arXiv v1 LaTeX source (main.tex; contents/1-intro through 8-appendix) and the 26-page PDF. Section 3: the history H_j holds past queries and peer responses only, with no ground truth; the Appendix C example and the released build_example_adv in ECL/utils/eval_utils.py also show no answer key. Section 4: two peers, five history rounds, GRPO; Tables 1-2 (PDF page 4) give the Flip and All-W diagnostics; MA-Reasoning Flip changes are -5.4, -2.7, +2.7 and +1.3 points; All-W ranges from 5.4% to 48.7%. Section 5: Table 3 (two-stage prompting, all eight cells improve by 6.7 to 25.7 points), Table 4 (1S RL vs ECL (I) vs ECL (E); model inferred as Qwen 2.5-3B from Table 1), Table 5 (PRR in single-stage RL lowers accuracy; reward hacking is the paper's explanation, not separately measured). Section 6: Table 6 (8 models x 2 benchmarks x 2 settings x 2 contexts), Table 7 test sizes 90 and 40. The adversarial wrong peers are built by prompting Qwen3-30B-A3B-Thinking to argue for a given answer (Appendix F.1). Flip with four peers: Appendix D.3 says the historically reliable peer answers wrongly; the released code (revert_test_identity == 1) also makes one previously unreliable peer correct. Appendix D: Tables 8-13; Table 11 is GPQA only. Appendix E: decoupled belief (Table 14, GPQA adversarial, three models) is a discussion experiment, not part of ECL. Derived counts quoted on the page were computed from the transcribed tables; inconsistencies (Table 8 42.0%, Gemini MA-Reasoning 95.0 vs 97.5, the GPT-5-mini 'less than 5%' remark) are recorded in source_note. No variance or repeated runs are reported, and Section 4's test-set sizes are not stated. The page describes the paper's contribution without assigning roles to individual co-authors.",
+  "demo": {
+    "kind": "trust-evidence",
+    "placement": "evidence",
+    "eyebrow": "Measured · Tables 6, 8, 10, 11 and 14 · computed question counts",
+    "title": "Where does trust help, and what happens when it is misplaced?",
+    "description": "Choose a benchmark, a peer setting and what the peers show. The table lists every model the paper reports for that view, as printed, and converts ECL (E) − AG into whole test questions. The two stress settings change only the current round: when the reliable peer flips, the peer that was right throughout the history now answers wrongly and a previously wrong peer answers correctly; with all peers wrong, every peer answers wrongly. Below the table, the GPQA strips split ECL (E)'s answers by whether Stage 1 named the reliable peer.",
+    "note": "Measured: every accuracy is copied as printed from Table 6 (natural and adversarial settings), Table 10 (Flip), Table 14 (All-W; GPQA, three models), Table 8 (peer recognition rate, GPQA rows) and Table 11 (GPQA accuracy by recognition outcome). Single agent is the RL-trained single agent for Qwen 3-4B and 8B and the untrained model otherwise. Computed: differences in percentage points, whole questions out of the 90 MMLU-Pro or 40 GPQA test questions (Table 7), and the split of the 40 GPQA questions that reproduces both Table 11 percentages and lies closest to the Table 8 rate. The paper reports no repeated runs or variance.",
+    "sources": [
+      {
+        "label": "Tables 6–14 (arXiv v1)",
+        "url": "https://arxiv.org/html/2601.21742v1"
+      }
+    ]
+  }
+}

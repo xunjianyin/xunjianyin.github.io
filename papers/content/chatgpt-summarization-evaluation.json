@@ -1,0 +1,187 @@
+{
+  "chatgpt-summarization-evaluation": {
+    "short_name": "ChatGPT as Summary Evaluator",
+    "topic": "Summarization evaluation · LLM evaluators",
+    "takeaway": "Given the instructions that human annotators follow, ChatGPT completed four summarization evaluation protocols. In this early-2023 study it agreed with human judgments better than common automatic metrics on SummEval but not on Newsroom, and its system-level agreement shifted sharply with the prompt.",
+    "glance": {
+      "result": "ChatGPT beats all 11 automatic metrics in every SummEval correlation column but ranks third, behind two BARTScore variants, in every Newsroom column.",
+      "prior": "Earlier metrics score n-gram or embedding overlap (ROUGE, BERTScore), BART likelihood (BARTScore), or sentence factuality (FactCC, DAE); this study prompts ChatGPT with four human evaluation protocols instead.",
+      "limitation": "One model snapshot (gpt-3.5-turbo-0301), one prompt per protocol, and no significance tests; a longer prompt moved system-level consistency from 0.833 to −0.149."
+    },
+    "question": "Human evaluation of summaries is slow and costly, and automatic metrics such as ROUGE agree only loosely with it. If ChatGPT receives the instructions that human annotators receive, do its judgments agree with people more closely than existing metrics do, and how stable is that agreement?",
+    "method": [
+      {
+        "title": "Reuse human protocols as prompts",
+        "text": "Turn four human evaluation methods (Likert scale scoring, pairwise comparison, Pyramid, and binary factuality evaluation) into zero-shot prompts that stay as close as possible to the original annotator instructions (Figures 1–4)."
+      },
+      {
+        "title": "Query ChatGPT and parse its replies",
+        "text": "Send each example to gpt-3.5-turbo-0301 with temperature 0 and max_tokens 256, extract the score or label with simple rules, and mark replies without one as invalid."
+      },
+      {
+        "title": "Compare with humans and metrics",
+        "text": "Correlate Likert scores with human scores (Spearman ρ at sample, system, and dataset level) and measure accuracy for the other protocols; score ROUGE, BERTScore, MoverScore, BARTScore, FactCC, and DAE against the same human judgments."
+      }
+    ],
+    "findings": [
+      {
+        "value": "12 of 12",
+        "label": "SummEval columns where ChatGPT beats all 11 metrics",
+        "detail": "Spearman ρ of gpt-3.5-turbo-0301 with human Likert scores for four dimensions at three levels; its narrowest lead is system-level consistency, 0.833 against 0.800 for BARTScore_s_h (Table 1). No significance tests are reported."
+      },
+      {
+        "value": "3rd of 12",
+        "label": "ChatGPT's rank in every Newsroom column",
+        "detail": "BARTScore_s_h and BARTScore_cnn_s_h are higher in all 12 columns; at sample-level coherence they reach 0.679 and 0.653 against ChatGPT's 0.484 (Table 2)."
+      },
+      {
+        "value": "+12.13 pp",
+        "label": "Accuracy lead on QAGS_XSUM factuality",
+        "detail": "ChatGPT 0.7573 against DAE 0.6360 on binary sentence factuality. Its other accuracy leads are small: +0.29 pp on QAGS_CNN, +1.32 pp on REALSumm SCUs, and +0.27 pp over BARTScore_h_r on TLDR pairwise comparison (Tables 3–5)."
+      },
+      {
+        "value": "−0.149",
+        "label": "SummEval system-level consistency with a longer prompt, from 0.833",
+        "detail": "Adding the dimension definitions and step instructions (Figure 5) reverses ChatGPT's system-level ρ, while its sample-level ρ falls only from 0.435 to 0.338; invalid replies rise from 0 to 1.06% (Tables 6 and 9)."
+      }
+    ],
+    "scope": "All results come from one ChatGPT snapshot, gpt-3.5-turbo-0301, queried in early 2023 (arXiv v1, 5 April 2023, the only version) with temperature 0 and one prompt per protocol; later models, snapshots, and prompts may behave differently. The study covers five summarization datasets, reports no significance tests or confidence intervals, and does not define its sample-, system-, and dataset-level correlations. Its reproducibility argument is not tested by repeated runs, and its cost comparison (about 3.2 USD in API fees against 60 USD for SummEval) assumes 5 annotator hours at 12 USD per hour rather than measuring human effort.",
+    "diagram": {
+      "title": "Human protocols in, comparable judgments out",
+      "steps": [
+        {
+          "label": "Human protocol",
+          "text": "Likert ratings, a pairwise choice, Pyramid SCUs, or sentence factuality"
+        },
+        {
+          "label": "ChatGPT prompt",
+          "text": "The annotator instructions as a zero-shot prompt at temperature 0"
+        },
+        {
+          "label": "Agreement",
+          "text": "Spearman ρ or accuracy against human labels, beside automatic metrics"
+        }
+      ],
+      "caption": "Each human evaluation protocol becomes a prompt, and ChatGPT's answers are scored against the human labels."
+    },
+    "source_url": "https://arxiv.org/abs/2304.02554",
+    "source_note": "Verified against the arXiv v1 LaTeX source (e-print 2304.02554, file emnlp2023.tex; v1 of 5 April 2023 is the only version) and the v1 PDF. Model and decoding settings: Section 3.1 (tex line 128). Prompt templates: Figures 1–4 (lines 135–213) and Figure 5 (lines 377–407). Results: Tables 1–5 (lines 236–341, PDF page 4) and Section 3.5 (lines 230–234). Prompt study and expert annotators: Table 6 (lines 352–373, PDF page 5) and Sections 4.1–4.2 (lines 426–437, including the cost estimate). Explanations: Section 4.3 and Table 7 (lines 409–421, 457–465). Invalid replies: Section 4.4 and Tables 8–9 (lines 439–487). Table numbers follow the PDF. Results table: Table 6, sample- and system-level columns for consistency and fluency, copied from tex lines 359–366 and re-checked cell by cell against PDF page 5 and the arXiv HTML (S4.T6); negative values use U+2212. Lead figure: Figures 1–4 cropped from PDF page 3 rendered at 200 dpi and arranged in a 2×2 grid without other changes. Derived readings (ranks, margins, 35 of 36 annotator-column pairs) are computed from the printed values. The author block lists one affiliation, the Wangxuan Institute of Computer Technology, Peking University; no code release is named in the paper.",
+    "authors_detail": [
+      {
+        "name": "Mingqi Gao",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Jie Ruan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Renliang Sun",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xunjian Yin",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Shiping Yang",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      },
+      {
+        "name": "Xiaojun Wan",
+        "affiliations": [
+          1
+        ],
+        "equal": false
+      }
+    ],
+    "affiliations": [
+      "Wangxuan Institute of Computer Technology, Peking University"
+    ],
+    "prior_work": "Common summarization metrics compare a summary with a reference by n-gram overlap (ROUGE) or contextual embeddings (BERTScore, MoverScore), score how likely BART is to generate it from the source or reference, or the reference from it (BARTScore), or label each sentence as factual or not (FactCC, DAE). Concurrent studies also used LLMs as evaluators: Kocmi and Federmann (2023) for translation quality, Wang et al. (2023) on three NLG meta-evaluation datasets, Ji et al. (2023) for ranking generated content, Luo et al. (2023) for factual consistency in summarization, and Liu et al. (2023) with ChatGPT, GPT-4, and chain-of-thought. This study concentrates on summarization: it recasts four human summarization protocols, including Pyramid and pairwise comparison, as prompts, and compares ChatGPT with both the metrics and expert annotators.",
+    "abstract_label": "Read the abstract",
+    "results_table": {
+      "caption": "Table 6 (sample- and system-level columns for consistency and fluency; the dataset-level columns and the relevance and coherence dimensions are omitted). Spearman ρ on SummEval, higher is better; gpt-3.5-turbo-0301 at temperature 0. +def adds the dimension definitions, +ins the step instructions (Figure 5), and +sys_prompt sets the system prompt “You are a human annotator that rates the quality of summaries.” Each annotator row correlates one expert’s scores with the average of all three experts, which includes that expert. The omitted columns follow the same pattern: with +def+ins, system-level ρ falls to −0.079 for relevance and 0.338 for coherence, while every dataset-level value of the three variants stays within 0.123 of the base prompt.",
+      "headings": [
+        "Evaluator",
+        "Consistency sample",
+        "Consistency system",
+        "Fluency sample",
+        "Fluency system"
+      ],
+      "rows": [
+        [
+          "ChatGPT",
+          "0.435",
+          "0.833",
+          "0.419",
+          "0.889"
+        ],
+        [
+          "ChatGPT+def",
+          "0.471",
+          "0.786",
+          "0.347",
+          "0.606"
+        ],
+        [
+          "ChatGPT+def+ins",
+          "0.338",
+          "−0.149",
+          "0.349",
+          "0.016"
+        ],
+        [
+          "ChatGPT+sys_prompt",
+          "0.414",
+          "0.007",
+          "0.390",
+          "0.149"
+        ],
+        [
+          "Annotator_0",
+          "0.843",
+          "0.990",
+          "0.740",
+          "0.960"
+        ],
+        [
+          "Annotator_1",
+          "0.813",
+          "0.965",
+          "0.847",
+          "0.843"
+        ],
+        [
+          "Annotator_2",
+          "0.712",
+          "0.973",
+          "0.613",
+          "0.923"
+        ]
+      ],
+      "highlight": [],
+      "source_url": "https://arxiv.org/html/2304.02554v1#S4.T6"
+    },
+    "figure_local": "assets/chatgpt-summarization-evaluation-prompts.png",
+    "figure_url": "https://arxiv.org/pdf/2304.02554v1 (Figures 1–4 on page 3, rendered at 200 dpi, cropped, and arranged in a 2×2 grid; LaTeX source emnlp2023.tex lines 135–213 of https://arxiv.org/e-print/2304.02554)",
+    "figure_caption": "The paper's four zero-shot prompt templates, one per human evaluation protocol: Likert scale scoring (Figure 1; SummEval and Newsroom), pairwise comparison (Figure 2; TLDR), Pyramid (Figure 3; REALSumm, up to 16 SCUs), and binary factuality evaluation (Figure 4; QAGS). Text in blue braces is filled in for each example. Original Figures 1–4 from the paper, arranged in a 2×2 grid.",
+    "primary_figure": true,
+    "figure_scroll": true
+  }
+}

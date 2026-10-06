@@ -1,0 +1,1266 @@
+{
+  "story": {
+    "title": "An API answer may not be the answer a chatbot user receives",
+    "paragraphs": [
+      "People increasingly ask consumer chatbots such as ChatGPT for health advice, and researchers try to check whether those answers are sound. Copying questions into the chatbot interface mirrors consumer use but is hard to scale, especially as models are updated. Most evaluations therefore query the provider's API (application programming interface), which gives programmatic access to the same underlying model, and their findings are then often read as if both routes were one system.",
+      "The two routes are different access systems. Even for the same model version, the consumer product surrounds the model with product-level instructions, conversation context and saved memory, built-in tools and connected data, a product-facing model choice, and provider-managed safeguards, and not all of these are publicly documented. A researcher can configure analogous API settings but cannot fully replicate the consumer environment. ChatGPT Health, a health-specific experience inside ChatGPT, adds health-focused model training, activates automatically when ChatGPT detects a personal health question, and can draw on connected medical records and wellness data; none of these features can be reproduced through the API.",
+      "The paper asks a narrow empirical question. With the model version held constant and the available settings matched as closely as possible, do the API and the consumer interfaces answer the same health question differently, and are those differences larger than the variation between repeated runs of the same condition?"
+    ]
+  },
+  "mechanism": {
+    "title": "Hold the question and the model fixed, then vary only the access mode",
+    "paragraphs": [
+      "The authors sampled 50 patient-authored questions from HealthCareMagic-100k, a corpus of online medical questions, and excluded questions addressed to a doctor so that the sample resembles what people type into a general chatbot. GPT-5.3 Instant, then the default ChatGPT model for all account holders, was queried through the API, standard ChatGPT, and ChatGPT Health. GPT-5.4 Thinking, available to paying subscribers, was queried through the API and ChatGPT with extended thinking and web search enabled. Figure 1 shows which parts of each route a researcher controls.",
+      "Each question was submitted verbatim as the only input, three times per condition: 600 responses in the primary comparison (April 1–22, 2026) and 126 ChatGPT Health responses (August 4–5, 2026). Interface runs started new conversations in Temporary Chat, which keeps them out of saved memory. Health offered no Temporary Chat, so each Health conversation was deleted after collection, and no records were connected. API runs used an empty system prompt, gpt-5.3-chat-latest without reasoning or tools, gpt-5.4 (snapshot gpt-5.4-2026-03-05) with high reasoning effort and web search, and default settings otherwise. Health activated for 42 of the 50 questions; the other eight concerned another person's health and were excluded from the Health analyses.",
+      "Each response was coded on four dimensions. Form: length in words and Flesch–Kincaid grade after removing Markdown, the frequency of headings, list items, and bold or italic spans, and emoji use. Behavior: self-limiting statements (sentences with “I can't” or “I cannot”) and continuation moves, that is, requests for more information and offers to produce more, classified by GPT-5.4. Sources: the webpages and domains that GPT-5.4 cited. Clinical content: additional clinical concepts not raised in the question, extracted by a GPT-5.4 pipeline with clinician-reviewed prompts and a question-specific codebook, and the levels of care named, from self-care to calling 911.",
+      "The question is the unit of analysis. For each question and condition, the three runs are averaged, or turned into the share of runs showing a yes/no feature, and access modes are compared within question with paired Wilcoxon signed-rank tests, separately for each model version. Cited sources and clinical concepts are sets, so they are compared with Jaccard overlap: shared items divided by distinct items. Because repeated runs of one condition already differ, the cross-mode overlap of a question is tested against the mean of its two within-mode overlaps. The explorer below applies this procedure to illustrative citation lists."
+    ]
+  },
+  "evidence": {
+    "title": "Form and engagement differ most, and their direction depends on the model version",
+    "paragraphs": [
+      "In GPT-5.3, both interface modes gave longer answers than the API (377 and 373 vs 268 words), with lower Flesch–Kincaid grades, denser headings, lists, and emphasis, and emoji in 36.7% and 28.6% of runs versus 0.7% (all p < 0.001 for these contrasts). They also invited further interaction more often: a continuation move appeared in 98.0% and 100.0% of runs versus 70.7% through the API, mainly as requests for more information.",
+      "In GPT-5.4, most of these differences reversed. Interface answers were harder to read (grade 11.8 vs 10.9), less densely formatted, and less likely to ask for more information (52.0% vs 76.7% of runs) or to make any continuation move (67.3% vs 98.7%). They were still longer (451 vs 425 words), but that difference depends on the preamble the interface shows before the answer: without it, interface answers were 45 words shorter on average (380 vs 425; p < 0.001, Table A2). The authors conclude that access-mode effects are not stable across model versions.",
+      "ChatGPT Health broadly resembled standard ChatGPT. On the 42 matched questions it was easier to read (−0.54 grade levels, p < 0.001) and asked for more information more often (+11.1 pp, p < 0.001), and it used self-limiting statements least (0.8% of runs). Clinical content varied less than form. Cross-mode overlap of additional clinical concepts was 0.03–0.05 below the within-mode baseline in the three comparisons with the API (p ≤ 0.013), whereas Health and standard ChatGPT overlapped as much as repeated runs did (0.645 vs 0.654, p = 0.617). Named levels of care showed no significant cross-mode drop in any pair. The number of additional concepts differed modestly: 6.7 vs 5.9 for GPT-5.3 ChatGPT vs API (p < 0.001), and 6.7 vs 7.4 for GPT-5.4 (p = 0.005).",
+      "Cited sources varied most, even within a mode. Repeated GPT-5.4 runs in the same mode shared only about 17–18% of cited webpages and 39% of domains; across modes the overlap fell to 10.9% and 29.8% (both p < 0.001), although both modes cited similar numbers of webpages (4.7 vs 4.4) and domains (3.2 each).",
+      "These results come from deliberately controlled conditions: single-turn questions without memory, history, customization, or connected records. The authors argue that these features could widen the gap in routine use, and that regulators should require developers of consumer-facing health AI to give researchers scalable, reproducible access to consumer deployment pathways; both are arguments rather than results of this study. All p-values are unadjusted, and no measure grades whether an answer is clinically correct."
+    ]
+  },
+  "sources": [
+    {
+      "label": "Paper · Sections 3 and 5, Figures 1–2, Table 1, Appendix Tables A1–A3",
+      "url": "https://arxiv.org/abs/2609.16590"
+    },
+    {
+      "label": "Study repository (code and data announced)",
+      "url": "https://github.com/yuan-pu/health-llm-variability"
+    }
+  ],
+  "reading_notes": "Read the full arXiv v1 LaTeX source (main.tex, 720 lines) and checked it against the PDF text. Design and collection: Sections 2, 5.1–5.3 (lines 176–179, 302–319); feature definitions: Section 5.4 (lines 322–332); statistics: Section 5.5 (lines 334–343), including the within- versus cross-mode Jaccard procedure (three within-mode pairs, nine cross-mode pairs, cross compared with the mean of the two within values, empty unions excluded). Results: Section 3 (lines 181–192); Discussion: Section 4 (lines 291–298). Figure 1 is a conceptual schematic that, per its caption, does not depict OpenAI's architecture; Figure 2 is one annotated example, and the figure itself notes that its specificity and clinical-suggestion differences also occur between runs of one mode. The disclaimer feature is narrow: only “I can't” / “I cannot” self-limiting sentences. Health contrasts use the matched 42-question subset, so their Δ need not equal differences of column means (Table A2 caption). GPT-5.4 ChatGPT length includes the interface preamble; the final-answer length reverses the sign (−45 words, Table A2). The main text's 'all p < 0.001' for GPT-5.3 formatting refers to the density measures; the any-heading contrasts have p = 0.004 and 0.008. Not reported: clinical accuracy, safety grading, multiple-comparison adjustment, other providers, multi-turn use. The paper's regulatory recommendation and the claim that memory or connected records would widen the gap are arguments, not measurements. Demo: Tables A1–A3 copied as printed; the explorer computes only the cut-off marking, counts, and the direction comparison; the overlap explorer uses illustrative citation lists with the Section 5.5 procedure.",
+  "demo": {
+    "kind": "access-modes",
+    "method_after": 1,
+    "figure": {
+      "src": "assets/auditing-health-llms-access.png",
+      "width": 1540,
+      "height": 1760,
+      "alt": "Original Figure 1: columns for the GPT API, ChatGPT, and ChatGPT Health compared row by row: access point, user input, system instructions, context and memory, tools and data, model version, and control and safeguards.",
+      "caption": "Original Figure 1, a conceptual schematic; the authors state that it does not depict OpenAI's internal architecture. All three routes share provider-managed model-level instructions and model behavior and safeguards (grey). Through the API, a researcher sets the instructions, supplied context, tools, and model snapshot (solid outline). ChatGPT adds provider-managed product-level instructions and product-exposed settings (dashed): custom instructions, the current conversation, saved memory, product tools and connected data, and a product-facing model choice. ChatGPT Health adds health-specific data integration and health-specific model behavior and safeguards."
+    },
+    "overlap": {
+      "eyebrow": "Section 5.5 procedure · illustrative citation lists",
+      "title": "When does low overlap point to the access mode?",
+      "description": "Each row is one run of the same question and each column a source that a run may cite. The lists are illustrative, not study data. Pick a preset or switch single citations: the page computes the Jaccard overlap of every pair of runs, averages the three pairs inside each mode and the nine pairs across modes, and compares the cross-mode value with the mean of the two within-mode values, as the paper does for each question. Compare the second and third presets: which one has the higher cross-mode overlap, and which one shows an access-mode gap?",
+      "sources": 8,
+      "modes": [
+        {
+          "id": "api",
+          "label": "API"
+        },
+        {
+          "id": "chatgpt",
+          "label": "ChatGPT"
+        }
+      ],
+      "presets": [
+        {
+          "id": "specific",
+          "label": "Each mode favors its own sources",
+          "runs": {
+            "api": [
+              [
+                1,
+                2,
+                3,
+                4
+              ],
+              [
+                1,
+                2,
+                3,
+                5
+              ],
+              [
+                1,
+                4,
+                5,
+                6
+              ]
+            ],
+            "chatgpt": [
+              [
+                3,
+                4,
+                6,
+                7
+              ],
+              [
+                3,
+                6,
+                7,
+                8
+              ],
+              [
+                4,
+                5,
+                7,
+                8
+              ]
+            ]
+          }
+        },
+        {
+          "id": "pool",
+          "label": "Both modes draw from one pool",
+          "runs": {
+            "api": [
+              [
+                1,
+                2,
+                5,
+                8
+              ],
+              [
+                1,
+                3,
+                6,
+                8
+              ],
+              [
+                2,
+                3,
+                4,
+                5
+              ]
+            ],
+            "chatgpt": [
+              [
+                1,
+                3,
+                4,
+                7
+              ],
+              [
+                2,
+                4,
+                7,
+                8
+              ],
+              [
+                3,
+                5,
+                6,
+                7
+              ]
+            ]
+          }
+        },
+        {
+          "id": "fixed",
+          "label": "Each mode repeats one list",
+          "runs": {
+            "api": [
+              [
+                1,
+                2,
+                3,
+                4
+              ],
+              [
+                1,
+                2,
+                3,
+                4
+              ],
+              [
+                1,
+                2,
+                3,
+                4
+              ]
+            ],
+            "chatgpt": [
+              [
+                3,
+                4,
+                5,
+                6
+              ],
+              [
+                3,
+                4,
+                5,
+                6
+              ],
+              [
+                3,
+                4,
+                5,
+                6
+              ]
+            ]
+          }
+        }
+      ],
+      "initial": "specific",
+      "measured": "Measured counterpart (Table A3, GPT-5.4, 50 questions): cited webpages overlap 0.175 within a mode and 0.109 across modes; cited domains 0.389 and 0.298 (both p < 0.001).",
+      "provenance": "Illustrative: the six citation lists, the eight source labels, and the presets. Computed: the Jaccard overlap (shared ÷ distinct sources) of every pair of runs, the within-mode means over three pairs, the cross-mode mean over nine pairs, and within minus cross, following Section 5.5. A pair of runs that cite nothing has no overlap value and is excluded, as in the paper. The paper computes these values for every question and tests the gap across questions with a paired Wilcoxon signed-rank test; one question cannot be tested."
+    },
+    "contrasts": {
+      "eyebrow": "Measured · Tables A1–A3",
+      "title": "Which access-mode differences hold, and which flip between model versions?",
+      "description": "Each cell is a paired difference printed in Table A2: the first-named mode minus the second, averaged over questions, with its unadjusted Wilcoxon p-value. Choose the cut-off used to mark a difference, and select a measure to see its per-mode means from Table A1. The column 5.3 → 5.4 compares the ChatGPT-vs-API difference in GPT-5.3 with the one in GPT-5.4; the last two columns compare ChatGPT Health with the API and with standard ChatGPT.",
+      "thresholds": [
+        "0.05",
+        "0.01",
+        "0.001"
+      ],
+      "initial": {
+        "threshold": "0.05",
+        "feature": "asks"
+      },
+      "columns": [
+        {
+          "id": "c53",
+          "version": "GPT-5.3",
+          "label": "ChatGPT vs API",
+          "first": "ChatGPT",
+          "second": "API"
+        },
+        {
+          "id": "h53",
+          "version": "GPT-5.3",
+          "label": "Health vs API",
+          "first": "ChatGPT Health",
+          "second": "API"
+        },
+        {
+          "id": "hc53",
+          "version": "GPT-5.3",
+          "label": "Health vs ChatGPT",
+          "first": "ChatGPT Health",
+          "second": "ChatGPT"
+        },
+        {
+          "id": "c54",
+          "version": "GPT-5.4",
+          "label": "ChatGPT vs API",
+          "first": "ChatGPT",
+          "second": "API"
+        }
+      ],
+      "layout": [
+        {
+          "group": "ChatGPT vs API",
+          "cells": [
+            {
+              "id": "c53",
+              "label": "GPT-5.3"
+            },
+            {
+              "id": "c54",
+              "label": "GPT-5.4"
+            },
+            {
+              "id": "direction",
+              "label": "5.3 → 5.4"
+            }
+          ]
+        },
+        {
+          "group": "ChatGPT Health, GPT-5.3",
+          "cells": [
+            {
+              "id": "h53",
+              "label": "vs API"
+            },
+            {
+              "id": "hc53",
+              "label": "vs ChatGPT"
+            }
+          ]
+        }
+      ],
+      "means_columns": [
+        "GPT-5.3 API",
+        "GPT-5.3 ChatGPT",
+        "GPT-5.3 Health",
+        "GPT-5.4 API",
+        "GPT-5.4 ChatGPT"
+      ],
+      "features": [
+        {
+          "id": "length",
+          "dimension": "Response form",
+          "label": "Length",
+          "measure": "words",
+          "unit": " words",
+          "up": "gives longer answers",
+          "down": "gives shorter answers",
+          "percent": false,
+          "note": "Words after Markdown removal. GPT-5.4 ChatGPT answers include the brief preamble that the interface shows before the final answer; the API returns none.",
+          "means": [
+            [
+              "268",
+              "63"
+            ],
+            [
+              "377",
+              "78"
+            ],
+            [
+              "373",
+              "82"
+            ],
+            [
+              "425",
+              "113"
+            ],
+            [
+              "451",
+              "112"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+109",
+              "<0.001"
+            ],
+            [
+              "+103",
+              "<0.001"
+            ],
+            [
+              "−8",
+              "0.132"
+            ],
+            [
+              "+26",
+              "0.003"
+            ]
+          ],
+          "caveat": "counting the GPT-5.4 interface preamble"
+        },
+        {
+          "id": "length-final",
+          "dimension": "Response form",
+          "label": "Length without preamble",
+          "measure": "words",
+          "unit": " words",
+          "up": "gives longer answers",
+          "down": "gives shorter answers",
+          "percent": false,
+          "note": "GPT-5.4 final answers only, without the interface preamble (Appendix).",
+          "means": [
+            null,
+            null,
+            null,
+            [
+              "425",
+              "113"
+            ],
+            [
+              "380",
+              "103"
+            ]
+          ],
+          "contrasts": [
+            [
+              "—"
+            ],
+            [
+              "—"
+            ],
+            [
+              "—"
+            ],
+            [
+              "−45",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "readability",
+          "dimension": "Response form",
+          "label": "Readability",
+          "measure": "FK grade",
+          "unit": " grade levels",
+          "up": "is harder to read",
+          "down": "is easier to read",
+          "percent": false,
+          "note": "Flesch–Kincaid grade level of the Markdown-free text; lower is easier to read.",
+          "means": [
+            [
+              "8.9",
+              "1.2"
+            ],
+            [
+              "8.0",
+              "1.2"
+            ],
+            [
+              "7.4",
+              "0.9"
+            ],
+            [
+              "10.9",
+              "1.6"
+            ],
+            [
+              "11.8",
+              "1.6"
+            ]
+          ],
+          "contrasts": [
+            [
+              "−0.89",
+              "<0.001"
+            ],
+            [
+              "−1.38",
+              "<0.001"
+            ],
+            [
+              "−0.54",
+              "<0.001"
+            ],
+            [
+              "+0.90",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "headings-any",
+          "dimension": "Response form",
+          "label": "Section headings",
+          "measure": "any, % of runs",
+          "unit": " pp",
+          "up": "uses headings in more runs",
+          "down": "uses headings in fewer runs",
+          "percent": true,
+          "note": "Markdown headings, standalone bold heading lines, and short colon-terminated labels.",
+          "means": [
+            [
+              "92.0",
+              "18.5"
+            ],
+            [
+              "99.3",
+              "4.7"
+            ],
+            [
+              "100.0",
+              "0.0"
+            ],
+            [
+              "77.3",
+              "27.3"
+            ],
+            [
+              "34.0",
+              "34.7"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+7.3",
+              "0.004"
+            ],
+            [
+              "+7.9",
+              "0.008"
+            ],
+            [
+              "n.t."
+            ],
+            [
+              "−43.3",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "headings-density",
+          "dimension": "Response form",
+          "label": "Section headings",
+          "measure": "n/100 words",
+          "unit": " per 100 words",
+          "up": "uses more headings per 100 words",
+          "down": "uses fewer headings per 100 words",
+          "percent": false,
+          "note": "Markdown headings, standalone bold heading lines, and short colon-terminated labels.",
+          "means": [
+            [
+              "0.9",
+              "0.5"
+            ],
+            [
+              "2.5",
+              "0.9"
+            ],
+            [
+              "2.7",
+              "0.7"
+            ],
+            [
+              "0.3",
+              "0.2"
+            ],
+            [
+              "0.1",
+              "0.1"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+1.56",
+              "<0.001"
+            ],
+            [
+              "+1.82",
+              "<0.001"
+            ],
+            [
+              "+0.28",
+              "0.024"
+            ],
+            [
+              "−0.19",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "lists-any",
+          "dimension": "Response form",
+          "label": "List items",
+          "measure": "any, % of runs",
+          "unit": " pp",
+          "up": "uses lists in more runs",
+          "down": "uses lists in fewer runs",
+          "percent": true,
+          "note": "Ordered and unordered list lines.",
+          "means": [
+            [
+              "98.7",
+              "6.6"
+            ],
+            [
+              "100.0",
+              "0.0"
+            ],
+            [
+              "100.0",
+              "0.0"
+            ],
+            [
+              "84.0",
+              "23.6"
+            ],
+            [
+              "36.0",
+              "33.6"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+1.3",
+              "0.500"
+            ],
+            [
+              "+1.6",
+              "0.500"
+            ],
+            [
+              "n.t."
+            ],
+            [
+              "−48.0",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "lists-density",
+          "dimension": "Response form",
+          "label": "List items",
+          "measure": "n/100 words",
+          "unit": " per 100 words",
+          "up": "uses more list items per 100 words",
+          "down": "uses fewer list items per 100 words",
+          "percent": false,
+          "note": "Ordered and unordered list lines.",
+          "means": [
+            [
+              "4.1",
+              "1.4"
+            ],
+            [
+              "6.4",
+              "1.9"
+            ],
+            [
+              "6.6",
+              "1.3"
+            ],
+            [
+              "1.7",
+              "0.9"
+            ],
+            [
+              "0.4",
+              "0.6"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+2.29",
+              "<0.001"
+            ],
+            [
+              "+2.69",
+              "<0.001"
+            ],
+            [
+              "+0.39",
+              "0.060"
+            ],
+            [
+              "−1.25",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "emphasis-any",
+          "dimension": "Response form",
+          "label": "Bold/italic spans",
+          "measure": "any, % of runs",
+          "unit": " pp",
+          "up": "uses bold or italics in more runs",
+          "down": "uses bold or italics in fewer runs",
+          "percent": true,
+          "note": "Inline emphasis, excluding standalone bold heading lines.",
+          "means": [
+            [
+              "42.7",
+              "31.6"
+            ],
+            [
+              "100.0",
+              "0.0"
+            ],
+            [
+              "100.0",
+              "0.0"
+            ],
+            [
+              "99.3",
+              "4.7"
+            ],
+            [
+              "98.7",
+              "6.6"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+57.3",
+              "<0.001"
+            ],
+            [
+              "+57.1",
+              "<0.001"
+            ],
+            [
+              "n.t."
+            ],
+            [
+              "−0.7",
+              "1.000"
+            ]
+          ]
+        },
+        {
+          "id": "emphasis-density",
+          "dimension": "Response form",
+          "label": "Bold/italic spans",
+          "measure": "n/100 words",
+          "unit": " per 100 words",
+          "up": "uses more bold or italic spans per 100 words",
+          "down": "uses fewer bold or italic spans per 100 words",
+          "percent": false,
+          "note": "Inline emphasis, excluding standalone bold heading lines.",
+          "means": [
+            [
+              "0.9",
+              "1.0"
+            ],
+            [
+              "3.9",
+              "1.0"
+            ],
+            [
+              "4.0",
+              "1.1"
+            ],
+            [
+              "6.8",
+              "1.0"
+            ],
+            [
+              "4.8",
+              "1.2"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+2.93",
+              "<0.001"
+            ],
+            [
+              "+3.03",
+              "<0.001"
+            ],
+            [
+              "+0.20",
+              "0.171"
+            ],
+            [
+              "−2.09",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "emoji",
+          "dimension": "Response form",
+          "label": "Emoji",
+          "measure": "any, % of runs",
+          "unit": " pp",
+          "up": "uses emoji in more runs",
+          "down": "uses emoji in fewer runs",
+          "percent": true,
+          "note": "Identified by Unicode. Neither GPT-5.4 access mode produced emoji.",
+          "means": [
+            [
+              "0.7",
+              "4.7"
+            ],
+            [
+              "36.7",
+              "37.0"
+            ],
+            [
+              "28.6",
+              "35.0"
+            ],
+            [
+              "0.0",
+              "0.0"
+            ],
+            [
+              "0.0",
+              "0.0"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+36.0",
+              "<0.001"
+            ],
+            [
+              "+28.6",
+              "<0.001"
+            ],
+            [
+              "−6.3",
+              "0.336"
+            ],
+            [
+              "n.t."
+            ]
+          ]
+        },
+        {
+          "id": "webpages",
+          "dimension": "Referenced sources",
+          "label": "Webpages referenced",
+          "measure": "n",
+          "unit": " webpages",
+          "up": "cites more webpages",
+          "down": "cites fewer webpages",
+          "percent": false,
+          "note": "Unique cited webpages per response; only GPT-5.4 ran with web search.",
+          "means": [
+            null,
+            null,
+            null,
+            [
+              "4.7",
+              "1.4"
+            ],
+            [
+              "4.4",
+              "1.1"
+            ]
+          ],
+          "contrasts": [
+            [
+              "—"
+            ],
+            [
+              "—"
+            ],
+            [
+              "—"
+            ],
+            [
+              "−0.27",
+              "0.109"
+            ]
+          ]
+        },
+        {
+          "id": "domains",
+          "dimension": "Referenced sources",
+          "label": "Domains referenced",
+          "measure": "n",
+          "unit": " domains",
+          "up": "cites more domains",
+          "down": "cites fewer domains",
+          "percent": false,
+          "note": "Unique source domains per response, with subdomain variants collapsed; GPT-5.4 only.",
+          "means": [
+            null,
+            null,
+            null,
+            [
+              "3.2",
+              "1.0"
+            ],
+            [
+              "3.2",
+              "0.7"
+            ]
+          ],
+          "contrasts": [
+            [
+              "—"
+            ],
+            [
+              "—"
+            ],
+            [
+              "—"
+            ],
+            [
+              "−0.04",
+              "0.820"
+            ]
+          ]
+        },
+        {
+          "id": "disclaimer",
+          "dimension": "Response behavior",
+          "label": "Disclaimer",
+          "measure": "any, % of runs",
+          "unit": " pp",
+          "up": "makes self-limiting statements in more runs",
+          "down": "makes self-limiting statements in fewer runs",
+          "percent": true,
+          "note": "A sentence in which the model limits its own role with “I can't” or “I cannot”; not medical disclaimers or care advice in general.",
+          "means": [
+            [
+              "10.0",
+              "27.1"
+            ],
+            [
+              "6.0",
+              "21.0"
+            ],
+            [
+              "0.8",
+              "5.1"
+            ],
+            [
+              "42.0",
+              "36.8"
+            ],
+            [
+              "24.7",
+              "31.5"
+            ]
+          ],
+          "contrasts": [
+            [
+              "−4.0",
+              "0.391"
+            ],
+            [
+              "−10.3",
+              "0.047"
+            ],
+            [
+              "−4.8",
+              "0.250"
+            ],
+            [
+              "−17.3",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "asks",
+          "dimension": "Response behavior",
+          "label": "Asks for information",
+          "measure": "% of runs",
+          "unit": " pp",
+          "up": "asks for information in more runs",
+          "down": "asks for information in fewer runs",
+          "percent": true,
+          "note": "Questions or prompts for additional case details; classified by GPT-5.4.",
+          "means": [
+            [
+              "54.0",
+              "35.6"
+            ],
+            [
+              "76.0",
+              "33.0"
+            ],
+            [
+              "91.3",
+              "22.2"
+            ],
+            [
+              "76.7",
+              "33.8"
+            ],
+            [
+              "52.0",
+              "37.0"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+22.0",
+              "<0.001"
+            ],
+            [
+              "+31.0",
+              "<0.001"
+            ],
+            [
+              "+11.1",
+              "<0.001"
+            ],
+            [
+              "−24.7",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "offers",
+          "dimension": "Response behavior",
+          "label": "Offers to produce more",
+          "measure": "% of runs",
+          "unit": " pp",
+          "up": "offers additional output in more runs",
+          "down": "offers additional output in fewer runs",
+          "percent": true,
+          "note": "Offers of a checklist, message draft, plan, or summary that need no new case facts; classified by GPT-5.4.",
+          "means": [
+            [
+              "24.0",
+              "34.4"
+            ],
+            [
+              "35.3",
+              "41.7"
+            ],
+            [
+              "23.8",
+              "37.0"
+            ],
+            [
+              "26.7",
+              "37.5"
+            ],
+            [
+              "19.3",
+              "27.8"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+11.3",
+              "0.014"
+            ],
+            [
+              "−0.8",
+              "0.861"
+            ],
+            [
+              "−10.3",
+              "0.043"
+            ],
+            [
+              "−7.3",
+              "0.046"
+            ]
+          ]
+        },
+        {
+          "id": "continuation",
+          "dimension": "Response behavior",
+          "label": "Any continuation move",
+          "measure": "% of runs",
+          "unit": " pp",
+          "up": "makes a continuation move in more runs",
+          "down": "makes a continuation move in fewer runs",
+          "percent": true,
+          "note": "A request for information, an offer to produce more, or both.",
+          "means": [
+            [
+              "70.7",
+              "32.0"
+            ],
+            [
+              "98.0",
+              "10.5"
+            ],
+            [
+              "100.0",
+              "0.0"
+            ],
+            [
+              "98.7",
+              "6.6"
+            ],
+            [
+              "67.3",
+              "31.9"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+27.3",
+              "<0.001"
+            ],
+            [
+              "+23.8",
+              "<0.001"
+            ],
+            [
+              "n.t."
+            ],
+            [
+              "−31.3",
+              "<0.001"
+            ]
+          ]
+        },
+        {
+          "id": "concepts",
+          "dimension": "Clinical content",
+          "label": "Additional clinical concepts",
+          "measure": "n",
+          "unit": " concepts",
+          "up": "names more additional clinical concepts",
+          "down": "names fewer additional clinical concepts",
+          "percent": false,
+          "note": "Diagnoses, tests or workups, treatments, and specialist referrals not raised in the question; extracted by a GPT-5.4 pipeline with clinician-reviewed prompts.",
+          "means": [
+            [
+              "5.9",
+              "3.4"
+            ],
+            [
+              "6.7",
+              "3.8"
+            ],
+            [
+              "6.0",
+              "3.7"
+            ],
+            [
+              "7.4",
+              "4.7"
+            ],
+            [
+              "6.7",
+              "4.1"
+            ]
+          ],
+          "contrasts": [
+            [
+              "+0.73",
+              "<0.001"
+            ],
+            [
+              "+0.09",
+              "0.900"
+            ],
+            [
+              "−0.56",
+              "<0.001"
+            ],
+            [
+              "−0.73",
+              "0.005"
+            ]
+          ]
+        },
+        {
+          "id": "care-levels",
+          "dimension": "Clinical content",
+          "label": "Named levels of care",
+          "measure": "n",
+          "unit": " levels",
+          "up": "names more levels of care",
+          "down": "names fewer levels of care",
+          "percent": false,
+          "note": "From a fixed schema: self-care, routine follow-up, urgent follow-up, emergency department care, and calling 911.",
+          "means": [
+            [
+              "3.0",
+              "1.4"
+            ],
+            [
+              "2.8",
+              "1.1"
+            ],
+            [
+              "2.8",
+              "1.3"
+            ],
+            [
+              "4.2",
+              "1.5"
+            ],
+            [
+              "4.1",
+              "1.8"
+            ]
+          ],
+          "contrasts": [
+            [
+              "−0.23",
+              "0.213"
+            ],
+            [
+              "−0.29",
+              "0.333"
+            ],
+            [
+              "+0.05",
+              "0.693"
+            ],
+            [
+              "−0.11",
+              "0.627"
+            ]
+          ]
+        }
+      ],
+      "overlap_rows": [
+        {
+          "metric": "Cited webpages",
+          "pair": "GPT-5.4 ChatGPT/API",
+          "n": "50",
+          "cross": "0.109",
+          "within": "0.175",
+          "delta": "+0.066",
+          "p": "<0.001"
+        },
+        {
+          "metric": "Cited domains",
+          "pair": "GPT-5.4 ChatGPT/API",
+          "n": "50",
+          "cross": "0.298",
+          "within": "0.389",
+          "delta": "+0.091",
+          "p": "<0.001"
+        },
+        {
+          "metric": "Additional clinical concepts",
+          "pair": "GPT-5.3 ChatGPT/API",
+          "n": "49",
+          "cross": "0.615",
+          "within": "0.653",
+          "delta": "+0.038",
+          "p": "0.012"
+        },
+        {
+          "metric": "Additional clinical concepts",
+          "pair": "GPT-5.3 Health/API",
+          "n": "41",
+          "cross": "0.614",
+          "within": "0.662",
+          "delta": "+0.048",
+          "p": "0.002"
+        },
+        {
+          "metric": "Additional clinical concepts",
+          "pair": "GPT-5.3 Health/ChatGPT",
+          "n": "41",
+          "cross": "0.645",
+          "within": "0.654",
+          "delta": "+0.010",
+          "p": "0.617"
+        },
+        {
+          "metric": "Additional clinical concepts",
+          "pair": "GPT-5.4 ChatGPT/API",
+          "n": "49",
+          "cross": "0.586",
+          "within": "0.619",
+          "delta": "+0.033",
+          "p": "0.013"
+        },
+        {
+          "metric": "Named levels of care",
+          "pair": "GPT-5.3 ChatGPT/API",
+          "n": "47",
+          "cross": "0.664",
+          "within": "0.696",
+          "delta": "+0.032",
+          "p": "0.342"
+        },
+        {
+          "metric": "Named levels of care",
+          "pair": "GPT-5.3 Health/API",
+          "n": "40",
+          "cross": "0.710",
+          "within": "0.727",
+          "delta": "+0.017",
+          "p": "0.734"
+        },
+        {
+          "metric": "Named levels of care",
+          "pair": "GPT-5.3 Health/ChatGPT",
+          "n": "40",
+          "cross": "0.681",
+          "within": "0.723",
+          "delta": "+0.042",
+          "p": "0.067"
+        },
+        {
+          "metric": "Named levels of care",
+          "pair": "GPT-5.4 ChatGPT/API",
+          "n": "48",
+          "cross": "0.714",
+          "within": "0.740",
+          "delta": "+0.026",
+          "p": "0.313"
+        }
+      ],
+      "provenance": "Measured: differences and p-values from Table A2 (two-sided paired Wilcoxon signed-rank tests, unadjusted; Δ in percentage points for percentage measures), means and standard deviations from Table A1, and overlaps from Table A3, all copied as printed. Contrasts involving ChatGPT Health use the 42 questions on which Health activated, so their Δ need not equal the difference between column means. n.t.: not tested because fewer than two questions had a nonzero paired difference; —: not part of the design. Computed on this page: the marking at the chosen cut-off, the counts, and the comparison of directions between versions. The cut-off changes only the marking; it is not a multiple-comparison correction. Bars start at zero; percentage measures use a 0–100% scale, other measures the largest mean in the row."
+    }
+  }
+}
