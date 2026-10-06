@@ -1,0 +1,103 @@
+/* Lens II · Through a model's eyes: token tiles, the hover tooltip and the decode replay. */
+
+/* The page layer sits above the text, so its tiles blend like a highlighter: multiply on a
+   light ground and screen on a dark one leave the glyphs untouched and tint only the ground. */
+.tk-layer {
+  mix-blend-mode: multiply;
+  --tk-alpha: 0.18;
+  --tk-hover: 0.42;
+  --tk-ghost: 0.05;
+  --tk-now: 0.6;
+}
+
+html[data-theme="dark"] .tk-layer {
+  mix-blend-mode: screen;
+  --tk-alpha: 0.22;
+  --tk-hover: 0.46;
+  --tk-ghost: 0.06;
+  --tk-now: 0.62;
+}
+
+.tk-tiles {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tk-tile {
+  position: absolute;
+  background: var(--tk-tint);
+  opacity: var(--tk-alpha);
+  transition: opacity 0.18s ease;
+}
+
+/* Five muted tints; consecutive tokens never share one. */
+.tk-c0 { --tk-tint: #4a78b5; }
+.tk-c1 { --tk-tint: #c9973a; }
+.tk-c2 { --tk-tint: #5a9a70; }
+.tk-c3 { --tk-tint: #b8697a; }
+.tk-c4 { --tk-tint: #7d6cb8; }
+
+html[data-theme="dark"] .tk-c0 { --tk-tint: #8fb4e8; }
+html[data-theme="dark"] .tk-c1 { --tk-tint: #e8c17a; }
+html[data-theme="dark"] .tk-c2 { --tk-tint: #8fd0a4; }
+html[data-theme="dark"] .tk-c3 { --tk-tint: #e8a0b0; }
+html[data-theme="dark"] .tk-c4 { --tk-tint: #b5a6ec; }
+
+.tk-pre .tk-tile { opacity: 0; }
+.tk-leaving .tk-tiles { opacity: 0; }
+.tk-tile.tk-hover { opacity: var(--tk-hover); transition: none; }
+
+/* Decode replay: the rest is dimmed, the current token is bright and settles behind it. */
+.tk-decoding .tk-tile { opacity: var(--tk-ghost); transition: opacity 0.25s ease; }
+.tk-decoding .tk-tile.tk-lit { opacity: var(--tk-alpha); transition: opacity 0.35s ease; }
+.tk-decoding .tk-tile.tk-now { opacity: var(--tk-now); transition: none; }
+
+::highlight(lens-tokens-future) { color: #c3c8cf; }
+html[data-theme="dark"] ::highlight(lens-tokens-future) { color: #4a4e55; }
+
+/* Hover: a small square tooltip and faint dots on the token's leading spaces. */
+.tk-tip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 2px 6px;
+  font: 400 11px/1.45 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: 0;
+  white-space: pre;
+  color: #24292f;
+  background: #fbfbf9;
+  border: 1px solid #d3d7dd;
+  border-radius: 0;
+  visibility: hidden;
+}
+
+.tk-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 2px;
+  background: rgba(36, 41, 47, 0.45);
+  visibility: hidden;
+}
+
+html[data-theme="dark"] .tk-tip {
+  color: #e2e5e9;
+  background: #26282c;
+  border-color: #474b52;
+}
+
+html[data-theme="dark"] .tk-dot { background: rgba(226, 229, 233, 0.5); }
+
+.tk-tip.tk-on,
+.tk-dot.tk-on { visibility: visible; }
+
+.tk-still .tk-tiles,
+.tk-still .tk-tile { transition: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tk-tiles,
+  .tk-tile { transition: none !important; }
+}

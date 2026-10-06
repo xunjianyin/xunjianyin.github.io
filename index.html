@@ -90,6 +90,8 @@
       line-height: 1.6;
       color: #1a1a1a;
       margin: 0 0 2px;
+      /* Double-tapping the name changes the lens; it must not zoom. */
+      touch-action: manipulation;
     }
 
     .profile-text .pronunciation {
@@ -331,7 +333,7 @@
 
   <div id="site-footer"></div>
 
-  <script src="site-shell.js?v=spira-v9"></script>
+  <script src="site-shell.js?v=lenses-v1"></script>
   <script src="utils.js"></script>
   <script src="data.js"></script>
   <script src="main.js"></script>

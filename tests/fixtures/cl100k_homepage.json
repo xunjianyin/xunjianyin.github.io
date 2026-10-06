@@ -1,0 +1,1294 @@
+{
+ "source": "tests/browser_tokens.js on the homepage (index.html) at 1440x900",
+ "tokenizer": "easter/tokens.js (cl100k_base, ranks from easter/cl100k.txt)",
+ "tokens": 852,
+ "runs": [
+  {
+   "text": "Home",
+   "ids": [
+    7778
+   ]
+  },
+  {
+   "text": "Publications",
+   "ids": [
+    12965,
+    811
+   ]
+  },
+  {
+   "text": "Projects",
+   "ids": [
+    31058
+   ]
+  },
+  {
+   "text": "Blogs",
+   "ids": [
+    33,
+    22856
+   ]
+  },
+  {
+   "text": "Photography",
+   "ids": [
+    53304,
+    5814
+   ]
+  },
+  {
+   "text": "CV",
+   "ids": [
+    20161
+   ]
+  },
+  {
+   "text": "Xunjian Yin",
+   "ids": [
+    55,
+    70014,
+    1122,
+    83958
+   ]
+  },
+  {
+   "text": "Xunjian is pronounced as Shwen-Jyen",
+   "ids": [
+    55,
+    70014,
+    1122,
+    374,
+    38617,
+    439,
+    1443,
+    17378,
+    12278,
+    77251
+   ]
+  },
+  {
+   "text": "I am a CS PhD student at Duke University, co-advised by Prof. Shuyan Zhou and Prof. Bhuwan Dhingra. My research asks how AI systems can keep improving themselves over long horizons: agents that rewrite their own logic, learn from experience, and stay reliable when their environment changes. I focus on self-referential agents and world models.",
+   "ids": [
+    40,
+    1097,
+    264,
+    10211,
+    30661,
+    5575,
+    520,
+    27453,
+    3907,
+    11,
+    1080,
+    26831,
+    26451,
+    555,
+    8626,
+    13,
+    1443,
+    4168,
+    276,
+    67927,
+    323,
+    8626,
+    13,
+    426,
+    17156,
+    16965,
+    44327,
+    287,
+    969,
+    13,
+    3092,
+    3495,
+    17501,
+    1268,
+    15592,
+    6067,
+    649,
+    2567,
+    18899,
+    5694,
+    927,
+    1317,
+    4917,
+    64947,
+    25,
+    13307,
+    430,
+    18622,
+    872,
+    1866,
+    12496,
+    11,
+    4048,
+    505,
+    3217,
+    11,
+    323,
+    4822,
+    15062,
+    994,
+    872,
+    4676,
+    4442,
+    13,
+    358,
+    5357,
+    389,
+    659,
+    5621,
+    809,
+    2335,
+    13307,
+    323,
+    1917,
+    4211,
+    13
+   ]
+  },
+  {
+   "text": "Previously, I was at Google DeepMind, Amazon AGI SF Lab, the UCSB NLP Group (with Prof. William Yang Wang), Microsoft Research, and Peking University (with Prof. Xiaojun Wan).",
+   "ids": [
+    83039,
+    11,
+    358,
+    574,
+    520,
+    5195,
+    18682,
+    70738,
+    11,
+    8339,
+    15432,
+    40,
+    24360,
+    11868,
+    11,
+    279,
+    80346,
+    33,
+    452,
+    12852,
+    5856,
+    320,
+    4291,
+    8626,
+    13,
+    12656,
+    25482,
+    29346,
+    705,
+    5210,
+    8483,
+    11,
+    323,
+    393,
+    59952,
+    3907,
+    320,
+    4291,
+    8626,
+    13,
+    41235,
+    21963,
+    359,
+    72118,
+    570
+   ]
+  },
+  {
+   "text": "I'm happy to discuss research and collaboration.",
+   "ids": [
+    40,
+    2846,
+    6380,
+    311,
+    4358,
+    3495,
+    323,
+    20632,
+    13
+   ]
+  },
+  {
+   "text": "Email / GitHub / LinkedIn / Twitter / CV / Google Scholar",
+   "ids": [
+    4886,
+    611,
+    33195,
+    611,
+    33867,
+    611,
+    6405,
+    611,
+    14499,
+    611,
+    5195,
+    25542
+   ]
+  },
+  {
+   "text": "News",
+   "ids": [
+    14710
+   ]
+  },
+  {
+   "text": "May 2026",
+   "ids": [
+    11356,
+    220,
+    2366,
+    21
+   ]
+  },
+  {
+   "text": "I joined Google DeepMind as a Student Researcher.",
+   "ids": [
+    40,
+    11096,
+    5195,
+    18682,
+    70738,
+    439,
+    264,
+    11988,
+    8483,
+    261,
+    13
+   ]
+  },
+  {
+   "text": "Fall 2025",
+   "ids": [
+    50872,
+    220,
+    2366,
+    20
+   ]
+  },
+  {
+   "text": "Started PhD at Duke University.",
+   "ids": [
+    33627,
+    30661,
+    520,
+    27453,
+    3907,
+    13
+   ]
+  },
+  {
+   "text": "Selected Papers",
+   "ids": [
+    6450,
+    45231
+   ]
+  },
+  {
+   "text": "NewConstructing Challenging Browser-Use Tasks by Controlled Environment Interventions",
+   "ids": [
+    3648,
+    29568,
+    287,
+    921,
+    34869,
+    287,
+    16889,
+    12,
+    10464,
+    47571,
+    555,
+    82445,
+    11847,
+    1357,
+    651,
+    64801
+   ]
+  },
+  {
+   "text": "Xunjian Yin*, Tianchen Guan*, Jinao Wang, Weili Cao, Daisy Xinlei Lin, Royce Cheng-Yue, Keagan Long, Kyle Wong, Bhuwan Dhingra, Xiangjun Wang, Shuyan Zhou",
+   "ids": [
+    55,
+    70014,
+    1122,
+    83958,
+    12594,
+    48443,
+    7674,
+    4673,
+    276,
+    12594,
+    622,
+    2259,
+    78,
+    29346,
+    11,
+    1226,
+    4008,
+    356,
+    3524,
+    11,
+    71264,
+    70761,
+    63885,
+    8732,
+    11,
+    11284,
+    346,
+    57807,
+    30237,
+    361,
+    11,
+    6706,
+    18851,
+    5843,
+    11,
+    31359,
+    56728,
+    11,
+    426,
+    17156,
+    16965,
+    44327,
+    287,
+    969,
+    11,
+    1630,
+    28323,
+    58781,
+    29346,
+    11,
+    1443,
+    4168,
+    276,
+    67927
+   ]
+  },
+  {
+   "text": "NeurIPS 2026 [ Paper | ",
+   "ids": [
+    8989,
+    324,
+    27034,
+    220,
+    2366,
+    21,
+    510,
+    18343,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Abstract",
+   "ids": [
+    16328
+   ]
+  },
+  {
+   "text": " | Page | ",
+   "ids": [
+    765,
+    5874,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Citation",
+   "ids": [
+    34,
+    7709
+   ]
+  },
+  {
+   "text": " ]",
+   "ids": [
+    2331
+   ]
+  },
+  {
+   "text": "NewLEDOM: Reverse Language Model",
+   "ids": [
+    3648,
+    13953,
+    1937,
+    25,
+    25263,
+    11688,
+    5008
+   ]
+  },
+  {
+   "text": "Xunjian Yin, Sitao Cheng, Yuxi Xie, Xinyu Hu, Li Lin, Xinyi Wang, Liangming Pan, William Yang Wang, Xiaojun Wan",
+   "ids": [
+    55,
+    70014,
+    1122,
+    83958,
+    11,
+    29508,
+    3524,
+    57807,
+    11,
+    816,
+    2249,
+    72,
+    1630,
+    648,
+    11,
+    1630,
+    6577,
+    84,
+    22546,
+    11,
+    14851,
+    8732,
+    11,
+    1630,
+    6577,
+    72,
+    29346,
+    11,
+    14851,
+    526,
+    5424,
+    11233,
+    11,
+    12656,
+    25482,
+    29346,
+    11,
+    41235,
+    21963,
+    359,
+    72118
+   ]
+  },
+  {
+   "text": "ACL 2026 [ Paper | ",
+   "ids": [
+    56493,
+    220,
+    2366,
+    21,
+    510,
+    18343,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Abstract",
+   "ids": [
+    16328
+   ]
+  },
+  {
+   "text": " | Code | Model | Page | ",
+   "ids": [
+    765,
+    6247,
+    765,
+    5008,
+    765,
+    5874,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Citation",
+   "ids": [
+    34,
+    7709
+   ]
+  },
+  {
+   "text": " ]",
+   "ids": [
+    2331
+   ]
+  },
+  {
+   "text": "Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement",
+   "ids": [
+    38,
+    3029,
+    9783,
+    21372,
+    25,
+    362,
+    10323,
+    12,
+    48547,
+    2335,
+    21372,
+    24686,
+    369,
+    4158,
+    80837,
+    10323,
+    12,
+    48942,
+    7986
+   ]
+  },
+  {
+   "text": "Xunjian Yin, Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, William Yang Wang",
+   "ids": [
+    55,
+    70014,
+    1122,
+    83958,
+    11,
+    1630,
+    6577,
+    72,
+    29346,
+    11,
+    14851,
+    526,
+    5424,
+    11233,
+    11,
+    14851,
+    8732,
+    11,
+    41235,
+    21963,
+    359,
+    72118,
+    11,
+    12656,
+    25482,
+    29346
+   ]
+  },
+  {
+   "text": "ACL 2025 [ Paper | ",
+   "ids": [
+    56493,
+    220,
+    2366,
+    20,
+    510,
+    18343,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Abstract",
+   "ids": [
+    16328
+   ]
+  },
+  {
+   "text": " | Code | Page | ",
+   "ids": [
+    765,
+    6247,
+    765,
+    5874,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Citation",
+   "ids": [
+    34,
+    7709
+   ]
+  },
+  {
+   "text": " ]",
+   "ids": [
+    2331
+   ]
+  },
+  {
+   "text": "The Geometry of Reasoning: Flowing Logics in Representation Space",
+   "ids": [
+    791,
+    40018,
+    315,
+    27857,
+    287,
+    25,
+    23260,
+    287,
+    2905,
+    1233,
+    304,
+    79146,
+    11746
+   ]
+  },
+  {
+   "text": "Yufa Zhou*, Yixiao Wang*, Xunjian Yin*, Shuyan Zhou, Anru R. Zhang",
+   "ids": [
+    56,
+    1739,
+    64,
+    67927,
+    12594,
+    816,
+    953,
+    23332,
+    29346,
+    12594,
+    1630,
+    70014,
+    1122,
+    83958,
+    12594,
+    1443,
+    4168,
+    276,
+    67927,
+    11,
+    1556,
+    2739,
+    432,
+    13,
+    37120
+   ]
+  },
+  {
+   "text": "ICLR 2026 [ Paper | ",
+   "ids": [
+    1341,
+    20721,
+    220,
+    2366,
+    21,
+    510,
+    18343,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Abstract",
+   "ids": [
+    16328
+   ]
+  },
+  {
+   "text": " | Code | Page | ",
+   "ids": [
+    765,
+    6247,
+    765,
+    5874,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Citation",
+   "ids": [
+    34,
+    7709
+   ]
+  },
+  {
+   "text": " ]",
+   "ids": [
+    2331
+   ]
+  },
+  {
+   "text": "Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability",
+   "ids": [
+    88070,
+    285,
+    25,
+    362,
+    17650,
+    12862,
+    33260,
+    38,
+    40388,
+    11688,
+    5008,
+    449,
+    27233,
+    3225,
+    323,
+    73177,
+    2968
+   ]
+  },
+  {
+   "text": "Xinyu Hu, Li Lin, Mingqi Gao, Xunjian Yin, Xiaojun Wan",
+   "ids": [
+    55,
+    6577,
+    84,
+    22546,
+    11,
+    14851,
+    8732,
+    11,
+    56983,
+    41287,
+    480,
+    3524,
+    11,
+    1630,
+    70014,
+    1122,
+    83958,
+    11,
+    41235,
+    21963,
+    359,
+    72118
+   ]
+  },
+  {
+   "text": "EMNLP 2024 [ Paper | ",
+   "ids": [
+    2783,
+    45,
+    12852,
+    220,
+    2366,
+    19,
+    510,
+    18343,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Abstract",
+   "ids": [
+    16328
+   ]
+  },
+  {
+   "text": " | Code | Page | ",
+   "ids": [
+    765,
+    6247,
+    765,
+    5874,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Citation",
+   "ids": [
+    34,
+    7709
+   ]
+  },
+  {
+   "text": " ]",
+   "ids": [
+    2331
+   ]
+  },
+  {
+   "text": "Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation",
+   "ids": [
+    86071,
+    287,
+    33025,
+    77516,
+    369,
+    20902,
+    11688,
+    27972,
+    25,
+    362,
+    34496,
+    70288,
+    389,
+    5008,
+    40388
+   ]
+  },
+  {
+   "text": "Xunjian Yin*, Xu Zhang*, Jie Ruan, Xiaojun Wan",
+   "ids": [
+    55,
+    70014,
+    1122,
+    83958,
+    12594,
+    57514,
+    37120,
+    12594,
+    622,
+    648,
+    432,
+    10602,
+    11,
+    41235,
+    21963,
+    359,
+    72118
+   ]
+  },
+  {
+   "text": "ACL 2024 [ Paper | ",
+   "ids": [
+    56493,
+    220,
+    2366,
+    19,
+    510,
+    18343,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Abstract",
+   "ids": [
+    16328
+   ]
+  },
+  {
+   "text": " | Code | Page | ",
+   "ids": [
+    765,
+    6247,
+    765,
+    5874,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Citation",
+   "ids": [
+    34,
+    7709
+   ]
+  },
+  {
+   "text": " ]",
+   "ids": [
+    2331
+   ]
+  },
+  {
+   "text": "History Matters: Temporal Knowledge Editing in Large Language Model",
+   "ids": [
+    13730,
+    58364,
+    25,
+    20539,
+    10020,
+    33025,
+    62153,
+    304,
+    20902,
+    11688,
+    5008
+   ]
+  },
+  {
+   "text": "Xunjian Yin, Jin Jiang, Liming Yang, Xiaojun Wan",
+   "ids": [
+    55,
+    70014,
+    1122,
+    83958,
+    11,
+    39611,
+    61922,
+    11,
+    13903,
+    287,
+    25482,
+    11,
+    41235,
+    21963,
+    359,
+    72118
+   ]
+  },
+  {
+   "text": "AAAI 2024 [ Paper | ",
+   "ids": [
+    6157,
+    15836,
+    220,
+    2366,
+    19,
+    510,
+    18343,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Abstract",
+   "ids": [
+    16328
+   ]
+  },
+  {
+   "text": " | Code | Page | ",
+   "ids": [
+    765,
+    6247,
+    765,
+    5874,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Citation",
+   "ids": [
+    34,
+    7709
+   ]
+  },
+  {
+   "text": " ]",
+   "ids": [
+    2331
+   ]
+  },
+  {
+   "text": "ALCUNA: Large Language Models Meet New Knowledge",
+   "ids": [
+    984,
+    34,
+    1899,
+    32,
+    25,
+    20902,
+    11688,
+    27972,
+    26911,
+    1561,
+    33025
+   ]
+  },
+  {
+   "text": "Xunjian Yin*, Baizhou Huang*, Xiaojun Wan",
+   "ids": [
+    55,
+    70014,
+    1122,
+    83958,
+    12594,
+    14659,
+    450,
+    18664,
+    59509,
+    12594,
+    41235,
+    21963,
+    359,
+    72118
+   ]
+  },
+  {
+   "text": "EMNLP 2023 [ Paper | ",
+   "ids": [
+    2783,
+    45,
+    12852,
+    220,
+    2366,
+    18,
+    510,
+    18343,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Abstract",
+   "ids": [
+    16328
+   ]
+  },
+  {
+   "text": " | Code | Page | ",
+   "ids": [
+    765,
+    6247,
+    765,
+    5874,
+    765,
+    220
+   ]
+  },
+  {
+   "text": "Citation",
+   "ids": [
+    34,
+    7709
+   ]
+  },
+  {
+   "text": " ]",
+   "ids": [
+    2331
+   ]
+  },
+  {
+   "text": "View all publications →",
+   "ids": [
+    860,
+    682,
+    29085,
+    11651
+   ]
+  },
+  {
+   "text": "Selected Projects",
+   "ids": [
+    6450,
+    32323
+   ]
+  },
+  {
+   "text": "Gödel Agent ★ 228",
+   "ids": [
+    38,
+    3029,
+    9783,
+    21372,
+    38334,
+    220,
+    14261
+   ]
+  },
+  {
+   "text": "A self-referential agent framework for recursive self-improvement implemented with Monkey Patching.",
+   "ids": [
+    32,
+    659,
+    5621,
+    809,
+    2335,
+    8479,
+    12914,
+    369,
+    31919,
+    659,
+    38025,
+    782,
+    7986,
+    11798,
+    449,
+    58937,
+    31512,
+    287,
+    13
+   ]
+  },
+  {
+   "text": "Claude Journal ★ 10",
+   "ids": [
+    65217,
+    799,
+    10139,
+    38334,
+    220,
+    605
+   ]
+  },
+  {
+   "text": "A live web interface to view, annotate, search, and analyze your Claude Code & Codex conversations. Talk to your AI directly from the browser, edit real history, and manage every session. (Interactive Guide)",
+   "ids": [
+    32,
+    3974,
+    3566,
+    3834,
+    311,
+    1684,
+    11,
+    89498,
+    11,
+    2778,
+    11,
+    323,
+    24564,
+    701,
+    75430,
+    6247,
+    612,
+    34777,
+    327,
+    21633,
+    13,
+    19513,
+    311,
+    701,
+    15592,
+    6089,
+    505,
+    279,
+    7074,
+    11,
+    4600,
+    1972,
+    3925,
+    11,
+    323,
+    10299,
+    1475,
+    3882,
+    13,
+    320,
+    72786,
+    13002,
+    8
+   ]
+  },
+  {
+   "text": "Overleaf-Bib-Helper ★ 135",
+   "ids": [
+    1959,
+    25126,
+    7826,
+    581,
+    12,
+    5628,
+    38334,
+    220,
+    8878
+   ]
+  },
+  {
+   "text": "A Userscript to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor.",
+   "ids": [
+    32,
+    14969,
+    1250,
+    311,
+    18885,
+    6193,
+    25126,
+    555,
+    10923,
+    4652,
+    27573,
+    323,
+    30545,
+    56063,
+    57470,
+    6089,
+    2949,
+    279,
+    6193,
+    25126,
+    6576,
+    13
+   ]
+  },
+  {
+   "text": "MultAI ★ 16",
+   "ids": [
+    41504,
+    15836,
+    38334,
+    220,
+    845
+   ]
+  },
+  {
+   "text": "A Chrome extension that lets you talk to seven AI chat sites — ChatGPT, Claude, Gemini, Grok, Meta AI, DeepSeek, and Qwen — from one cockpit, with broadcast prompts, side-by-side compare, and a tiled layout.",
+   "ids": [
+    32,
+    17669,
+    9070,
+    430,
+    15714,
+    499,
+    3137,
+    311,
+    8254,
+    15592,
+    6369,
+    6732,
+    2001,
+    13149,
+    38,
+    2898,
+    11,
+    75430,
+    11,
+    86811,
+    11,
+    18370,
+    74,
+    11,
+    16197,
+    15592,
+    11,
+    18682,
+    40450,
+    11,
+    323,
+    1229,
+    17378,
+    2001,
+    505,
+    832,
+    60724,
+    11,
+    449,
+    13195,
+    52032,
+    11,
+    3185,
+    14656,
+    25034,
+    9616,
+    11,
+    323,
+    264,
+    82970,
+    6932,
+    13
+   ]
+  },
+  {
+   "text": "View all projects →",
+   "ids": [
+    860,
+    682,
+    7224,
+    11651
+   ]
+  },
+  {
+   "text": "© 2026 Xunjian Yin ",
+   "ids": [
+    20644,
+    220,
+    2366,
+    21,
+    1630,
+    70014,
+    1122,
+    83958,
+    220
+   ]
+  },
+  {
+   "text": "*",
+   "ids": [
+    9
+   ]
+  }
+ ]
+}

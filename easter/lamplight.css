@@ -1,0 +1,129 @@
+/* V · Lamplight. The layer's custom properties are written by easter/lamplight.js:
+   --ll-x/--ll-y lamp centre, --ll-r its reach, --ll-o the night's alpha, --ll-g the glow's,
+   --ll-w/--ll-h half the night's size, --ll-gr the glow radius, --ll-mask, --ll-grain. */
+
+html.lens-lamplight {
+  --ll-ember: #8f5a33;                 /* a link out in the dark: a dim ember */
+  --lenses-caption-color: #cfae82;     /* the caption is read in the dark */
+}
+
+/* The lamp: moved by transform only, so following the pointer never repaints. */
+.lamplight-layer .lamplight-lamp {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform: translate3d(var(--ll-x, 50vw), var(--ll-y, 40vh), 0);
+  will-change: transform;
+}
+.lamplight-layer .lamplight-flame,
+.lamplight-layer .lamplight-flicker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Night: warm deep black with a hole of light at the lamp (a radial mask). */
+.lamplight-layer .lamplight-night {
+  position: absolute;
+  left: calc(var(--ll-w) * -1);
+  top: calc(var(--ll-h) * -1);
+  width: calc(var(--ll-w) * 2);
+  height: calc(var(--ll-h) * 2);
+  background: #0b0806;
+  opacity: var(--ll-o, 1);
+  -webkit-mask-image: var(--ll-mask);
+  mask-image: var(--ll-mask);
+}
+
+/* Glow: the lamp's warm tint; its backdrop filter warms the page under the light only. */
+.lamplight-layer .lamplight-glow {
+  position: absolute;
+  left: calc(var(--ll-gr) * -1);
+  top: calc(var(--ll-gr) * -1);
+  width: calc(var(--ll-gr) * 2);
+  height: calc(var(--ll-gr) * 2);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 233, 196, 0.16), rgba(255, 233, 196, 0.07) 55%, rgba(255, 233, 196, 0));
+  -webkit-backdrop-filter: sepia(0.2);
+  backdrop-filter: sepia(0.2);
+  -webkit-mask-image: radial-gradient(closest-side, #000 45%, transparent);
+  mask-image: radial-gradient(closest-side, #000 45%, transparent);
+  opacity: var(--ll-g, 1);
+}
+html[data-theme="dark"] .lamplight-layer .lamplight-glow {
+  background: radial-gradient(closest-side, rgba(255, 233, 196, 0.1), rgba(255, 233, 196, 0.04) 55%, rgba(255, 233, 196, 0));
+}
+
+/* Grain: faint warm flecks, fixed to the viewport, visible on the dark only. */
+.lamplight-layer .lamplight-grain {
+  position: absolute;
+  inset: 0;
+  background-image: var(--ll-grain);
+  background-size: 128px 128px;
+  opacity: var(--ll-o, 1);
+}
+
+/* The candle: an irregular flicker of reach and alpha, at most 1.5 %. Composited only. */
+.lamplight-layer .lamplight-flicker { animation: lamplight-flicker 7.3s linear infinite; }
+.lamplight-layer .lamplight-flame { animation: lamplight-flame 7.3s linear infinite; }
+@keyframes lamplight-flicker {
+  0%   { transform: scale(1);     opacity: 1; }
+  6%   { transform: scale(1.006); opacity: 0.992; }
+  11%  { transform: scale(0.997); opacity: 1; }
+  19%  { transform: scale(1.011); opacity: 0.987; }
+  23%  { transform: scale(1.002); opacity: 0.996; }
+  34%  { transform: scale(0.993); opacity: 1; }
+  41%  { transform: scale(1.008); opacity: 0.99; }
+  47%  { transform: scale(1.014); opacity: 0.985; }
+  52%  { transform: scale(1.001); opacity: 0.997; }
+  63%  { transform: scale(0.995); opacity: 1; }
+  71%  { transform: scale(1.009); opacity: 0.989; }
+  78%  { transform: scale(1.003); opacity: 0.995; }
+  86%  { transform: scale(0.996); opacity: 1; }
+  93%  { transform: scale(1.007); opacity: 0.991; }
+  100% { transform: scale(1);     opacity: 1; }
+}
+@keyframes lamplight-flame {
+  0%   { transform: scale(1); }
+  6%   { transform: scale(1.006); }
+  11%  { transform: scale(0.997); }
+  19%  { transform: scale(1.011); }
+  23%  { transform: scale(1.002); }
+  34%  { transform: scale(0.993); }
+  41%  { transform: scale(1.008); }
+  47%  { transform: scale(1.014); }
+  52%  { transform: scale(1.001); }
+  63%  { transform: scale(0.995); }
+  71%  { transform: scale(1.009); }
+  78%  { transform: scale(1.003); }
+  86%  { transform: scale(0.996); }
+  93%  { transform: scale(1.007); }
+  100% { transform: scale(1); }
+}
+html.lens-lamplight-still .lamplight-layer .lamplight-flicker,
+html.lens-lamplight-still .lamplight-layer .lamplight-flame { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .lamplight-layer .lamplight-flicker,
+  .lamplight-layer .lamplight-flame { animation: none; }
+}
+
+/* Links above the night: their own colour under the lamp, a dim ember in the dark. */
+html.lens-lamplight #site-nav a[href],
+html.lens-lamplight #main-content a[href],
+html.lens-lamplight #site-footer a[href] {
+  position: relative;
+  z-index: 1002;
+  color: color-mix(in oklab, var(--ll-link, currentColor) calc(var(--ll-near, 1) * 100%), var(--ll-ember));
+  text-shadow: 0 0 6px rgba(255, 128, 48, calc(0.3 * (1 - var(--ll-near, 1))));
+  transition: none;
+}
+/* While the links' own colours are read: no transition, so the value is final. */
+html.lens-lamplight-measure #site-nav a[href],
+html.lens-lamplight-measure #main-content a[href],
+html.lens-lamplight-measure #site-footer a[href] { transition: none !important; }
+/* The skip link is already positioned; it only needs to rise. */
+html.lens-lamplight #site-nav a.skip-link { position: absolute; }

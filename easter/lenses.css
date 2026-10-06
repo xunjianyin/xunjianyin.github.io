@@ -1,0 +1,74 @@
+/* Lenses core: hidden glyphs (the first egg's technique), the layers lenses draw in, and
+   the transient caption. Lens styles live in easter/<id>.css under html.lens-<id>. */
+
+/* Glyphs only: colours, borders, SVG icons and list markers keep theirs. */
+html.lenses-hide-glyphs #site-nav, html.lenses-hide-glyphs #site-nav *,
+html.lenses-hide-glyphs #main-content, html.lenses-hide-glyphs #main-content *,
+html.lenses-hide-glyphs #site-footer, html.lenses-hide-glyphs #site-footer * {
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+}
+
+/* Layers: a viewport layer, or a document layer that scrolls with the page (its height is
+   set by the core). Neither ever takes the pointer. */
+.lenses-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  pointer-events: none !important;
+}
+.lenses-layer-page {
+  position: absolute;
+  inset: auto;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 0;
+}
+.lenses-layer * { pointer-events: none !important; }
+
+/* Caption: one serif italic line (and at most two quieter ones) beside or above the name. */
+.lenses-caption {
+  --lenses-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  position: absolute;
+  z-index: 2147483000;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  color: var(--lenses-caption-color, #6b7280);
+  -webkit-text-fill-color: currentColor;
+  font-family: var(--lenses-serif);
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 17px;
+  letter-spacing: 0.01em;
+  text-align: left;
+  text-shadow: none;
+  text-transform: none;
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+html[data-theme="dark"] .lenses-caption { color: var(--lenses-caption-color, #9ca3af); }
+.lenses-caption.is-shown { opacity: 1; }
+.lenses-caption.is-centred { text-align: center; }
+.lenses-caption span { display: block; }
+.lenses-caption .lenses-caption-note {
+  margin-top: 1px;
+  font-size: 11.5px;
+  line-height: 16px;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  opacity: 0.78;
+}
+.lenses-caption.is-compact { font-size: 12px; line-height: 15px; }
+.lenses-caption.is-compact .lenses-caption-note { font-size: 11px; line-height: 14px; }
+.lenses-caption.is-still { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .lenses-caption { transition: none; }
+}

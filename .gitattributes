@@ -1,0 +1,3 @@
+# Token data: some lines end in meaningful spaces and some look like conflict markers.
+# Treat it as binary so git never converts, merges or whitespace-checks it.
+easter/cl100k.txt binary

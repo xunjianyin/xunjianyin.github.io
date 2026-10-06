@@ -1,0 +1,278 @@
+/* Lens III · Blueprint (easter/blueprint.js).
+   Paint only: colour, background, text decoration and the core's layers. No rule here may
+   change size, spacing, font or position, so the layout stays identical to normal.
+
+   Classes on <html>:
+     lens-blueprint          the whole activation; invisible by itself (grid alpha 0,
+                             transparent underlines), so it can sit under the fades
+     lens-blueprint-on       the blueprint colours
+     lens-blueprint-fade     transitions, only while entering or leaving
+     lens-blueprint-leaving  the shorter leaving timings
+   The selectors carry an id (through :is()) so they outrank the site's own colour rules,
+   including the dark-theme ones; the lens shows the same drawing in both site themes. */
+
+@property --lens-bp-grid {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/* ---- Ground: Prussian blue with a white grid (minor 8 px, major 64 px) aligned to the
+   main column; the offsets come from the script as --lens-bp-gx / --lens-bp-gy. The body
+   background propagates to the canvas, so it covers the whole document. ---- */
+html.lens-blueprint body {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / calc(0.12 * var(--lens-bp-grid))) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / calc(0.12 * var(--lens-bp-grid))) 1px, transparent 1px),
+    linear-gradient(to right, rgb(255 255 255 / calc(0.06 * var(--lens-bp-grid))) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / calc(0.06 * var(--lens-bp-grid))) 1px, transparent 1px);
+  background-size: 64px 64px, 64px 64px, 8px 8px, 8px 8px;
+  background-position: var(--lens-bp-gx, 0px) var(--lens-bp-gy, 0px);
+}
+
+html.lens-blueprint-on {
+  --text-color: #e9f1fb;
+  --primary-color: #a9e3f5;
+  --secondary-color: #ffffff;
+  --bg-color: #0f3a63;
+  --border-color: rgba(214, 236, 251, 0.3);
+  --section-bg: rgba(255, 255, 255, 0.04);
+  --hover-bg: rgba(169, 227, 245, 0.1);
+  --lenses-caption-color: #bfe3f6;
+}
+
+html.lens-blueprint-on body {
+  --lens-bp-grid: 1;
+  background-color: #0f3a63 !important;
+}
+
+html.lens-blueprint-on #main-content,
+html.lens-blueprint-on :is(#main-content, #site-footer) table {
+  background-color: transparent !important;
+}
+
+/* ---- Text: near-white, in three weights of emphasis ---- */
+html.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(.name, h2, .news-date, .papertitle, strong, b, .nav-button[aria-current="page"]) {
+  color: #f6f9fd;
+}
+
+html.lens-blueprint-on :is(#main-content, #site-footer) :is(.bio, .news-list li, li, p) {
+  color: #e9f1fb;
+}
+
+html.lens-blueprint-on :is(#main-content, #site-footer) :is(.pronunciation, .paper_rest, .footer-copyright) {
+  color: rgba(233, 241, 251, 0.74);
+}
+
+html.lens-blueprint-on :is(#main-content, #site-footer) :is(.paper-venue, .venue, .new-badge, .project-stars) {
+  color: rgba(233, 241, 251, 0.6);
+}
+
+/* ---- Lines that belong to the page ---- */
+html.lens-blueprint-on #main-content .homepage-section h2 {
+  border-bottom-color: rgba(214, 236, 251, 0.34);
+}
+
+html.lens-blueprint-on #main-content .profile-photo {
+  border-color: rgba(214, 236, 251, 0.55);
+}
+
+/* ---- Links: pale cyan with a dashed underline (main content and footer text) ---- */
+html.lens-blueprint :is(#main-content, #site-footer) :is(a:not(.project-link):not(.project-stars), .abstract-toggle, .citation-toggle) {
+  text-decoration: underline dashed transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+html.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(a, .abstract-toggle, .citation-toggle) {
+  color: #a9e3f5;
+}
+
+html.lens-blueprint.lens-blueprint-on :is(#main-content, #site-footer) :is(a:not(.project-link):not(.project-stars), a.project-link, .abstract-toggle, .citation-toggle) {
+  text-decoration: underline dashed rgba(169, 227, 245, 0.6);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+html.lens-blueprint.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(a:not(.project-link):not(.project-stars), a.project-link, a.project-stars, .abstract-toggle, .citation-toggle):is(:hover, :focus-visible) {
+  color: #ffffff;
+  text-decoration-color: rgba(255, 255, 255, 0.85);
+}
+
+html.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) .nav-button[aria-current="page"] {
+  color: #f6f9fd;
+}
+
+html.lens-blueprint-on #site-footer .footer-social a {
+  color: #e9f1fb;
+}
+
+html.lens-blueprint-on :is(#main-content, #site-footer) .project-stars {
+  color: rgba(169, 227, 245, 0.72);
+}
+
+/* ---- Fades (entering 0.6 s; leaving 0.4 s after 0.1 s) ---- */
+html.lens-blueprint-fade body {
+  transition: background-color 600ms ease, --lens-bp-grid 600ms ease !important;
+}
+
+html.lens-blueprint-fade :is(#site-nav, #main-content, #site-footer),
+html.lens-blueprint-fade :is(#site-nav, #main-content, #site-footer) * {
+  transition: color 600ms ease, border-color 600ms ease, text-decoration-color 600ms ease,
+    background-color 600ms ease, opacity 200ms ease, visibility 200ms ease !important;
+}
+
+html.lens-blueprint-fade .lenses-caption {
+  transition: opacity 450ms ease, color 600ms ease !important;
+}
+
+html.lens-blueprint-fade.lens-blueprint-leaving body,
+html.lens-blueprint-fade.lens-blueprint-leaving :is(#site-nav, #main-content, #site-footer),
+html.lens-blueprint-fade.lens-blueprint-leaving :is(#site-nav, #main-content, #site-footer) * {
+  transition-duration: 400ms !important;
+  transition-delay: 100ms !important;
+}
+
+/* ---- The drawing (in the core's page layer) ---- */
+.lens-bp-root {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+
+.lens-bp-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+
+.lens-bp-svg .bp-line {
+  fill: none;
+  stroke: rgba(214, 236, 251, 0.78);
+  stroke-width: 1;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+.lens-bp-svg .bp-mask-line {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 4;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+.lens-bp-svg .bp-dash {
+  fill: none;
+  stroke: rgba(214, 236, 251, 0.36);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.lens-bp-svg .bp-head {
+  fill: rgba(214, 236, 251, 0.88);
+  opacity: 0;
+}
+
+.lens-bp-svg .bp-label {
+  fill: #e9f1fb;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  opacity: 0;
+}
+
+.lens-bp-cyan {
+  position: absolute;
+  display: block;
+  opacity: 0;
+}
+
+.lens-bp-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 125% 105% at 50% 42%, rgba(4, 22, 42, 0) 58%, rgba(4, 22, 42, 0.34) 100%);
+  opacity: 0;
+}
+
+.lens-bp-root.is-drawn :is(.bp-line, .bp-mask-line) { stroke-dashoffset: 0; }
+.lens-bp-root.is-drawn :is(.bp-head, .bp-label, .lens-bp-cyan),
+.lens-bp-vignette.is-drawn { opacity: 1; }
+
+/* A label under the core's caption waits for it (see deferUnderCaption). */
+.lens-bp-root.is-drawn .bp-label { transition: opacity 400ms ease; }
+.lens-bp-root .bp-label.bp-deferred { opacity: 0; }
+
+/* Entering: outlines trace from 0.1 s, each dimension line from its own --d (set by the
+   script), arrowheads and labels settle in at the end; everything is done by 0.9 s. */
+.lens-bp-root.is-animating .bp-line {
+  transition: stroke-dashoffset 500ms cubic-bezier(0.45, 0.05, 0.25, 1) var(--d, 160ms);
+}
+.lens-bp-root.is-animating .bp-mask-line {
+  transition: stroke-dashoffset 650ms cubic-bezier(0.45, 0.05, 0.25, 1) 100ms;
+}
+.lens-bp-root.is-animating :is(.bp-head, .bp-label) {
+  transition: opacity 240ms ease 620ms;
+}
+.lens-bp-root.is-animating .lens-bp-cyan {
+  transition: opacity 600ms ease 150ms;
+}
+.lens-bp-vignette.is-animating {
+  transition: opacity 600ms ease;
+}
+
+/* Leaving: labels go first, then the lines undraw. */
+.lens-bp-root.is-leaving :is(.bp-line, .bp-mask-line) {
+  transition: stroke-dashoffset 340ms cubic-bezier(0.55, 0, 0.75, 0.4) 60ms;
+}
+.lens-bp-root.is-leaving :is(.bp-head, .bp-label) {
+  transition: opacity 140ms ease;
+}
+.lens-bp-root.is-leaving .lens-bp-cyan,
+.lens-bp-vignette.is-leaving {
+  transition: opacity 400ms ease 100ms;
+}
+
+/* ---- Hover inspector: margin hatched, padding tinted, content outlined ---- */
+.lens-bp-inspect {
+  position: absolute;
+  display: none;
+  overflow: visible;
+}
+
+.lens-bp-inspect.is-on { display: block; }
+.lens-bp-inspect .bp-hatch { stroke: rgba(169, 227, 245, 0.5); stroke-width: 1; }
+.lens-bp-inspect .bp-i-padding { fill: rgba(169, 227, 245, 0.16); }
+.lens-bp-inspect .bp-i-content { fill: rgba(169, 227, 245, 0.06); stroke: rgba(233, 241, 251, 0.9); stroke-width: 1; }
+
+.lens-bp-tag {
+  position: absolute;
+  display: none;
+  box-sizing: border-box;
+  padding: 2px 6px;
+  border: 1px solid rgba(169, 227, 245, 0.55);
+  background: rgba(8, 36, 64, 0.94);
+  color: #e9f1fb;
+  -webkit-text-fill-color: #e9f1fb;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 13px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.lens-bp-tag.is-on { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  html.lens-blueprint-fade body,
+  html.lens-blueprint-fade :is(#site-nav, #main-content, #site-footer),
+  html.lens-blueprint-fade :is(#site-nav, #main-content, #site-footer) *,
+  .lens-bp-root *, .lens-bp-vignette {
+    transition: none !important;
+  }
+}
