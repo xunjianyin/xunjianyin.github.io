@@ -247,7 +247,7 @@
   "coral": {
     "title": "COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement",
     "authors": "Yuxi Xie, Anirudh Goyal, Xiaobao Wu, Xunjian Yin , Xiao Xu, Min-Yen Kan, Liangming Pan, William Yang Wang",
-    "venue": "ArXiv Preprint 2024",
+    "venue": "AFM Workshop, NeurIPS 2024",
     "links": [
       {
         "label": "Paper",
@@ -306,7 +306,7 @@
   "derl": {
     "title": "Differentiable Evolutionary Reinforcement Learning",
     "authors": "Sitao Cheng*, Tianle Li*, Xuhan Huang*, Xunjian Yin , Difan Zou",
-    "venue": "ArXiv Preprint 2025",
+    "venue": "Recursive Self-Improvement Workshop, ICLR 2026",
     "links": [
       {
         "label": "Paper",

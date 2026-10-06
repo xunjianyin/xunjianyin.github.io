@@ -71,50 +71,6 @@ const publications = [
     isSelected: false
   },
   {
-    title: "Differentiable Evolutionary Reinforcement Learning",
-    authors: "Sitao Cheng*, Tianle Li*, Xuhan Huang*, <b>Xunjian Yin</b>, Difan Zou",
-    venue: "ArXiv:2510",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2512.13399" },
-      { text: "Code", url: "https://github.com/sitaocheng/DERL" },
-      { text: "Page", url: "papers/derl.html" }
-    ],
-    abstract: "The design of effective reward functions presents a central and often arduous challenge in reinforcement learning (RL), particularly when developing autonomous agents for complex reasoning tasks. While automated reward optimization approaches exist, they typically rely on derivative-free evolutionary heuristics that treat the reward function as a black box, failing to capture the causal relationship between reward structure and task performance. To bridge this gap, we propose Differentiable Evolutionary Reinforcement Learning (DERL), a bilevel framework that enables the autonomous discovery of optimal reward signals. In DERL, a Meta-Optimizer evolves a reward function (i.e., Meta-Reward) by composing structured atomic primitives, guiding the training of an inner-loop policy. Crucially, unlike previous evolution, DERL is differentiable in its metaoptimization: it treats the inner-loop validation performance as a signal to update the Meta-Optimizer via reinforcement learning. This allows DERL to approximate the meta-gradient of task success, progressively learning to generate denser and more actionable feedback. We validate DERL across three distinct domains: robotic agent (ALFWorld), scientific simulation (ScienceWorld), and mathematical reasoning (GSM8k, MATH). Experimental results show that DERL achieves state-of-the-art performance on ALFWorld and ScienceWorld, significantly outperforming methods relying on heuristic rewards, especially in out-of-distribution scenarios. Analysis of the evolutionary trajectory demonstrates that DERL successfully captures the intrinsic structure of tasks, enabling selfimproving agent alignment without human intervention.",
-    citation: `<pre><code>@misc{cheng2025differentiableevolutionaryreinforcementlearning,
-      title={Differentiable Evolutionary Reinforcement Learning}, 
-      author={Sitao Cheng and Tianle Li and Xuhan Huang and Xunjian Yin and Difan Zou},
-      year={2025},
-      eprint={2512.13399},
-      archivePrefix={arXiv},
-      primaryClass={cs.AI},
-      url={https://arxiv.org/abs/2512.13399}, 
-}</code></pre>`,
-    isPreprint: true,
-    isSelected: false
-  },
-  {
-    title: "COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement",
-    authors: "Yuxi Xie, Anirudh Goyal, Xiaobao Wu, <b>Xunjian Yin</b>, Xiao Xu, Min-Yen Kan, Liangming Pan, William Yang Wang",
-    venue: "ArXiv:2410",
-    links: [
-      { text: "Paper", url: "https://arxiv.org/abs/2410.09675" },
-      { text: "Code", url: "https://github.com/YuxiXie/COrAL" },
-      { text: "Page", url: "papers/coral.html" }
-    ],
-    abstract: "Iterative refinement has emerged as an effective paradigm for enhancing the capabilities of large language models (LLMs) on complex tasks. However, existing approaches typically implement iterative refinement at the application or prompting level, relying on autoregressive (AR) modeling. The sequential token generation in AR models can lead to high inference latency. To overcome these challenges, we propose Context-Wise Order-Agnostic Language Modeling (COrAL), which incorporates iterative refinement directly into the LLM architecture while maintaining computational efficiency. Our approach models multiple token dependencies within manageable context windows, enabling the model to perform iterative refinement internally during the generation process. Leveraging the order-agnostic nature of COrAL, we introduce sliding blockwise order-agnostic decoding, which performs multi-token forward prediction and backward reconstruction within context windows. This allows the model to iteratively refine its outputs in parallel in the sliding block, effectively capturing diverse dependencies without the high inference cost of sequential generation. Empirical evaluations on reasoning tasks demonstrate that COrAL improves performance and inference speed, respectively, achieving absolute accuracy gains of $4.6\\%$ on GSM8K and $4.0\\%$ on LogiQA, along with inference speedups of up to $3.9\\times$ over next-token baselines. Preliminary results on code generation indicate a drop in pass rates due to inconsistencies in order-agnostic outputs, highlighting the inherent quality--speed trade-off. Our code is publicly available at https://github.com/YuxiXie/COrAL.",
-    citation: `<pre><code>@misc{xie2024coralorderagnosticlanguagemodeling,
-      title={COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement}, 
-      author={Yuxi Xie and Anirudh Goyal and Xiaobao Wu and Xunjian Yin and Xiao Xu and Min-Yen Kan and Liangming Pan and William Yang Wang},
-      year={2024},
-      eprint={2410.09675},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2410.09675}, 
-}</code></pre>`,
-    isPreprint: true,
-    isSelected: false
-  },
-  {
     title: "ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions",
     authors: "Xu Zhang*, <b>Xunjian Yin</b>*, Xiaojun Wan",
     venue: "ArXiv:2406",
@@ -415,6 +371,28 @@ const publications = [
     isSelected: false
   },
   {
+    title: "Differentiable Evolutionary Reinforcement Learning",
+    authors: "Sitao Cheng*, Tianle Li*, Xuhan Huang*, <b>Xunjian Yin</b>, Difan Zou",
+    venue: "Recursive Self-Improvement Workshop, ICLR 2026",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2512.13399" },
+      { text: "Code", url: "https://github.com/sitaocheng/DERL" },
+      { text: "Page", url: "papers/derl.html" }
+    ],
+    abstract: "The design of effective reward functions presents a central and often arduous challenge in reinforcement learning (RL), particularly when developing autonomous agents for complex reasoning tasks. While automated reward optimization approaches exist, they typically rely on derivative-free evolutionary heuristics that treat the reward function as a black box, failing to capture the causal relationship between reward structure and task performance. To bridge this gap, we propose Differentiable Evolutionary Reinforcement Learning (DERL), a bilevel framework that enables the autonomous discovery of optimal reward signals. In DERL, a Meta-Optimizer evolves a reward function (i.e., Meta-Reward) by composing structured atomic primitives, guiding the training of an inner-loop policy. Crucially, unlike previous evolution, DERL is differentiable in its metaoptimization: it treats the inner-loop validation performance as a signal to update the Meta-Optimizer via reinforcement learning. This allows DERL to approximate the meta-gradient of task success, progressively learning to generate denser and more actionable feedback. We validate DERL across three distinct domains: robotic agent (ALFWorld), scientific simulation (ScienceWorld), and mathematical reasoning (GSM8k, MATH). Experimental results show that DERL achieves state-of-the-art performance on ALFWorld and ScienceWorld, significantly outperforming methods relying on heuristic rewards, especially in out-of-distribution scenarios. Analysis of the evolutionary trajectory demonstrates that DERL successfully captures the intrinsic structure of tasks, enabling selfimproving agent alignment without human intervention.",
+    citation: `<pre><code>@misc{cheng2025differentiableevolutionaryreinforcementlearning,
+      title={Differentiable Evolutionary Reinforcement Learning},
+      author={Sitao Cheng and Tianle Li and Xuhan Huang and Xunjian Yin and Difan Zou},
+      year={2025},
+      eprint={2512.13399},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2512.13399},
+}</code></pre>`,
+    isPreprint: false,
+    isSelected: false
+  },
+  {
     title: "MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency",
     authors: "Junzhe Zhang, Huixuan Zhang, <b>Xunjian Yin</b>, Baizhou Huang, Xu Zhang, Xinyu Hu, Xiaojun Wan",
     venue: "ACL 2025 Findings ",
@@ -638,6 +616,28 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
 }</code></pre>`,
     isPreprint: false,
     isSelected: true
+  },
+  {
+    title: "COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement",
+    authors: "Yuxi Xie, Anirudh Goyal, Xiaobao Wu, <b>Xunjian Yin</b>, Xiao Xu, Min-Yen Kan, Liangming Pan, William Yang Wang",
+    venue: "AFM Workshop, NeurIPS 2024",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2410.09675" },
+      { text: "Code", url: "https://github.com/YuxiXie/COrAL" },
+      { text: "Page", url: "papers/coral.html" }
+    ],
+    abstract: "Iterative refinement has emerged as an effective paradigm for enhancing the capabilities of large language models (LLMs) on complex tasks. However, existing approaches typically implement iterative refinement at the application or prompting level, relying on autoregressive (AR) modeling. The sequential token generation in AR models can lead to high inference latency. To overcome these challenges, we propose Context-Wise Order-Agnostic Language Modeling (COrAL), which incorporates iterative refinement directly into the LLM architecture while maintaining computational efficiency. Our approach models multiple token dependencies within manageable context windows, enabling the model to perform iterative refinement internally during the generation process. Leveraging the order-agnostic nature of COrAL, we introduce sliding blockwise order-agnostic decoding, which performs multi-token forward prediction and backward reconstruction within context windows. This allows the model to iteratively refine its outputs in parallel in the sliding block, effectively capturing diverse dependencies without the high inference cost of sequential generation. Empirical evaluations on reasoning tasks demonstrate that COrAL improves performance and inference speed, respectively, achieving absolute accuracy gains of $4.6\\%$ on GSM8K and $4.0\\%$ on LogiQA, along with inference speedups of up to $3.9\\times$ over next-token baselines. Preliminary results on code generation indicate a drop in pass rates due to inconsistencies in order-agnostic outputs, highlighting the inherent quality--speed trade-off. Our code is publicly available at https://github.com/YuxiXie/COrAL.",
+    citation: `<pre><code>@misc{xie2024coralorderagnosticlanguagemodeling,
+      title={COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement},
+      author={Yuxi Xie and Anirudh Goyal and Xiaobao Wu and Xunjian Yin and Xiao Xu and Min-Yen Kan and Liangming Pan and William Yang Wang},
+      year={2024},
+      eprint={2410.09675},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2410.09675},
+}</code></pre>`,
+    isPreprint: false,
+    isSelected: false
   },
   {
     title: "Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation",
