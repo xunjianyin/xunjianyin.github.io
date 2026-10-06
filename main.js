@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Other sections (used on homepage or other pages if present)
-  populateProjects(false);
+  populateProjects();
   populateResearchExperience();
   populateAcademicServices();
   populateTeaching();
@@ -171,21 +171,47 @@ function populatePublications(publications, listId) {
 /**
  * Populate projects (only selected ones for homepage)
  */
-function populateProjects(showAllBadges) {
+function populateProjects() {
   const list = document.getElementById('projects-list');
   if (!list) return;
 
   getSelectedProjects().forEach(project => {
     const li = document.createElement('li');
-    const badges = showAllBadges
-      ? project.badges
-      : project.badges.filter(b => b.img.includes('/github/stars/'));
-    const badgeHtml = badges.map(badge =>
-      `<a href="${badge.url}" target="_blank" rel="noopener"><img alt="stars" src="${badge.img}" loading="lazy" style="vertical-align:middle;" /></a>`
-    ).join(' ');
-    li.innerHTML = `<strong>${project.title}</strong> ${badgeHtml}<br>${project.description}`;
+    // The repository named by the project's shields.io star badge, e.g. "Arvid-pku/Godel_Agent".
+    const starBadge = project.badges.find(b => b.img.includes('/github/stars/'));
+    const repo = starBadge ? starBadge.img.split('/github/stars/')[1].split(/[?#]/)[0] : '';
+    const stars = repo ? ` <a class="project-stars" href="https://github.com/${repo}" target="_blank" rel="noopener" hidden></a>` : '';
+    li.innerHTML = `<strong>${project.title}</strong>${stars}<br>${project.description}`;
     list.appendChild(li);
+    if (repo) renderStarCount(li.querySelector('.project-stars'), repo);
   });
+}
+
+/**
+ * Show a repository's GitHub star count as plain text ("★ 228").
+ * Counts come from the GitHub API and are cached for the browser session;
+ * if the request fails, the element stays hidden.
+ */
+function renderStarCount(element, repo) {
+  const key = `github-stars:${repo}`;
+  const show = count => {
+    const label = count >= 1000 ? `${(count / 1000).toFixed(1).replace(/\.0$/, '')}k` : String(count);
+    element.textContent = `\u2605 ${label}`;
+    element.setAttribute('aria-label', `${count} GitHub stars`);
+    element.hidden = false;
+  };
+  try {
+    const cached = JSON.parse(sessionStorage.getItem(key) || 'null');
+    if (cached && typeof cached.count === 'number') { show(cached.count); return; }
+  } catch (error) { /* storage unavailable */ }
+  fetch(`https://api.github.com/repos/${repo}`)
+    .then(response => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
+    .then(data => {
+      if (typeof data.stargazers_count !== 'number') return;
+      show(data.stargazers_count);
+      try { sessionStorage.setItem(key, JSON.stringify({ count: data.stargazers_count })); } catch (error) { /* storage unavailable */ }
+    })
+    .catch(() => { /* leave the count hidden */ });
 }
 
 /**

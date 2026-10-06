@@ -66,43 +66,17 @@
       margin-bottom: 20px;
       position: relative;
       overflow: hidden;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       cursor: pointer;
-      opacity: 0;
-      transform: translateY(30px);
-    }
-
-    .photo-item.visible {
-      opacity: 1;
-      transform: translateY(0);
     }
 
     .photo-item.hidden {
       display: none;
     }
 
-    .photo-item:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    }
-
-    .photo-item.visible:hover {
-      transform: translateY(-8px);
-    }
-
     .photo-item img {
       width: 100%;
       height: auto;
       display: block;
-      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      filter: brightness(0.95) contrast(1.05);
-    }
-
-    .photo-item:hover img {
-      transform: scale(1.05);
-      filter: brightness(1) contrast(1.1);
     }
 
     .photo-caption {
@@ -110,11 +84,11 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      background: rgba(0,0,0,0.6);
       color: white;
-      padding: 40px 15px 15px;
+      padding: 12px 15px;
       opacity: 0;
-      transition: all 0.4s ease;
+      transition: opacity 0.2s ease;
       font-size: 14px;
       font-weight: 300;
       letter-spacing: 0.5px;
@@ -160,10 +134,6 @@
       .gallery-intro {
         font-size: 16px;
         margin-bottom: 30px;
-      }
-
-      .photo-item {
-        border-radius: 10px;
       }
     }
 
@@ -239,8 +209,6 @@
     .lightbox-content {
       max-width: 90%;
       max-height: 85%;
-      border-radius: 8px;
-      box-shadow: 0 10px 50px rgba(0,0,0,0.5);
     }
 
     .lightbox-caption {
@@ -287,12 +255,8 @@
       color: var(--text-color, #b8b8b8);
     }
 
-    [data-theme="dark"] .photo-item {
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-
     [data-theme="dark"] .photo-caption {
-      background: linear-gradient(transparent, rgba(0,0,0,0.9));
+      background: rgba(0,0,0,0.7);
     }
 
     [data-theme="dark"] .photo-title {
@@ -307,7 +271,7 @@
 
 <body>
   <!-- Navigation Buttons -->
-  <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
+  <nav class="nav-buttons nav-buttons-wide" role="navigation" aria-label="Main navigation">
     <a href="index.html" class="nav-button">Home</a>
     <a href="publications.html" class="nav-button">Publications</a>
     <a href="projects.html" class="nav-button">Projects</a>

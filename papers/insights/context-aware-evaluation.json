@@ -24,10 +24,6 @@
     {
       "label": "Paper · Sections 2–5 and Tables 1–3",
       "url": "https://aclanthology.org/2023.findings-emnlp.1021.pdf"
-    },
-    {
-      "label": "Cont-COMET code",
-      "url": "https://github.com/herrxy/Cont-COMET"
     }
   ],
   "reading_notes": "Re-read full method and result/ablation tables. Distinguish system Pearson from segment Kendall. Demo reproduces the selection formula on authored text and hand-set similarities; it does not run COMET or score translations.",

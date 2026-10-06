@@ -73,13 +73,13 @@
 
 :root {
   --primary-color: #0065C0;
-  --secondary-color: #f09228;
+  --secondary-color: #004A8C;
   --text-color: #000000;
   --bg-color: #FFFFFF;
   --border-color: #bbb;
   --sidebar-bg: #FFFFFF;
   --section-bg: #FFFFFF;
-  --hover-bg: rgba(240, 146, 40, 0.08);
+  --hover-bg: rgba(0, 101, 192, 0.06);
   --shadow-color: rgba(0, 0, 0, 0.1);
   --placeholder-bg: #f5f5f5;
   --placeholder-text: #666;
@@ -88,13 +88,13 @@
 /* Dark mode colors */
 [data-theme="dark"] {
   --primary-color: #6BA3F5;
-  --secondary-color: #FFB366;
+  --secondary-color: #A9CBFA;
   --text-color: #D4D4D4;
   --bg-color: #1F1F1F;
   --border-color: #4A4A4A;
   --sidebar-bg: #2A2A2A;
   --section-bg: #252525;
-  --hover-bg: rgba(255, 179, 102, 0.12);
+  --hover-bg: rgba(107, 163, 245, 0.12);
   --shadow-color: rgba(0, 0, 0, 0.2);
   --placeholder-bg: #333333;
   --placeholder-text: #B8B8B8;
@@ -243,19 +243,11 @@ html {
 
 /* Enhanced hover effects for links */
 a {
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
-a:hover {
-  text-shadow: 0 1px 2px rgba(0, 101, 192, 0.1);
+  transition: color 0.2s ease;
 }
 
 /* Section spacing */
 
-/* Profile photo */
-.profile-photo {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
 
 
 
@@ -268,14 +260,13 @@ a:focus, button:focus {
 /* Skip to main content link (hidden by default) */
 .skip-link {
   position: absolute;
-  top: -40px;
+  top: -100px;
   left: 6px;
   background: var(--primary-color);
   color: white;
   padding: 8px;
   text-decoration: none;
   z-index: 1000;
-  border-radius: 4px;
 }
 
 .skip-link:focus {
@@ -344,7 +335,8 @@ a:focus, button:focus {
     font-size: 16px;
   }
   
-  .paper_rest {
+  .paper_rest,
+  .paper-links {
     font-size: 14px;
   }
   

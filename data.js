@@ -76,7 +76,6 @@ const publications = [
     venue: "ArXiv:2406",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2406.08842" },
-      { text: "Code", url: "https://github.com/Arvid-pku/ContraSolver" },
       { text: "Page", url: "papers/contrasolver.html" }
     ],
     abstract: "While substantial advancements have been made in developing large language models (LLMs), achieving control over their behavior can be difficult. Direct preference optimization (DPO) assumes the existence of a latent reward function to evaluate the responses of LLMs. This assumption indicates a strict preference ordering of different responses to the same input. However, there always exist contradictions of preference in LLMs according to our experimental observations. In this paper, we construct a graph structure of the preference relationship among different responses with self-annotation to find contradictions in the preference order. We propose ContraSolver, an algorithm that traverses all edges on the preference graph to identify those that might cause contradictions. ContraSolver initializes the graph with a maximum spanning tree and identifies contradictory edges, prioritizing the resolution of low-confidence preferences while preserving high-confidence ones. Experimental results on four different generation tasks show that the performance of different LLMs can be largely improved through our completely unsupervised self-alignment. Furthermore, by analyzing the preference graphs of LLMs with and without self-alignment by ContraSolver, we quantify the reduction in contradictions, suggesting that resolving preference contradictions is crucial for achieving better alignment performance.",
@@ -800,7 +799,6 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     venue: "EMNLP 2023 Findings",
     links: [
       { text: "Paper", url: "https://aclanthology.org/2023.findings-emnlp.1021/" },
-      { text: "Code", url: "https://github.com/herrxy/Cont-COMET" },
       { text: "Page", url: "papers/context-aware-evaluation.html" }
     ],
     abstract: "Previous studies on machine translation evaluation mostly focused on the quality of individual sentences, while overlooking the important role of contextual information. Although WMT Metrics Shared Tasks have introduced context content into the human annotations of translation evaluation since 2019, the relevant metrics and methods still did not take advantage of the corresponding context. In this paper, we propose a context-aware machine translation evaluation metric called Cont-COMET, built upon the effective COMET framework. Our approach simultaneously considers the preceding and subsequent contexts of the sentence to be evaluated and trains our metric to be aligned with the setting during human annotation. We also introduce a content selection method to extract and utilize the most relevant information. The experiments and evaluation of Cont-COMET on the official test framework from WMT show improvements in both system-level and segment-level assessments.",

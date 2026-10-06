@@ -188,10 +188,6 @@
       {
         "label": "Paper",
         "url": "https://aclanthology.org/2023.findings-emnlp.1021/"
-      },
-      {
-        "label": "Code",
-        "url": "https://github.com/herrxy/Cont-COMET"
       }
     ],
     "abstract": "Previous studies on machine translation evaluation mostly focused on the quality of individual sentences, while overlooking the important role of contextual information. Although WMT Metrics Shared Tasks have introduced context content into the human annotations of translation evaluation since 2019, the relevant metrics and methods still did not take advantage of the corresponding context. In this paper, we propose a context-aware machine translation evaluation metric called Cont-COMET, built upon the effective COMET framework. Our approach simultaneously considers the preceding and subsequent contexts of the sentence to be evaluated and trains our metric to be aligned with the setting during human annotation. We also introduce a content selection method to extract and utilize the most relevant information. The experiments and evaluation of Cont-COMET on the official test framework from WMT show improvements in both system-level and segment-level assessments.",
@@ -222,10 +218,6 @@
       {
         "label": "Paper",
         "url": "https://arxiv.org/abs/2406.08842"
-      },
-      {
-        "label": "Code",
-        "url": "https://github.com/Arvid-pku/ContraSolver"
       }
     ],
     "abstract": "Recent alignment methods such as RLHF and DPO have significantly improved the quality of large language model outputs. However, these approaches depend on high-quality preference data, which is expensive to obtain. Self-alignment techniques alleviate this dependency but introduce the challenge of internal contradictions in model-generated preferences. We observe that language models exhibit preference contradictions -- logical inconsistencies where pairwise comparisons violate transitivity. ContraSolver addresses this by modeling preferences as a directed graph, identifying contradictory cycles, and resolving them via maximum spanning tree initialization that preserves high-confidence preferences. Experiments across four generation tasks demonstrate consistent improvements in both alignment quality and preference consistency, all without any human supervision.",

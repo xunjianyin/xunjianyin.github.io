@@ -45,48 +45,55 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 18px;
-  padding: 20px 35px;
   flex-wrap: wrap;
+  gap: 4px 22px;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 20px 24px 12px;
+  box-sizing: border-box;
+}
+
+/* Pages with a wider content column (the photography grid) align the nav to that column. */
+.nav-buttons-wide {
+  max-width: 1440px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .nav-button {
   display: inline-block;
-  padding: 6px 12px;
+  padding: 6px 0;
   background-color: transparent;
   color: var(--primary-color);
   font-weight: 500;
   font-size: 14px;
-  transition: all 0.25s ease;
+  transition: color 0.2s ease;
   text-align: center;
   border: none;
-  border-radius: 4px;
 }
 
 .nav-button:hover {
   color: var(--secondary-color);
-  background-color: var(--hover-bg);
 }
 
 /* Theme Toggle Button - Sun/Moon Icons */
 .theme-toggle {
   background: transparent;
   border: none;
-  border-radius: 8px;
   width: 36px;
   height: 36px;
+  margin-right: -8px; /* the icon, not the button box, lines up with the content edge */
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
   color: var(--text-color);
   padding: 6px;
 }
 
 .theme-toggle:hover {
-  background-color: var(--hover-bg);
-  color: var(--secondary-color);
+  color: var(--primary-color);
 }
 
 .theme-toggle:focus {
@@ -99,23 +106,25 @@
   height: 20px;
 }
 
-/* Navigation Active State */
+/* Navigation Active State: body-text colour with a full-width rule, so links keep the only accent. */
 .nav-button[aria-current="page"] {
-  color: var(--secondary-color);
+  color: #1a1a1a;
   font-weight: 600;
   position: relative;
+}
+
+[data-theme="dark"] .nav-button[aria-current="page"] {
+  color: var(--text-color);
 }
 
 .nav-button[aria-current="page"]::after {
   content: '';
   position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
+  left: 0;
+  right: 0;
+  bottom: 1px;
   height: 2px;
-  background-color: var(--secondary-color);
-  border-radius: 1px;
+  background-color: currentColor;
 }
 
 /* Main Content Layout - Only applies to pages without specific overrides */
@@ -242,7 +251,7 @@ ul, ol {
   display: inline;
   padding: 0;
   margin: 0;
-  font-size: 16px;
+  font-size: inherit;
   font-family: inherit;
   font-weight: 400;
   color: var(--primary-color);
@@ -293,7 +302,6 @@ ul, ol {
   padding: 12px 14px;
   background-color: var(--section-bg);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
   font-size: 13px;
   overflow: auto;
 }
@@ -309,26 +317,24 @@ ul, ol {
 
 /* Responsive Design */
 @media screen and (max-width: 1315px) {
+  .main-content-wrapper:not(.page-shell) {
+    padding: 0 15px;
+  }
+}
+
+@media screen and (max-width: 600px) {
   .nav-buttons {
     justify-content: center;
-    gap: 12px 16px;
-    padding: 12px 16px;
+    gap: 0 16px;
+    padding: 10px 16px 0;
   }
 
   .nav-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 14px;
-    font-size: 16px;
+    padding: 6px 0;
   }
 
   .theme-toggle {
-    order: -1; /* Move theme toggle to the left */
-  }
-
-  .main-content-wrapper:not(.page-shell) {
-    padding: 0 15px;
+    margin-right: 0;
   }
 }
 
@@ -363,20 +369,18 @@ ul, ol {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 44px;
-  height: 44px;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.2s ease, visibility 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   z-index: 999;
 }
 
@@ -386,9 +390,8 @@ ul, ol {
 }
 
 .back-to-top:hover {
-  background-color: var(--secondary-color);
-  transform: translateY(-3px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .back-to-top svg {
@@ -414,13 +417,12 @@ ul, ol {
 .footer-social a {
   color: var(--text-color);
   opacity: 0.6;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .footer-social a:hover {
   color: var(--primary-color);
   opacity: 1;
-  transform: translateY(-2px);
 }
 
 .footer-social svg {
@@ -439,8 +441,6 @@ ul, ol {
   .back-to-top {
     bottom: 20px;
     right: 20px;
-    width: 40px;
-    height: 40px;
   }
 
   .footer-social {
@@ -451,4 +451,21 @@ ul, ol {
     width: 20px;
     height: 20px;
   }
+}
+
+/* GitHub star count beside a project name, e.g. "★ 228" (filled in by main.js) */
+.project-stars {
+  margin-left: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.project-stars:hover {
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .project-stars {
+  color: #9ca3af;
 }
