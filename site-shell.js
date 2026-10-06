@@ -111,6 +111,11 @@
     return 'page-shell-footer';
   }
 
+  // The photography grid is wider than the text column; its nav lines up with the grid.
+  function getNavClassName() {
+    return getCurrentPage() === 'photography' ? 'nav-buttons nav-buttons-wide' : 'nav-buttons';
+  }
+
   function buildNav() {
     const currentPage = getCurrentPage();
     const hasMainContent = Boolean(document.getElementById('main-content'));
@@ -120,7 +125,7 @@
     }).join('');
 
     return `${hasMainContent ? '<a href="#main-content" class="skip-link">Skip to main content</a>' : ''}
-  <nav class="nav-buttons" role="navigation" aria-label="Main navigation">
+  <nav class="${getNavClassName()}" role="navigation" aria-label="Main navigation">
     ${navLinks}
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode"></button>
   </nav>`;

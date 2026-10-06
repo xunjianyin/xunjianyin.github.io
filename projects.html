@@ -63,15 +63,20 @@
       font-size: 16px;
     }
 
+    .project-group:first-of-type .project-group-heading {
+      margin-top: 0;
+    }
+
     .project-description {
       margin-bottom: 0;
       line-height: 1.6;
       color: #374151;
     }
 
-    #projects-list {
+    .project-list {
       list-style: none !important;
       padding-left: 0 !important;
+      margin: 0 0 8px !important;
     }
 
     [data-theme="dark"] .page-title { color: var(--text-color); }
@@ -99,11 +104,15 @@
   <main id="main-content" class="main-content-wrapper page-shell">
     <h1 class="page-title">Projects</h1>
 
-    <div style="margin-bottom:24px;">
-      <ul id="projects-list">
-        <!-- Projects will be inserted here -->
-      </ul>
-    </div>
+    <section class="project-group">
+      <h2 class="project-group-heading">Research and developer tools</h2>
+      <ul class="project-list" data-category="tools"></ul>
+    </section>
+
+    <section class="project-group">
+      <h2 class="project-group-heading">Interactive experiments</h2>
+      <ul class="project-list" data-category="experiments"></ul>
+    </section>
   </main>
 
   <div id="site-footer"></div>
@@ -116,91 +125,47 @@
   <script>
     // Projects page specific script
     document.addEventListener('DOMContentLoaded', function() {
-      // Populate all projects (both selected and non-selected)
-      populateProjects(getAllProjects(), 'projects-list');
-      
-      // Initialize dark mode toggle (uses utils.js with sun/moon icons)
+      populateProjectGroups(getAllProjects());
       initializeDarkMode();
-
-      // Initialize back to top button
       initializeBackToTop();
     });
 
     /**
-     * Function to populate projects in the specified container element
-     * @param {Array} projects - Array of project objects
-     * @param {string} containerId - ID of the container element to populate
+     * Render every project into the list for its category ("tools" or "experiments").
+     * The name and the thumbnail link to the project's homepage (project.url).
      */
-    function populateProjects(projects, containerId) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      
+    function populateProjectGroups(projects) {
       projects.forEach(project => {
+        const list = document.querySelector(`.project-list[data-category="${project.category}"]`);
+        if (!list) return;
         const li = document.createElement('li');
         li.className = 'project-item';
-        
-        // Project demo image
+
         if (project.demoPath) {
-          const imgDiv = document.createElement('div');
+          const imageLink = document.createElement('a');
+          imageLink.href = project.url;
+          imageLink.target = '_blank';
+          imageLink.rel = 'noopener';
+          imageLink.tabIndex = -1;   // the name link below is the keyboard target
+          imageLink.setAttribute('aria-hidden', 'true');
           const img = document.createElement('img');
           img.src = project.demoPath;
-          img.alt = `${project.title} demo`;
+          img.alt = '';
           img.className = 'project-demo-image';
           img.loading = 'lazy';
-          
-          // Check if project has a homepage link to make image clickable
-          const homepageMatch = project.description.match(/<a href="([^"]+)">Project Homepage<\/a>/);
-          if (homepageMatch) {
-            const homepageUrl = homepageMatch[1];
-            const imgLink = document.createElement('a');
-            imgLink.href = homepageUrl;
-            imgLink.target = '_blank';
-            imgLink.rel = 'noopener';
-            imgLink.style.textDecoration = 'none';
-            imgLink.appendChild(img);
-            imgDiv.appendChild(imgLink);
-          } else {
-            imgDiv.appendChild(img);
-          }
-          
-          li.appendChild(imgDiv);
+          imageLink.appendChild(img);
+          li.appendChild(imageLink);
         }
-        
-        // Project content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'project-content';
-        
-        // Project title with homepage link
-        const titleDiv = document.createElement('div');
-        titleDiv.className = 'project-title';
-        
-        // Check if project has a homepage link in the description
-        const homepageMatch = project.description.match(/<a href="([^"]+)">Project Homepage<\/a>/);
-        if (homepageMatch) {
-          const homepageUrl = homepageMatch[1];
-          const titleText = project.title;
-          titleDiv.innerHTML = `<strong><a href="${homepageUrl}" target="_blank" rel="noopener">${titleText}</a></strong>`;
-        } else {
-          titleDiv.textContent = project.title;
-        }
-        
-        // Project description (remove homepage link from description since it's now in title)
-        const descDiv = document.createElement('div');
-        descDiv.className = 'project-description';
-        // Remove the homepage link from description since it's now in the title
-        const cleanDescription = project.description.replace(/<a href="[^"]+">Project Homepage<\/a>/, '');
-        // Clean up any extra spaces or punctuation that might be left
-        const finalDescription = cleanDescription.replace(/\s*\(\s*\)\s*/, '').trim();
-        descDiv.innerHTML = finalDescription;
-        
-        // Append elements
-        contentDiv.appendChild(titleDiv);
-        contentDiv.appendChild(descDiv);
-        li.appendChild(contentDiv);
-        container.appendChild(li);
+
+        const content = document.createElement('div');
+        content.className = 'project-content';
+        content.innerHTML = `<div class="project-title"><a class="project-link" href="${project.url}" target="_blank" rel="noopener">${project.title}</a></div>`
+          + `<div class="project-description">${project.description}</div>`;
+        li.appendChild(content);
+        list.appendChild(li);
       });
     }
-    
+
     // Dark mode functions are loaded from utils.js
   </script>
 </body>

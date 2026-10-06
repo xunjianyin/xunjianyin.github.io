@@ -24,48 +24,38 @@
   <link rel="stylesheet" type="text/css" href="shared-styles.css">
   <link rel="icon" type="image/png" href="figures/logo.png">
   <style>
-    body {
-      font-display: swap;
-    }
-
-    .photography-container {
+    /* The grid is wider than the text column; title, intro and grid share one left edge. */
+    #main-content.photography-container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 40px 20px;
+      padding: 32px 20px 0;
+      box-sizing: border-box;
     }
 
     .page-title {
       font-size: 24px;
       font-weight: 700;
       color: #1a1a1a;
-      margin-bottom: 20px;
+      margin: 0 0 8px;
       text-align: left;
     }
 
-    [data-theme="dark"] .page-title { color: var(--text-color); }
-
     .gallery-intro {
-      text-align: center;
-      max-width: 600px;
-      margin: 0 auto 40px;
-      line-height: 1.8;
-      font-size: 16px;
-      color: #666;
-      font-style: italic;
+      max-width: 640px;
+      margin: 0 0 32px;
+      color: #4b5563;
     }
 
-    /* Masonry Grid */
+    /* Masonry grid: square, flat photos with a caption underneath */
     .photo-grid {
       column-count: 3;
       column-gap: 20px;
-      margin-bottom: 60px;
+      margin-bottom: 40px;
     }
 
     .photo-item {
       break-inside: avoid;
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
+      margin: 0 0 24px;
       cursor: pointer;
     }
 
@@ -80,218 +70,126 @@
     }
 
     .photo-caption {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0,0,0,0.6);
-      color: white;
-      padding: 12px 15px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
+      padding-top: 8px;
+      line-height: 1.4;
+    }
+
+    .photo-item .photo-title {
       font-size: 14px;
-      font-weight: 300;
-      letter-spacing: 0.5px;
+      font-weight: 600;
+      color: #1a1a1a;
     }
 
-    .photo-item:hover .photo-caption {
-      opacity: 1;
-    }
-
-    .photo-title {
-      font-weight: 500;
-      margin-bottom: 4px;
-      font-size: 16px;
-    }
-
-    .photo-meta {
+    .photo-item .photo-meta {
       font-size: 12px;
-      opacity: 0.9;
-      color: #ddd;
+      color: #6b7280;
     }
 
-    /* Responsive Masonry */
-    @media screen and (max-width: 1024px) {
-      .photography-container {
-        padding: 30px 15px;
-      }
+    .photo-item:hover .photo-title {
+      color: var(--primary-color);
+    }
 
+    @media screen and (max-width: 1024px) {
       .photo-grid {
         column-count: 2;
-        column-gap: 15px;
-      }
-
-      .photo-item {
-        margin-bottom: 15px;
-      }
-    }
-
-    @media screen and (max-width: 768px) {
-      .page-title {
-        font-size: 32px;
-      }
-
-      .gallery-intro {
-        font-size: 16px;
-        margin-bottom: 30px;
+        column-gap: 16px;
       }
     }
 
     @media screen and (max-width: 600px) {
-      .photography-container {
-        padding: 20px 10px;
-      }
-
-      .page-title {
-        font-size: 28px;
+      #main-content.photography-container {
+        padding: 24px 16px 0;
       }
 
       .photo-grid {
         column-count: 1;
-        column-gap: 0;
-      }
-
-      .photo-item {
-        margin-bottom: 15px;
-      }
-
-      .photo-caption {
-        opacity: 1;
-        padding: 30px 12px 12px;
-      }
-
-      .photo-title {
-        font-size: 14px;
-      }
-
-      .photo-meta {
-        font-size: 11px;
       }
     }
 
-    /* Lightbox Styles */
+    /* Lightbox */
     .lightbox {
       display: none;
       position: fixed;
       z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.95);
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.95);
     }
 
     .lightbox.active {
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 1;
-    }
-
-    .lightbox-close {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      color: #fff;
-      font-size: 35px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: color 0.2s;
-      z-index: 1001;
-    }
-
-    .lightbox-close:hover {
-      color: var(--primary-color);
     }
 
     .lightbox-content {
       max-width: 90%;
-      max-height: 85%;
+      max-height: 82%;
     }
 
-    .lightbox-caption {
+    .lightbox-close,
+    .lightbox-nav {
       position: absolute;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: white;
-      text-align: center;
-      font-size: 16px;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s ease;
     }
 
-    .lightbox-caption .photo-title {
-      font-size: 18px;
-      margin-bottom: 5px;
+    .lightbox-close:hover,
+    .lightbox-nav:hover {
+      color: #9ca3af;
+    }
+
+    .lightbox-close {
+      top: 16px;
+      right: 28px;
+      font-size: 32px;
+      z-index: 1001;
     }
 
     .lightbox-nav {
-      position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      color: white;
-      font-size: 50px;
-      cursor: pointer;
+      font-size: 40px;
       padding: 20px;
-      transition: color 0.2s;
-      user-select: none;
     }
 
-    .lightbox-nav:hover {
-      color: var(--primary-color);
-    }
+    .lightbox-prev { left: 12px; }
+    .lightbox-next { right: 12px; }
 
-    .lightbox-prev {
-      left: 20px;
-    }
-
-    .lightbox-next {
-      right: 20px;
-    }
-
-    /* Dark mode styles */
-    [data-theme="dark"] .gallery-intro {
-      color: var(--text-color, #b8b8b8);
-    }
-
-    [data-theme="dark"] .photo-caption {
-      background: rgba(0,0,0,0.7);
-    }
-
-    [data-theme="dark"] .photo-title {
+    .lightbox-caption {
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
       color: #fff;
+      text-align: center;
     }
 
-    [data-theme="dark"] .photo-meta {
-      color: #ccc;
+    .lightbox-caption .photo-title {
+      font-size: 16px;
+      font-weight: 600;
     }
+
+    .lightbox-caption .photo-meta {
+      font-size: 13px;
+      color: #d1d5db;
+    }
+
+    [data-theme="dark"] .page-title,
+    [data-theme="dark"] .photo-item .photo-title { color: var(--text-color); }
+    [data-theme="dark"] .gallery-intro,
+    [data-theme="dark"] .photo-item .photo-meta { color: #9ca3af; }
   </style>
 </head>
 
 <body>
-  <!-- Navigation Buttons -->
-  <nav class="nav-buttons nav-buttons-wide" role="navigation" aria-label="Main navigation">
-    <a href="index.html" class="nav-button">Home</a>
-    <a href="publications.html" class="nav-button">Publications</a>
-    <a href="projects.html" class="nav-button">Projects</a>
-    
-    <a href="blogs.html" class="nav-button">Blogs</a>
-    <a href="photography.html" class="nav-button" aria-current="page">Photography</a>
-    <a href="cv.html" class="nav-button">CV</a>
+  <div id="site-nav"></div>
 
-    <!-- Dark mode toggle -->
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
-    </button>
-  </nav>
-
-  <!-- Photography Content -->
-  <div class="photography-container">
+  <main id="main-content" class="photography-container">
     <h1 class="page-title">Photography</h1>
 
-    <div class="gallery-intro">
-      <p>I enjoy capturing moments. Here's a collection of some shots from my everyday life.</p>
-    </div>
+    <p class="gallery-intro">I enjoy capturing moments. Here is a collection of shots from my everyday life.</p>
 
     <!-- Masonry Photo Grid -->
     <div class="photo-grid" id="photo-grid">
@@ -380,7 +278,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <!-- Enhanced Lightbox -->
   <div id="lightbox" class="lightbox">
@@ -394,33 +292,10 @@
     </div>
   </div>
 
-  <!-- Footer -->
-  <div style="max-width:1200px;margin:0 auto;padding:0 20px;">
-    <footer class="site-footer">
-      <div class="footer-social">
-        <a href="https://github.com/Arvid-pku" aria-label="GitHub" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-        </a>
-        <a href="https://www.linkedin.com/in/xunjian-yin-5b40252a5" aria-label="LinkedIn" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-        </a>
-        <a href="https://x.com/xunjian_yin" aria-label="Twitter" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        </a>
-        <a href="https://scholar.google.com/citations?user=PociQ5EAAAAJ" aria-label="Google Scholar" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
-        </a>
-      </div>
-      <p class="footer-copyright">© 2026 Xunjian Yin. All rights reserved. All photographs are original works.</p>
-    </footer>
-  </div>
-
-  <!-- Back to Top Button -->
-  <button id="back-to-top" class="back-to-top" aria-label="Back to top">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-  </button>
+  <div id="site-footer"></div>
 
   <!-- Load JavaScript files -->
+  <script src="site-shell.js"></script>
   <script src="utils.js"></script>
   <script>
     // Photo data for lightbox navigation
@@ -430,38 +305,9 @@
     document.addEventListener('DOMContentLoaded', function() {
       initializeDarkMode();
       initializeBackToTop();
-      initializeFadeIn();
+      updateVisiblePhotos();
       initializeLightbox();
     });
-
-    /**
-     * Initialize fade-in animations on scroll
-     */
-    function initializeFadeIn() {
-      const photoItems = document.querySelectorAll('.photo-item');
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-          if (entry.isIntersecting) {
-            // Stagger the animations
-            setTimeout(() => {
-              entry.target.classList.add('visible');
-            }, index * 100);
-            observer.unobserve(entry.target);
-          }
-        });
-      }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      });
-
-      photoItems.forEach(item => {
-        observer.observe(item);
-      });
-
-      // Initialize visible photos array
-      updateVisiblePhotos();
-    }
 
     /**
      * Update the array of visible photos for lightbox navigation

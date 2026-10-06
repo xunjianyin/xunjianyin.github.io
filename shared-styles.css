@@ -224,6 +224,14 @@ ul, ol {
   font-size: 16px;
 }
 
+/* Small screens: the whole link row (links, Abstract and Citation buttons, brackets) at 14 px.
+   This rule must live here: shared-styles.css loads after stylesheet.css and sets the 16 px above. */
+@media screen and (max-width: 480px) {
+  .paper-links {
+    font-size: 14px;
+  }
+}
+
 .paper-links a {
   color: var(--primary-color);
   font-weight: 400;
@@ -469,3 +477,144 @@ ul, ol {
 [data-theme="dark"] .project-stars {
   color: #9ca3af;
 }
+
+/* Section headings inside a page (publication years, project groups): the homepage's section style */
+.pub-year-heading,
+.project-group-heading {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 28px 0 12px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+[data-theme="dark"] .pub-year-heading,
+[data-theme="dark"] .project-group-heading {
+  color: var(--text-color);
+  border-bottom-color: #374151;
+}
+
+/* Publication filters: text options; the active one reads like the active nav item */
+.pub-filters {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 18px;
+}
+
+.filter-label {
+  width: 56px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.filter-option {
+  position: relative;
+  padding: 3px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.filter-option:hover {
+  color: var(--secondary-color);
+}
+
+.filter-option:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.filter-option[aria-pressed="true"] {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.filter-option[aria-pressed="true"]::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background-color: currentColor;
+}
+
+.filter-count {
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+.pub-status {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.filter-question {
+  font-style: italic;
+}
+
+.filter-question::before,
+.filter-note::before {
+  content: '·';
+  display: inline-block;
+  margin: 0 8px;
+  font-style: normal;
+}
+
+.pub-empty {
+  margin: 24px 0;
+  color: #6b7280;
+}
+
+[data-theme="dark"] .filter-label,
+[data-theme="dark"] .pub-status,
+[data-theme="dark"] .pub-empty { color: #9ca3af; }
+[data-theme="dark"] .filter-option[aria-pressed="true"] { color: var(--text-color); }
+[data-theme="dark"] .filter-count { color: #888; }
+
+@media screen and (max-width: 600px) {
+  .filter-label {
+    width: 100%;
+  }
+
+  .filter-row {
+    gap: 0 16px;
+  }
+}
+
+/* Project names link to their homepages: body-text colour with a light underline */
+.project-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: #d1d5db;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.project-link:hover {
+  color: var(--primary-color);
+  text-decoration-color: currentColor;
+}
+
+[data-theme="dark"] .project-link { text-decoration-color: #4b5563; }

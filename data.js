@@ -4,7 +4,7 @@ const publications = [
   {
     title: "X-Tree: Tokenizing Reusable Experience for Efficient Agent Generalization",
     authors: "Sitao Cheng, <b>Xunjian Yin</b>, Zhiyuan Sun, Yuxuan Li, Ruiwen Zhou, Xiangru Jian, Victor Zhong",
-    venue: "ArXiv:2609",
+    venue: "arXiv preprint 2026",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2609.32993" },
       { text: "Code", url: "https://github.com/sitaocheng/X-Tree" },
@@ -21,13 +21,14 @@ const publications = [
       url={https://arxiv.org/abs/2609.32993},
 }</code></pre>`,
     isNew: false,
+    topic: "improvement",
     isPreprint: true,
     isSelected: false
   },
   {
     title: "Challenges of Auditing: Variability in Outputs of Large Language Models for Health",
     authors: "Yuan Pu, Yewon Chang, Furong Jia, <b>Xunjian Yin</b>, Jessica Ma, Ayman Ali, Monica Agrawal",
-    venue: "ArXiv:2609",
+    venue: "arXiv preprint 2026",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2609.16590" },
       { text: "Code", url: "https://github.com/yuan-pu/health-llm-variability" },
@@ -44,13 +45,14 @@ const publications = [
       url={https://arxiv.org/abs/2609.16590},
 }</code></pre>`,
     isNew: false,
+    topic: "evaluation",
     isPreprint: true,
     isSelected: false
   },
   {
     title: "Coding Agents are Effective Long-Context Processors",
     authors: "Weili Cao, <b>Xunjian Yin</b>, Bhuwan Dhingra, Shuyan Zhou",
-    venue: "ArXiv:2603",
+    venue: "arXiv preprint 2026",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2603.20432" },
       { text: "Code", url: "https://github.com/weilicao/Coding_Agents_are_Effective_Long_Context_Processors" },
@@ -67,13 +69,14 @@ const publications = [
       url={https://arxiv.org/abs/2603.20432},
 }</code></pre>`,
     isNew: false,
+    topic: "grounding",
     isPreprint: true,
     isSelected: false
   },
   {
     title: "ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions",
     authors: "Xu Zhang*, <b>Xunjian Yin</b>*, Xiaojun Wan",
-    venue: "ArXiv:2406",
+    venue: "arXiv preprint 2024",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2406.08842" },
       { text: "Page", url: "papers/contrasolver.html" }
@@ -88,13 +91,14 @@ const publications = [
       primaryClass={cs.CL},
       url={https://arxiv.org/abs/2406.08842}, 
 }</code></pre>`,
+    topic: "evaluation",
     isPreprint: true,
     isSelected: false
   },
   {
     title: "Human-like Summarization Evaluation with ChatGPT",
     authors: "Mingqi Gao, Jie Ruan, Renliang Sun, <b>Xunjian Yin</b>, Shiping Yang, Xiaojun Wan",
-    venue: "ArXiv:2304",
+    venue: "arXiv preprint 2023",
     links: [
       { text: "Paper", url: "https://arxiv.org/abs/2304.02554" },
       { text: "Page", url: "papers/chatgpt-summarization-evaluation.html" }
@@ -110,6 +114,7 @@ const publications = [
       url={https://arxiv.org/abs/2304.02554},
 }</code></pre>`,
     isNew: false,
+    topic: "evaluation",
     isPreprint: true,
     isSelected: false
   },
@@ -133,6 +138,7 @@ const publications = [
       url={https://arxiv.org/abs/2609.35814},
 }</code></pre>`,
     isNew: true,
+    topic: "evaluation",
     isPreprint: false,
     isSelected: true
   },
@@ -156,6 +162,7 @@ const publications = [
       url={https://arxiv.org/abs/2608.30303},
 }</code></pre>`,
     isNew: false,
+    topic: "grounding",
     isPreprint: false,
     isSelected: false
   },
@@ -178,6 +185,7 @@ const publications = [
       url={https://arxiv.org/abs/2505.15261},
 }</code></pre>`,
     isNew: false,
+    topic: "evaluation",
     isPreprint: false,
     isSelected: false
   },
@@ -224,6 +232,7 @@ const publications = [
       url={https://arxiv.org/abs/2507.01335},
 }</code></pre>`,
     isNew: true,
+    topic: "reasoning",
     isPreprint: false,
     isSelected: true
   },
@@ -261,6 +270,7 @@ const publications = [
     abstract = "While large language models (LLMs) demonstrate remarkable capabilities across a wide range of tasks, they remain vulnerable to generating outputs that are potentially harmful. Red teaming, which involves crafting adversarial inputs to expose vulnerabilities, is a widely adopted approach for evaluating the robustness of these models. Prior studies have indicated that LLMs are susceptible to vulnerabilities exposed through multi-turn interactions as opposed to single-turn scenarios. Nevertheless, existing methods for multi-turn attacks mainly utilize a predefined dialogue pattern, limiting their effectiveness in realistic situations. Effective attacks require adaptive dialogue strategies that respond dynamically to the initial user prompt and the evolving context of the conversation. To address these limitations, we propose DAMON, a novel multi-turn jailbreak attack method. DAMON leverages Monte Carlo Tree Search (MCTS) to systematically explore multi-turn conversational spaces, efficiently identifying sub-instruction sequences that induce harmful responses. We evaluate DAMON{'}s efficacy across five LLMs and three datasets. Our experimental results show that DAMON can effectively induce undesired behaviors."
 }</code></pre>`,
     isNew: false,
+    topic: "evaluation",
     isPreprint: false,
     isSelected: false
   },
@@ -298,6 +308,7 @@ const publications = [
     abstract = {The rapid advancement of large language models (LLMs) has significantly enhanced the capabilities of agents across various tasks. However, existing agentic systems, whether based on fixed pipeline algorithms or pre-defined meta-learning frameworks, cannot search the whole agent design space due to the restriction of human-designed components, and thus might miss the more optimal agent design. In this paper, we introduce G{\"o}del Agent, a self-evolving framework inspired by the G{\"o}del Machine, enabling agents to recursively improve themselves without relying on predefined routines or fixed optimization algorithms. G{\"o}del Agent leverages LLMs to dynamically modify its own logic and behavior, guided solely by high-level objectives through prompting. Experimental results on multiple domains demonstrate that the implementation of G{\"o}del Agent can achieve continuous self-improvement, surpassing manually crafted agents in performance, efficiency, and generalizability.}
 }</code></pre>`,
     isNew: false,
+    topic: "improvement",
     isPreprint: false,
     isSelected: true
   },
@@ -321,6 +332,7 @@ const publications = [
       url={https://arxiv.org/abs/2510.09782},
 }</code></pre>`,
     isNew: false,
+    topic: "reasoning",
     isPreprint: false,
     isSelected: true
   },
@@ -344,6 +356,7 @@ const publications = [
       url={https://arxiv.org/abs/2601.21742},
 }</code></pre>`,
     isNew: false,
+    topic: "improvement",
     isPreprint: false,
     isSelected: false
   },
@@ -366,6 +379,7 @@ const publications = [
       primaryClass={cs.AI},
       url={https://arxiv.org/abs/2512.01970},
 }</code></pre>`,
+    topic: "reasoning",
     isPreprint: false,
     isSelected: false
   },
@@ -388,6 +402,7 @@ const publications = [
       primaryClass={cs.AI},
       url={https://arxiv.org/abs/2512.13399},
 }</code></pre>`,
+    topic: "improvement",
     isPreprint: false,
     isSelected: false
   },
@@ -426,11 +441,12 @@ const publications = [
     abstract = "Multimodal large language models (MLLMs) are prone to non-factual or outdated knowledge issues, highlighting the importance of knowledge editing. Many benchmark has been proposed for researching multimodal knowledge editing. However, previous benchmarks focus on limited scenarios due to the lack of rigorous definition of multimodal knowledge. To better evaluate multimodal knowledge editing, we propose a decomposed definition of multimodal knowledge. Following the decomposed definition of multimodal knowledge, we introduce three scenarios and a novel requirement modality consistency. We construct MC-MKE, a fine-grained **M**ultimodal **K**nowledge **E**diting benchmark emphasizing **M**odality **C**onsistency through strict data selection. We evaluate four multimodal knowledge editing methods on MC-MKE, revealing their limitations, particularly in terms of modality consistency. Our work highlights the challenges posed by multimodal knowledge editing and motivates further research in developing effective techniques for this task."
 }</code></pre>`,
     isNew: false,
+    topic: "knowledge",
     isPreprint: false,
     isSelected: false
   },
   {
-    title: "Understanding the interplay between parametric and contextual knowledge for large language models",
+    title: "Understanding the Interplay between Parametric and Contextual Knowledge for Large Language Models",
     authors: "Sitao Cheng, Liangming Pan, <b>Xunjian Yin</b>, Xinyi Wang, William Yang Wang",
     venue: "KnowLM Workshop, ACL 2025",
     links: [
@@ -447,6 +463,7 @@ booktitle={Knowledgeable Foundation Models at ACL 2025},
 year={2025},
 url={https://openreview.net/forum?id=4uisAcagzw}
 }</code></pre>`,
+    topic: "grounding",
     isPreprint: false,
     isSelected: false
   },
@@ -480,12 +497,13 @@ url={https://openreview.net/forum?id=4uisAcagzw}
     abstract = "Evaluating natural language generation (NLG) is a vital but challenging problem in natural language processing. Traditional evaluation metrics mainly capturing content (e.g., n-gram) overlap between system outputs and references are far from satisfactory, and large language models (LLMs) such as ChatGPT have demonstrated great potential in NLG evaluation in recent years. Various automatic evaluation methods based on LLMs have been proposed, including metrics derived from LLMs, prompting LLMs, fine-tuning LLMs, and human{--}LLM collaborative evaluation. In this survey, we first give a taxonomy of LLM-based NLG evaluation methods, and discuss their pros and cons, respectively. Lastly, we discuss several open problems in this area and point out future research directions."
 }</code></pre>`,
     isNew: false,
+    topic: "evaluation",
     isPreprint: false,
     isSelected: false
   },
   {
     title: "Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models",
-    authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b> and Xiaojun Wan",
+    authors: "Jiatao Li, Xinyu Hu, <b>Xunjian Yin</b>, Xiaojun Wan",
     venue: "NAACL 2025 Findings",
     links: [
       { text: "Paper", url: "https://aclanthology.org/2025.findings-naacl.149/" },
@@ -513,6 +531,7 @@ url={https://openreview.net/forum?id=4uisAcagzw}
     ISBN = "979-8-89176-195-7",
     abstract = "The integration of documents generated by LLMs themselves (Self-Docs) alongside retrieved documents has emerged as a promising strategy for retrieval-augmented generation systems. However, previous research primarily focuses on optimizing the use of Self-Docs, with their inherent properties remaining underexplored. To bridge this gap, we first investigate the overall effectiveness of Self-Docs, identifying key factors that shape their contribution to RAG performance (RQ1). Building on these insights, we develop a taxonomy grounded in Systemic Functional Linguistics to compare the influence of various Self-Docs categories (RQ2) and explore strategies for combining them with external sources (RQ3). Our findings reveal which types of Self-Docs are most beneficial and offer practical guidelines for leveraging them to achieve significant improvements in knowledge-intensive question answering tasks."
 }</code></pre>`,
+    topic: "grounding",
     isPreprint: false,
     isSelected: false
   },
@@ -534,6 +553,7 @@ booktitle={The Thirteenth International Conference on Learning Representations},
 year={2025},
 url={https://openreview.net/forum?id=kuhIqeVg0e}
 }</code></pre>`,
+    topic: "improvement",
     isPreprint: false,
     isSelected: false
   },
@@ -556,6 +576,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
   pages={25561--25569},
   year={2025}
 }</code></pre>`,
+    topic: "evaluation",
     isPreprint: false,
     isSelected: false
   },
@@ -580,6 +601,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
       doi={10.1145/3801548},
       url={https://doi.org/10.1145/3801548},
 }</code></pre>`,
+    topic: "grounding",
     isPreprint: false,
     isSelected: false
   },
@@ -613,6 +635,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     pages = "15924--15951",
     abstract = "The evaluation of natural language generation (NLG) tasks is a significant and longstanding research area. With the recent emergence of powerful large language models (LLMs), some studies have turned to LLM-based automatic evaluation methods, which demonstrate great potential to become a new evaluation paradigm following traditional string-based and model-based metrics. However, despite the improved performance of existing methods, they still possess some deficiencies, such as dependency on references and limited evaluation flexibility. Therefore, in this paper, we meticulously construct a large-scale NLG evaluation corpus **NLG-Eval** with annotations from both human and GPT-4 to alleviate the lack of relevant data in this field. Furthermore, we propose **Themis**, an LLM dedicated to NLG evaluation, which has been trained with our designed multi-perspective consistency verification and rating-oriented preference alignment methods. Themis can conduct flexible and interpretable evaluations without references, and it exhibits superior evaluation performance on various NLG tasks, simultaneously generalizing well to unseen tasks and surpassing other evaluation models, including GPT-4."
 }</code></pre>`,
+    topic: "evaluation",
     isPreprint: false,
     isSelected: true
   },
@@ -635,6 +658,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
       primaryClass={cs.CL},
       url={https://arxiv.org/abs/2410.09675},
 }</code></pre>`,
+    topic: "reasoning",
     isPreprint: false,
     isSelected: false
   },
@@ -667,6 +691,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     pages = "2270--2286",
     abstract = "In recent years, substantial advancements have been made in the development of large language models, achieving remarkable performance across diverse tasks.To evaluate the knowledge ability of language models, previous studies have proposed lots of benchmarks based on question-answering pairs.We argue that it is not reliable and comprehensive to evaluate language models with a fixed question or limited paraphrases as the query, since language models are sensitive to prompt.Therefore, we introduce a novel concept named knowledge boundary to encompass both prompt-agnostic and prompt-sensitive knowledge within language models.Knowledge boundary avoids prompt sensitivity in language model evaluations, rendering them more dependable and robust.To explore the knowledge boundary for a given model, we propose projected gradient descent method with semantic constraints, a new algorithm designed to identify the optimal prompt for each piece of knowledge.Experiments demonstrate a superior performance of our algorithm in computing the knowledge boundary compared to existing methods.Furthermore, we evaluate the ability of multiple language models in several domains with knowledge boundary."
 }</code></pre>`,
+    topic: "knowledge",
     isPreprint: false,
     isSelected: true
   },
@@ -689,6 +714,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
   pages={19413--19421},
   year={2024}
 }</code></pre>`,
+    topic: "knowledge",
     isPreprint: false,
     isSelected: true
   },
@@ -723,12 +749,13 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     pages = "6257--6267",
     abstract = "Chinese Spelling Check (CSC) aims to detect and correct error tokens in Chinese contexts, which has a wide range of applications. However, it is confronted with the challenges of insufficient annotated data and the issue that previous methods may actually not fully leverage the existing datasets. In this paper, we introduce our plug-and-play retrieval method with error-robust information for Chinese Spelling Check (RERIC), which can be directly applied to existing CSC models. The datastore for retrieval is built completely based on the training data, with elaborate designs according to the characteristics of CSC. Specifically, we employ multimodal representations that fuse phonetic, morphologic, and contextual information in the calculation of query and key during retrieval to enhance robustness against potential errors. Furthermore, in order to better judge the retrieved candidates, the n-gram surrounding the token to be checked is regarded as the value and utilized for specific reranking. The experiment results on the SIGHAN benchmarks demonstrate that our proposed method achieves substantial improvements over existing work."
 }</code></pre>`,
+    topic: "grounding",
     isPreprint: false,
     isSelected: false
   },
   {
     title: "Contextual Modeling for Document-level ASR Error Correction",
-    authors: "Jin Jiang, <b>Xunjian Yin</b>, Xiaojun Wan, Wei Peng, Rongjun Li, Jingyuan Yang, and Yanquan Zhou",
+    authors: "Jin Jiang, <b>Xunjian Yin</b>, Xiaojun Wan, Wei Peng, Rongjun Li, Jingyuan Yang, Yanquan Zhou",
     venue: "LREC-COLING 2024",
     links: [
       { text: "Paper", url: "https://aclanthology.org/2024.lrec-main.341/" },
@@ -759,6 +786,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     url = "https://aclanthology.org/2024.lrec-main.341/",
     pages = "3855--3867"
 }</code></pre>`,
+    topic: "grounding",
     isPreprint: false,
     isSelected: false
   },
@@ -790,6 +818,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     pages = "1397--1414",
     abstract = "With the rapid development of NLP, large-scale language models (LLMs) excel in various tasks across multiple domains now. However, existing benchmarks may not adequately measure these models' capabilities, especially when faced with new knowledge. In this paper, we address the lack of benchmarks to evaluate LLMs' ability to handle new knowledge, an important and challenging aspect in the rapidly evolving world. We propose an approach called KnowGen that generates new knowledge by altering existing entity attributes and relationships, resulting in artificial entities that are distinct from real-world entities. With KnowGen, we introduce a benchmark named ALCUNA to assess LLMs' abilities in knowledge understanding, differentiation, and association. We benchmark several LLMs, reveals that their performance in face of new knowledge is not satisfactory, particularly in reasoning between new and internal knowledge. We also explore the impact of entity similarity on the model{'}s understanding of entity knowledge and the influence of contextual entities. We appeal to the need for caution when using LLMs in new scenarios or with new knowledge, and hope that our benchmarks can help drive the development of LLMs in face of new knowledge."
 }</code></pre>`,
+    topic: "knowledge",
     isPreprint: false,
     isSelected: true
   },
@@ -820,6 +849,7 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     pages = "15291--15298",
     abstract = "Previous studies on machine translation evaluation mostly focused on the quality of individual sentences, while overlooking the important role of contextual information. Although WMT Metrics Shared Tasks have introduced context content into the human annotations of translation evaluation since 2019, the relevant metrics and methods still did not take advantage of the corresponding context. In this paper, we propose a context-aware machine translation evaluation metric called Cont-COMET, built upon the effective COMET framework. Our approach simultaneously considers the preceding and subsequent contexts of the sentence to be evaluated and trains our metric to be aligned with the setting during human annotation. We also introduce a content selection method to extract and utilize the most relevant information. The experiments and evaluation of Cont-COMET on the official test framework from WMT show improvements in both system-level and segment-level assessments."
 }</code></pre>`,
+    topic: "evaluation",
     isPreprint: false,
     isSelected: false
   },
@@ -849,12 +879,22 @@ url={https://openreview.net/forum?id=kuhIqeVg0e}
     doi = "10.18653/v1/2022.acl-long.531",
     pages = "7701--7710"
 }</code></pre>`,
+    topic: "evaluation",
     isPreprint: false,
     isSelected: false
   }
 ];
 
 // Helper functions to filter publications
+// Research topics used to filter publications; the same five questions as the easter egg's themes.
+const PUBLICATION_TOPICS = [
+  { id: 'evaluation', label: 'Evaluation', question: 'How do we know what works, and what fails?' },
+  { id: 'knowledge', label: 'Knowledge', question: 'What can a model know, and revise?' },
+  { id: 'grounding', label: 'Grounding', question: 'How does reasoning stay connected to evidence?' },
+  { id: 'reasoning', label: 'Reasoning', question: 'How can reasoning go beyond familiar cases?' },
+  { id: 'improvement', label: 'Self-improvement', question: 'Can experience change the learner?' }
+];
+
 const getPreprints = () => publications.filter(pub => pub.isPreprint);
 const getSelectedPreprints = () => publications.filter(pub => pub.isPreprint && pub.isSelected);
 const getPublications = () => publications.filter(pub => !pub.isPreprint);
@@ -870,7 +910,9 @@ const fullPublications = getAllPublications();
 const projects = [
   {
     title: "Gödel Agent",
-    description: "A self-referential agent framework for recursive self-improvement implemented with Monkey Patching. (<a href=\"https://github.com/Arvid-pku/Godel_Agent\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://github.com/Arvid-pku/Godel_Agent",
+    category: "tools",
+    description: "A self-referential agent framework for recursive self-improvement implemented with Monkey Patching.",
     badges: [
       { url: "https://github.com/Arvid-pku/Godel_Agent/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/Godel_Agent/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -885,7 +927,9 @@ const projects = [
   },
   {
     title: "Claude Journal",
-      description: "A live web interface to view, annotate, search, and analyze your Claude Code & Codex conversations. Talk to your AI directly from the browser, edit real history, and manage every session. (<a href=\"https://arvid-pku.github.io/claude-journal/\" target=\"_blank\" rel=\"noopener\">Interactive Guide</a> | <a href=\"https://github.com/Arvid-pku/claude-journal\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://github.com/Arvid-pku/claude-journal",
+    category: "tools",
+    description: "A live web interface to view, annotate, search, and analyze your Claude Code & Codex conversations. Talk to your AI directly from the browser, edit real history, and manage every session. (<a href=\"https://arvid-pku.github.io/claude-journal/\" target=\"_blank\" rel=\"noopener\">Interactive Guide</a>)",
       badges: [
         { url: "https://www.npmjs.com/package/claude-journal", img: "https://img.shields.io/npm/v/claude-journal?color=c6603f&label=npm" },
         { url: "https://github.com/Arvid-pku/claude-journal/blob/main/LICENSE", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -900,7 +944,9 @@ const projects = [
   },
   {
     title: "Overleaf-Bib-Helper",
-    description: "A <a href=\"https://greasyfork.org/scripts/532304-overleaf-bib-helper\" target=\"_blank\" rel=\"noopener\">Userscript</a> to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor. (<a href=\"https://github.com/MLNLP-World/Overleaf-Bib-Helper\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper",
+    category: "tools",
+    description: "A <a href=\"https://greasyfork.org/scripts/532304-overleaf-bib-helper\" target=\"_blank\" rel=\"noopener\">Userscript</a> to enhance Overleaf by allowing article searches and BibTeX retrieval directly within the Overleaf editor.",
     badges: [
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/releases", img: "https://img.shields.io/badge/Version-1.3-blue" },
       { url: "https://github.com/MLNLP-World/Overleaf-Bib-Helper/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -915,7 +961,9 @@ const projects = [
   },
   {
     title: "MultAI",
-    description: "A Chrome extension that lets you talk to seven AI chat sites — ChatGPT, Claude, Gemini, Grok, Meta AI, DeepSeek, and Qwen — from one cockpit, with broadcast prompts, side-by-side compare, and a tiled layout. (<a href=\"https://github.com/Arvid-pku/MultAI\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://github.com/Arvid-pku/MultAI",
+    category: "tools",
+    description: "A Chrome extension that lets you talk to seven AI chat sites — ChatGPT, Claude, Gemini, Grok, Meta AI, DeepSeek, and Qwen — from one cockpit, with broadcast prompts, side-by-side compare, and a tiled layout.",
     badges: [
       { url: "https://github.com/Arvid-pku/MultAI/releases", img: "https://img.shields.io/badge/Version-0.1.0-blue" },
       { url: "https://github.com/Arvid-pku/MultAI/blob/main/LICENSE", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -929,7 +977,9 @@ const projects = [
   },
   {
     title: "nnviz",
-    description: "Inspect any HuggingFace transformer's weights, activations, gradients, and KV cache as an interactive 3D web app. (<a href=\"https://arvid-pku.github.io/nnviz/\" target=\"_blank\" rel=\"noopener\">Live Demo</a> | <a href=\"https://github.com/Arvid-pku/nnviz\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://github.com/Arvid-pku/nnviz",
+    category: "tools",
+    description: "Inspect any HuggingFace transformer's weights, activations, gradients, and KV cache as an interactive 3D web app. (<a href=\"https://arvid-pku.github.io/nnviz/\" target=\"_blank\" rel=\"noopener\">Live Demo</a>)",
     badges: [
       { url: "https://github.com/Arvid-pku/nnviz/blob/main/LICENSE", img: "https://img.shields.io/badge/License-Apache_2.0-blue" },
       { url: "https://github.com/Arvid-pku/nnviz/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/nnviz" },
@@ -941,7 +991,9 @@ const projects = [
   },
   {
     title: "CodeRead",
-    description: "Turns a Python codebase into an interactive, importance-ranked dependency graph in a single self-contained HTML file. (<a href=\"https://arvid-pku.github.io/coderead/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://arvid-pku.github.io/coderead/",
+    category: "tools",
+    description: "Turns a Python codebase into an interactive, importance-ranked dependency graph in a single self-contained HTML file.",
     badges: [
       { url: "https://arvid-pku.github.io/coderead/", img: "https://img.shields.io/badge/Demo-Live-brightgreen" }
     ],
@@ -950,7 +1002,9 @@ const projects = [
   },
   {
     title: "Puzzle Game Hub",
-    description: "A single-page hub of 80+ web mini-games with a unified achievement system. (<a href=\"https://arvid-pku.github.io/games/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://arvid-pku.github.io/games/",
+    category: "experiments",
+    description: "A single-page hub of 80+ web mini-games with a unified achievement system.",
     badges: [
       { url: "https://arvid-pku.github.io/games/", img: "https://img.shields.io/badge/Demo-Live-brightgreen" }
     ],
@@ -959,7 +1013,9 @@ const projects = [
   },
   {
     title: "Squirrel IM",
-    description: "Personal customizations of Squirrel (Rime), the macOS Chinese input method engine. (<a href=\"https://github.com/Arvid-pku/IM\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://github.com/Arvid-pku/IM",
+    category: "tools",
+    description: "Personal customizations of Squirrel (Rime), the macOS Chinese input method engine.",
     badges: [
       { url: "https://github.com/Arvid-pku/IM/blob/master/LICENSE.txt", img: "https://img.shields.io/badge/License-GPL_v3-blue" },
       { url: "https://github.com/Arvid-pku/IM/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/IM" },
@@ -970,7 +1026,9 @@ const projects = [
   },
   {
     title: "Vision2Text",
-    description: "Convert images and videos to ASCII art in real-time. (<a href=\"https://arvid-pku.github.io/image2text/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://arvid-pku.github.io/image2text/",
+    category: "experiments",
+    description: "Convert images and videos to ASCII art in real-time.",
     badges: [
       { url: "https://github.com/Arvid-pku/image2text/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/image2text/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -996,7 +1054,9 @@ const projects = [
   // },
   {
     title: "History Visualization",
-    description: "A web application that visualizes world history through an interactive timeline and map. (<a href=\"https://arvid-pku.github.io/history_vis/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://arvid-pku.github.io/history_vis/",
+    category: "experiments",
+    description: "A web application that visualizes world history through an interactive timeline and map.",
     badges: [
       { url: "https://arvid-pku.github.io/history_vis/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://arvid-pku.github.io/history_vis/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -1006,7 +1066,9 @@ const projects = [
   },
   {
     title: "Tower of Babel",
-    description: "Type words and watch the letters stack, collide, and topple as physical bodies. (<a href=\"https://arvid-pku.github.io/Babel/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://arvid-pku.github.io/Babel/",
+    category: "experiments",
+    description: "Type words and watch the letters stack, collide, and topple as physical bodies.",
     badges: [
       { url: "https://arvid-pku.github.io/Babel/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://arvid-pku.github.io/Babel/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -1016,7 +1078,9 @@ const projects = [
   },
     {
     title: "World of Physics",
-    description: "A physics simulation platform where we can play with blocks, spring, rope, electric field, magnetic field, and more. (<a href=\"https://arvid-pku.github.io/worldofphysics/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://arvid-pku.github.io/worldofphysics/",
+    category: "experiments",
+    description: "A physics simulation platform where we can play with blocks, spring, rope, electric field, magnetic field, and more.",
     badges: [
       { url: "https://arvid-pku.github.io/worldofphysics/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://arvid-pku.github.io/worldofphysics/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -1026,7 +1090,9 @@ const projects = [
   },
   {
     title: "Proactive AI Assistant",
-    description: "An AI assistant extension that proactively helps users with tasks and reminders. (<a href=\"https://github.com/Arvid-pku/Proactive-AI\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://github.com/Arvid-pku/Proactive-AI",
+    category: "tools",
+    description: "An AI assistant extension that proactively helps users with tasks and reminders.",
     badges: [
       { url: "https://github.com/Arvid-pku/Proactive-AI/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/Proactive-AI/stargazers", img: "https://img.shields.io/github/stars/Arvid-pku/Proactive-AI" },
@@ -1038,7 +1104,9 @@ const projects = [
   },
   {
     title: "Music Letter",
-    description: "Turn your letter into a song and let your heart be heard. (<a href=\"https://xunjianyin.github.io/MusicLetter\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://xunjianyin.github.io/MusicLetter",
+    category: "experiments",
+    description: "Turn your letter into a song and let your heart be heard.",
     badges: [
       { url: "https://github.com/xunjianyin/MusicLetter/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/MusicLetter/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -1053,7 +1121,9 @@ const projects = [
   },
   {
     title: "Text of Sisyphus",
-    description: "An interactive simulation where Sisyphus's collapse builds a text archive. (<a href=\"https://Arvid-pku.github.io/Sisyphus/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://Arvid-pku.github.io/Sisyphus/",
+    category: "experiments",
+    description: "An interactive simulation where Sisyphus's collapse builds a text archive.",
     badges: [
       { url: "https://github.com/Arvid-pku/Sisyphus/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/Sisyphus/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -1085,7 +1155,9 @@ const projects = [
   // },
   {
     title: "Game-of-Life",
-    description: "An interactive sandbox for Conway's Game of Life. (<a href=\"https://xunjianyin.github.io/Game-of-Life/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://xunjianyin.github.io/Game-of-Life/",
+    category: "experiments",
+    description: "An interactive sandbox for Conway's Game of Life.",
     badges: [
       { url: "https://github.com/xunjianyin/Game-of-Life/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/Game-of-Life/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -1136,7 +1208,9 @@ const projects = [
   // },
   {
     title: "Bouncing Ball",
-    description: "A physics playground where you drop and fling bouncing balls. (<a href=\"https://xunjianyin.github.io/bouncing-ball-animation/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://xunjianyin.github.io/bouncing-ball-animation/",
+    category: "experiments",
+    description: "A physics playground where you drop and fling bouncing balls.",
     badges: [
       { url: "https://github.com/xunjianyin/bouncing-ball-animation/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/bouncing-ball-animation/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -1151,7 +1225,9 @@ const projects = [
   },
   {
     title: "Star-Maker",
-    description: "Build star systems and watch planets orbit under live gravitational simulation. (<a href=\"https://xunjianyin.github.io/star-maker/\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://xunjianyin.github.io/star-maker/",
+    category: "experiments",
+    description: "Build star systems and watch planets orbit under live gravitational simulation.",
     badges: [
       { url: "https://github.com/xunjianyin/star-maker/releases", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/xunjianyin/star-maker/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },
@@ -1166,7 +1242,9 @@ const projects = [
   },
   {
     title: "HF-Downloader",
-    description: "A <a href=\"https://greasyfork.org/zh-CN/scripts/543283-hugging-face-batch-downloader\" target=\"_blank\" rel=\"noopener\">Tampermonkey userscript</a> that enhances Hugging Face model pages with batch download functionality. (<a href=\"https://github.com/Arvid-pku/HF-Downloader\" target=\"_blank\" rel=\"noopener\">Project Homepage</a>)",
+    url: "https://github.com/Arvid-pku/HF-Downloader",
+    category: "tools",
+    description: "A <a href=\"https://greasyfork.org/zh-CN/scripts/543283-hugging-face-batch-downloader\" target=\"_blank\" rel=\"noopener\">Tampermonkey userscript</a> that enhances Hugging Face model pages with batch download functionality.",
     badges: [
       { url: "https://greasyfork.org/zh-CN/scripts/543283-hugging-face-batch-downloader", img: "https://img.shields.io/badge/Version-1.0-blue" },
       { url: "https://github.com/Arvid-pku/HF-Downloader/blob/main/LICENSE.md", img: "https://img.shields.io/badge/License-MIT-blue" },

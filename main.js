@@ -22,12 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
     populatePublications(selected, 'selected-papers-list');
   }
 
-  // Full publications page (renders all preprints and all conference/journal papers)
-  if (document.getElementById('preprints-list')) {
-    populatePublications(getPreprints(), 'preprints-list');
-  }
-  if (document.getElementById('publications-list')) {
-    populatePublications(getPublications(), 'publications-list');
+  // Full publications page: every paper, grouped by year, with topic, type and authorship filters
+  const publicationIndex = document.getElementById('publication-index');
+  if (publicationIndex) {
+    renderPublicationIndex(publicationIndex);
   }
 
   // Other sections (used on homepage or other pages if present)
@@ -62,6 +60,9 @@ function populatePublications(publications, listId) {
 
   publications.forEach(pub => {
     const li = document.createElement('li');
+    li.dataset.topic = pub.topic || '';
+    li.dataset.type = publicationType(pub);
+    li.dataset.lead = String(isLeadAuthor(pub));
 
     const titleDiv = document.createElement('div');
     titleDiv.className = 'papertitle';
@@ -168,6 +169,116 @@ function populatePublications(publications, listId) {
   });
 }
 
+const PUBLICATION_TYPES = [
+  { id: 'conference', label: 'Conference & journal' },
+  { id: 'workshop', label: 'Workshop' },
+  { id: 'preprint', label: 'Preprint' }
+];
+
+/** 'preprint', 'workshop', or 'conference' (conference and journal papers). */
+function publicationType(pub) {
+  if (pub.isPreprint) return 'preprint';
+  return /workshop/i.test(pub.venue) ? 'workshop' : 'conference';
+}
+
+/** The year printed in the venue, e.g. 2026 for "SPOT Workshop, ICLR 2026" or "arXiv preprint 2026". */
+function publicationYear(pub) {
+  const years = pub.venue.match(/(?:19|20)\d{2}/g);
+  return years ? Number(years[years.length - 1]) : 0;
+}
+
+/** First author, or co-first author (the name carries the equal-contribution mark). */
+function isLeadAuthor(pub) {
+  return /^<b>Xunjian Yin/.test(pub.authors) || /<b>Xunjian Yin\*<\/b>|<b>Xunjian Yin<\/b>\*/.test(pub.authors);
+}
+
+/**
+ * Render the publications page: year sections (published papers first, then preprints,
+ * data.js order within each), filter rows for topic, type and authorship, and a status
+ * line. The filter state is kept in the query string (?topic=…&type=…&author=lead).
+ */
+function renderPublicationIndex(container) {
+  const filtersRoot = container.querySelector('[data-pub-filters]');
+  const statusLine = container.querySelector('[data-pub-status]');
+  const yearsRoot = container.querySelector('[data-pub-years]');
+  const emptyLine = container.querySelector('[data-pub-empty]');
+
+  const ordered = [...getPublications(), ...getPreprints()];
+  const years = [...new Set(ordered.map(publicationYear))].sort((a, b) => b - a);
+  years.forEach(year => {
+    const section = document.createElement('section');
+    section.className = 'pub-year';
+    section.innerHTML = `<h2 class="pub-year-heading">${year}</h2><ul id="pubs-${year}" class="publication-list"></ul>`;
+    yearsRoot.appendChild(section);
+    populatePublications(ordered.filter(pub => publicationYear(pub) === year), `pubs-${year}`);
+  });
+
+  const facets = [
+    { key: 'topic', param: 'topic', label: 'Topic', options: PUBLICATION_TOPICS, value: pub => pub.topic },
+    { key: 'type', param: 'type', label: 'Type', options: PUBLICATION_TYPES, value: publicationType },
+    { key: 'lead', param: 'author', label: 'Author', options: [{ id: 'true', label: 'First or co-first' }], value: pub => String(isLeadAuthor(pub)) }
+  ];
+  const params = new URLSearchParams(window.location.search);
+  const state = {};
+  facets.forEach(facet => {
+    const requested = facet.key === 'lead' ? (params.get(facet.param) === 'lead' ? 'true' : 'all') : params.get(facet.param);
+    state[facet.key] = facet.options.some(option => option.id === requested) ? requested : 'all';
+  });
+
+  facets.forEach(facet => {
+    const row = document.createElement('div');
+    row.className = 'filter-row';
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-label', `Filter by ${facet.label.toLowerCase()}`);
+    const label = document.createElement('span');
+    label.className = 'filter-label';
+    label.textContent = facet.label;
+    row.appendChild(label);
+    [{ id: 'all', label: 'All' }, ...facet.options].forEach(option => {
+      const count = option.id === 'all' ? ordered.length : ordered.filter(pub => facet.value(pub) === option.id).length;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'filter-option';
+      button.dataset.key = facet.key;
+      button.dataset.value = option.id;
+      button.innerHTML = `${option.label}<span class="filter-count">${count}</span>`;
+      button.addEventListener('click', () => { state[facet.key] = option.id; apply(); });
+      row.appendChild(button);
+    });
+    filtersRoot.appendChild(row);
+  });
+
+  function apply() {
+    let shown = 0;
+    yearsRoot.querySelectorAll('.pub-year').forEach(section => {
+      let visible = 0;
+      section.querySelectorAll('.publication-list > li').forEach(li => {
+        const match = ['topic', 'type', 'lead'].every(key => state[key] === 'all' || li.dataset[key] === state[key]);
+        li.hidden = !match;
+        if (match) visible++;
+      });
+      section.hidden = visible === 0;
+      shown += visible;
+    });
+    filtersRoot.querySelectorAll('.filter-option').forEach(button => {
+      button.setAttribute('aria-pressed', String(state[button.dataset.key] === button.dataset.value));
+    });
+    const topic = PUBLICATION_TOPICS.find(option => option.id === state.topic);
+    statusLine.innerHTML = `${shown === ordered.length ? `${shown} papers` : `${shown} of ${ordered.length} papers`}`
+      + (topic ? `<span class="filter-question">${topic.question}</span>` : '')
+      + '<span class="filter-note">* Equal contribution</span>';
+    emptyLine.hidden = shown > 0;
+
+    const query = new URLSearchParams();
+    if (state.topic !== 'all') query.set('topic', state.topic);
+    if (state.type !== 'all') query.set('type', state.type);
+    if (state.lead !== 'all') query.set('author', 'lead');
+    const search = query.toString();
+    window.history.replaceState(null, '', search ? `?${search}` : window.location.pathname);
+  }
+  apply();
+}
+
 /**
  * Populate projects (only selected ones for homepage)
  */
@@ -181,7 +292,8 @@ function populateProjects() {
     const starBadge = project.badges.find(b => b.img.includes('/github/stars/'));
     const repo = starBadge ? starBadge.img.split('/github/stars/')[1].split(/[?#]/)[0] : '';
     const stars = repo ? ` <a class="project-stars" href="https://github.com/${repo}" target="_blank" rel="noopener" hidden></a>` : '';
-    li.innerHTML = `<strong>${project.title}</strong>${stars}<br>${project.description}`;
+    const name = project.url ? `<a class="project-link" href="${project.url}" target="_blank" rel="noopener">${project.title}</a>` : project.title;
+    li.innerHTML = `<strong>${name}</strong>${stars}<br>${project.description}`;
     list.appendChild(li);
     if (repo) renderStarCount(li.querySelector('.project-stars'), repo);
   });
