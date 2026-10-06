@@ -390,7 +390,6 @@
     [2025, 'knowledge', 'mc-mke', 'MC-MKE', 'MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency', 'ACL 2025 Findings'],
     [2025, 'grounding', 'self-generated-documents', 'Self-Generated Documents', 'Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models', 'NAACL 2025 Findings'],
     [2025, 'grounding', 'knowledge-interplay', 'EchoQA', 'Understanding the Interplay between Parametric and Contextual Knowledge for Large Language Models', 'KnowLM Workshop @ ACL 2025'],
-    [2025, 'reasoning', 'atomic-to-composite', 'Atomic to Composite', 'From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning', 'arXiv preprint 2025'],
     [2025, 'improvement', 'chemagent', 'ChemAgent', 'ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning', 'ICLR 2025'],
     [2025, 'improvement', 'godel-agent', 'Gödel Agent', 'Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement', 'ACL 2025 · Main Conference'],
     [2025, 'improvement', 'derl', 'DERL', 'Differentiable Evolutionary Reinforcement Learning', 'arXiv preprint 2025'],
@@ -400,6 +399,7 @@
     [2026, 'grounding', 'coding-agents-long-context', 'Coding Agents for Long Context', 'Coding Agents are Effective Long-Context Processors', 'arXiv preprint 2026'],
     [2026, 'grounding', 'lazy-grounding', 'Lazy Grounding', 'Lazy Grounding: Attacking Search Agents with Factual Evidence', 'EMNLP 2026'],
     [2026, 'reasoning', 'geometry-of-reasoning', 'The Geometry of Reasoning', 'The Geometry of Reasoning: Flowing Logics in Representation Space', 'ICLR 2026'],
+    [2026, 'reasoning', 'atomic-to-composite', 'Atomic to Composite', 'From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning', 'SPOT Workshop, ICLR 2026'],
     [2026, 'reasoning', 'reverse-lm', 'LEDOM', 'LEDOM: Reverse Language Model', 'ACL 2026'],
     [2026, 'improvement', 'epistemic-context-learning', 'Epistemic Context Learning', 'Epistemic Context Learning: Building Trust the Right Way in LLM-Based Multi-Agent Systems', 'Agentic AI in the Wild Workshop, ICLR 2026']
   ].map(([year, theme, slug, name, title, venue]) => ({
