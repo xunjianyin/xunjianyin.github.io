@@ -923,3 +923,25 @@ summary span {
   .section-demo { margin-top: 24px; }
   .method-demo + .method-reading { margin-top: 26px; }
 }
+
+/* Lenses (easter/): a page opened while a lens is active is marked before its first paint
+   (html[data-lens-arriving], set from sessionStorage in <head>). It stays hidden over the
+   lens's ground until easter/boot.js brings the lens, then fades in (data-lens-revealing).
+   A CSS failsafe shows the page after 3 s even if no script runs. Identical rules live in
+   shared-styles.css and papers/paper-page.css. */
+html[data-lens-arriving="stardust"], html[data-lens-revealing="stardust"] { background: #06080c; }
+html[data-lens-arriving="blueprint"], html[data-lens-revealing="blueprint"] { background: #0f3a63; }
+html[data-lens-arriving="acta"], html[data-lens-revealing="acta"] { background: #f2e8d3; }
+html[data-lens-arriving="lamplight"], html[data-lens-revealing="lamplight"] { background: #0b0806; }
+html[data-lens-arriving]:not([data-lens-arriving="tokens"]) body {
+  opacity: 0;
+  animation: lenses-arrival-failsafe 0s linear 3s forwards;
+}
+html[data-lens-revealing]:not([data-lens-revealing="tokens"]) body { animation: lenses-reveal 180ms ease-out both; }
+@keyframes lenses-arrival-failsafe { to { opacity: 1; } }
+@keyframes lenses-reveal { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-lens-revealing] body { animation: none; }
+}
+/* Double-clicking a [data-lens-trigger] changes the lens: a double-tap must not zoom. */
+[data-lens-trigger] { touch-action: manipulation; }

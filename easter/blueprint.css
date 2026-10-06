@@ -1,15 +1,20 @@
 /* Lens III · Blueprint (easter/blueprint.js).
-   Paint only: colour, background, text decoration and the core's layers. No rule here may
-   change size, spacing, font or position, so the layout stays identical to normal.
+   Paint only: colour, background, text decoration, filters and the core's layers. No rule
+   here may change size, spacing, font or position, so the layout stays identical to normal.
 
    Classes on <html>:
      lens-blueprint          the whole activation; invisible by itself (grid alpha 0,
                              transparent underlines), so it can sit under the fades
-     lens-blueprint-on       the blueprint colours
-     lens-blueprint-fade     transitions, only while entering or leaving
+     lens-blueprint-shell    site-shell pages (home, site pages, blog posts): explicit colours
+     lens-blueprint-paper    paper pages: one colour matrix (#lens-bp-negative) on the scope
+     lens-blueprint-on       the blueprint itself
+     lens-blueprint-fade     transitions, only while entering or leaving a shell page
      lens-blueprint-leaving  the shorter leaving timings
-   The selectors carry an id (through :is()) so they outrank the site's own colour rules,
-   including the dark-theme ones; the lens shows the same drawing in both site themes. */
+     lens-blueprint-vt-in/-out  the paper-page crossfade (a view transition)
+   The scope is the page's nav, main and footer: #site-nav / header.site-header,
+   #main-content, #site-footer / footer.paper-footer. The selectors carry an id (through
+   :is()) so they outrank the site's own colour rules, including the dark-theme ones; the
+   lens shows the same drawing in both site themes. */
 
 @property --lens-bp-grid {
   syntax: '<number>';
@@ -18,8 +23,7 @@
 }
 
 /* ---- Ground: Prussian blue with a white grid (minor 8 px, major 64 px) aligned to the
-   main column; the offsets come from the script as --lens-bp-gx / --lens-bp-gy. The body
-   background propagates to the canvas, so it covers the whole document. ---- */
+   main column; the offsets come from the script as --lens-bp-gx / --lens-bp-gy. ---- */
 html.lens-blueprint body {
   background-image:
     linear-gradient(to right, rgb(255 255 255 / calc(0.12 * var(--lens-bp-grid))) 1px, transparent 1px),
@@ -31,6 +35,16 @@ html.lens-blueprint body {
 }
 
 html.lens-blueprint-on {
+  --lenses-caption-color: #bfe3f6;
+}
+
+html.lens-blueprint-on body {
+  --lens-bp-grid: 1;
+}
+
+/* ===================== Shell pages: explicit colours ===================== */
+
+html.lens-blueprint-shell.lens-blueprint-on {
   --text-color: #e9f1fb;
   --primary-color: #a9e3f5;
   --secondary-color: #ffffff;
@@ -38,80 +52,93 @@ html.lens-blueprint-on {
   --border-color: rgba(214, 236, 251, 0.3);
   --section-bg: rgba(255, 255, 255, 0.04);
   --hover-bg: rgba(169, 227, 245, 0.1);
-  --lenses-caption-color: #bfe3f6;
 }
 
-html.lens-blueprint-on body {
-  --lens-bp-grid: 1;
+html.lens-blueprint-shell.lens-blueprint-on body {
   background-color: #0f3a63 !important;
 }
 
-html.lens-blueprint-on #main-content,
-html.lens-blueprint-on :is(#main-content, #site-footer) table {
+html.lens-blueprint-shell.lens-blueprint-on #main-content {
   background-color: transparent !important;
 }
 
-/* ---- Text: near-white, in three weights of emphasis ---- */
-html.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(.name, h2, .news-date, .papertitle, strong, b, .nav-button[aria-current="page"]) {
-  color: #f6f9fd;
+/* Light panels, cards and tables lose their fills (the script outlines them). */
+html.lens-blueprint-shell.lens-blueprint-on :is(#main-content, #site-footer) :is(pre, code, kbd, samp, mark, table, thead, tbody, tfoot, tr, th, td, blockquote, details, summary, fieldset, .article-note, .article-toc, .tag, .highlight, .detail-content) {
+  background: transparent !important;
 }
 
-html.lens-blueprint-on :is(#main-content, #site-footer) :is(.bio, .news-list li, li, p) {
+/* Every line in the scope turns faint white (a blanket first; specific lines below). */
+html.lens-blueprint-shell.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :where(*) {
+  border-color: rgba(214, 236, 251, 0.3);
+}
+
+/* Text: near-white everywhere, then three weights of emphasis. */
+html.lens-blueprint-shell.lens-blueprint-on :is(#site-nav, #main-content, #site-footer),
+html.lens-blueprint-shell.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) * {
   color: #e9f1fb;
 }
 
-html.lens-blueprint-on :is(#main-content, #site-footer) :is(.pronunciation, .paper_rest, .footer-copyright) {
+html.lens-blueprint-shell.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(h1, h2, h3, h4, .name, .news-date, .papertitle, strong, b, th, dt, .photo-title, .nav-button[aria-current="page"]) {
+  color: #f6f9fd;
+}
+
+html.lens-blueprint-shell.lens-blueprint-on :is(#main-content, #site-footer) :is(.pronunciation, .paper_rest, .footer-copyright, .gallery-intro, .photo-meta, .pub-status, .filter-label, .article-kicker, .article-dek, .article-meta, .post-meta, figcaption, small, time) {
   color: rgba(233, 241, 251, 0.74);
 }
 
-html.lens-blueprint-on :is(#main-content, #site-footer) :is(.paper-venue, .venue, .new-badge, .project-stars) {
+html.lens-blueprint-shell.lens-blueprint-on :is(#main-content, #site-footer) :is(.paper-venue, .venue, .new-badge, .project-stars, .filter-count, .sep) {
   color: rgba(233, 241, 251, 0.6);
 }
 
-/* ---- Lines that belong to the page ---- */
-html.lens-blueprint-on #main-content .homepage-section h2 {
+/* Lines that belong to the page. */
+html.lens-blueprint-shell.lens-blueprint-on #main-content :is(.homepage-section h2, .pub-year-heading, .project-group-heading, .about-section h2) {
   border-bottom-color: rgba(214, 236, 251, 0.34);
 }
 
-html.lens-blueprint-on #main-content .profile-photo {
+html.lens-blueprint-shell.lens-blueprint-on #main-content .profile-photo {
   border-color: rgba(214, 236, 251, 0.55);
 }
 
-/* ---- Links: pale cyan with a dashed underline (main content and footer text) ---- */
-html.lens-blueprint :is(#main-content, #site-footer) :is(a:not(.project-link):not(.project-stars), .abstract-toggle, .citation-toggle) {
+/* Links: pale cyan with a dashed underline (main content and footer text). */
+html.lens-blueprint-shell :is(#main-content, #site-footer) :is(a:not(.project-link):not(.project-stars), .abstract-toggle, .citation-toggle) {
   text-decoration: underline dashed transparent;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 
-html.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(a, .abstract-toggle, .citation-toggle) {
+html.lens-blueprint-shell.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(a, button, .abstract-toggle, .citation-toggle) {
   color: #a9e3f5;
 }
 
-html.lens-blueprint.lens-blueprint-on :is(#main-content, #site-footer) :is(a:not(.project-link):not(.project-stars), a.project-link, .abstract-toggle, .citation-toggle) {
+html.lens-blueprint-shell.lens-blueprint-on :is(#main-content, #site-footer) :is(a:not(.project-link):not(.project-stars), a.project-link, .abstract-toggle, .citation-toggle) {
   text-decoration: underline dashed rgba(169, 227, 245, 0.6);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 
-html.lens-blueprint.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(a:not(.project-link):not(.project-stars), a.project-link, a.project-stars, .abstract-toggle, .citation-toggle):is(:hover, :focus-visible) {
+html.lens-blueprint-shell.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(a:not(.project-link):not(.project-stars), a.project-link, a.project-stars, button, .abstract-toggle, .citation-toggle):is(:hover, :focus-visible) {
   color: #ffffff;
   text-decoration-color: rgba(255, 255, 255, 0.85);
 }
 
-html.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) .nav-button[aria-current="page"] {
+html.lens-blueprint-shell.lens-blueprint-on :is(#site-nav, #main-content, #site-footer) :is(.nav-button[aria-current="page"], .filter-option[aria-pressed="true"]) {
   color: #f6f9fd;
 }
 
-html.lens-blueprint-on #site-footer .footer-social a {
+html.lens-blueprint-shell.lens-blueprint-on #site-footer :is(.footer-social a, .theme-toggle, .back-to-top) {
   color: #e9f1fb;
 }
 
-html.lens-blueprint-on :is(#main-content, #site-footer) .project-stars {
+html.lens-blueprint-shell.lens-blueprint-on :is(#main-content, #site-footer) .project-stars {
   color: rgba(169, 227, 245, 0.72);
 }
 
-/* ---- Fades (entering 0.6 s; leaving 0.4 s after 0.1 s) ---- */
+/* Images and canvases as cyanotypes (the homepage portrait has its own, drawn by the script). */
+html.lens-blueprint-shell.lens-blueprint-on #main-content :is(img, video, canvas):not(.profile-photo) {
+  filter: grayscale(1) sepia(1) hue-rotate(178deg) saturate(1.5) contrast(1.06) brightness(0.92);
+}
+
+/* Fades (entering 0.6 s; leaving 0.4 s after 0.1 s). */
 html.lens-blueprint-fade body {
   transition: background-color 600ms ease, --lens-bp-grid 600ms ease !important;
 }
@@ -119,7 +146,7 @@ html.lens-blueprint-fade body {
 html.lens-blueprint-fade :is(#site-nav, #main-content, #site-footer),
 html.lens-blueprint-fade :is(#site-nav, #main-content, #site-footer) * {
   transition: color 600ms ease, border-color 600ms ease, text-decoration-color 600ms ease,
-    background-color 600ms ease, opacity 200ms ease, visibility 200ms ease !important;
+    background-color 600ms ease, filter 600ms ease, opacity 200ms ease, visibility 200ms ease !important;
 }
 
 html.lens-blueprint-fade .lenses-caption {
@@ -133,13 +160,51 @@ html.lens-blueprint-fade.lens-blueprint-leaving :is(#site-nav, #main-content, #s
   transition-delay: 100ms !important;
 }
 
-/* ---- The drawing (in the core's page layer) ---- */
+/* ===================== Paper pages: one colour matrix ===================== */
+
+html.lens-blueprint-paper.lens-blueprint-on {
+  background: #0f3a63 !important;
+}
+
+html.lens-blueprint-paper.lens-blueprint-on :is(body > header.site-header, #main-content, body > footer.paper-footer) {
+  filter: url(#lens-bp-negative);
+}
+
+/* Links in running text get the dashed underline (drawn before the matrix: it inverts it). */
+html.lens-blueprint-paper.lens-blueprint-on #main-content :is(p, li, dd, figcaption, td) a {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 1px;
+}
+
+/* The crossfade: the old and new snapshots blend for 0.6 s in, 0.42 s out. */
+html.lens-blueprint-vt-in::view-transition-old(root),
+html.lens-blueprint-vt-in::view-transition-new(root) {
+  animation-duration: 600ms;
+  animation-timing-function: ease;
+}
+
+html.lens-blueprint-vt-out::view-transition-old(root),
+html.lens-blueprint-vt-out::view-transition-new(root) {
+  animation-duration: 420ms;
+  animation-timing-function: ease;
+}
+
+/* ===================== The drawing (in the core's page layer) ===================== */
+
 .lens-bp-root {
   position: absolute;
   left: 0;
   top: 0;
   width: 0;
   height: 0;
+}
+
+.lens-bp-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .lens-bp-svg {
@@ -167,7 +232,7 @@ html.lens-blueprint-fade.lens-blueprint-leaving :is(#site-nav, #main-content, #s
 
 .lens-bp-svg .bp-dash {
   fill: none;
-  stroke: rgba(214, 236, 251, 0.36);
+  stroke: rgba(214, 236, 251, 0.42);
   stroke-width: 1;
   stroke-dasharray: 4 3;
 }

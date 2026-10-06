@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="API-based health evaluations may not describe what chatbot users see. With the model version fixed, GPT answers to the same 50 consumer health questions differed between the API and ChatGPT, and several differences reversed between GPT-5.3 and GPT-5.4.">
   <meta name="theme-color" content="#fbfcfa">
@@ -22,6 +23,7 @@
   <link rel="stylesheet" href="demos/auditing.css">
   <script src="demos/auditing.js" defer></script>
   <script src="paper-page.js" defer></script>
+  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -32,7 +34,7 @@
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>arXiv preprint 2026</span><span>LLM auditing · Consumer health</span></p>
-      <h1><span class="title-name">Challenges of Auditing:</span> Variability in Outputs of Large Language Models for Health</h1>
+      <h1 data-lens-trigger><span class="title-name">Challenges of Auditing:</span> Variability in Outputs of Large Language Models for Health</h1>
       <p class="paper-authors"><span class="author">Yuan Pu<sup>1</sup></span>, <span class="author">Yewon Chang<sup>1</sup></span>, <span class="author">Furong Jia<sup>1</sup></span>, <span class="author"><a href="../index.html">Xunjian Yin</a><sup>1</sup></span>, <span class="author">Jessica Ma<sup>2,3</sup></span>, <span class="author">Ayman Ali<sup>4</sup></span>, <span class="author">Monica Agrawal<sup>1,5</sup></span></p><p class="author-legend"><span><sup>1</sup> Duke University, Department of Computer Science</span> · <span><sup>2</sup> Duke University, Department of Medicine</span> · <span><sup>3</sup> Durham VA Health System, Geriatrics and Extended Care</span> · <span><sup>4</sup> Duke University, Department of Surgery</span> · <span><sup>5</sup> Duke University, Department of Biostatistics and Bioinformatics</span></p>
       <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://arxiv.org/abs/2609.16590">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://github.com/yuan-pu/health-llm-variability">Code <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">API-based health evaluations may not describe what chatbot users see. With the model version fixed, GPT answers to the same 50 consumer health questions differed between the API and ChatGPT, and several differences reversed between GPT-5.3 and GPT-5.4.</p>

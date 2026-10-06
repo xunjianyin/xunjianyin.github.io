@@ -1,49 +1,45 @@
-/* Lens I · Stardust (see stardust.js). The core hides the glyphs and the lens draws
-   them as particles; these rules turn the ground to night and recolour the page's few
-   marks that are not text (rules, icons, underlines), and hide the portrait under its
-   point cloud. Durations match GROUND_IN and GROUND_OUT in stardust.js. */
+/* Lens I · Stardust (see stardust.js). The core hides the glyphs and the lens draws them
+   as particles; these rules turn the ground to night and make the rest of the page sit in
+   it: on a light page the main column is inverted (hue kept), so light panels sink into
+   the night, borders become faint and data tints stay distinguishable, while images,
+   canvases and video are filtered back and dimmed. Durations match GROUND_IN and
+   GROUND_OUT in stardust.js. */
 
-/* Transitions for the ground, kept through the exit so the ground eases back. */
-html.lens-stardust-ground body {
-  transition: background-color 0.8s cubic-bezier(0.65, 0, 0.35, 1) !important;
-}
-html.lens-stardust-ground.lens-stardust-leaving body {
-  transition-duration: 0.7s !important;
-}
-/* In the dark site theme the main column paints its own background; let the body show. */
-html.lens-stardust-ground #main-content {
-  background-color: transparent !important;
-}
-html.lens-stardust-ground .homepage-section h2,
-html.lens-stardust-ground .nav-button[aria-current="page"]::after,
-html.lens-stardust-ground .project-link {
-  transition: color 0.2s ease, border-color 0.8s ease, background-color 0.8s ease, text-decoration-color 0.8s ease;
-}
-html.lens-stardust-ground #theme-toggle,
-html.lens-stardust-ground .footer-social a {
-  transition: color 0.8s ease, opacity 0.2s ease;
-}
-html.lens-stardust-ground .back-to-top {
-  transition: opacity 0.2s ease, visibility 0.2s ease, color 0.8s ease, border-color 0.8s ease, background-color 0.8s ease;
-}
-
-/* Night */
-/* The core's caption, in a light tone once the ground has passed mid-grey (the lens adds
-   this class then; before it the caption keeps the core's grey on the day page). */
-html.lens-stardust-caption {
-  --lenses-caption-color: #b3bfce;
-}
-html.lens-stardust body {
+/* The ground: the root always (as the pre-paint rule paints it), and the body when it
+   paints its own background. */
+html.lens-stardust {
   background-color: #06080c !important;
 }
-html.lens-stardust .homepage-section h2 {
-  border-bottom-color: rgba(190, 205, 225, 0.16);
+html.lens-stardust.lens-stardust-body body {
+  background-color: #06080c !important;
 }
+/* In the dark site theme the main column paints its own background; let the ground show. */
+html.lens-stardust #main-content {
+  background-color: transparent !important;
+}
+
+/* A light page: the main column inverted, its media turned back and dimmed. */
+html.lens-stardust.lens-stardust-invert #main-content {
+  filter: invert(0.94) hue-rotate(180deg);
+}
+html.lens-stardust.lens-stardust-invert #main-content :is(img, video, canvas, iframe, object, embed) {
+  filter: brightness(0.66) saturate(0.7) hue-rotate(180deg) invert(1);
+}
+/* A dark page (or the nav, header and footer): media simply dimmed. */
+html.lens-stardust:not(.lens-stardust-invert) #main-content :is(img, video, canvas, iframe, object, embed),
+html.lens-stardust :is(#site-nav, body > header.site-header, #site-footer, body > footer.paper-footer) :is(img, video, canvas) {
+  filter: brightness(0.62) saturate(0.7);
+}
+
+/* Faint rules in the nav, header and footer. */
+html.lens-stardust :is(#site-nav, body > header.site-header, #site-footer, body > footer.paper-footer),
+html.lens-stardust :is(#site-nav, body > header.site-header, #site-footer, body > footer.paper-footer) *:not(.back-to-top) {
+  border-color: rgba(190, 205, 225, 0.14);
+}
+
+/* The homepage's marks that are not text. */
 html.lens-stardust .nav-button[aria-current="page"]::after {
   background-color: rgba(226, 233, 242, 0.7);
-}
-html.lens-stardust .project-link {
-  text-decoration-color: rgba(190, 205, 225, 0.28);
 }
 html.lens-stardust #theme-toggle,
 html.lens-stardust .footer-social a {
@@ -58,9 +54,59 @@ html.lens-stardust .back-to-top {
   color: #c3cdd9;
   border-color: rgba(190, 205, 225, 0.25);
 }
+/* Without the inversion (dark site theme) the main column's own rules are made faint. */
+html.lens-stardust:not(.lens-stardust-invert) .homepage-section h2 {
+  border-bottom-color: rgba(190, 205, 225, 0.16);
+}
+html.lens-stardust:not(.lens-stardust-invert) .project-link {
+  text-decoration-color: rgba(190, 205, 225, 0.28);
+}
 
-/* Reduced motion and instant exits: the night comes and goes at once, without even the
-   site's own short colour fades on these marks. */
+/* The core's caption, in a light tone once the ground has passed mid-grey (the lens adds
+   this class then; before it the caption keeps the core's grey on the day page). */
+html.lens-stardust-caption {
+  --lenses-caption-color: #b3bfce;
+}
+
+/* The portrait is drawn as a point cloud in its place. */
+html.lens-stardust-photo .profile-photo {
+  visibility: hidden;
+}
+
+/* Transitions for the ground and the inversion; kept through the exit so they ease back. */
+html.lens-stardust-ground,
+html.lens-stardust-ground body {
+  transition: background-color 0.8s cubic-bezier(0.65, 0, 0.35, 1) !important;
+}
+html.lens-stardust-ground #main-content,
+html.lens-stardust-ground #main-content :is(img, video, canvas, iframe, object, embed) {
+  transition: filter 0.8s cubic-bezier(0.65, 0, 0.35, 1) !important;
+}
+html.lens-stardust-ground.lens-stardust-leaving,
+html.lens-stardust-ground.lens-stardust-leaving body,
+html.lens-stardust-ground.lens-stardust-leaving #main-content,
+html.lens-stardust-ground.lens-stardust-leaving #main-content :is(img, video, canvas, iframe, object, embed) {
+  transition-duration: 0.7s !important;
+}
+html.lens-stardust-ground .homepage-section h2,
+html.lens-stardust-ground .nav-button[aria-current="page"]::after,
+html.lens-stardust-ground .project-link {
+  transition: color 0.2s ease, border-color 0.8s ease, background-color 0.8s ease, text-decoration-color 0.8s ease;
+}
+html.lens-stardust-ground #theme-toggle,
+html.lens-stardust-ground .footer-social a {
+  transition: color 0.8s ease, opacity 0.2s ease;
+}
+html.lens-stardust-ground .back-to-top {
+  transition: opacity 0.2s ease, visibility 0.2s ease, color 0.8s ease, border-color 0.8s ease, background-color 0.8s ease;
+}
+
+/* Arrival, reduced motion and instant exits: the night comes and goes at once, without
+   even the page's own short colour fades on these marks. */
+html.lens-stardust-still,
+html.lens-stardust-still body,
+html.lens-stardust-still #main-content,
+html.lens-stardust-still #main-content :is(img, video, canvas, iframe, object, embed),
 html.lens-stardust-still .homepage-section h2,
 html.lens-stardust-still .project-link,
 html.lens-stardust-still #theme-toggle,
@@ -69,9 +115,4 @@ html.lens-stardust-still .back-to-top,
 html.lens-stardust-still .nav-button,
 html.lens-stardust-still .nav-button[aria-current="page"]::after {
   transition: none !important;
-}
-
-/* The portrait is drawn as a point cloud in its place. */
-html.lens-stardust-photo .profile-photo {
-  visibility: hidden;
 }

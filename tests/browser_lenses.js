@@ -29,9 +29,10 @@
   const pending = new Set();
 
   const load = async (path = '/') => {
+    sessionStorage.removeItem('lenses-active');   // a remembered lens would arrive with the page
     await new Promise(resolve => { frame.onload = resolve; frame.src = path; });
     doc = frame.contentDocument; win = frame.contentWindow;
-    await until(() => doc.querySelector('.easter-egg-footnote') && doc.querySelector('#selected-papers-list li'), 'the site shell');
+    await until(() => doc.querySelector('.easter-egg-footnote') && doc.querySelector('#selected-papers-list li') && win.SiteLensesBoot, 'the site shell and the lens boot');
     win.addEventListener('error', event => errors.push(`${path}: ${event.message}`));
     win.addEventListener('unhandledrejection', event => errors.push(`${path}: ${event.reason}`));
     const consoleError = win.console.error.bind(win.console);
@@ -167,7 +168,7 @@
     const prevented = dblclick();
     check(prevented, 'A double-click on the name does not select its text');
     await until(() => win.SiteLenses, 'the core to load');
-    check(assets().length === 2 && [...assets()].every(a => (a.src || a.href).includes('v=lenses-v1')), 'The core script and stylesheet load once, versioned lenses-v1');
+    check(assets().length === 2 && [...assets()].every(a => (a.src || a.href).includes('v=lenses-v2')), 'The core script and stylesheet load once, versioned lenses-v2');
     check(!!win.__lensesAudioContext || state().audio !== null || localStorage.getItem('spira-sound') === 'off', 'The trigger primes an AudioContext inside the gesture');
     await idle();
     const registered = await lenses()._debug.loadAll();
@@ -384,6 +385,7 @@
   } catch (error) { failures.push(error.stack || String(error)); }
   finally {
     frame.remove();
+    sessionStorage.removeItem('lenses-active');
     for (const [key, value] of Object.entries(stored)) { if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, value); }
   }
   /* 14. No uncaught errors or console.error calls. */

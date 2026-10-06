@@ -31,6 +31,9 @@
   const DUSK_FAR = 3;                  // the dusk starts with its reach this many times the farthest corner's distance
   const LIFT_S = 0.5;                  // the dark lifts
   const LIFT_GROW = 1.8;               // the light widens this much while the dark lifts
+  const ARRIVE_S = 0.3;                // on a page opened with the lens: the lamp's warmth comes up
+  // Links whose content is a picture are lit by the lamp like the page, not lifted as embers.
+  const PICTURE_LINK = 'img, picture, video, canvas';
   const NIGHT_PAD = 48;                // px of extra night beyond the viewport (flicker, rounding)
   const LAYER_Z = 1001;                // above the back-to-top button (999) and the skip link (1000)
   const GRAIN_SIZE = 128;              // px: one tile of paper grain, generated once
@@ -96,25 +99,49 @@
     return el;
   }
 
-  // The links the lamp lifts: every link in the scope, with its own style attribute kept.
+  // The links the lamp lifts: every text link in the scope, with its own style attribute kept.
+  const liftable = el => !el.querySelector(PICTURE_LINK);
+  const linkEntry = el => ({ el, style: el.getAttribute('style'), near: -1, x0: 0, y0: 0, x1: 0, y1: 0, shown: false });
   function collectLinks(scope) {
     const links = [];
-    scope.forEach(root => root.querySelectorAll('a[href]').forEach(el => {
-      links.push({ el, style: el.getAttribute('style'), near: -1, x0: 0, y0: 0, x1: 0, y1: 0, shown: false });
-    }));
+    scope.forEach(root => root.querySelectorAll('a[href]').forEach(el => { if (liftable(el)) links.push(linkEntry(el)); }));
     return links;
+  }
+
+  // Late content (markdown, star counts, demos): new links join, removed ones are dropped.
+  function refreshLinks(s, scope) {
+    const known = new Set(s.links.map(link => link.el));
+    const added = [];
+    scope.forEach(root => root.querySelectorAll('a[href]').forEach(el => {
+      if (!known.has(el) && liftable(el)) { const link = linkEntry(el); s.links.push(link); added.push(link); }
+    }));
+    const kept = s.links.filter(link => link.el.isConnected);
+    if (kept.length !== s.links.length) s.links = kept;
+    if (added.length) readLinkColours(s, added);
+    s.measured = false; s.dirtyLinks = true;
   }
 
   // Each link's own colour, read with the lens class off (so it is the page's colour) and
   // without transitions (the site eases link colours, which would return a midway colour).
-  function readLinkColours(s) {
+  function readLinkColours(s, links = s.links) {
     const had = html.classList.contains('lens-lamplight');
     html.classList.add('lens-lamplight-measure');
     if (had) html.classList.remove('lens-lamplight');
-    const colours = s.links.map(link => getComputedStyle(link.el).color);
+    // A link drawn as a button (a background or a border) keeps them under the lamp; in the
+    // dark only an ember outline is left.
+    const looks = links.map(link => {
+      const cs = getComputedStyle(link.el);
+      const bordered = ['Top', 'Right', 'Bottom', 'Left'].some(side => parseFloat(cs[`border${side}Width`]) > 0 && cs[`border${side}Style`] !== 'none');
+      return { color: cs.color, bg: /^rgba\(.*,\s*0\)$|^transparent$/.test(cs.backgroundColor) ? '' : cs.backgroundColor, border: bordered ? cs.borderTopColor : '' };
+    });
     if (had) html.classList.add('lens-lamplight');
     html.classList.remove('lens-lamplight-measure');
-    s.links.forEach((link, i) => link.el.style.setProperty('--ll-link', colours[i]));
+    links.forEach((link, i) => {
+      const look = looks[i];
+      link.el.style.setProperty('--ll-link', look.color);
+      if (look.bg) link.el.style.setProperty('--ll-bg', look.bg);
+      if (look.border) link.el.style.setProperty('--ll-bd', look.border);
+    });
   }
 
   // Link boxes in document coordinates (refreshed on resize and reflow, not per frame).
@@ -212,13 +239,15 @@
     s.wake();
   }
 
+  // Where the lamp starts: at the pointer, else on the page's name or title when it is in
+  // view (the homepage name, a page title, a paper's title), else a little above the centre.
   function startPoint(ctx, s) {
     const known = ctx.pointer;
     if (known) return known;
-    const name = document.querySelector('.profile-text .name');
-    if (name) {
-      const r = name.getBoundingClientRect();
-      if (r.bottom > 0 && r.top < s.h) return { x: r.left + Math.min(r.width, 160) / 2, y: r.top + r.height / 2 };
+    for (const el of document.querySelectorAll('.profile-text .name, #main-content [data-lens-trigger], #main-content h1')) {
+      const range = document.createRange(); range.selectNodeContents(el);
+      const r = range.getBoundingClientRect();
+      if (r.width && r.bottom > 0 && r.top < s.h) return { x: r.left + Math.min(r.width, 320) / 2, y: r.top + Math.min(r.height, 80) / 2 };
     }
     return { x: s.w / 2, y: s.h * 0.4 };
   }
@@ -251,6 +280,7 @@
       ctx.scope.forEach(root => observer.observe(root));
       signal.addEventListener('abort', () => observer.disconnect());
     }
+    ctx.onContentChange(() => { refreshLinks(s, ctx.scope); s.wake(); });
     // A theme switch changes the links' own colours.
     const themes = new MutationObserver(() => { readLinkColours(s); s.dirtyLinks = true; s.wake(); });
     themes.observe(html, { attributes: true, attributeFilter: ['data-theme'] });
@@ -276,6 +306,43 @@
     html.classList.remove('lens-lamplight', 'lens-lamplight-still', 'lens-lamplight-measure');
   }
 
+  // The lamp's state, layer, links and listeners, shared by enter and arrive.
+  function build(ctx) {
+    const s = {
+      layer: ctx.layer('fixed'), links: collectLinks(ctx.scope), still: ctx.motion.matches,
+      x: 0, y: 0, tx: 0, ty: 0, r: RADIUS, base: RADIUS, night: 1, glow: 1, w: 0, h: 0,
+      shownX: NaN, shownY: NaN, shownR: NaN, shownNight: NaN, shownGlow: NaN,
+      anim: null, measured: false, dirtyLinks: true, restored: false, wake: null,
+      quick: () => s.still || ctx.instant      // no animation: reduced motion, or an instant reset
+    };
+    state = s;
+    const frame = dt => tick(s, dt);
+    s.wake = () => ctx.frame(frame);
+
+    // The lamp (glow under night), then the grain.
+    const { layer } = s;
+    layer.classList.add('lamplight-layer');
+    layer.style.zIndex = String(LAYER_Z);
+    layer.style.setProperty('--ll-mask', maskGradient());
+    layer.style.setProperty('--ll-grain', `url("${makeGrain()}")`);
+    const lamp = element('lamplight-lamp', layer);
+    element('lamplight-glow', element('lamplight-flame', lamp));
+    element('lamplight-night', element('lamplight-flicker', lamp));
+    element('lamplight-grain', layer);
+    viewport(s);
+
+    measureLinks(s);                     // while layout is clean, so no frame has to force it
+    readLinkColours(s);
+    html.classList.add('lens-lamplight');
+    html.classList.toggle('lens-lamplight-still', s.still);
+    const start = startPoint(ctx, s);
+    s.x = s.tx = clamp(start.x, 0, s.w); s.y = s.ty = clamp(start.y, 0, s.h);
+    listen(ctx, s);
+    // An interrupted entrance ends where it is; exit takes it from there.
+    ctx.signal.addEventListener('abort', () => { if (s.anim) { const a = s.anim; s.anim = null; a.done(); } }, { once: true });
+    return s;
+  }
+
   window.SiteLenses.register({
     id: 'lamplight',
     order: 5,
@@ -284,51 +351,27 @@
     line: 'Read by the light you carry.',
     css: true,
 
+    // Dusk: the dark closes in from the edges until only the lamp is left.
     async enter(ctx) {
-      const s = {
-        layer: ctx.layer('fixed'), links: collectLinks(ctx.scope), still: ctx.motion.matches,
-        x: 0, y: 0, tx: 0, ty: 0, r: RADIUS, base: RADIUS, night: 1, glow: 1, w: 0, h: 0,
-        shownX: NaN, shownY: NaN, shownR: NaN, shownNight: NaN, shownGlow: NaN,
-        anim: null, measured: false, dirtyLinks: true, restored: false, wake: null,
-        quick: () => s.still || ctx.instant      // no animation: reduced motion, or an instant reset
-      };
-      state = s;
-      const frame = dt => tick(s, dt);
-      s.wake = () => ctx.frame(frame);
-
-      // Build: the lamp (glow under night), then the grain.
-      const { layer } = s;
-      layer.classList.add('lamplight-layer');
-      layer.style.zIndex = String(LAYER_Z);
-      layer.style.setProperty('--ll-mask', maskGradient());
-      layer.style.setProperty('--ll-grain', `url("${makeGrain()}")`);
-      const lamp = element('lamplight-lamp', layer);
-      element('lamplight-glow', element('lamplight-flame', lamp));
-      element('lamplight-night', element('lamplight-flicker', lamp));
-      element('lamplight-grain', layer);
-      viewport(s);
-
-      measureLinks(s);                   // while layout is clean, so no frame has to force it
-      readLinkColours(s);
-      html.classList.add('lens-lamplight');
-      html.classList.toggle('lens-lamplight-still', s.still);
-      const start = startPoint(ctx, s);
-      s.x = s.tx = clamp(start.x, 0, s.w); s.y = s.ty = clamp(start.y, 0, s.h);
-      listen(ctx, s);
-
-      // Dusk: the dark closes in from the edges until only the lamp is left.
+      const s = build(ctx);
       const from = Math.max(s.base, farthest(s) * DUSK_FAR);
       const logFrom = Math.log(from); const logTo = Math.log(s.base);
       s.r = from; s.glow = 0; s.night = 1;
       apply(s);
-      const dusk = animate(s, DUSK_S, t => {
+      await animate(s, DUSK_S, t => {
         const e = easeInOut(t);
         s.r = Math.exp(logFrom + (logTo - logFrom) * e);
         s.glow = e;
       });
-      // An interrupted dusk ends where it is; exit takes it from there.
-      ctx.signal.addEventListener('abort', () => { if (s.anim) { const a = s.anim; s.anim = null; a.done(); } }, { once: true });
-      await dusk;
+    },
+
+    // A page opened in lamplight: the dark is already there (the pre-paint ground), so the
+    // lamp is lit at once and only its warmth comes up.
+    async arrive(ctx) {
+      const s = build(ctx);
+      s.r = s.base; s.glow = 0; s.night = 1;
+      apply(s);
+      await animate(s, ARRIVE_S, t => { s.glow = easeOut(t); });
     },
 
     async exit(ctx) {

@@ -103,6 +103,11 @@
     return '© 2026 Xunjian Yin';
   }
 
+  // The footer's name is a lens trigger: a double-click (or double-tap) changes the lens.
+  function lensTriggerName(copy) {
+    return copy.replace('Xunjian Yin', '<span data-lens-trigger>Xunjian Yin</span>');
+  }
+
   function getFooterClassName() {
     const footerSize = document.body.dataset.footerWidth;
     if (footerSize === 'wide' || getCurrentPage() === 'photography') {
@@ -142,7 +147,7 @@
     <footer class="site-footer">
       <div class="footer-social">${socialLinks}
       </div>
-      <p class="footer-copyright">${getFooterCopy()} <button class="easter-egg-footnote" aria-label="Open the spiral" title="Eadem mutata resurgo">*</button></p>
+      <p class="footer-copyright">${lensTriggerName(getFooterCopy())} <button class="easter-egg-footnote" aria-label="Open the spiral" title="Eadem mutata resurgo">*</button></p>
     </footer>
   </div>
   <button id="back-to-top" class="back-to-top" aria-label="Back to top">
@@ -179,9 +184,14 @@
       } catch (error) { /* sound is optional */ }
     }
     function openEasterEgg() {
-      // A lens restyles the page the egg captures: return to normal first, without animation.
+      // A lens restyles the page the egg captures: return to normal first, without animation,
+      // and forget it, so the next page opens normal too.
       const lenses = window.SiteLenses;
       const lensesSettled = lenses && (lenses.current || lenses.busy) ? lenses.reset({ instant: true }) : null;
+      if (!lensesSettled) {
+        try { sessionStorage.removeItem('lenses-active'); } catch (error) { /* storage is optional */ }
+        document.documentElement.removeAttribute('data-lens-arriving');
+      }
       primeEggAudio();
       if (eggReady) {
         if (lensesSettled) lensesSettled.then(() => window.SiteEasterEgg.open());
@@ -233,87 +243,22 @@
       while (sequence && !password.startsWith(sequence)) sequence = sequence.slice(1);
       if (sequence === password) { sequence = ''; openEasterEgg(); }
     });
-    bindLensTrigger(document.querySelector('.profile-text .name'));
   }
 
-  /* Lenses: double-click (or double-tap) the homepage name to see the page through the next
-   * lens. The core and its stylesheet load on the first trigger. */
-  const LENS_ASSET_VERSION = 'lenses-v1';
-  const DOUBLE_TAP_MS = 320;
-  const DOUBLE_TAP_PX = 24;
-  const TAP_DBLCLICK_GUARD_MS = 700;   // a double-tap may also synthesize a dblclick; count it once
-
-  function bindLensTrigger(name) {
-    if (!name) return;
-    let lensesLoading = false;
-    let lastTap = null;
-    let tappedAt = -Infinity;
-
-    // The bell needs an AudioContext created inside the gesture; the core adopts it.
-    function primeLensAudio() {
-      try {
-        if (window.__lensesAudioContext || localStorage.getItem('spira-sound') === 'off') return;
-        const Context = window.AudioContext || window.webkitAudioContext;
-        if (!Context) return;
-        const context = new Context();
-        if (context.resume) context.resume().catch(() => {});
-        window.__lensesAudioContext = context;
-      } catch (error) { /* sound is optional */ }
-    }
-
-    function triggerLens(pointerType) {
-      if (window.SiteLenses) { window.SiteLenses.next({ pointerType }); return; }
-      if (lensesLoading) return;
-      lensesLoading = true;
-      primeLensAudio();
-      const script = document.createElement('script');
-      const style = document.createElement('link');
-      script.src = toRootHref(`easter/lenses.js?v=${LENS_ASSET_VERSION}`);
-      style.rel = 'stylesheet';
-      style.href = toRootHref(`easter/lenses.css?v=${LENS_ASSET_VERSION}`);
-      Promise.all([style, script].map(asset => new Promise((resolve, reject) => {
-        asset.onload = resolve;
-        asset.onerror = reject;
-        document.head.append(asset);
-      }))).then(() => {
-        if (!window.SiteLenses) throw new Error('Lenses did not initialize.');
-        window.SiteLenses.next({ pointerType });
-      }).catch(() => {
-        // Leave nothing behind, so the next double-click can try again.
-        script.remove();
-        style.remove();
-        try { window.__lensesAudioContext?.close().catch(() => {}); } catch (error) { /* already closed */ }
-        window.__lensesAudioContext = undefined;
-      }).finally(() => { lensesLoading = false; });
-    }
-
-    // A double-click would select the word under the pointer: keep the selection as it was.
-    name.addEventListener('mousedown', event => { if (event.detail > 1) event.preventDefault(); });
-    name.addEventListener('dblclick', event => {
-      event.preventDefault();
-      if (performance.now() - tappedAt < TAP_DBLCLICK_GUARD_MS) return;
-      triggerLens('mouse');
-    });
-    // Touch and pen: two taps within 320 ms and 24 px.
-    name.addEventListener('pointerup', event => {
-      if (event.pointerType === 'mouse' || !event.isPrimary) return;
-      const now = performance.now();
-      if (lastTap && now - lastTap.at <= DOUBLE_TAP_MS &&
-          Math.hypot(event.clientX - lastTap.x, event.clientY - lastTap.y) <= DOUBLE_TAP_PX) {
-        lastTap = null;
-        tappedAt = now;
-        event.preventDefault();
-        triggerLens(event.pointerType);
-      } else {
-        lastTap = { at: now, x: event.clientX, y: event.clientY };
-      }
-    });
-    // Cancelling the second tap's touchend stops its synthesized click and dblclick; the
-    // double-tap zoom is stopped by touch-action: manipulation on the name (page CSS).
-    name.addEventListener('touchend', event => {
-      if (performance.now() - tappedAt < 60 && event.cancelable) event.preventDefault();
-    }, { passive: false });
+  /* Lenses: easter/boot.js binds the lens triggers ([data-lens-trigger]) and brings the
+   * reader's lens to this page when one is active. It loads as early as possible: a page
+   * opened with a lens stays hidden until the lens arrives. */
+  function loadLensesBoot() {
+    if (window.SiteLensesBoot) return;
+    const script = document.createElement('script');
+    script.src = toRootHref('easter/boot.js?v=lenses-v2');
+    script.onerror = () => {
+      script.remove();
+      document.documentElement.removeAttribute('data-lens-arriving');
+    };
+    document.head.append(script);
   }
 
+  loadLensesBoot();
   whenReady(injectSiteShell);
 })();

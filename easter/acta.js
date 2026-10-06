@@ -2,16 +2,24 @@
  * Lens IV · Acta Eruditorum, 1692: "As it might have been printed when Bernoulli named the
  * spira mirabilis." (Jacob Bernoulli named the logarithmic spiral in the Acta in 1692.)
  *
- * The same page, set as a 17th-century learned journal: IM Fell English (Google Fonts) with
- * small-cap headings, a three-line drop cap, engraved double rules with a fleuron, iron-gall
- * ink on laid paper, and the portrait as a copperplate engraving. No word changes: only
- * fonts, colours and ornaments (acta.css), plus the paper and the engraving drawn here.
+ * Any page of the site, set as a 17th-century learned journal: IM Fell English (Google
+ * Fonts) with small capitals, a three-line drop cap on the first paragraph of running text,
+ * engraved rules, iron-gall ink on laid paper, sepia plates for images, and on the homepage
+ * the portrait as a copperplate engraving. No word changes: only fonts, colours and
+ * ornaments (acta.css), plus the paper, the engraving and the drop cap rule made here.
+ *
+ * Site-shell pages (home, site pages, blog posts) are coloured by explicit rules; paper
+ * pages, with their own design and many-coloured demos, by one SVG colour matrix that
+ * prints white as paper and black as ink (acta.css explains both). Their header becomes a
+ * running head.
  *
  * Enter: the fonts load first (no flash of unstyled text), then a soft band of paper colour
  * descends over the page (a view transition whose old and new snapshots are masked on either
- * side of the band), leaving the Acta style above it. Exit: the band rises. The layout
- * reflows with the fonts; the scroll position is restored on exit if the reader did not
- * scroll. Without view transitions the page crossfades through a paper veil.
+ * side of the band), leaving the Acta style above it. Exit: the band rises. Arrive (a page
+ * opened while the lens is on): the style switches at once under the pre-painted paper; the
+ * tile is kept in sessionStorage, so that is quick. The layout reflows with the fonts; the
+ * scroll position is restored on exit if the reader did not scroll. Without view transitions
+ * the page crossfades through a paper veil.
  */
 (() => {
   'use strict';
@@ -20,6 +28,7 @@
   const VEIL_IN_MS = 300;             // fallback without view transitions: veil fades in…
   const VEIL_OUT_MS = 450;            // …and out again
   const FONT_TIMEOUT_MS = 4000;       // give up waiting for the fonts (slow network) after this
+  const ARRIVE_FONT_MS = 1500;        // the same on arrival, while the page is still hidden
   // Google Fonts' stylesheet for the two IM Fell families. It is read with fetch() and its
   // faces are added through the FontFace API, so no <link> is involved and a blocked Google
   // only means fallback serif faces (lens-acta-fallback), never a failed lens.
@@ -41,6 +50,8 @@
   const FOXING_SPOTS = 3;             // per tile: sparse
   const SEED = 1692;
   const SLICE_MS = 6;                 // longest stretch of generation work between yields
+  const PAPER_KEY = 'lenses-acta-paper';   // sessionStorage: the tile as a data URL, per DPR,
+                                           // so the next page of the site arrives at once
 
   // The engraving: luminance-modulated hatching (css px spacing, degrees), clipped to an oval.
   const INK_RGB = [42, 29, 18];       // #2a1d12
@@ -57,9 +68,15 @@
   const OVAL_RY = 0.475;
   const BACKGROUND_LIFT = 0.35;       // lightens the photo's background away from the sitter
 
-  const CLS = { on: 'lens-acta', portrait: 'lens-acta-portrait', vtIn: 'lens-acta-vt-in', vtOut: 'lens-acta-vt-out', hold: 'lens-acta-hold', fallback: 'lens-acta-fallback' };
+  const CLS = {
+    on: 'lens-acta', portrait: 'lens-acta-portrait', vtIn: 'lens-acta-vt-in', vtOut: 'lens-acta-vt-out',
+    hold: 'lens-acta-hold', fallback: 'lens-acta-fallback', home: 'lens-acta-home', shell: 'lens-acta-shell', paper: 'lens-acta-paper'
+  };
   // Blocks that can hold the reader's place while the type reflows.
-  const ANCHORS = '#main-content :is(h1, h2, p, li, .pronunciation, .profile-links, .view-all), #site-footer .site-footer';
+  const ANCHORS = '#main-content :is(h1, h2, h3, p, li, figure, .pronunciation, .profile-links, .view-all), #site-footer .site-footer, body > footer.paper-footer';
+  // Where the drop cap's paragraph is not looked for.
+  const NOT_PROSE = 'figure, [data-paper-demo], .paper-demo, header, nav, aside, table, li, dd, blockquote, .article-note, .paper-header';
+  const PRINT_ID = 'lens-acta-print';
   const ROOT_VAR = '--lens-acta-paper';
 
   const html = document.documentElement;
@@ -85,6 +102,27 @@
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+
+  const shown = el => !!el && el.getClientRects().length > 0;
+
+  // The page kind from the core (ctx.page), or worked out here for an older core.
+  function pageKind(ctx) {
+    if (ctx.page && ctx.page.kind) return ctx.page.kind;
+    if (document.querySelector('#main-content.paper-container')) return 'paper';
+    if (document.querySelector('#main-content .profile-section')) return 'home';
+    return /\/blogs\//.test(location.pathname) ? 'blog' : 'site';
+  }
+
+  // The paper-page colour matrix (sRGB): each channel maps 0 → ink and 1 → paper, so white
+  // panels become the sheet, black becomes ink, and colours keep their hue, printed.
+  function printMatrix() {
+    const rows = PAPER_RGB.map((p, c) => {
+      const row = [0, 0, 0, 0, +(INK_RGB[c] / 255).toFixed(4)];
+      row[c] = +((p - INK_RGB[c]) / 255).toFixed(4);
+      return row;
+    });
+    return [...rows.flat(), 0, 0, 0, 1, 0].join(' ');
+  }
 
   // Separable box blur of a W×H field (edges clamped).
   function boxBlur(src, W, H, r) {
@@ -224,12 +262,23 @@
     return canvas;
   }
 
-  // The tile as an image URL: encoded off the main thread (toBlob) where possible.
+  // The tile as an image URL: encoded off the main thread (toBlob) where possible, and kept
+  // in sessionStorage as a data URL so the next page of the site does not draw it again.
   async function makePaper(signal) {
+    const key = `${PAPER_KEY}@${Math.min(window.devicePixelRatio || 1, 2)}`;
+    try { const kept = sessionStorage.getItem(key); if (kept && kept.startsWith('data:image/')) return { url: kept }; } catch (error) { /* storage unavailable */ }
     const canvas = await runSliced(paperSteps(), signal);
     if (!canvas) return null;
     const blob = canvas.toBlob ? await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9)) : null;
-    return { url: blob ? URL.createObjectURL(blob) : canvas.toDataURL('image/jpeg', 0.9) };
+    if (!blob) {
+      const url = canvas.toDataURL('image/jpeg', 0.9);
+      try { sessionStorage.setItem(key, url); } catch (error) { /* full or unavailable */ }
+      return { url };
+    }
+    const reader = new FileReader();
+    reader.onload = () => { try { sessionStorage.setItem(key, reader.result); } catch (error) { /* full or unavailable */ } };
+    reader.readAsDataURL(blob);
+    return { url: URL.createObjectURL(blob) };
   }
 
   /* ---------- the engraved portrait ---------- */
@@ -387,16 +436,70 @@
 
   // Resolves true once the faces are in document.fonts, false on failure or after
   // FONT_TIMEOUT_MS (a late arrival is kept for the next activation, never swapped in mid-lens).
-  async function loadFonts(signal) {
+  async function loadFonts(signal, limit = FONT_TIMEOUT_MS) {
     if (!fell && typeof FontFace === 'function' && document.fonts) {
       const fetched = fetchFell().then(faces => { fell = fell || faces; return !!faces; }, () => false);
-      if (!await Promise.race([fetched, sleep(FONT_TIMEOUT_MS, signal).then(() => false)])) return false;
+      if (!await Promise.race([fetched, sleep(limit, signal).then(() => false)])) return false;
     }
     if (!fell || signal?.aborted) return false;
     fell.forEach(face => document.fonts.add(face));
     return true;
   }
   const unloadFonts = () => { if (fell && document.fonts) fell.forEach(face => document.fonts.delete(face)); };
+
+  // The drop cap's paragraph: the first narrative paragraph of a paper page, elsewhere the
+  // first paragraph of running text in main (long, upright, starting with a letter). The
+  // homepage has its own rule in acta.css.
+  function dropCapParagraph(st) {
+    if (st.kind === 'home') return null;
+    const main = document.getElementById('main-content');
+    if (!main) return null;
+    const pick = list => [...list].find(p => {
+      if (!shown(p) || p.closest(NOT_PROSE)) return false;
+      const text = p.textContent.trim();
+      return text.length >= 120 && /^[A-Za-z]/.test(text) && getComputedStyle(p).fontStyle === 'normal';
+    });
+    return (st.kind === 'paper' && pick(main.querySelectorAll('.narrative p'))) || pick(main.querySelectorAll('p')) || null;
+  }
+
+  // A selector for one element of main, by position: #main-content > div:nth-child(2) > p:nth-child(1).
+  function pathTo(el) {
+    const parts = [];
+    for (let node = el; node && node.id !== 'main-content'; node = node.parentElement) {
+      if (!node.parentElement) return null;
+      parts.unshift(`${node.tagName.toLowerCase()}:nth-child(${[...node.parentElement.children].indexOf(node) + 1})`);
+    }
+    return `#main-content > ${parts.join(' > ')}`;
+  }
+
+  // Writes the drop cap rule into this lens's own stylesheet (removed with it after exit).
+  function setDropCap(st) {
+    const sheet = [...document.styleSheets].find(sh => (sh.href || '').includes('easter/acta.css'));
+    if (!sheet) return;
+    const target = dropCapParagraph(st);
+    const path = target && pathTo(target);
+    if (path === st.dropCapPath) return;
+    clearDropCap(st);
+    if (!path) return;
+    const initial = CSS.supports('initial-letter', '3') || CSS.supports('-webkit-initial-letter', '3');
+    const shape = initial
+      ? '-webkit-initial-letter: 3; initial-letter: 3; margin-right: 0.14em;'
+      : 'float: left; font-size: 4.05em; line-height: 0.8; padding: 0.08em 0.12em 0 0;';
+    try {
+      // font-size-adjust off: Chrome sizes an initial letter wrongly with it.
+      const index = sheet.insertRule(`html.lens-acta ${path}::first-letter { ${shape} font-family: var(--lens-acta-serif); font-style: normal; font-size-adjust: none; color: var(--lens-acta-dropcap); }`, sheet.cssRules.length);
+      st.dropCap = { sheet, rule: sheet.cssRules[index] };
+      st.dropCapPath = path;
+    } catch (error) { /* an odd path: no drop cap */ }
+  }
+  function clearDropCap(st) {
+    if (st.dropCap) {
+      const { sheet, rule } = st.dropCap;
+      const index = [...sheet.cssRules].indexOf(rule);
+      if (index >= 0) sheet.deleteRule(index);
+    }
+    st.dropCap = null; st.dropCapPath = null;
+  }
 
   // Puts the engraving over the (hidden) photo; called whenever the layout may have moved.
   function placePortrait(st) {
@@ -420,6 +523,7 @@
   function apply(st, on) {
     if (on) {
       rootVar.set(`url("${paper.url}")`);
+      setDropCap(st);
       html.classList.add(CLS.on);
       st.scrollAfter = scrollY;                // the offset an untouched exit returns from
       placePortrait(st);
@@ -473,10 +577,16 @@
     const { signal } = st.ctx;
     if (signal.aborted) return;                // a reset arrived during the transition
     let pending = false;
-    // Re-place the engraving when the layout moves (resize, late content), once per frame.
-    const update = () => { pending = false; if (state === st && html.classList.contains(CLS.on)) placePortrait(st); return false; };
+    // Re-place the engraving, and find the drop cap's paragraph again, when the layout or the
+    // content moves (resize, late markdown, toggled details, demos), once per frame.
+    const update = () => {
+      pending = false;
+      if (state === st && html.classList.contains(CLS.on)) { setDropCap(st); placePortrait(st); }
+      return false;
+    };
     const schedule = () => { if (!pending && !signal.aborted) { pending = true; st.ctx.frame(update); } };
     window.addEventListener('resize', schedule, { passive: true, signal });
+    if (typeof st.ctx.onContentChange === 'function') st.ctx.onContentChange(schedule);
     if ('ResizeObserver' in window) {
       const observer = new ResizeObserver(schedule);
       const main = document.getElementById('main-content');
@@ -485,31 +595,64 @@
     }
   }
 
-  async function enter(ctx) {
-    const st = { ctx, vt: null, portrait: null, scrollBefore: scrollY, scrollAfter: null };
+  // The activation's layers, the page-kind classes and (paper pages) the print matrix.
+  function build(ctx) {
+    const kind = pageKind(ctx);
+    const st = { ctx, kind, vt: null, portrait: null, scrollBefore: scrollY, scrollAfter: null, dropCap: null, dropCapPath: null };
     state = st;
     st.page = ctx.layer('page');
     const fixed = ctx.layer('fixed');
     st.vignette = document.createElement('div'); st.vignette.className = 'lens-acta-vignette';
     st.veil = document.createElement('div'); st.veil.className = 'lens-acta-veil';
     fixed.append(st.vignette, st.veil);
+    if (kind === 'paper') {
+      const ns = 'http://www.w3.org/2000/svg';
+      const defs = document.createElementNS(ns, 'svg');
+      defs.setAttribute('class', 'lens-acta-defs'); defs.setAttribute('width', '0'); defs.setAttribute('height', '0');
+      const filter = document.createElementNS(ns, 'filter');
+      filter.setAttribute('id', PRINT_ID); filter.setAttribute('color-interpolation-filters', 'sRGB');
+      const matrix = document.createElementNS(ns, 'feColorMatrix');
+      matrix.setAttribute('type', 'matrix'); matrix.setAttribute('values', printMatrix());
+      filter.appendChild(matrix); defs.appendChild(filter); st.page.appendChild(defs);
+    }
+    html.classList.add(kind === 'paper' ? CLS.paper : CLS.shell);
+    if (kind === 'home') html.classList.add(CLS.home);
+    return st;
+  }
 
-    // Fonts, paper and engraving first (the latter two in slices while the fonts load):
-    // nothing changes on screen until all three are ready.
-    const making = paper ? Promise.resolve(paper) : makePaper(ctx.signal);
-    const [fonts, made] = await Promise.all([loadFonts(ctx.signal), making, prepareEngraving(ctx.signal)]);
-    if (ctx.signal.aborted || state !== st || !made) return;
+  // Fonts, paper and engraving, the latter two in slices while the fonts load. Nothing
+  // changes on screen until all three are ready. False when the activation was abandoned.
+  async function prepare(st, fontLimit) {
+    const { signal } = st.ctx;
+    const making = paper ? Promise.resolve(paper) : makePaper(signal);
+    const [fonts, made] = await Promise.all([loadFonts(signal, fontLimit), making, prepareEngraving(signal)]);
+    if (signal.aborted || state !== st || !made) return false;
     paper = made;
     if (!fonts) html.classList.add(CLS.fallback);
     try { const probe = new Image(); probe.src = paper.url; await probe.decode(); } catch (error) { /* drawn anyway */ }
-    if (ctx.signal.aborted || state !== st) return;
-
+    if (signal.aborted || state !== st) return false;
     st.vignette.classList.add('is-on');
     st.scrollBefore = scrollY;
     html.classList.add(CLS.hold);
-    if (ctx.motion.matches || document.hidden) apply(st, true);
+    return true;
+  }
+
+  async function enter(ctx) {
+    const st = build(ctx);
+    if (!await prepare(st, FONT_TIMEOUT_MS)) return;
+    if (ctx.motion.matches || document.hidden || ctx.arriving) apply(st, true);
     else await transition(st, true, ctx.signal);
     if (state !== st) return;
+    st.scrollAfter = scrollY;
+    bind(st);
+  }
+
+  // A page opened while the lens is on: the ground is already paper (pre-paint rule), so the
+  // style switches at once, as soon as the fonts and the paper are ready.
+  async function arrive(ctx) {
+    const st = build(ctx);
+    if (!await prepare(st, ARRIVE_FONT_MS)) return;
+    apply(st, true);
     st.scrollAfter = scrollY;
     bind(st);
   }
@@ -522,8 +665,9 @@
       if (ctx.instant || ctx.motion.matches || document.hidden) apply(st, false);
       else await transition(st, false, null);
     }
-    html.classList.remove(CLS.on, CLS.portrait, CLS.vtIn, CLS.vtOut, CLS.fallback);
+    html.classList.remove(CLS.on, CLS.portrait, CLS.vtIn, CLS.vtOut, CLS.fallback, CLS.home, CLS.shell, CLS.paper);
     rootVar.restore();
+    clearDropCap(st);
     unloadFonts();
     st.portrait?.remove();
     // Re-enable scroll anchoring only once the restored layout has been used for a frame.
@@ -539,6 +683,7 @@
     line: 'As it might have been printed when Bernoulli named the spira mirabilis.',
     css: true,
     enter,
+    arrive,
     exit
   });
 })();

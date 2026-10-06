@@ -4,6 +4,7 @@
 
 html.lens-lamplight {
   --ll-ember: #8f5a33;                 /* a link out in the dark: a dim ember */
+  --ll-ember-line: rgba(143, 90, 51, 0.45);   /* ... and the outline of a link drawn as a button */
   --lenses-caption-color: #cfae82;     /* the caption is read in the dark */
 }
 
@@ -111,19 +112,23 @@ html.lens-lamplight-still .lamplight-layer .lamplight-flame { animation: none; }
   .lamplight-layer .lamplight-flame { animation: none; }
 }
 
-/* Links above the night: their own colour under the lamp, a dim ember in the dark. */
-html.lens-lamplight #site-nav a[href],
-html.lens-lamplight #main-content a[href],
-html.lens-lamplight #site-footer a[href] {
+/* Links above the night: their own colour under the lamp, a dim ember in the dark. On a
+   paper page the scope is its header, main and footer. Links around a picture stay under the
+   night (the lamp reads them like the page). */
+html.lens-lamplight :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer)
+  a[href]:not(:has(img, picture, video, canvas)) {
   position: relative;
   z-index: 1002;
   color: color-mix(in oklab, var(--ll-link, currentColor) calc(var(--ll-near, 1) * 100%), var(--ll-ember));
+  background-color: color-mix(in srgb, var(--ll-bg, transparent) calc(var(--ll-near, 1) * 100%), transparent);
+  border-color: color-mix(in srgb, var(--ll-bd, transparent) calc(var(--ll-near, 1) * 100%), var(--ll-ember-line));
   text-shadow: 0 0 6px rgba(255, 128, 48, calc(0.3 * (1 - var(--ll-near, 1))));
   transition: none;
 }
 /* While the links' own colours are read: no transition, so the value is final. */
-html.lens-lamplight-measure #site-nav a[href],
-html.lens-lamplight-measure #main-content a[href],
-html.lens-lamplight-measure #site-footer a[href] { transition: none !important; }
+html.lens-lamplight-measure :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer)
+  a[href] { transition: none !important; }
 /* The skip link is already positioned; it only needs to rise. */
-html.lens-lamplight #site-nav a.skip-link { position: absolute; }
+html.lens-lamplight #site-nav a.skip-link[href] { position: absolute; }
+/* The photography lightbox is a view of its own: it opens above the dark, like a lit print. */
+html.lens-lamplight #lightbox { z-index: 1003; }

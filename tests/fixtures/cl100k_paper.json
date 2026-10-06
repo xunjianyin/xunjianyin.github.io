@@ -1,0 +1,9053 @@
+{
+ "source": "tests/browser_tokens.js on papers/auditing-health-llms.html at 1440x900",
+ "tokenizer": "easter/tokens.js (cl100k_base, ranks from easter/cl100k.txt)",
+ "tokens": 6176,
+ "runs": [
+  {
+   "text": "Xunjian Yin / Research",
+   "ids": [
+    55,
+    70014,
+    1122,
+    83958,
+    611,
+    8483
+   ]
+  },
+  {
+   "text": "Overview",
+   "ids": [
+    42144
+   ]
+  },
+  {
+   "text": "Method",
+   "ids": [
+    3607
+   ]
+  },
+  {
+   "text": "Evidence",
+   "ids": [
+    93702
+   ]
+  },
+  {
+   "text": "Cite",
+   "ids": [
+    34,
+    635
+   ]
+  },
+  {
+   "text": "arXiv preprint 2026",
+   "ids": [
+    277,
+    55,
+    344,
+    864,
+    1374,
+    220,
+    2366,
+    21
+   ]
+  },
+  {
+   "text": "LLM auditing · Consumer health",
+   "ids": [
+    4178,
+    44,
+    93596,
+    9787,
+    26262,
+    2890
+   ]
+  },
+  {
+   "text": "Challenges of Auditing: Variability in Outputs of Large Language Models for Health",
+   "ids": [
+    1163,
+    43470,
+    315,
+    15416,
+    5977,
+    25,
+    28968,
+    2968,
+    304,
+    59514,
+    315,
+    20902,
+    11688,
+    27972,
+    369,
+    6401
+   ]
+  },
+  {
+   "text": "Yuan Pu1, Yewon Chang1, Furong Jia1, Xunjian Yin1, Jessica Ma2,3, Ayman Ali4, Monica Agrawal1,5",
+   "ids": [
+    56,
+    10602,
+    22989,
+    16,
+    11,
+    816,
+    365,
+    263,
+    44472,
+    16,
+    11,
+    50940,
+    647,
+    622,
+    689,
+    16,
+    11,
+    1630,
+    70014,
+    1122,
+    83958,
+    16,
+    11,
+    33467,
+    11583,
+    17,
+    11,
+    18,
+    11,
+    24852,
+    1543,
+    14925,
+    19,
+    11,
+    46844,
+    72808,
+    675,
+    278,
+    16,
+    11,
+    20
+   ]
+  },
+  {
+   "text": "1 Duke University, Department of Computer Science · 2 Duke University, Department of Medicine · 3 Durham VA Health System, Geriatrics and Extended Care · 4 Duke University, Department of Surgery · 5 Duke University, Department of Biostatistics and Bioinformatics",
+   "ids": [
+    16,
+    27453,
+    3907,
+    11,
+    6011,
+    315,
+    17863,
+    10170,
+    9787,
+    220,
+    17,
+    27453,
+    3907,
+    11,
+    6011,
+    315,
+    19152,
+    9787,
+    220,
+    18,
+    58814,
+    21571,
+    6401,
+    744,
+    11,
+    20524,
+    71528,
+    323,
+    41665,
+    10852,
+    9787,
+    220,
+    19,
+    27453,
+    3907,
+    11,
+    6011,
+    315,
+    48190,
+    9787,
+    220,
+    20,
+    27453,
+    3907,
+    11,
+    6011,
+    315,
+    12371,
+    537,
+    266,
+    5706,
+    323,
+    24432,
+    98588
+   ]
+  },
+  {
+   "text": "Paper",
+   "ids": [
+    31998
+   ]
+  },
+  {
+   "text": "↗",
+   "ids": [
+    27017,
+    245
+   ]
+  },
+  {
+   "text": "Code",
+   "ids": [
+    2123
+   ]
+  },
+  {
+   "text": "↗",
+   "ids": [
+    27017,
+    245
+   ]
+  },
+  {
+   "text": "API-based health evaluations may not describe what chatbot users see. With the model version fixed, GPT answers to the same 50 consumer health questions differed between the API and ChatGPT, and several differences reversed between GPT-5.3 and GPT-5.4.",
+   "ids": [
+    7227,
+    6108,
+    2890,
+    56181,
+    1253,
+    539,
+    7664,
+    1148,
+    6369,
+    6465,
+    3932,
+    1518,
+    13,
+    3161,
+    279,
+    1646,
+    2373,
+    8521,
+    11,
+    480,
+    2898,
+    11503,
+    311,
+    279,
+    1890,
+    220,
+    1135,
+    11761,
+    2890,
+    4860,
+    89075,
+    1990,
+    279,
+    5446,
+    323,
+    13149,
+    38,
+    2898,
+    11,
+    323,
+    3892,
+    12062,
+    28537,
+    1990,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    323,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13
+   ]
+  },
+  {
+   "text": "Result",
+   "ids": [
+    2122
+   ]
+  },
+  {
+   "text": "GPT-5.3 answers averaged 377 words through ChatGPT vs 268 through the API and asked for more information in 76.0% vs 54.0% of runs; GPT-5.4 asked less often through ChatGPT (52.0% vs 76.7%).",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    11503,
+    37956,
+    220,
+    10898,
+    4339,
+    1555,
+    13149,
+    38,
+    2898,
+    6296,
+    220,
+    16332,
+    1555,
+    279,
+    5446,
+    323,
+    4691,
+    369,
+    810,
+    2038,
+    304,
+    220,
+    4767,
+    13,
+    15,
+    4,
+    6296,
+    220,
+    4370,
+    13,
+    15,
+    4,
+    315,
+    8640,
+    26,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    4691,
+    2753,
+    3629,
+    1555,
+    13149,
+    38,
+    2898,
+    320,
+    4103,
+    13,
+    15,
+    4,
+    6296,
+    220,
+    4767,
+    13,
+    22,
+    53172
+   ]
+  },
+  {
+   "text": "New vs prior",
+   "ids": [
+    3648,
+    6296,
+    4972
+   ]
+  },
+  {
+   "text": "Health evaluations usually query the API and generalize to the chatbot; this study measures the gap on paired questions, including ChatGPT Health, against run-to-run variation.",
+   "ids": [
+    14884,
+    56181,
+    6118,
+    3319,
+    279,
+    5446,
+    323,
+    93640,
+    311,
+    279,
+    6369,
+    6465,
+    26,
+    420,
+    4007,
+    11193,
+    279,
+    13225,
+    389,
+    35526,
+    4860,
+    11,
+    2737,
+    13149,
+    38,
+    2898,
+    6401,
+    11,
+    2403,
+    1629,
+    4791,
+    23831,
+    23851,
+    13
+   ]
+  },
+  {
+   "text": "Limitation",
+   "ids": [
+    16934,
+    367
+   ]
+  },
+  {
+   "text": "One provider, 50 single-turn questions, and three runs per condition in fresh sessions without memory or connected records; p-values are unadjusted.",
+   "ids": [
+    4054,
+    9287,
+    11,
+    220,
+    1135,
+    3254,
+    65051,
+    4860,
+    11,
+    323,
+    2380,
+    8640,
+    824,
+    3044,
+    304,
+    7878,
+    16079,
+    2085,
+    5044,
+    477,
+    8599,
+    7576,
+    26,
+    281,
+    70150,
+    527,
+    653,
+    88897,
+    13
+   ]
+  },
+  {
+   "text": "Original Figure 2: one consumer health question answered by GPT-5.3 through the API (left) and ChatGPT Health (right), with the authors' annotations. The interface answer is longer and more formatted (312 vs 203 words), names more specific conditions, gives different alternative causes and different reasons to seek urgent care, and ends with follow-up questions. The authors note that the differences in specificity and clinical suggestions were also observed between repeated runs in the same access mode. Full size ↗",
+   "ids": [
+    18902,
+    19575,
+    220,
+    17,
+    25,
+    832,
+    11761,
+    2890,
+    3488,
+    19089,
+    555,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    1555,
+    279,
+    5446,
+    320,
+    2414,
+    8,
+    323,
+    13149,
+    38,
+    2898,
+    6401,
+    320,
+    1315,
+    705,
+    449,
+    279,
+    12283,
+    6,
+    33307,
+    13,
+    578,
+    3834,
+    4320,
+    374,
+    5129,
+    323,
+    810,
+    24001,
+    320,
+    13384,
+    6296,
+    220,
+    9639,
+    4339,
+    705,
+    5144,
+    810,
+    3230,
+    4787,
+    11,
+    6835,
+    2204,
+    10778,
+    11384,
+    323,
+    2204,
+    8125,
+    311,
+    6056,
+    34771,
+    2512,
+    11,
+    323,
+    10548,
+    449,
+    1833,
+    5352,
+    4860,
+    13,
+    578,
+    12283,
+    5296,
+    430,
+    279,
+    12062,
+    304,
+    76041,
+    323,
+    14830,
+    18726,
+    1051,
+    1101,
+    13468,
+    1990,
+    11763,
+    8640,
+    304,
+    279,
+    1890,
+    2680,
+    3941,
+    13,
+    8797,
+    1404,
+    9212,
+    245
+   ]
+  },
+  {
+   "text": "01 / The research question",
+   "ids": [
+    1721,
+    611,
+    578,
+    3495,
+    3488
+   ]
+  },
+  {
+   "text": "An API answer may not be the answer a chatbot user receives",
+   "ids": [
+    2127,
+    5446,
+    4320,
+    1253,
+    539,
+    387,
+    279,
+    4320,
+    264,
+    6369,
+    6465,
+    1217,
+    21879
+   ]
+  },
+  {
+   "text": "People increasingly ask consumer chatbots such as ChatGPT for health advice, and researchers try to check whether those answers are sound. Copying questions into the chatbot interface mirrors consumer use but is hard to scale, especially as models are updated. Most evaluations therefore query the provider's API (application programming interface), which gives programmatic access to the same underlying model, and their findings are then often read as if both routes were one system.",
+   "ids": [
+    16298,
+    15098,
+    2610,
+    11761,
+    6369,
+    63005,
+    1778,
+    439,
+    13149,
+    38,
+    2898,
+    369,
+    2890,
+    9650,
+    11,
+    323,
+    12074,
+    1456,
+    311,
+    1817,
+    3508,
+    1884,
+    11503,
+    527,
+    5222,
+    13,
+    14882,
+    287,
+    4860,
+    1139,
+    279,
+    6369,
+    6465,
+    3834,
+    41585,
+    11761,
+    1005,
+    719,
+    374,
+    2653,
+    311,
+    5569,
+    11,
+    5423,
+    439,
+    4211,
+    527,
+    6177,
+    13,
+    7648,
+    56181,
+    9093,
+    3319,
+    279,
+    9287,
+    596,
+    5446,
+    320,
+    5242,
+    15840,
+    3834,
+    705,
+    902,
+    6835,
+    2068,
+    38344,
+    2680,
+    311,
+    279,
+    1890,
+    16940,
+    1646,
+    11,
+    323,
+    872,
+    14955,
+    527,
+    1243,
+    3629,
+    1373,
+    439,
+    422,
+    2225,
+    11543,
+    1051,
+    832,
+    1887,
+    13
+   ]
+  },
+  {
+   "text": "The two routes are different access systems. Even for the same model version, the consumer product surrounds the model with product-level instructions, conversation context and saved memory, built-in tools and connected data, a product-facing model choice, and provider-managed safeguards, and not all of these are publicly documented. A researcher can configure analogous API settings but cannot fully replicate the consumer environment. ChatGPT Health, a health-specific experience inside ChatGPT, adds health-focused model training, activates automatically when ChatGPT detects a personal health question, and can draw on connected medical records and wellness data; none of these features can be reproduced through the API.",
+   "ids": [
+    791,
+    1403,
+    11543,
+    527,
+    2204,
+    2680,
+    6067,
+    13,
+    7570,
+    369,
+    279,
+    1890,
+    1646,
+    2373,
+    11,
+    279,
+    11761,
+    2027,
+    71374,
+    279,
+    1646,
+    449,
+    2027,
+    11852,
+    11470,
+    11,
+    10652,
+    2317,
+    323,
+    6924,
+    5044,
+    11,
+    5918,
+    3502,
+    7526,
+    323,
+    8599,
+    828,
+    11,
+    264,
+    2027,
+    64406,
+    1646,
+    5873,
+    11,
+    323,
+    9287,
+    21110,
+    3359,
+    78020,
+    11,
+    323,
+    539,
+    682,
+    315,
+    1521,
+    527,
+    17880,
+    27470,
+    13,
+    362,
+    32185,
+    649,
+    14749,
+    79283,
+    5446,
+    5110,
+    719,
+    4250,
+    7373,
+    46113,
+    279,
+    11761,
+    4676,
+    13,
+    13149,
+    38,
+    2898,
+    6401,
+    11,
+    264,
+    2890,
+    19440,
+    3217,
+    4871,
+    13149,
+    38,
+    2898,
+    11,
+    11621,
+    2890,
+    52373,
+    1646,
+    4967,
+    11,
+    75042,
+    9651,
+    994,
+    13149,
+    38,
+    2898,
+    67578,
+    264,
+    4443,
+    2890,
+    3488,
+    11,
+    323,
+    649,
+    4128,
+    389,
+    8599,
+    6593,
+    7576,
+    323,
+    39890,
+    828,
+    26,
+    7000,
+    315,
+    1521,
+    4519,
+    649,
+    387,
+    55717,
+    1555,
+    279,
+    5446,
+    13
+   ]
+  },
+  {
+   "text": "The paper asks a narrow empirical question. With the model version held constant and the available settings matched as closely as possible, do the API and the consumer interfaces answer the same health question differently, and are those differences larger than the variation between repeated runs of the same condition?",
+   "ids": [
+    791,
+    5684,
+    17501,
+    264,
+    15376,
+    46763,
+    3488,
+    13,
+    3161,
+    279,
+    1646,
+    2373,
+    5762,
+    6926,
+    323,
+    279,
+    2561,
+    5110,
+    18545,
+    439,
+    15499,
+    439,
+    3284,
+    11,
+    656,
+    279,
+    5446,
+    323,
+    279,
+    11761,
+    25066,
+    4320,
+    279,
+    1890,
+    2890,
+    3488,
+    22009,
+    11,
+    323,
+    527,
+    1884,
+    12062,
+    8294,
+    1109,
+    279,
+    23851,
+    1990,
+    11763,
+    8640,
+    315,
+    279,
+    1890,
+    3044,
+    30
+   ]
+  },
+  {
+   "text": "Closest prior work",
+   "ids": [
+    8084,
+    267,
+    4972,
+    990
+   ]
+  },
+  {
+   "text": "Work on AI auditing and governance has argued that audit conclusions depend on the form of model access and has called for evaluation across access conditions (Casper et al., 2024; Kembery, 2024). Outside health care, studies have reported differences between ChatGPT-interface and GPT-API outputs in source selection, source diversity, and behavior in disordered or conspiratorial dialogue (Schatto-Eckrodt et al., 2025; Kirgis et al., 2026). This paper compares access modes on consumer health questions, includes ChatGPT Health, and uses repeated runs of each condition as the variability baseline.",
+   "ids": [
+    6919,
+    389,
+    15592,
+    93596,
+    323,
+    35186,
+    706,
+    18784,
+    430,
+    25261,
+    31342,
+    6904,
+    389,
+    279,
+    1376,
+    315,
+    1646,
+    2680,
+    323,
+    706,
+    2663,
+    369,
+    16865,
+    4028,
+    2680,
+    4787,
+    320,
+    34,
+    33361,
+    1880,
+    453,
+    2637,
+    220,
+    2366,
+    19,
+    26,
+    735,
+    1402,
+    88,
+    11,
+    220,
+    2366,
+    19,
+    570,
+    42251,
+    2890,
+    2512,
+    11,
+    7978,
+    617,
+    5068,
+    12062,
+    1990,
+    13149,
+    38,
+    2898,
+    84054,
+    323,
+    480,
+    2898,
+    99873,
+    16674,
+    304,
+    2592,
+    6727,
+    11,
+    2592,
+    20057,
+    11,
+    323,
+    7865,
+    304,
+    834,
+    10767,
+    477,
+    22236,
+    39036,
+    21976,
+    320,
+    50,
+    9884,
+    998,
+    13737,
+    377,
+    299,
+    8207,
+    1880,
+    453,
+    2637,
+    220,
+    2366,
+    20,
+    26,
+    26608,
+    52198,
+    1880,
+    453,
+    2637,
+    220,
+    2366,
+    21,
+    570,
+    1115,
+    5684,
+    43565,
+    2680,
+    20362,
+    389,
+    11761,
+    2890,
+    4860,
+    11,
+    5764,
+    13149,
+    38,
+    2898,
+    6401,
+    11,
+    323,
+    5829,
+    11763,
+    8640,
+    315,
+    1855,
+    3044,
+    439,
+    279,
+    54709,
+    26954,
+    13
+   ]
+  },
+  {
+   "text": "02 / Inside the method",
+   "ids": [
+    2437,
+    611,
+    28468,
+    279,
+    1749
+   ]
+  },
+  {
+   "text": "Hold the question and the model fixed, then vary only the access mode",
+   "ids": [
+    48527,
+    279,
+    3488,
+    323,
+    279,
+    1646,
+    8521,
+    11,
+    1243,
+    13592,
+    1193,
+    279,
+    2680,
+    3941
+   ]
+  },
+  {
+   "text": "The authors sampled 50 patient-authored questions from HealthCareMagic-100k, a corpus of online medical questions, and excluded questions addressed to a doctor so that the sample resembles what people type into a general chatbot. GPT-5.3 Instant, then the default ChatGPT model for all account holders, was queried through the API, standard ChatGPT, and ChatGPT Health. GPT-5.4 Thinking, available to paying subscribers, was queried through the API and ChatGPT with extended thinking and web search enabled. Figure 1 shows which parts of each route a researcher controls.",
+   "ids": [
+    791,
+    12283,
+    49976,
+    220,
+    1135,
+    8893,
+    96471,
+    4860,
+    505,
+    6401,
+    33099,
+    44638,
+    12,
+    1041,
+    74,
+    11,
+    264,
+    43194,
+    315,
+    2930,
+    6593,
+    4860,
+    11,
+    323,
+    28544,
+    4860,
+    20669,
+    311,
+    264,
+    10896,
+    779,
+    430,
+    279,
+    6205,
+    53291,
+    1148,
+    1274,
+    955,
+    1139,
+    264,
+    4689,
+    6369,
+    6465,
+    13,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    18549,
+    11,
+    1243,
+    279,
+    1670,
+    13149,
+    38,
+    2898,
+    1646,
+    369,
+    682,
+    2759,
+    29809,
+    11,
+    574,
+    79002,
+    1555,
+    279,
+    5446,
+    11,
+    5410,
+    13149,
+    38,
+    2898,
+    11,
+    323,
+    13149,
+    38,
+    2898,
+    6401,
+    13,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    53389,
+    11,
+    2561,
+    311,
+    12798,
+    31120,
+    11,
+    574,
+    79002,
+    1555,
+    279,
+    5446,
+    323,
+    13149,
+    38,
+    2898,
+    449,
+    11838,
+    7422,
+    323,
+    3566,
+    2778,
+    9147,
+    13,
+    19575,
+    220,
+    16,
+    5039,
+    902,
+    5596,
+    315,
+    1855,
+    6149,
+    264,
+    32185,
+    11835,
+    13
+   ]
+  },
+  {
+   "text": "Original Figure 1, a conceptual schematic; the authors state that it does not depict OpenAI's internal architecture. All three routes share provider-managed model-level instructions and model behavior and safeguards (grey). Through the API, a researcher sets the instructions, supplied context, tools, and model snapshot (solid outline). ChatGPT adds provider-managed product-level instructions and product-exposed settings (dashed): custom instructions, the current conversation, saved memory, product tools and connected data, and a product-facing model choice. ChatGPT Health adds health-specific data integration and health-specific model behavior and safeguards. Full size ↗",
+   "ids": [
+    18902,
+    19575,
+    220,
+    16,
+    11,
+    264,
+    44901,
+    68144,
+    26,
+    279,
+    12283,
+    1614,
+    430,
+    433,
+    1587,
+    539,
+    43504,
+    5377,
+    15836,
+    596,
+    5419,
+    18112,
+    13,
+    2052,
+    2380,
+    11543,
+    4430,
+    9287,
+    21110,
+    3359,
+    1646,
+    11852,
+    11470,
+    323,
+    1646,
+    7865,
+    323,
+    78020,
+    320,
+    35671,
+    570,
+    17331,
+    279,
+    5446,
+    11,
+    264,
+    32185,
+    7437,
+    279,
+    11470,
+    11,
+    17665,
+    2317,
+    11,
+    7526,
+    11,
+    323,
+    1646,
+    16694,
+    320,
+    32127,
+    21782,
+    570,
+    13149,
+    38,
+    2898,
+    11621,
+    9287,
+    21110,
+    3359,
+    2027,
+    11852,
+    11470,
+    323,
+    2027,
+    10397,
+    3950,
+    5110,
+    320,
+    67,
+    13883,
+    1680,
+    2587,
+    11470,
+    11,
+    279,
+    1510,
+    10652,
+    11,
+    6924,
+    5044,
+    11,
+    2027,
+    7526,
+    323,
+    8599,
+    828,
+    11,
+    323,
+    264,
+    2027,
+    64406,
+    1646,
+    5873,
+    13,
+    13149,
+    38,
+    2898,
+    6401,
+    11621,
+    2890,
+    19440,
+    828,
+    18052,
+    323,
+    2890,
+    19440,
+    1646,
+    7865,
+    323,
+    78020,
+    13,
+    8797,
+    1404,
+    9212,
+    245
+   ]
+  },
+  {
+   "text": "Each question was submitted verbatim as the only input, three times per condition: 600 responses in the primary comparison (April 1–22, 2026) and 126 ChatGPT Health responses (August 4–5, 2026). Interface runs started new conversations in Temporary Chat, which keeps them out of saved memory. Health offered no Temporary Chat, so each Health conversation was deleted after collection, and no records were connected. API runs used an empty system prompt, gpt-5.3-chat-latest without reasoning or tools, gpt-5.4 (snapshot gpt-5.4-2026-03-05) with high reasoning effort and web search, and default settings otherwise. Health activated for 42 of the 50 questions; the other eight concerned another person's health and were excluded from the Health analyses.",
+   "ids": [
+    4959,
+    3488,
+    574,
+    14976,
+    2807,
+    55848,
+    439,
+    279,
+    1193,
+    1988,
+    11,
+    2380,
+    3115,
+    824,
+    3044,
+    25,
+    220,
+    5067,
+    14847,
+    304,
+    279,
+    6156,
+    12593,
+    320,
+    29146,
+    220,
+    16,
+    4235,
+    1313,
+    11,
+    220,
+    2366,
+    21,
+    8,
+    323,
+    220,
+    9390,
+    13149,
+    38,
+    2898,
+    6401,
+    14847,
+    320,
+    32559,
+    220,
+    19,
+    4235,
+    20,
+    11,
+    220,
+    2366,
+    21,
+    570,
+    20620,
+    8640,
+    3940,
+    502,
+    21633,
+    304,
+    55548,
+    13149,
+    11,
+    902,
+    13912,
+    1124,
+    704,
+    315,
+    6924,
+    5044,
+    13,
+    6401,
+    9076,
+    912,
+    55548,
+    13149,
+    11,
+    779,
+    1855,
+    6401,
+    10652,
+    574,
+    11309,
+    1306,
+    4526,
+    11,
+    323,
+    912,
+    7576,
+    1051,
+    8599,
+    13,
+    5446,
+    8640,
+    1511,
+    459,
+    4384,
+    1887,
+    10137,
+    11,
+    342,
+    418,
+    12,
+    20,
+    13,
+    18,
+    61635,
+    2922,
+    14217,
+    2085,
+    33811,
+    477,
+    7526,
+    11,
+    342,
+    418,
+    12,
+    20,
+    13,
+    19,
+    320,
+    36601,
+    342,
+    418,
+    12,
+    20,
+    13,
+    19,
+    12,
+    2366,
+    21,
+    12,
+    2839,
+    12,
+    2304,
+    8,
+    449,
+    1579,
+    33811,
+    5149,
+    323,
+    3566,
+    2778,
+    11,
+    323,
+    1670,
+    5110,
+    6062,
+    13,
+    6401,
+    22756,
+    369,
+    220,
+    2983,
+    315,
+    279,
+    220,
+    1135,
+    4860,
+    26,
+    279,
+    1023,
+    8223,
+    11920,
+    2500,
+    1732,
+    596,
+    2890,
+    323,
+    1051,
+    28544,
+    505,
+    279,
+    6401,
+    29060,
+    13
+   ]
+  },
+  {
+   "text": "Each response was coded on four dimensions. Form: length in words and Flesch–Kincaid grade after removing Markdown, the frequency of headings, list items, and bold or italic spans, and emoji use. Behavior: self-limiting statements (sentences with “I can't” or “I cannot”) and continuation moves, that is, requests for more information and offers to produce more, classified by GPT-5.4. Sources: the webpages and domains that GPT-5.4 cited. Clinical content: additional clinical concepts not raised in the question, extracted by a GPT-5.4 pipeline with clinician-reviewed prompts and a question-specific codebook, and the levels of care named, from self-care to calling 911.",
+   "ids": [
+    4959,
+    2077,
+    574,
+    47773,
+    389,
+    3116,
+    15696,
+    13,
+    3459,
+    25,
+    3160,
+    304,
+    4339,
+    323,
+    435,
+    645,
+    331,
+    4235,
+    68227,
+    936,
+    307,
+    12239,
+    1306,
+    18054,
+    74292,
+    11,
+    279,
+    11900,
+    315,
+    70552,
+    11,
+    1160,
+    3673,
+    11,
+    323,
+    14265,
+    477,
+    61863,
+    45395,
+    11,
+    323,
+    43465,
+    1005,
+    13,
+    27773,
+    25,
+    659,
+    72259,
+    287,
+    12518,
+    320,
+    25526,
+    2436,
+    449,
+    1054,
+    40,
+    649,
+    956,
+    863,
+    477,
+    1054,
+    40,
+    4250,
+    33611,
+    323,
+    42271,
+    11031,
+    11,
+    430,
+    374,
+    11,
+    7540,
+    369,
+    810,
+    2038,
+    323,
+    6209,
+    311,
+    8356,
+    810,
+    11,
+    21771,
+    555,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13,
+    48132,
+    25,
+    279,
+    3566,
+    11014,
+    323,
+    31576,
+    430,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    22628,
+    13,
+    33135,
+    2262,
+    25,
+    5217,
+    14830,
+    19476,
+    539,
+    9408,
+    304,
+    279,
+    3488,
+    11,
+    28532,
+    555,
+    264,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    15660,
+    449,
+    9400,
+    12734,
+    79804,
+    52032,
+    323,
+    264,
+    3488,
+    19440,
+    2082,
+    2239,
+    11,
+    323,
+    279,
+    5990,
+    315,
+    2512,
+    7086,
+    11,
+    505,
+    659,
+    41206,
+    311,
+    8260,
+    220,
+    17000,
+    13
+   ]
+  },
+  {
+   "text": "The question is the unit of analysis. For each question and condition, the three runs are averaged, or turned into the share of runs showing a yes/no feature, and access modes are compared within question with paired Wilcoxon signed-rank tests, separately for each model version. Cited sources and clinical concepts are sets, so they are compared with Jaccard overlap: shared items divided by distinct items. Because repeated runs of one condition already differ, the cross-mode overlap of a question is tested against the mean of its two within-mode overlaps. The explorer below applies this procedure to illustrative citation lists.",
+   "ids": [
+    791,
+    3488,
+    374,
+    279,
+    5089,
+    315,
+    6492,
+    13,
+    1789,
+    1855,
+    3488,
+    323,
+    3044,
+    11,
+    279,
+    2380,
+    8640,
+    527,
+    37956,
+    11,
+    477,
+    6656,
+    1139,
+    279,
+    4430,
+    315,
+    8640,
+    9204,
+    264,
+    10035,
+    34200,
+    4668,
+    11,
+    323,
+    2680,
+    20362,
+    527,
+    7863,
+    2949,
+    3488,
+    449,
+    35526,
+    10785,
+    1030,
+    62585,
+    8667,
+    3880,
+    1201,
+    7177,
+    11,
+    26214,
+    369,
+    1855,
+    1646,
+    2373,
+    13,
+    356,
+    1639,
+    8336,
+    323,
+    14830,
+    19476,
+    527,
+    7437,
+    11,
+    779,
+    814,
+    527,
+    7863,
+    449,
+    622,
+    4575,
+    569,
+    28347,
+    25,
+    6222,
+    3673,
+    18255,
+    555,
+    12742,
+    3673,
+    13,
+    9393,
+    11763,
+    8640,
+    315,
+    832,
+    3044,
+    2736,
+    1782,
+    11,
+    279,
+    5425,
+    15331,
+    28347,
+    315,
+    264,
+    3488,
+    374,
+    12793,
+    2403,
+    279,
+    3152,
+    315,
+    1202,
+    1403,
+    2949,
+    15331,
+    77107,
+    13,
+    578,
+    54067,
+    3770,
+    17208,
+    420,
+    10537,
+    311,
+    12573,
+    1413,
+    45477,
+    11725,
+    13
+   ]
+  },
+  {
+   "text": "01",
+   "ids": [
+    1721
+   ]
+  },
+  {
+   "text": "Fix the question and the model",
+   "ids": [
+    27048,
+    279,
+    3488,
+    323,
+    279,
+    1646
+   ]
+  },
+  {
+   "text": "Fifty patient-authored questions from HealthCareMagic-100k, each submitted verbatim as the only input, in fresh sessions without memory, history, customization, or connected records.",
+   "ids": [
+    37,
+    39724,
+    8893,
+    96471,
+    4860,
+    505,
+    6401,
+    33099,
+    44638,
+    12,
+    1041,
+    74,
+    11,
+    1855,
+    14976,
+    2807,
+    55848,
+    439,
+    279,
+    1193,
+    1988,
+    11,
+    304,
+    7878,
+    16079,
+    2085,
+    5044,
+    11,
+    3925,
+    11,
+    49141,
+    11,
+    477,
+    8599,
+    7576,
+    13
+   ]
+  },
+  {
+   "text": "02",
+   "ids": [
+    2437
+   ]
+  },
+  {
+   "text": "Vary only the access mode",
+   "ids": [
+    53,
+    661,
+    1193,
+    279,
+    2680,
+    3941
+   ]
+  },
+  {
+   "text": "GPT-5.3 Instant through the API, ChatGPT, and ChatGPT Health; GPT-5.4 Thinking with web search through the API and ChatGPT. Three runs per question and condition, 726 responses in total.",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    18549,
+    1555,
+    279,
+    5446,
+    11,
+    13149,
+    38,
+    2898,
+    11,
+    323,
+    13149,
+    38,
+    2898,
+    6401,
+    26,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    53389,
+    449,
+    3566,
+    2778,
+    1555,
+    279,
+    5446,
+    323,
+    13149,
+    38,
+    2898,
+    13,
+    14853,
+    8640,
+    824,
+    3488,
+    323,
+    3044,
+    11,
+    220,
+    24430,
+    14847,
+    304,
+    2860,
+    13
+   ]
+  },
+  {
+   "text": "03",
+   "ids": [
+    2839
+   ]
+  },
+  {
+   "text": "Test against run-to-run variation",
+   "ids": [
+    2323,
+    2403,
+    1629,
+    4791,
+    23831,
+    23851
+   ]
+  },
+  {
+   "text": "Paired Wilcoxon signed-rank tests within question; for cited sources and clinical concepts, cross-mode Jaccard overlap against the overlap among repeated runs in one mode.",
+   "ids": [
+    20908,
+    2757,
+    10785,
+    1030,
+    62585,
+    8667,
+    3880,
+    1201,
+    7177,
+    2949,
+    3488,
+    26,
+    369,
+    22628,
+    8336,
+    323,
+    14830,
+    19476,
+    11,
+    5425,
+    15331,
+    622,
+    4575,
+    569,
+    28347,
+    2403,
+    279,
+    28347,
+    4315,
+    11763,
+    8640,
+    304,
+    832,
+    3941,
+    13
+   ]
+  },
+  {
+   "text": "Section 5.5 procedure · illustrative citation lists",
+   "ids": [
+    9817,
+    220,
+    20,
+    13,
+    20,
+    10537,
+    9787,
+    12573,
+    1413,
+    45477,
+    11725
+   ]
+  },
+  {
+   "text": "When does low overlap point to the access mode?",
+   "ids": [
+    4599,
+    1587,
+    3428,
+    28347,
+    1486,
+    311,
+    279,
+    2680,
+    3941,
+    30
+   ]
+  },
+  {
+   "text": "Each row is one run of the same question and each column a source that a run may cite. The lists are illustrative, not study data. Pick a preset or switch single citations: the page computes the Jaccard overlap of every pair of runs, averages the three pairs inside each mode and the nine pairs across modes, and compares the cross-mode value with the mean of the two within-mode values, as the paper does for each question. Compare the second and third presets: which one has the higher cross-mode overlap, and which one shows an access-mode gap?",
+   "ids": [
+    4959,
+    2872,
+    374,
+    832,
+    1629,
+    315,
+    279,
+    1890,
+    3488,
+    323,
+    1855,
+    3330,
+    264,
+    2592,
+    430,
+    264,
+    1629,
+    1253,
+    39396,
+    13,
+    578,
+    11725,
+    527,
+    12573,
+    1413,
+    11,
+    539,
+    4007,
+    828,
+    13,
+    20305,
+    264,
+    44021,
+    477,
+    3480,
+    3254,
+    52946,
+    25,
+    279,
+    2199,
+    58303,
+    279,
+    622,
+    4575,
+    569,
+    28347,
+    315,
+    1475,
+    6857,
+    315,
+    8640,
+    11,
+    49920,
+    279,
+    2380,
+    13840,
+    4871,
+    1855,
+    3941,
+    323,
+    279,
+    11888,
+    13840,
+    4028,
+    20362,
+    11,
+    323,
+    43565,
+    279,
+    5425,
+    15331,
+    907,
+    449,
+    279,
+    3152,
+    315,
+    279,
+    1403,
+    2949,
+    15331,
+    2819,
+    11,
+    439,
+    279,
+    5684,
+    1587,
+    369,
+    1855,
+    3488,
+    13,
+    24702,
+    279,
+    2132,
+    323,
+    4948,
+    63296,
+    25,
+    902,
+    832,
+    706,
+    279,
+    5190,
+    5425,
+    15331,
+    28347,
+    11,
+    323,
+    902,
+    832,
+    5039,
+    459,
+    2680,
+    15331,
+    13225,
+    30
+   ]
+  },
+  {
+   "text": "Illustrative preset",
+   "ids": [
+    97257,
+    1413,
+    44021
+   ]
+  },
+  {
+   "text": "Each mode favors its own sources",
+   "ids": [
+    4959,
+    3941,
+    54947,
+    1202,
+    1866,
+    8336
+   ]
+  },
+  {
+   "text": "Both modes draw from one pool",
+   "ids": [
+    21279,
+    20362,
+    4128,
+    505,
+    832,
+    7463
+   ]
+  },
+  {
+   "text": "Each mode repeats one list",
+   "ids": [
+    4959,
+    3941,
+    44694,
+    832,
+    1160
+   ]
+  },
+  {
+   "text": "Or switch a single citation in the grid.",
+   "ids": [
+    2244,
+    3480,
+    264,
+    3254,
+    45477,
+    304,
+    279,
+    5950,
+    13
+   ]
+  },
+  {
+   "text": "Sources cited by each run (source labels 1–8)",
+   "ids": [
+    33300,
+    22628,
+    555,
+    1855,
+    1629,
+    320,
+    2484,
+    9382,
+    220,
+    16,
+    4235,
+    23,
+    8
+   ]
+  },
+  {
+   "text": "Run",
+   "ids": [
+    6869
+   ]
+  },
+  {
+   "text": "1",
+   "ids": [
+    16
+   ]
+  },
+  {
+   "text": "2",
+   "ids": [
+    17
+   ]
+  },
+  {
+   "text": "3",
+   "ids": [
+    18
+   ]
+  },
+  {
+   "text": "4",
+   "ids": [
+    19
+   ]
+  },
+  {
+   "text": "5",
+   "ids": [
+    20
+   ]
+  },
+  {
+   "text": "6",
+   "ids": [
+    21
+   ]
+  },
+  {
+   "text": "7",
+   "ids": [
+    22
+   ]
+  },
+  {
+   "text": "8",
+   "ids": [
+    23
+   ]
+  },
+  {
+   "text": "n",
+   "ids": [
+    77
+   ]
+  },
+  {
+   "text": "API 1",
+   "ids": [
+    7227,
+    220,
+    16
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "4",
+   "ids": [
+    19
+   ]
+  },
+  {
+   "text": "API 2",
+   "ids": [
+    7227,
+    220,
+    17
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "4",
+   "ids": [
+    19
+   ]
+  },
+  {
+   "text": "API 3",
+   "ids": [
+    7227,
+    220,
+    18
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "4",
+   "ids": [
+    19
+   ]
+  },
+  {
+   "text": "ChatGPT 1",
+   "ids": [
+    16047,
+    38,
+    2898,
+    220,
+    16
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "4",
+   "ids": [
+    19
+   ]
+  },
+  {
+   "text": "ChatGPT 2",
+   "ids": [
+    16047,
+    38,
+    2898,
+    220,
+    17
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "4",
+   "ids": [
+    19
+   ]
+  },
+  {
+   "text": "ChatGPT 3",
+   "ids": [
+    16047,
+    38,
+    2898,
+    220,
+    18
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "·",
+   "ids": [
+    14260
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "●",
+   "ids": [
+    45048
+   ]
+  },
+  {
+   "text": "4",
+   "ids": [
+    19
+   ]
+  },
+  {
+   "text": "Jaccard overlap of each pair of runs",
+   "ids": [
+    41,
+    4575,
+    569,
+    28347,
+    315,
+    1855,
+    6857,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "API 1",
+   "ids": [
+    7227,
+    220,
+    16
+   ]
+  },
+  {
+   "text": "API 2",
+   "ids": [
+    7227,
+    220,
+    17
+   ]
+  },
+  {
+   "text": "API 3",
+   "ids": [
+    7227,
+    220,
+    18
+   ]
+  },
+  {
+   "text": "ChatGPT 1",
+   "ids": [
+    16047,
+    38,
+    2898,
+    220,
+    16
+   ]
+  },
+  {
+   "text": "ChatGPT 2",
+   "ids": [
+    16047,
+    38,
+    2898,
+    220,
+    17
+   ]
+  },
+  {
+   "text": "API 2",
+   "ids": [
+    7227,
+    220,
+    17
+   ]
+  },
+  {
+   "text": "0.60",
+   "ids": [
+    15,
+    13,
+    1399
+   ]
+  },
+  {
+   "text": "API 3",
+   "ids": [
+    7227,
+    220,
+    18
+   ]
+  },
+  {
+   "text": "0.33",
+   "ids": [
+    15,
+    13,
+    1644
+   ]
+  },
+  {
+   "text": "0.33",
+   "ids": [
+    15,
+    13,
+    1644
+   ]
+  },
+  {
+   "text": "ChatGPT 1",
+   "ids": [
+    16047,
+    38,
+    2898,
+    220,
+    16
+   ]
+  },
+  {
+   "text": "0.33",
+   "ids": [
+    15,
+    13,
+    1644
+   ]
+  },
+  {
+   "text": "0.14",
+   "ids": [
+    15,
+    13,
+    975
+   ]
+  },
+  {
+   "text": "0.33",
+   "ids": [
+    15,
+    13,
+    1644
+   ]
+  },
+  {
+   "text": "ChatGPT 2",
+   "ids": [
+    16047,
+    38,
+    2898,
+    220,
+    17
+   ]
+  },
+  {
+   "text": "0.14",
+   "ids": [
+    15,
+    13,
+    975
+   ]
+  },
+  {
+   "text": "0.14",
+   "ids": [
+    15,
+    13,
+    975
+   ]
+  },
+  {
+   "text": "0.14",
+   "ids": [
+    15,
+    13,
+    975
+   ]
+  },
+  {
+   "text": "0.60",
+   "ids": [
+    15,
+    13,
+    1399
+   ]
+  },
+  {
+   "text": "ChatGPT 3",
+   "ids": [
+    16047,
+    38,
+    2898,
+    220,
+    18
+   ]
+  },
+  {
+   "text": "0.14",
+   "ids": [
+    15,
+    13,
+    975
+   ]
+  },
+  {
+   "text": "0.14",
+   "ids": [
+    15,
+    13,
+    975
+   ]
+  },
+  {
+   "text": "0.33",
+   "ids": [
+    15,
+    13,
+    1644
+   ]
+  },
+  {
+   "text": "0.33",
+   "ids": [
+    15,
+    13,
+    1644
+   ]
+  },
+  {
+   "text": "0.33",
+   "ids": [
+    15,
+    13,
+    1644
+   ]
+  },
+  {
+   "text": "Within a mode",
+   "ids": [
+    43061,
+    264,
+    3941
+   ]
+  },
+  {
+   "text": "Across modes",
+   "ids": [
+    93031,
+    20362
+   ]
+  },
+  {
+   "text": "Shading grows with overlap.",
+   "ids": [
+    2059,
+    2277,
+    28815,
+    449,
+    28347,
+    13
+   ]
+  },
+  {
+   "text": "Within API",
+   "ids": [
+    43061,
+    5446
+   ]
+  },
+  {
+   "text": "mean of 3 pairs",
+   "ids": [
+    14622,
+    315,
+    220,
+    18,
+    13840
+   ]
+  },
+  {
+   "text": "0.422",
+   "ids": [
+    15,
+    13,
+    16460
+   ]
+  },
+  {
+   "text": "Within ChatGPT",
+   "ids": [
+    43061,
+    13149,
+    38,
+    2898
+   ]
+  },
+  {
+   "text": "mean of 3 pairs",
+   "ids": [
+    14622,
+    315,
+    220,
+    18,
+    13840
+   ]
+  },
+  {
+   "text": "0.422",
+   "ids": [
+    15,
+    13,
+    16460
+   ]
+  },
+  {
+   "text": "Within-mode baseline",
+   "ids": [
+    43061,
+    15331,
+    26954
+   ]
+  },
+  {
+   "text": "mean of the two",
+   "ids": [
+    14622,
+    315,
+    279,
+    1403
+   ]
+  },
+  {
+   "text": "0.422",
+   "ids": [
+    15,
+    13,
+    16460
+   ]
+  },
+  {
+   "text": "Cross-mode",
+   "ids": [
+    29601,
+    15331
+   ]
+  },
+  {
+   "text": "mean of 9 pairs",
+   "ids": [
+    14622,
+    315,
+    220,
+    24,
+    13840
+   ]
+  },
+  {
+   "text": "0.206",
+   "ids": [
+    15,
+    13,
+    11056
+   ]
+  },
+  {
+   "text": "Within minus cross",
+   "ids": [
+    43061,
+    28382,
+    5425
+   ]
+  },
+  {
+   "text": "tested across questions",
+   "ids": [
+    76036,
+    4028,
+    4860
+   ]
+  },
+  {
+   "text": "+0.216",
+   "ids": [
+    10,
+    15,
+    13,
+    12463
+   ]
+  },
+  {
+   "text": "Within-mode baseline 0.422, cross-mode 0.206: within minus cross is +0.216. Runs share fewer sources across access modes than between repeated runs in one mode. A gap of this sign, consistent across questions, is what the paper's paired test detects.",
+   "ids": [
+    43061,
+    15331,
+    26954,
+    220,
+    15,
+    13,
+    16460,
+    11,
+    5425,
+    15331,
+    220,
+    15,
+    13,
+    11056,
+    25,
+    2949,
+    28382,
+    5425,
+    374,
+    489,
+    15,
+    13,
+    12463,
+    13,
+    51090,
+    4430,
+    17162,
+    8336,
+    4028,
+    2680,
+    20362,
+    1109,
+    1990,
+    11763,
+    8640,
+    304,
+    832,
+    3941,
+    13,
+    362,
+    13225,
+    315,
+    420,
+    1879,
+    11,
+    13263,
+    4028,
+    4860,
+    11,
+    374,
+    1148,
+    279,
+    5684,
+    596,
+    35526,
+    1296,
+    67578,
+    13
+   ]
+  },
+  {
+   "text": "Measured counterpart (Table A3, GPT-5.4, 50 questions): cited webpages overlap 0.175 within a mode and 0.109 across modes; cited domains 0.389 and 0.298 (both p < 0.001).",
+   "ids": [
+    86455,
+    45116,
+    320,
+    2620,
+    362,
+    18,
+    11,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    11,
+    220,
+    1135,
+    4860,
+    1680,
+    22628,
+    3566,
+    11014,
+    28347,
+    220,
+    15,
+    13,
+    10005,
+    2949,
+    264,
+    3941,
+    323,
+    220,
+    15,
+    13,
+    7743,
+    4028,
+    20362,
+    26,
+    22628,
+    31576,
+    220,
+    15,
+    13,
+    20422,
+    323,
+    220,
+    15,
+    13,
+    17690,
+    320,
+    21704,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    570
+   ]
+  },
+  {
+   "text": "Illustrative: the six citation lists, the eight source labels, and the presets. Computed: the Jaccard overlap (shared ÷ distinct sources) of every pair of runs, the within-mode means over three pairs, the cross-mode mean over nine pairs, and within minus cross, following Section 5.5. A pair of runs that cite nothing has no overlap value and is excluded, as in the paper. The paper computes these values for every question and tests the gap across questions with a paired Wilcoxon signed-rank test; one question cannot be tested.",
+   "ids": [
+    97257,
+    1413,
+    25,
+    279,
+    4848,
+    45477,
+    11725,
+    11,
+    279,
+    8223,
+    2592,
+    9382,
+    11,
+    323,
+    279,
+    63296,
+    13,
+    1219,
+    19849,
+    25,
+    279,
+    622,
+    4575,
+    569,
+    28347,
+    320,
+    6228,
+    1717,
+    115,
+    12742,
+    8336,
+    8,
+    315,
+    1475,
+    6857,
+    315,
+    8640,
+    11,
+    279,
+    2949,
+    15331,
+    3445,
+    927,
+    2380,
+    13840,
+    11,
+    279,
+    5425,
+    15331,
+    3152,
+    927,
+    11888,
+    13840,
+    11,
+    323,
+    2949,
+    28382,
+    5425,
+    11,
+    2768,
+    11360,
+    220,
+    20,
+    13,
+    20,
+    13,
+    362,
+    6857,
+    315,
+    8640,
+    430,
+    39396,
+    4400,
+    706,
+    912,
+    28347,
+    907,
+    323,
+    374,
+    28544,
+    11,
+    439,
+    304,
+    279,
+    5684,
+    13,
+    578,
+    5684,
+    58303,
+    1521,
+    2819,
+    369,
+    1475,
+    3488,
+    323,
+    7177,
+    279,
+    13225,
+    4028,
+    4860,
+    449,
+    264,
+    35526,
+    10785,
+    1030,
+    62585,
+    8667,
+    3880,
+    1201,
+    1296,
+    26,
+    832,
+    3488,
+    4250,
+    387,
+    12793,
+    13
+   ]
+  },
+  {
+   "text": "03 / Reading the evidence",
+   "ids": [
+    2839,
+    611,
+    18242,
+    279,
+    6029
+   ]
+  },
+  {
+   "text": "Form and engagement differ most, and their direction depends on the model version",
+   "ids": [
+    1876,
+    323,
+    20392,
+    1782,
+    1455,
+    11,
+    323,
+    872,
+    5216,
+    14117,
+    389,
+    279,
+    1646,
+    2373
+   ]
+  },
+  {
+   "text": "+22.0 / −24.7 pp",
+   "ids": [
+    10,
+    1313,
+    13,
+    15,
+    611,
+    25173,
+    1187,
+    13,
+    22,
+    12086
+   ]
+  },
+  {
+   "text": "Requests for more information, ChatGPT minus API",
+   "ids": [
+    36395,
+    369,
+    810,
+    2038,
+    11,
+    13149,
+    38,
+    2898,
+    28382,
+    5446
+   ]
+  },
+  {
+   "text": "GPT-5.3: 76.0% vs 54.0% of runs; GPT-5.4: 52.0% vs 76.7% (both p < 0.001, 50 questions, Table A2). Readability and formatting density reverse between the versions in the same way.",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    25,
+    220,
+    4767,
+    13,
+    15,
+    4,
+    6296,
+    220,
+    4370,
+    13,
+    15,
+    4,
+    315,
+    8640,
+    26,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    25,
+    220,
+    4103,
+    13,
+    15,
+    4,
+    6296,
+    220,
+    4767,
+    13,
+    22,
+    4,
+    320,
+    21704,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    11,
+    220,
+    1135,
+    4860,
+    11,
+    6771,
+    362,
+    17,
+    570,
+    4557,
+    2968,
+    323,
+    37666,
+    17915,
+    10134,
+    1990,
+    279,
+    11028,
+    304,
+    279,
+    1890,
+    1648,
+    13
+   ]
+  },
+  {
+   "text": "0.109 vs 0.175",
+   "ids": [
+    15,
+    13,
+    7743,
+    6296,
+    220,
+    15,
+    13,
+    10005
+   ]
+  },
+  {
+   "text": "Cited-webpage overlap across vs within modes",
+   "ids": [
+    34,
+    1639,
+    30531,
+    2964,
+    28347,
+    4028,
+    6296,
+    2949,
+    20362
+   ]
+  },
+  {
+   "text": "Mean Jaccard overlap between GPT-5.4 API and ChatGPT runs, against repeated runs in one mode (p < 0.001, 50 questions, Table A3). Clinical concepts varied less: 0.615 vs 0.653 for GPT-5.3 ChatGPT vs API.",
+   "ids": [
+    19312,
+    622,
+    4575,
+    569,
+    28347,
+    1990,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    5446,
+    323,
+    13149,
+    38,
+    2898,
+    8640,
+    11,
+    2403,
+    11763,
+    8640,
+    304,
+    832,
+    3941,
+    320,
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    11,
+    220,
+    1135,
+    4860,
+    11,
+    6771,
+    362,
+    18,
+    570,
+    33135,
+    19476,
+    28830,
+    2753,
+    25,
+    220,
+    15,
+    13,
+    21385,
+    6296,
+    220,
+    15,
+    13,
+    21598,
+    369,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898,
+    6296,
+    5446,
+    13
+   ]
+  },
+  {
+   "text": "Measured · Tables A1–A3",
+   "ids": [
+    86455,
+    9787,
+    43252,
+    362,
+    16,
+    4235,
+    32,
+    18
+   ]
+  },
+  {
+   "text": "Which access-mode differences hold, and which flip between model versions?",
+   "ids": [
+    23956,
+    2680,
+    15331,
+    12062,
+    3412,
+    11,
+    323,
+    902,
+    18791,
+    1990,
+    1646,
+    11028,
+    30
+   ]
+  },
+  {
+   "text": "Each cell is a paired difference printed in Table A2: the first-named mode minus the second, averaged over questions, with its unadjusted Wilcoxon p-value. Choose the cut-off used to mark a difference, and select a measure to see its per-mode means from Table A1. The column 5.3 → 5.4 compares the ChatGPT-vs-API difference in GPT-5.3 with the one in GPT-5.4; the last two columns compare ChatGPT Health with the API and with standard ChatGPT.",
+   "ids": [
+    4959,
+    2849,
+    374,
+    264,
+    35526,
+    6811,
+    17124,
+    304,
+    6771,
+    362,
+    17,
+    25,
+    279,
+    1176,
+    5392,
+    3690,
+    3941,
+    28382,
+    279,
+    2132,
+    11,
+    37956,
+    927,
+    4860,
+    11,
+    449,
+    1202,
+    653,
+    88897,
+    10785,
+    1030,
+    62585,
+    281,
+    19625,
+    13,
+    22991,
+    279,
+    4018,
+    12744,
+    1511,
+    311,
+    1906,
+    264,
+    6811,
+    11,
+    323,
+    3373,
+    264,
+    6767,
+    311,
+    1518,
+    1202,
+    824,
+    15331,
+    3445,
+    505,
+    6771,
+    362,
+    16,
+    13,
+    578,
+    3330,
+    220,
+    20,
+    13,
+    18,
+    11651,
+    220,
+    20,
+    13,
+    19,
+    43565,
+    279,
+    13149,
+    38,
+    2898,
+    98974,
+    99873,
+    6811,
+    304,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    449,
+    279,
+    832,
+    304,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    26,
+    279,
+    1566,
+    1403,
+    8310,
+    9616,
+    13149,
+    38,
+    2898,
+    6401,
+    449,
+    279,
+    5446,
+    323,
+    449,
+    5410,
+    13149,
+    38,
+    2898,
+    13
+   ]
+  },
+  {
+   "text": "Mark a difference when its unadjusted p is below",
+   "ids": [
+    9126,
+    264,
+    6811,
+    994,
+    1202,
+    653,
+    88897,
+    281,
+    374,
+    3770
+   ]
+  },
+  {
+   "text": "p < 0.05",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    2304
+   ]
+  },
+  {
+   "text": "p < 0.01",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    1721
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Select a measure in the table to see its per-mode means.",
+   "ids": [
+    3461,
+    264,
+    6767,
+    304,
+    279,
+    2007,
+    311,
+    1518,
+    1202,
+    824,
+    15331,
+    3445,
+    13
+   ]
+  },
+  {
+   "text": "With p < 0.05 as the cut-off, 12 of 15 tested measures differ for GPT-5.3 ChatGPT vs API, 11 of 15 for GPT-5.3 Health vs API, 5 of 11 for GPT-5.3 Health vs ChatGPT, and 13 of 17 for GPT-5.4 ChatGPT vs API. Of the 10 measures that pass in both versions' ChatGPT-vs-API contrasts, 9 change direction between GPT-5.3 and GPT-5.4; only length (words, counting the GPT-5.4 interface preamble) keeps its direction.",
+   "ids": [
+    2409,
+    281,
+    366,
+    220,
+    15,
+    13,
+    2304,
+    439,
+    279,
+    4018,
+    12744,
+    11,
+    220,
+    717,
+    315,
+    220,
+    868,
+    12793,
+    11193,
+    1782,
+    369,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898,
+    6296,
+    5446,
+    11,
+    220,
+    806,
+    315,
+    220,
+    868,
+    369,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    6401,
+    6296,
+    5446,
+    11,
+    220,
+    20,
+    315,
+    220,
+    806,
+    369,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    6401,
+    6296,
+    13149,
+    38,
+    2898,
+    11,
+    323,
+    220,
+    1032,
+    315,
+    220,
+    1114,
+    369,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    6296,
+    5446,
+    13,
+    5046,
+    279,
+    220,
+    605,
+    11193,
+    430,
+    1522,
+    304,
+    2225,
+    11028,
+    6,
+    13149,
+    38,
+    2898,
+    98974,
+    99873,
+    83379,
+    11,
+    220,
+    24,
+    2349,
+    5216,
+    1990,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    323,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    26,
+    1193,
+    3160,
+    320,
+    5880,
+    11,
+    26060,
+    279,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    3834,
+    90554,
+    8,
+    13912,
+    1202,
+    5216,
+    13
+   ]
+  },
+  {
+   "text": "Measure",
+   "ids": [
+    33336
+   ]
+  },
+  {
+   "text": "ChatGPT vs API",
+   "ids": [
+    16047,
+    38,
+    2898,
+    6296,
+    5446
+   ]
+  },
+  {
+   "text": "ChatGPT Health, GPT-5.3",
+   "ids": [
+    16047,
+    38,
+    2898,
+    6401,
+    11,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "GPT-5.3",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "GPT-5.4",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    19
+   ]
+  },
+  {
+   "text": "5.3 → 5.4",
+   "ids": [
+    20,
+    13,
+    18,
+    11651,
+    220,
+    20,
+    13,
+    19
+   ]
+  },
+  {
+   "text": "vs API",
+   "ids": [
+    11823,
+    5446
+   ]
+  },
+  {
+   "text": "vs ChatGPT",
+   "ids": [
+    11823,
+    13149,
+    38,
+    2898
+   ]
+  },
+  {
+   "text": "Response form",
+   "ids": [
+    2647,
+    1376
+   ]
+  },
+  {
+   "text": "Length",
+   "ids": [
+    4472
+   ]
+  },
+  {
+   "text": "words",
+   "ids": [
+    5880
+   ]
+  },
+  {
+   "text": "+109",
+   "ids": [
+    10,
+    7743
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "+26",
+   "ids": [
+    10,
+    1627
+   ]
+  },
+  {
+   "text": "p = 0.003",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    6268
+   ]
+  },
+  {
+   "text": "Same",
+   "ids": [
+    19749
+   ]
+  },
+  {
+   "text": "+103",
+   "ids": [
+    10,
+    6889
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−8",
+   "ids": [
+    34363,
+    23
+   ]
+  },
+  {
+   "text": "p = 0.132",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    9413
+   ]
+  },
+  {
+   "text": "Length without preamble",
+   "ids": [
+    4472,
+    2085,
+    90554
+   ]
+  },
+  {
+   "text": "words",
+   "ids": [
+    5880
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "−45",
+   "ids": [
+    34363,
+    1774
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "Readability",
+   "ids": [
+    4518,
+    2968
+   ]
+  },
+  {
+   "text": "FK grade",
+   "ids": [
+    28096,
+    12239
+   ]
+  },
+  {
+   "text": "−0.89",
+   "ids": [
+    34363,
+    15,
+    13,
+    4578
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "+0.90",
+   "ids": [
+    10,
+    15,
+    13,
+    1954
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Reverses",
+   "ids": [
+    697,
+    3078,
+    288
+   ]
+  },
+  {
+   "text": "−1.38",
+   "ids": [
+    34363,
+    16,
+    13,
+    1987
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−0.54",
+   "ids": [
+    34363,
+    15,
+    13,
+    4370
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Section headings",
+   "ids": [
+    9817,
+    70552
+   ]
+  },
+  {
+   "text": "any, % of runs",
+   "ids": [
+    3852,
+    11,
+    1034,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "+7.3",
+   "ids": [
+    10,
+    22,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p = 0.004",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    8759
+   ]
+  },
+  {
+   "text": "−43.3",
+   "ids": [
+    34363,
+    3391,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Reverses",
+   "ids": [
+    697,
+    3078,
+    288
+   ]
+  },
+  {
+   "text": "+7.9",
+   "ids": [
+    10,
+    22,
+    13,
+    24
+   ]
+  },
+  {
+   "text": "p = 0.008",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    11436
+   ]
+  },
+  {
+   "text": "n.t.",
+   "ids": [
+    77,
+    739,
+    13
+   ]
+  },
+  {
+   "text": "Section headings",
+   "ids": [
+    9817,
+    70552
+   ]
+  },
+  {
+   "text": "n/100 words",
+   "ids": [
+    77,
+    14,
+    1041,
+    4339
+   ]
+  },
+  {
+   "text": "+1.56",
+   "ids": [
+    10,
+    16,
+    13,
+    3487
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−0.19",
+   "ids": [
+    34363,
+    15,
+    13,
+    777
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Reverses",
+   "ids": [
+    697,
+    3078,
+    288
+   ]
+  },
+  {
+   "text": "+1.82",
+   "ids": [
+    10,
+    16,
+    13,
+    6086
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "+0.28",
+   "ids": [
+    10,
+    15,
+    13,
+    1591
+   ]
+  },
+  {
+   "text": "p = 0.024",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    19592
+   ]
+  },
+  {
+   "text": "List items",
+   "ids": [
+    861,
+    3673
+   ]
+  },
+  {
+   "text": "any, % of runs",
+   "ids": [
+    3852,
+    11,
+    1034,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "+1.3",
+   "ids": [
+    10,
+    16,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p = 0.500",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    2636
+   ]
+  },
+  {
+   "text": "−48.0",
+   "ids": [
+    34363,
+    2166,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "5.4 only",
+   "ids": [
+    20,
+    13,
+    19,
+    1193
+   ]
+  },
+  {
+   "text": "+1.6",
+   "ids": [
+    10,
+    16,
+    13,
+    21
+   ]
+  },
+  {
+   "text": "p = 0.500",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    2636
+   ]
+  },
+  {
+   "text": "n.t.",
+   "ids": [
+    77,
+    739,
+    13
+   ]
+  },
+  {
+   "text": "List items",
+   "ids": [
+    861,
+    3673
+   ]
+  },
+  {
+   "text": "n/100 words",
+   "ids": [
+    77,
+    14,
+    1041,
+    4339
+   ]
+  },
+  {
+   "text": "+2.29",
+   "ids": [
+    10,
+    17,
+    13,
+    1682
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−1.25",
+   "ids": [
+    34363,
+    16,
+    13,
+    914
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Reverses",
+   "ids": [
+    697,
+    3078,
+    288
+   ]
+  },
+  {
+   "text": "+2.69",
+   "ids": [
+    10,
+    17,
+    13,
+    3076
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "+0.39",
+   "ids": [
+    10,
+    15,
+    13,
+    2137
+   ]
+  },
+  {
+   "text": "p = 0.060",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    15101
+   ]
+  },
+  {
+   "text": "Bold/italic spans",
+   "ids": [
+    43900,
+    14,
+    35506,
+    45395
+   ]
+  },
+  {
+   "text": "any, % of runs",
+   "ids": [
+    3852,
+    11,
+    1034,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "+57.3",
+   "ids": [
+    10,
+    3226,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−0.7",
+   "ids": [
+    34363,
+    15,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "p = 1.000",
+   "ids": [
+    79,
+    284,
+    220,
+    16,
+    13,
+    931
+   ]
+  },
+  {
+   "text": "5.3 only",
+   "ids": [
+    20,
+    13,
+    18,
+    1193
+   ]
+  },
+  {
+   "text": "+57.1",
+   "ids": [
+    10,
+    3226,
+    13,
+    16
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "n.t.",
+   "ids": [
+    77,
+    739,
+    13
+   ]
+  },
+  {
+   "text": "Bold/italic spans",
+   "ids": [
+    43900,
+    14,
+    35506,
+    45395
+   ]
+  },
+  {
+   "text": "n/100 words",
+   "ids": [
+    77,
+    14,
+    1041,
+    4339
+   ]
+  },
+  {
+   "text": "+2.93",
+   "ids": [
+    10,
+    17,
+    13,
+    6365
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−2.09",
+   "ids": [
+    34363,
+    17,
+    13,
+    2545
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Reverses",
+   "ids": [
+    697,
+    3078,
+    288
+   ]
+  },
+  {
+   "text": "+3.03",
+   "ids": [
+    10,
+    18,
+    13,
+    2839
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "+0.20",
+   "ids": [
+    10,
+    15,
+    13,
+    508
+   ]
+  },
+  {
+   "text": "p = 0.171",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    11123
+   ]
+  },
+  {
+   "text": "Emoji",
+   "ids": [
+    93831
+   ]
+  },
+  {
+   "text": "any, % of runs",
+   "ids": [
+    3852,
+    11,
+    1034,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "+36.0",
+   "ids": [
+    10,
+    1927,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "n.t.",
+   "ids": [
+    77,
+    739,
+    13
+   ]
+  },
+  {
+   "text": "5.3 only",
+   "ids": [
+    20,
+    13,
+    18,
+    1193
+   ]
+  },
+  {
+   "text": "+28.6",
+   "ids": [
+    10,
+    1591,
+    13,
+    21
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−6.3",
+   "ids": [
+    34363,
+    21,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p = 0.336",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    17014
+   ]
+  },
+  {
+   "text": "Referenced sources",
+   "ids": [
+    48547,
+    5886,
+    8336
+   ]
+  },
+  {
+   "text": "Webpages referenced",
+   "ids": [
+    6109,
+    11014,
+    25819
+   ]
+  },
+  {
+   "text": "n",
+   "ids": [
+    77
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "−0.27",
+   "ids": [
+    34363,
+    15,
+    13,
+    1544
+   ]
+  },
+  {
+   "text": "p = 0.109",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    7743
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "Domains referenced",
+   "ids": [
+    75813,
+    25819
+   ]
+  },
+  {
+   "text": "n",
+   "ids": [
+    77
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "−0.04",
+   "ids": [
+    34363,
+    15,
+    13,
+    2371
+   ]
+  },
+  {
+   "text": "p = 0.820",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    18248
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "—",
+   "ids": [
+    2345
+   ]
+  },
+  {
+   "text": "Response behavior",
+   "ids": [
+    2647,
+    7865
+   ]
+  },
+  {
+   "text": "Disclaimer",
+   "ids": [
+    52125
+   ]
+  },
+  {
+   "text": "any, % of runs",
+   "ids": [
+    3852,
+    11,
+    1034,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "−4.0",
+   "ids": [
+    34363,
+    19,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "p = 0.391",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    19631
+   ]
+  },
+  {
+   "text": "−17.3",
+   "ids": [
+    34363,
+    1114,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "5.4 only",
+   "ids": [
+    20,
+    13,
+    19,
+    1193
+   ]
+  },
+  {
+   "text": "−10.3",
+   "ids": [
+    34363,
+    605,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p = 0.047",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    24970
+   ]
+  },
+  {
+   "text": "−4.8",
+   "ids": [
+    34363,
+    19,
+    13,
+    23
+   ]
+  },
+  {
+   "text": "p = 0.250",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    5154
+   ]
+  },
+  {
+   "text": "Asks for information",
+   "ids": [
+    2170,
+    2857,
+    369,
+    2038
+   ]
+  },
+  {
+   "text": "% of runs",
+   "ids": [
+    4,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "+22.0",
+   "ids": [
+    10,
+    1313,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−24.7",
+   "ids": [
+    34363,
+    1187,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Reverses",
+   "ids": [
+    697,
+    3078,
+    288
+   ]
+  },
+  {
+   "text": "+31.0",
+   "ids": [
+    10,
+    2148,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "+11.1",
+   "ids": [
+    10,
+    806,
+    13,
+    16
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Offers to produce more",
+   "ids": [
+    96609,
+    311,
+    8356,
+    810
+   ]
+  },
+  {
+   "text": "% of runs",
+   "ids": [
+    4,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "+11.3",
+   "ids": [
+    10,
+    806,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p = 0.014",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    15901
+   ]
+  },
+  {
+   "text": "−7.3",
+   "ids": [
+    34363,
+    22,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p = 0.046",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    24222
+   ]
+  },
+  {
+   "text": "Reverses",
+   "ids": [
+    697,
+    3078,
+    288
+   ]
+  },
+  {
+   "text": "−0.8",
+   "ids": [
+    34363,
+    15,
+    13,
+    23
+   ]
+  },
+  {
+   "text": "p = 0.861",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    24963
+   ]
+  },
+  {
+   "text": "−10.3",
+   "ids": [
+    34363,
+    605,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p = 0.043",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    17776
+   ]
+  },
+  {
+   "text": "Any continuation move",
+   "ids": [
+    8780,
+    42271,
+    3351
+   ]
+  },
+  {
+   "text": "% of runs",
+   "ids": [
+    4,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "+27.3",
+   "ids": [
+    10,
+    1544,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−31.3",
+   "ids": [
+    34363,
+    2148,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Reverses",
+   "ids": [
+    697,
+    3078,
+    288
+   ]
+  },
+  {
+   "text": "+23.8",
+   "ids": [
+    10,
+    1419,
+    13,
+    23
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "n.t.",
+   "ids": [
+    77,
+    739,
+    13
+   ]
+  },
+  {
+   "text": "Clinical content",
+   "ids": [
+    96830,
+    2262
+   ]
+  },
+  {
+   "text": "Additional clinical concepts",
+   "ids": [
+    30119,
+    14830,
+    19476
+   ]
+  },
+  {
+   "text": "n",
+   "ids": [
+    77
+   ]
+  },
+  {
+   "text": "+0.73",
+   "ids": [
+    10,
+    15,
+    13,
+    5958
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "−0.73",
+   "ids": [
+    34363,
+    15,
+    13,
+    5958
+   ]
+  },
+  {
+   "text": "p = 0.005",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    8504
+   ]
+  },
+  {
+   "text": "Reverses",
+   "ids": [
+    697,
+    3078,
+    288
+   ]
+  },
+  {
+   "text": "+0.09",
+   "ids": [
+    10,
+    15,
+    13,
+    2545
+   ]
+  },
+  {
+   "text": "p = 0.900",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    7467
+   ]
+  },
+  {
+   "text": "−0.56",
+   "ids": [
+    34363,
+    15,
+    13,
+    3487
+   ]
+  },
+  {
+   "text": "p < 0.001",
+   "ids": [
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Named levels of care",
+   "ids": [
+    16187,
+    5990,
+    315,
+    2512
+   ]
+  },
+  {
+   "text": "n",
+   "ids": [
+    77
+   ]
+  },
+  {
+   "text": "−0.23",
+   "ids": [
+    34363,
+    15,
+    13,
+    1419
+   ]
+  },
+  {
+   "text": "p = 0.213",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    11702
+   ]
+  },
+  {
+   "text": "−0.11",
+   "ids": [
+    34363,
+    15,
+    13,
+    806
+   ]
+  },
+  {
+   "text": "p = 0.627",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    23103
+   ]
+  },
+  {
+   "text": "Neither",
+   "ids": [
+    63295
+   ]
+  },
+  {
+   "text": "−0.29",
+   "ids": [
+    34363,
+    15,
+    13,
+    1682
+   ]
+  },
+  {
+   "text": "p = 0.333",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    8765
+   ]
+  },
+  {
+   "text": "+0.05",
+   "ids": [
+    10,
+    15,
+    13,
+    2304
+   ]
+  },
+  {
+   "text": "p = 0.693",
+   "ids": [
+    79,
+    284,
+    220,
+    15,
+    13,
+    25298
+   ]
+  },
+  {
+   "text": "First-named mode higher",
+   "ids": [
+    5451,
+    5392,
+    3690,
+    3941,
+    5190
+   ]
+  },
+  {
+   "text": "First-named mode lower",
+   "ids": [
+    5451,
+    5392,
+    3690,
+    3941,
+    4827
+   ]
+  },
+  {
+   "text": "Not below the cut-off",
+   "ids": [
+    2688,
+    3770,
+    279,
+    4018,
+    12744
+   ]
+  },
+  {
+   "text": "n.t. not tested · — not in the design",
+   "ids": [
+    77,
+    739,
+    13,
+    539,
+    12793,
+    9787,
+    2001,
+    539,
+    304,
+    279,
+    2955
+   ]
+  },
+  {
+   "text": "Asks for information % of runs",
+   "ids": [
+    2170,
+    2857,
+    369,
+    2038,
+    1034,
+    315,
+    8640
+   ]
+  },
+  {
+   "text": "Questions or prompts for additional case details; classified by GPT-5.4.",
+   "ids": [
+    36349,
+    477,
+    52032,
+    369,
+    5217,
+    1162,
+    3649,
+    26,
+    21771,
+    555,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13
+   ]
+  },
+  {
+   "text": "Mean (SD) over questions, Table A1. API and ChatGPT: 50 questions; Health: 42.",
+   "ids": [
+    19312,
+    320,
+    5608,
+    8,
+    927,
+    4860,
+    11,
+    6771,
+    362,
+    16,
+    13,
+    5446,
+    323,
+    13149,
+    38,
+    2898,
+    25,
+    220,
+    1135,
+    4860,
+    26,
+    6401,
+    25,
+    220,
+    2983,
+    13
+   ]
+  },
+  {
+   "text": "GPT-5.3 API",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    5446
+   ]
+  },
+  {
+   "text": "54.0 (35.6)",
+   "ids": [
+    4370,
+    13,
+    15,
+    320,
+    1758,
+    13,
+    21,
+    8
+   ]
+  },
+  {
+   "text": "GPT-5.3 ChatGPT",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898
+   ]
+  },
+  {
+   "text": "76.0 (33.0)",
+   "ids": [
+    4767,
+    13,
+    15,
+    320,
+    1644,
+    13,
+    15,
+    8
+   ]
+  },
+  {
+   "text": "GPT-5.3 Health",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    6401
+   ]
+  },
+  {
+   "text": "91.3 (22.2)",
+   "ids": [
+    5925,
+    13,
+    18,
+    320,
+    1313,
+    13,
+    17,
+    8
+   ]
+  },
+  {
+   "text": "GPT-5.4 API",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    5446
+   ]
+  },
+  {
+   "text": "76.7 (33.8)",
+   "ids": [
+    4767,
+    13,
+    22,
+    320,
+    1644,
+    13,
+    23,
+    8
+   ]
+  },
+  {
+   "text": "GPT-5.4 ChatGPT",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898
+   ]
+  },
+  {
+   "text": "52.0 (37.0)",
+   "ids": [
+    4103,
+    13,
+    15,
+    320,
+    1806,
+    13,
+    15,
+    8
+   ]
+  },
+  {
+   "text": "GPT-5.3 ChatGPT vs API: +22.0 pp, p < 0.001; ChatGPT asks for information in more runs. GPT-5.3 ChatGPT Health vs API: +31.0 pp, p < 0.001; ChatGPT Health asks for information in more runs. GPT-5.3 ChatGPT Health vs ChatGPT: +11.1 pp, p < 0.001; ChatGPT Health asks for information in more runs. GPT-5.4 ChatGPT vs API: −24.7 pp, p < 0.001; ChatGPT asks for information in fewer runs. The ChatGPT-vs-API difference reverses direction from GPT-5.3 to GPT-5.4.",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898,
+    6296,
+    5446,
+    25,
+    489,
+    1313,
+    13,
+    15,
+    12086,
+    11,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    26,
+    13149,
+    38,
+    2898,
+    17501,
+    369,
+    2038,
+    304,
+    810,
+    8640,
+    13,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898,
+    6401,
+    6296,
+    5446,
+    25,
+    489,
+    2148,
+    13,
+    15,
+    12086,
+    11,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    26,
+    13149,
+    38,
+    2898,
+    6401,
+    17501,
+    369,
+    2038,
+    304,
+    810,
+    8640,
+    13,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898,
+    6401,
+    6296,
+    13149,
+    38,
+    2898,
+    25,
+    489,
+    806,
+    13,
+    16,
+    12086,
+    11,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    26,
+    13149,
+    38,
+    2898,
+    6401,
+    17501,
+    369,
+    2038,
+    304,
+    810,
+    8640,
+    13,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    6296,
+    5446,
+    25,
+    25173,
+    1187,
+    13,
+    22,
+    12086,
+    11,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    26,
+    13149,
+    38,
+    2898,
+    17501,
+    369,
+    2038,
+    304,
+    17162,
+    8640,
+    13,
+    578,
+    13149,
+    38,
+    2898,
+    98974,
+    99873,
+    6811,
+    17888,
+    288,
+    5216,
+    505,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    311,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13
+   ]
+  },
+  {
+   "text": "Within- versus cross-mode overlap Table A3, mean Jaccard overlap per question",
+   "ids": [
+    43061,
+    12,
+    19579,
+    5425,
+    15331,
+    28347,
+    6771,
+    362,
+    18,
+    11,
+    3152,
+    622,
+    4575,
+    569,
+    28347,
+    824,
+    3488
+   ]
+  },
+  {
+   "text": "Set compared",
+   "ids": [
+    1681,
+    7863
+   ]
+  },
+  {
+   "text": "0 to 1",
+   "ids": [
+    15,
+    311,
+    220,
+    16
+   ]
+  },
+  {
+   "text": "Within",
+   "ids": [
+    43061
+   ]
+  },
+  {
+   "text": "Cross",
+   "ids": [
+    29601
+   ]
+  },
+  {
+   "text": "Δ",
+   "ids": [
+    138,
+    242
+   ]
+  },
+  {
+   "text": "p",
+   "ids": [
+    79
+   ]
+  },
+  {
+   "text": "Cited webpages",
+   "ids": [
+    34,
+    1639,
+    3566,
+    11014
+   ]
+  },
+  {
+   "text": "GPT-5.4 ChatGPT/API · n = 50",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    73130,
+    9787,
+    308,
+    284,
+    220,
+    1135
+   ]
+  },
+  {
+   "text": "0.175",
+   "ids": [
+    15,
+    13,
+    10005
+   ]
+  },
+  {
+   "text": "0.109",
+   "ids": [
+    15,
+    13,
+    7743
+   ]
+  },
+  {
+   "text": "+0.066",
+   "ids": [
+    10,
+    15,
+    13,
+    23835
+   ]
+  },
+  {
+   "text": "<0.001",
+   "ids": [
+    27,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Cited domains",
+   "ids": [
+    34,
+    1639,
+    31576
+   ]
+  },
+  {
+   "text": "GPT-5.4 ChatGPT/API · n = 50",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    73130,
+    9787,
+    308,
+    284,
+    220,
+    1135
+   ]
+  },
+  {
+   "text": "0.389",
+   "ids": [
+    15,
+    13,
+    20422
+   ]
+  },
+  {
+   "text": "0.298",
+   "ids": [
+    15,
+    13,
+    17690
+   ]
+  },
+  {
+   "text": "+0.091",
+   "ids": [
+    10,
+    15,
+    13,
+    24443
+   ]
+  },
+  {
+   "text": "<0.001",
+   "ids": [
+    27,
+    15,
+    13,
+    4119
+   ]
+  },
+  {
+   "text": "Additional clinical concepts",
+   "ids": [
+    30119,
+    14830,
+    19476
+   ]
+  },
+  {
+   "text": "GPT-5.3 ChatGPT/API · n = 49",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898,
+    73130,
+    9787,
+    308,
+    284,
+    220,
+    2491
+   ]
+  },
+  {
+   "text": "0.653",
+   "ids": [
+    15,
+    13,
+    21598
+   ]
+  },
+  {
+   "text": "0.615",
+   "ids": [
+    15,
+    13,
+    21385
+   ]
+  },
+  {
+   "text": "+0.038",
+   "ids": [
+    10,
+    15,
+    13,
+    24462
+   ]
+  },
+  {
+   "text": "0.012",
+   "ids": [
+    15,
+    13,
+    11531
+   ]
+  },
+  {
+   "text": "Additional clinical concepts",
+   "ids": [
+    30119,
+    14830,
+    19476
+   ]
+  },
+  {
+   "text": "GPT-5.3 Health/API · n = 41",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    6401,
+    73130,
+    9787,
+    308,
+    284,
+    220,
+    3174
+   ]
+  },
+  {
+   "text": "0.662",
+   "ids": [
+    15,
+    13,
+    24199
+   ]
+  },
+  {
+   "text": "0.614",
+   "ids": [
+    15,
+    13,
+    22638
+   ]
+  },
+  {
+   "text": "+0.048",
+   "ids": [
+    10,
+    15,
+    13,
+    23904
+   ]
+  },
+  {
+   "text": "0.002",
+   "ids": [
+    15,
+    13,
+    6726
+   ]
+  },
+  {
+   "text": "Additional clinical concepts",
+   "ids": [
+    30119,
+    14830,
+    19476
+   ]
+  },
+  {
+   "text": "GPT-5.3 Health/ChatGPT · n = 41",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    6401,
+    14,
+    16047,
+    38,
+    2898,
+    9787,
+    308,
+    284,
+    220,
+    3174
+   ]
+  },
+  {
+   "text": "0.654",
+   "ids": [
+    15,
+    13,
+    21969
+   ]
+  },
+  {
+   "text": "0.645",
+   "ids": [
+    15,
+    13,
+    22926
+   ]
+  },
+  {
+   "text": "+0.010",
+   "ids": [
+    10,
+    15,
+    13,
+    7755
+   ]
+  },
+  {
+   "text": "0.617",
+   "ids": [
+    15,
+    13,
+    21717
+   ]
+  },
+  {
+   "text": "Additional clinical concepts",
+   "ids": [
+    30119,
+    14830,
+    19476
+   ]
+  },
+  {
+   "text": "GPT-5.4 ChatGPT/API · n = 49",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    73130,
+    9787,
+    308,
+    284,
+    220,
+    2491
+   ]
+  },
+  {
+   "text": "0.619",
+   "ids": [
+    15,
+    13,
+    23388
+   ]
+  },
+  {
+   "text": "0.586",
+   "ids": [
+    15,
+    13,
+    22345
+   ]
+  },
+  {
+   "text": "+0.033",
+   "ids": [
+    10,
+    15,
+    13,
+    13103
+   ]
+  },
+  {
+   "text": "0.013",
+   "ids": [
+    15,
+    13,
+    16368
+   ]
+  },
+  {
+   "text": "Named levels of care",
+   "ids": [
+    16187,
+    5990,
+    315,
+    2512
+   ]
+  },
+  {
+   "text": "GPT-5.3 ChatGPT/API · n = 47",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898,
+    73130,
+    9787,
+    308,
+    284,
+    220,
+    2618
+   ]
+  },
+  {
+   "text": "0.696",
+   "ids": [
+    15,
+    13,
+    23578
+   ]
+  },
+  {
+   "text": "0.664",
+   "ids": [
+    15,
+    13,
+    23888
+   ]
+  },
+  {
+   "text": "+0.032",
+   "ids": [
+    10,
+    15,
+    13,
+    21040
+   ]
+  },
+  {
+   "text": "0.342",
+   "ids": [
+    15,
+    13,
+    17590
+   ]
+  },
+  {
+   "text": "Named levels of care",
+   "ids": [
+    16187,
+    5990,
+    315,
+    2512
+   ]
+  },
+  {
+   "text": "GPT-5.3 Health/API · n = 40",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    6401,
+    73130,
+    9787,
+    308,
+    284,
+    220,
+    1272
+   ]
+  },
+  {
+   "text": "0.727",
+   "ids": [
+    15,
+    13,
+    23486
+   ]
+  },
+  {
+   "text": "0.710",
+   "ids": [
+    15,
+    13,
+    19027
+   ]
+  },
+  {
+   "text": "+0.017",
+   "ids": [
+    10,
+    15,
+    13,
+    17248
+   ]
+  },
+  {
+   "text": "0.734",
+   "ids": [
+    15,
+    13,
+    24438
+   ]
+  },
+  {
+   "text": "Named levels of care",
+   "ids": [
+    16187,
+    5990,
+    315,
+    2512
+   ]
+  },
+  {
+   "text": "GPT-5.3 Health/ChatGPT · n = 40",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    6401,
+    14,
+    16047,
+    38,
+    2898,
+    9787,
+    308,
+    284,
+    220,
+    1272
+   ]
+  },
+  {
+   "text": "0.723",
+   "ids": [
+    15,
+    13,
+    24388
+   ]
+  },
+  {
+   "text": "0.681",
+   "ids": [
+    15,
+    13,
+    25091
+   ]
+  },
+  {
+   "text": "+0.042",
+   "ids": [
+    10,
+    15,
+    13,
+    22349
+   ]
+  },
+  {
+   "text": "0.067",
+   "ids": [
+    15,
+    13,
+    27309
+   ]
+  },
+  {
+   "text": "Named levels of care",
+   "ids": [
+    16187,
+    5990,
+    315,
+    2512
+   ]
+  },
+  {
+   "text": "GPT-5.4 ChatGPT/API · n = 48",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    73130,
+    9787,
+    308,
+    284,
+    220,
+    2166
+   ]
+  },
+  {
+   "text": "0.740",
+   "ids": [
+    15,
+    13,
+    21112
+   ]
+  },
+  {
+   "text": "0.714",
+   "ids": [
+    15,
+    13,
+    23193
+   ]
+  },
+  {
+   "text": "+0.026",
+   "ids": [
+    10,
+    15,
+    13,
+    21641
+   ]
+  },
+  {
+   "text": "0.313",
+   "ids": [
+    15,
+    13,
+    15231
+   ]
+  },
+  {
+   "text": "Within mode",
+   "ids": [
+    43061,
+    3941
+   ]
+  },
+  {
+   "text": "Across modes",
+   "ids": [
+    93031,
+    20362
+   ]
+  },
+  {
+   "text": "Δ is within minus cross.",
+   "ids": [
+    138,
+    242,
+    374,
+    2949,
+    28382,
+    5425,
+    13
+   ]
+  },
+  {
+   "text": "At p < 0.05, cross-mode overlap is below the within-mode baseline in 5 of 10 comparisons: cited webpages, GPT-5.4 ChatGPT/API; cited domains, GPT-5.4 ChatGPT/API; additional clinical concepts, GPT-5.3 ChatGPT/API; additional clinical concepts, GPT-5.3 Health/API; additional clinical concepts, GPT-5.4 ChatGPT/API. All printed gaps are positive (within minus cross from +0.010 to +0.091).",
+   "ids": [
+    1688,
+    281,
+    366,
+    220,
+    15,
+    13,
+    2304,
+    11,
+    5425,
+    15331,
+    28347,
+    374,
+    3770,
+    279,
+    2949,
+    15331,
+    26954,
+    304,
+    220,
+    20,
+    315,
+    220,
+    605,
+    36595,
+    25,
+    22628,
+    3566,
+    11014,
+    11,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    73130,
+    26,
+    22628,
+    31576,
+    11,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    73130,
+    26,
+    5217,
+    14830,
+    19476,
+    11,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898,
+    73130,
+    26,
+    5217,
+    14830,
+    19476,
+    11,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    6401,
+    73130,
+    26,
+    5217,
+    14830,
+    19476,
+    11,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    73130,
+    13,
+    2052,
+    17124,
+    33251,
+    527,
+    6928,
+    320,
+    56950,
+    28382,
+    5425,
+    505,
+    489,
+    15,
+    13,
+    7755,
+    311,
+    489,
+    15,
+    13,
+    24443,
+    570
+   ]
+  },
+  {
+   "text": "Measured: differences and p-values from Table A2 (two-sided paired Wilcoxon signed-rank tests, unadjusted; Δ in percentage points for percentage measures), means and standard deviations from Table A1, and overlaps from Table A3, all copied as printed. Contrasts involving ChatGPT Health use the 42 questions on which Health activated, so their Δ need not equal the difference between column means. n.t.: not tested because fewer than two questions had a nonzero paired difference; —: not part of the design. Computed on this page: the marking at the chosen cut-off, the counts, and the comparison of directions between versions. The cut-off changes only the marking; it is not a multiple-comparison correction. Bars start at zero; percentage measures use a 0–100% scale, other measures the largest mean in the row.",
+   "ids": [
+    86455,
+    25,
+    12062,
+    323,
+    281,
+    70150,
+    505,
+    6771,
+    362,
+    17,
+    320,
+    20375,
+    50858,
+    35526,
+    10785,
+    1030,
+    62585,
+    8667,
+    3880,
+    1201,
+    7177,
+    11,
+    653,
+    88897,
+    26,
+    82263,
+    304,
+    11668,
+    3585,
+    369,
+    11668,
+    11193,
+    705,
+    3445,
+    323,
+    5410,
+    86365,
+    505,
+    6771,
+    362,
+    16,
+    11,
+    323,
+    77107,
+    505,
+    6771,
+    362,
+    18,
+    11,
+    682,
+    22523,
+    439,
+    17124,
+    13,
+    35341,
+    12019,
+    16239,
+    13149,
+    38,
+    2898,
+    6401,
+    1005,
+    279,
+    220,
+    2983,
+    4860,
+    389,
+    902,
+    6401,
+    22756,
+    11,
+    779,
+    872,
+    82263,
+    1205,
+    539,
+    6273,
+    279,
+    6811,
+    1990,
+    3330,
+    3445,
+    13,
+    308,
+    739,
+    18976,
+    539,
+    12793,
+    1606,
+    17162,
+    1109,
+    1403,
+    4860,
+    1047,
+    264,
+    73332,
+    35526,
+    6811,
+    26,
+    2001,
+    25,
+    539,
+    961,
+    315,
+    279,
+    2955,
+    13,
+    1219,
+    19849,
+    389,
+    420,
+    2199,
+    25,
+    279,
+    36024,
+    520,
+    279,
+    12146,
+    4018,
+    12744,
+    11,
+    279,
+    14921,
+    11,
+    323,
+    279,
+    12593,
+    315,
+    18445,
+    1990,
+    11028,
+    13,
+    578,
+    4018,
+    12744,
+    4442,
+    1193,
+    279,
+    36024,
+    26,
+    433,
+    374,
+    539,
+    264,
+    5361,
+    11733,
+    36642,
+    27358,
+    13,
+    57206,
+    1212,
+    520,
+    7315,
+    26,
+    11668,
+    11193,
+    1005,
+    264,
+    220,
+    15,
+    4235,
+    1041,
+    4,
+    5569,
+    11,
+    1023,
+    11193,
+    279,
+    7928,
+    3152,
+    304,
+    279,
+    2872,
+    13
+   ]
+  },
+  {
+   "text": "In GPT-5.3, both interface modes gave longer answers than the API (377 and 373 vs 268 words), with lower Flesch–Kincaid grades, denser headings, lists, and emphasis, and emoji in 36.7% and 28.6% of runs versus 0.7% (all p < 0.001 for these contrasts). They also invited further interaction more often: a continuation move appeared in 98.0% and 100.0% of runs versus 70.7% through the API, mainly as requests for more information.",
+   "ids": [
+    644,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    11,
+    2225,
+    3834,
+    20362,
+    6688,
+    5129,
+    11503,
+    1109,
+    279,
+    5446,
+    320,
+    10898,
+    323,
+    220,
+    18017,
+    6296,
+    220,
+    16332,
+    4339,
+    705,
+    449,
+    4827,
+    435,
+    645,
+    331,
+    4235,
+    68227,
+    936,
+    307,
+    28711,
+    11,
+    39950,
+    261,
+    70552,
+    11,
+    11725,
+    11,
+    323,
+    25679,
+    11,
+    323,
+    43465,
+    304,
+    220,
+    1927,
+    13,
+    22,
+    4,
+    323,
+    220,
+    1591,
+    13,
+    21,
+    4,
+    315,
+    8640,
+    19579,
+    220,
+    15,
+    13,
+    22,
+    4,
+    320,
+    543,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    369,
+    1521,
+    83379,
+    570,
+    2435,
+    1101,
+    18719,
+    4726,
+    16628,
+    810,
+    3629,
+    25,
+    264,
+    42271,
+    3351,
+    9922,
+    304,
+    220,
+    3264,
+    13,
+    15,
+    4,
+    323,
+    220,
+    1041,
+    13,
+    15,
+    4,
+    315,
+    8640,
+    19579,
+    220,
+    2031,
+    13,
+    22,
+    4,
+    1555,
+    279,
+    5446,
+    11,
+    14918,
+    439,
+    7540,
+    369,
+    810,
+    2038,
+    13
+   ]
+  },
+  {
+   "text": "In GPT-5.4, most of these differences reversed. Interface answers were harder to read (grade 11.8 vs 10.9), less densely formatted, and less likely to ask for more information (52.0% vs 76.7% of runs) or to make any continuation move (67.3% vs 98.7%). They were still longer (451 vs 425 words), but that difference depends on the preamble the interface shows before the answer: without it, interface answers were 45 words shorter on average (380 vs 425; p < 0.001, Table A2). The authors conclude that access-mode effects are not stable across model versions.",
+   "ids": [
+    644,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    11,
+    1455,
+    315,
+    1521,
+    12062,
+    28537,
+    13,
+    20620,
+    11503,
+    1051,
+    16127,
+    311,
+    1373,
+    320,
+    7082,
+    220,
+    806,
+    13,
+    23,
+    6296,
+    220,
+    605,
+    13,
+    24,
+    705,
+    2753,
+    97617,
+    24001,
+    11,
+    323,
+    2753,
+    4461,
+    311,
+    2610,
+    369,
+    810,
+    2038,
+    320,
+    4103,
+    13,
+    15,
+    4,
+    6296,
+    220,
+    4767,
+    13,
+    22,
+    4,
+    315,
+    8640,
+    8,
+    477,
+    311,
+    1304,
+    904,
+    42271,
+    3351,
+    320,
+    3080,
+    13,
+    18,
+    4,
+    6296,
+    220,
+    3264,
+    13,
+    22,
+    53172,
+    2435,
+    1051,
+    2103,
+    5129,
+    320,
+    20360,
+    6296,
+    220,
+    17837,
+    4339,
+    705,
+    719,
+    430,
+    6811,
+    14117,
+    389,
+    279,
+    90554,
+    279,
+    3834,
+    5039,
+    1603,
+    279,
+    4320,
+    25,
+    2085,
+    433,
+    11,
+    3834,
+    11503,
+    1051,
+    220,
+    1774,
+    4339,
+    24210,
+    389,
+    5578,
+    320,
+    13897,
+    6296,
+    220,
+    17837,
+    26,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    11,
+    6771,
+    362,
+    17,
+    570,
+    578,
+    12283,
+    32194,
+    430,
+    2680,
+    15331,
+    6372,
+    527,
+    539,
+    15528,
+    4028,
+    1646,
+    11028,
+    13
+   ]
+  },
+  {
+   "text": "ChatGPT Health broadly resembled standard ChatGPT. On the 42 matched questions it was easier to read (−0.54 grade levels, p < 0.001) and asked for more information more often (+11.1 pp, p < 0.001), and it used self-limiting statements least (0.8% of runs). Clinical content varied less than form. Cross-mode overlap of additional clinical concepts was 0.03–0.05 below the within-mode baseline in the three comparisons with the API (p ≤ 0.013), whereas Health and standard ChatGPT overlapped as much as repeated runs did (0.645 vs 0.654, p = 0.617). Named levels of care showed no significant cross-mode drop in any pair. The number of additional concepts differed modestly: 6.7 vs 5.9 for GPT-5.3 ChatGPT vs API (p < 0.001), and 6.7 vs 7.4 for GPT-5.4 (p = 0.005).",
+   "ids": [
+    16047,
+    38,
+    2898,
+    6401,
+    44029,
+    96858,
+    5410,
+    13149,
+    38,
+    2898,
+    13,
+    1952,
+    279,
+    220,
+    2983,
+    18545,
+    4860,
+    433,
+    574,
+    8831,
+    311,
+    1373,
+    320,
+    34363,
+    15,
+    13,
+    4370,
+    12239,
+    5990,
+    11,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    8,
+    323,
+    4691,
+    369,
+    810,
+    2038,
+    810,
+    3629,
+    18457,
+    806,
+    13,
+    16,
+    12086,
+    11,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    705,
+    323,
+    433,
+    1511,
+    659,
+    72259,
+    287,
+    12518,
+    3325,
+    320,
+    15,
+    13,
+    23,
+    4,
+    315,
+    8640,
+    570,
+    33135,
+    2262,
+    28830,
+    2753,
+    1109,
+    1376,
+    13,
+    11511,
+    15331,
+    28347,
+    315,
+    5217,
+    14830,
+    19476,
+    574,
+    220,
+    15,
+    13,
+    2839,
+    4235,
+    15,
+    13,
+    2304,
+    3770,
+    279,
+    2949,
+    15331,
+    26954,
+    304,
+    279,
+    2380,
+    36595,
+    449,
+    279,
+    5446,
+    320,
+    79,
+    38394,
+    220,
+    15,
+    13,
+    16368,
+    705,
+    20444,
+    6401,
+    323,
+    5410,
+    13149,
+    38,
+    2898,
+    29204,
+    5795,
+    439,
+    1790,
+    439,
+    11763,
+    8640,
+    1550,
+    320,
+    15,
+    13,
+    22926,
+    6296,
+    220,
+    15,
+    13,
+    21969,
+    11,
+    281,
+    284,
+    220,
+    15,
+    13,
+    21717,
+    570,
+    41559,
+    5990,
+    315,
+    2512,
+    8710,
+    912,
+    5199,
+    5425,
+    15331,
+    6068,
+    304,
+    904,
+    6857,
+    13,
+    578,
+    1396,
+    315,
+    5217,
+    19476,
+    89075,
+    27946,
+    398,
+    25,
+    220,
+    21,
+    13,
+    22,
+    6296,
+    220,
+    20,
+    13,
+    24,
+    369,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898,
+    6296,
+    5446,
+    320,
+    79,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    705,
+    323,
+    220,
+    21,
+    13,
+    22,
+    6296,
+    220,
+    22,
+    13,
+    19,
+    369,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    320,
+    79,
+    284,
+    220,
+    15,
+    13,
+    8504,
+    570
+   ]
+  },
+  {
+   "text": "Cited sources varied most, even within a mode. Repeated GPT-5.4 runs in the same mode shared only about 17–18% of cited webpages and 39% of domains; across modes the overlap fell to 10.9% and 29.8% (both p < 0.001), although both modes cited similar numbers of webpages (4.7 vs 4.4) and domains (3.2 each).",
+   "ids": [
+    34,
+    1639,
+    8336,
+    28830,
+    1455,
+    11,
+    1524,
+    2949,
+    264,
+    3941,
+    13,
+    1050,
+    43054,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    8640,
+    304,
+    279,
+    1890,
+    3941,
+    6222,
+    1193,
+    922,
+    220,
+    1114,
+    4235,
+    972,
+    4,
+    315,
+    22628,
+    3566,
+    11014,
+    323,
+    220,
+    2137,
+    4,
+    315,
+    31576,
+    26,
+    4028,
+    20362,
+    279,
+    28347,
+    11299,
+    311,
+    220,
+    605,
+    13,
+    24,
+    4,
+    323,
+    220,
+    1682,
+    13,
+    23,
+    4,
+    320,
+    21704,
+    281,
+    366,
+    220,
+    15,
+    13,
+    4119,
+    705,
+    8051,
+    2225,
+    20362,
+    22628,
+    4528,
+    5219,
+    315,
+    3566,
+    11014,
+    320,
+    19,
+    13,
+    22,
+    6296,
+    220,
+    19,
+    13,
+    19,
+    8,
+    323,
+    31576,
+    320,
+    18,
+    13,
+    17,
+    1855,
+    570
+   ]
+  },
+  {
+   "text": "These results come from deliberately controlled conditions: single-turn questions without memory, history, customization, or connected records. The authors argue that these features could widen the gap in routine use, and that regulators should require developers of consumer-facing health AI to give researchers scalable, reproducible access to consumer deployment pathways; both are arguments rather than results of this study. All p-values are unadjusted, and no measure grades whether an answer is clinically correct.",
+   "ids": [
+    9673,
+    3135,
+    2586,
+    505,
+    36192,
+    14400,
+    4787,
+    25,
+    3254,
+    65051,
+    4860,
+    2085,
+    5044,
+    11,
+    3925,
+    11,
+    49141,
+    11,
+    477,
+    8599,
+    7576,
+    13,
+    578,
+    12283,
+    18046,
+    430,
+    1521,
+    4519,
+    1436,
+    94415,
+    279,
+    13225,
+    304,
+    14348,
+    1005,
+    11,
+    323,
+    430,
+    40242,
+    1288,
+    1397,
+    13707,
+    315,
+    11761,
+    64406,
+    2890,
+    15592,
+    311,
+    3041,
+    12074,
+    69311,
+    11,
+    53823,
+    79385,
+    2680,
+    311,
+    11761,
+    24047,
+    44014,
+    26,
+    2225,
+    527,
+    6105,
+    4856,
+    1109,
+    3135,
+    315,
+    420,
+    4007,
+    13,
+    2052,
+    281,
+    70150,
+    527,
+    653,
+    88897,
+    11,
+    323,
+    912,
+    6767,
+    28711,
+    3508,
+    459,
+    4320,
+    374,
+    70432,
+    4495,
+    13
+   ]
+  },
+  {
+   "text": "Table 1 (10 of 13 rows). Mean over questions of question-level values by access mode: the three runs of each question are averaged within mode, and percentage rows give the share of runs showing the feature. API and ChatGPT columns cover 50 questions; ChatGPT Health covers the 42 on which it activated. FK grade is the Flesch–Kincaid grade level (lower is easier to read). Disclaimer counts only self-limiting “I can't” or “I cannot” sentences. GPT-5.4 ChatGPT length includes the interface's pre-answer preamble (380 words without it, Table A1). Omitted: the sample-size row and the GPT-5.4-only counts of cited webpages (API 4.7, ChatGPT 4.4) and domains (3.2 and 3.2). Source ↗",
+   "ids": [
+    2620,
+    220,
+    16,
+    320,
+    605,
+    315,
+    220,
+    1032,
+    7123,
+    570,
+    16729,
+    927,
+    4860,
+    315,
+    3488,
+    11852,
+    2819,
+    555,
+    2680,
+    3941,
+    25,
+    279,
+    2380,
+    8640,
+    315,
+    1855,
+    3488,
+    527,
+    37956,
+    2949,
+    3941,
+    11,
+    323,
+    11668,
+    7123,
+    3041,
+    279,
+    4430,
+    315,
+    8640,
+    9204,
+    279,
+    4668,
+    13,
+    5446,
+    323,
+    13149,
+    38,
+    2898,
+    8310,
+    3504,
+    220,
+    1135,
+    4860,
+    26,
+    13149,
+    38,
+    2898,
+    6401,
+    14861,
+    279,
+    220,
+    2983,
+    389,
+    902,
+    433,
+    22756,
+    13,
+    85346,
+    12239,
+    374,
+    279,
+    435,
+    645,
+    331,
+    4235,
+    68227,
+    936,
+    307,
+    12239,
+    2237,
+    320,
+    15115,
+    374,
+    8831,
+    311,
+    1373,
+    570,
+    67929,
+    14921,
+    1193,
+    659,
+    72259,
+    287,
+    1054,
+    40,
+    649,
+    956,
+    863,
+    477,
+    1054,
+    40,
+    4250,
+    863,
+    23719,
+    13,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898,
+    3160,
+    5764,
+    279,
+    3834,
+    596,
+    864,
+    96877,
+    90554,
+    320,
+    13897,
+    4339,
+    2085,
+    433,
+    11,
+    6771,
+    362,
+    16,
+    570,
+    507,
+    5600,
+    25,
+    279,
+    6205,
+    7321,
+    2872,
+    323,
+    279,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    15744,
+    14921,
+    315,
+    22628,
+    3566,
+    11014,
+    320,
+    7227,
+    220,
+    19,
+    13,
+    22,
+    11,
+    13149,
+    38,
+    2898,
+    220,
+    19,
+    13,
+    19,
+    8,
+    323,
+    31576,
+    320,
+    18,
+    13,
+    17,
+    323,
+    220,
+    18,
+    13,
+    17,
+    570,
+    8922,
+    9212,
+    245
+   ]
+  },
+  {
+   "text": "Feature (measure)",
+   "ids": [
+    14180,
+    320,
+    48899,
+    8
+   ]
+  },
+  {
+   "text": "GPT-5.3 API",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    5446
+   ]
+  },
+  {
+   "text": "GPT-5.3 ChatGPT",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    13149,
+    38,
+    2898
+   ]
+  },
+  {
+   "text": "GPT-5.3 Health",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    6401
+   ]
+  },
+  {
+   "text": "GPT-5.4 API",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    5446
+   ]
+  },
+  {
+   "text": "GPT-5.4 ChatGPT",
+   "ids": [
+    38,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    13149,
+    38,
+    2898
+   ]
+  },
+  {
+   "text": "Length (words)",
+   "ids": [
+    4472,
+    320,
+    5880,
+    8
+   ]
+  },
+  {
+   "text": "268",
+   "ids": [
+    16332
+   ]
+  },
+  {
+   "text": "377",
+   "ids": [
+    10898
+   ]
+  },
+  {
+   "text": "373",
+   "ids": [
+    18017
+   ]
+  },
+  {
+   "text": "425",
+   "ids": [
+    17837
+   ]
+  },
+  {
+   "text": "451",
+   "ids": [
+    20360
+   ]
+  },
+  {
+   "text": "Readability (FK grade)",
+   "ids": [
+    4518,
+    2968,
+    320,
+    28096,
+    12239,
+    8
+   ]
+  },
+  {
+   "text": "8.9",
+   "ids": [
+    23,
+    13,
+    24
+   ]
+  },
+  {
+   "text": "8.0",
+   "ids": [
+    23,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "7.4",
+   "ids": [
+    22,
+    13,
+    19
+   ]
+  },
+  {
+   "text": "10.9",
+   "ids": [
+    605,
+    13,
+    24
+   ]
+  },
+  {
+   "text": "11.8",
+   "ids": [
+    806,
+    13,
+    23
+   ]
+  },
+  {
+   "text": "Section headings (n/100 words)",
+   "ids": [
+    9817,
+    70552,
+    320,
+    77,
+    14,
+    1041,
+    4339,
+    8
+   ]
+  },
+  {
+   "text": "0.9",
+   "ids": [
+    15,
+    13,
+    24
+   ]
+  },
+  {
+   "text": "2.5",
+   "ids": [
+    17,
+    13,
+    20
+   ]
+  },
+  {
+   "text": "2.7",
+   "ids": [
+    17,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "0.3",
+   "ids": [
+    15,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "0.1",
+   "ids": [
+    15,
+    13,
+    16
+   ]
+  },
+  {
+   "text": "List items (n/100 words)",
+   "ids": [
+    861,
+    3673,
+    320,
+    77,
+    14,
+    1041,
+    4339,
+    8
+   ]
+  },
+  {
+   "text": "4.1",
+   "ids": [
+    19,
+    13,
+    16
+   ]
+  },
+  {
+   "text": "6.4",
+   "ids": [
+    21,
+    13,
+    19
+   ]
+  },
+  {
+   "text": "6.6",
+   "ids": [
+    21,
+    13,
+    21
+   ]
+  },
+  {
+   "text": "1.7",
+   "ids": [
+    16,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "0.4",
+   "ids": [
+    15,
+    13,
+    19
+   ]
+  },
+  {
+   "text": "Bold/italic spans (n/100 words)",
+   "ids": [
+    43900,
+    14,
+    35506,
+    45395,
+    320,
+    77,
+    14,
+    1041,
+    4339,
+    8
+   ]
+  },
+  {
+   "text": "0.9",
+   "ids": [
+    15,
+    13,
+    24
+   ]
+  },
+  {
+   "text": "3.9",
+   "ids": [
+    18,
+    13,
+    24
+   ]
+  },
+  {
+   "text": "4.0",
+   "ids": [
+    19,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "6.8",
+   "ids": [
+    21,
+    13,
+    23
+   ]
+  },
+  {
+   "text": "4.8",
+   "ids": [
+    19,
+    13,
+    23
+   ]
+  },
+  {
+   "text": "Any emoji (% of runs)",
+   "ids": [
+    8780,
+    43465,
+    13764,
+    315,
+    8640,
+    8
+   ]
+  },
+  {
+   "text": "0.7",
+   "ids": [
+    15,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "36.7",
+   "ids": [
+    1927,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "28.6",
+   "ids": [
+    1591,
+    13,
+    21
+   ]
+  },
+  {
+   "text": "0.0",
+   "ids": [
+    15,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "0.0",
+   "ids": [
+    15,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "Any disclaimer (% of runs)",
+   "ids": [
+    8780,
+    18141,
+    13764,
+    315,
+    8640,
+    8
+   ]
+  },
+  {
+   "text": "10.0",
+   "ids": [
+    605,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "6.0",
+   "ids": [
+    21,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "0.8",
+   "ids": [
+    15,
+    13,
+    23
+   ]
+  },
+  {
+   "text": "42.0",
+   "ids": [
+    2983,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "24.7",
+   "ids": [
+    1187,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "Asks for information (% of runs)",
+   "ids": [
+    2170,
+    2857,
+    369,
+    2038,
+    13764,
+    315,
+    8640,
+    8
+   ]
+  },
+  {
+   "text": "54.0",
+   "ids": [
+    4370,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "76.0",
+   "ids": [
+    4767,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "91.3",
+   "ids": [
+    5925,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "76.7",
+   "ids": [
+    4767,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "52.0",
+   "ids": [
+    4103,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "Offers to produce more (% of runs)",
+   "ids": [
+    96609,
+    311,
+    8356,
+    810,
+    13764,
+    315,
+    8640,
+    8
+   ]
+  },
+  {
+   "text": "24.0",
+   "ids": [
+    1187,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "35.3",
+   "ids": [
+    1758,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "23.8",
+   "ids": [
+    1419,
+    13,
+    23
+   ]
+  },
+  {
+   "text": "26.7",
+   "ids": [
+    1627,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "19.3",
+   "ids": [
+    777,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "Any continuation move (% of runs)",
+   "ids": [
+    8780,
+    42271,
+    3351,
+    13764,
+    315,
+    8640,
+    8
+   ]
+  },
+  {
+   "text": "70.7",
+   "ids": [
+    2031,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "98.0",
+   "ids": [
+    3264,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "100.0",
+   "ids": [
+    1041,
+    13,
+    15
+   ]
+  },
+  {
+   "text": "98.7",
+   "ids": [
+    3264,
+    13,
+    22
+   ]
+  },
+  {
+   "text": "67.3",
+   "ids": [
+    3080,
+    13,
+    18
+   ]
+  },
+  {
+   "text": "Scope. OpenAI models only (GPT-5.3 Instant and GPT-5.4 Thinking), 50 single-turn questions from HealthCareMagic-100k, and three runs per condition, collected in April 2026 (ChatGPT Health in August 2026) in fresh sessions without memory, history, customization, or connected records. P-values are unadjusted; continuation moves and clinical concepts were coded with GPT-5.4-based pipelines; no measure grades clinical accuracy or safety. The call for provider APIs that reproduce consumer settings is the authors' argument, not a tested intervention. Read the study ↗",
+   "ids": [
+    11037,
+    13,
+    5377,
+    15836,
+    4211,
+    1193,
+    320,
+    38,
+    2898,
+    12,
+    20,
+    13,
+    18,
+    18549,
+    323,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    53389,
+    705,
+    220,
+    1135,
+    3254,
+    65051,
+    4860,
+    505,
+    6401,
+    33099,
+    44638,
+    12,
+    1041,
+    74,
+    11,
+    323,
+    2380,
+    8640,
+    824,
+    3044,
+    11,
+    14890,
+    304,
+    5936,
+    220,
+    2366,
+    21,
+    320,
+    16047,
+    38,
+    2898,
+    6401,
+    304,
+    6287,
+    220,
+    2366,
+    21,
+    8,
+    304,
+    7878,
+    16079,
+    2085,
+    5044,
+    11,
+    3925,
+    11,
+    49141,
+    11,
+    477,
+    8599,
+    7576,
+    13,
+    393,
+    70150,
+    527,
+    653,
+    88897,
+    26,
+    42271,
+    11031,
+    323,
+    14830,
+    19476,
+    1051,
+    47773,
+    449,
+    480,
+    2898,
+    12,
+    20,
+    13,
+    19,
+    6108,
+    58773,
+    26,
+    912,
+    6767,
+    28711,
+    14830,
+    13708,
+    477,
+    7296,
+    13,
+    578,
+    1650,
+    369,
+    9287,
+    34456,
+    430,
+    23645,
+    11761,
+    5110,
+    374,
+    279,
+    12283,
+    6,
+    5811,
+    11,
+    539,
+    264,
+    12793,
+    21623,
+    13,
+    4557,
+    279,
+    4007,
+    9212,
+    245
+   ]
+  },
+  {
+   "text": "Further reading in the paper",
+   "ids": [
+    31428,
+    5403,
+    304,
+    279,
+    5684
+   ]
+  },
+  {
+   "text": "Paper · Sections 3 and 5, Figures 1–2, Table 1, Appendix Tables A1–A3 ↗",
+   "ids": [
+    31998,
+    9787,
+    60137,
+    220,
+    18,
+    323,
+    220,
+    20,
+    11,
+    69356,
+    220,
+    16,
+    4235,
+    17,
+    11,
+    6771,
+    220,
+    16,
+    11,
+    65814,
+    43252,
+    362,
+    16,
+    4235,
+    32,
+    18,
+    9212,
+    245
+   ]
+  },
+  {
+   "text": "Study repository (code and data announced) ↗",
+   "ids": [
+    49812,
+    12827,
+    320,
+    1889,
+    323,
+    828,
+    7376,
+    8,
+    9212,
+    245
+   ]
+  },
+  {
+   "text": "Read the abstract",
+   "ids": [
+    4518,
+    279,
+    8278
+   ]
+  },
+  {
+   "text": "Citation BibTeX",
+   "ids": [
+    34,
+    7709,
+    30545,
+    56063
+   ]
+  },
+  {
+   "text": "Related research",
+   "ids": [
+    11948,
+    3495
+   ]
+  },
+  {
+   "text": "Evaluation and red-teaming",
+   "ids": [
+    83463,
+    323,
+    2579,
+    49893,
+    6605
+   ]
+  },
+  {
+   "text": "ThemisA Reference-free NLG Evaluation Language Model with Flexibility and Interpretability",
+   "ids": [
+    88070,
+    285,
+    32,
+    17650,
+    12862,
+    33260,
+    38,
+    40388,
+    11688,
+    5008,
+    449,
+    27233,
+    3225,
+    323,
+    73177,
+    2968
+   ]
+  },
+  {
+   "text": "EMNLP 2024",
+   "ids": [
+    2783,
+    45,
+    12852,
+    220,
+    2366,
+    19
+   ]
+  },
+  {
+   "text": "LLMs as EvaluatorsLLM-based NLG Evaluation: Current Status and Challenges",
+   "ids": [
+    4178,
+    22365,
+    439,
+    76198,
+    3046,
+    4178,
+    44,
+    6108,
+    33260,
+    38,
+    40388,
+    25,
+    9303,
+    8266,
+    323,
+    69778
+   ]
+  },
+  {
+   "text": "Computational Linguistics 2025",
+   "ids": [
+    59122,
+    1697,
+    89333,
+    5706,
+    220,
+    2366,
+    20
+   ]
+  },
+  {
+   "text": "ChatGPT as Summary EvaluatorHuman-like Summarization Evaluation with ChatGPT",
+   "ids": [
+    16047,
+    38,
+    2898,
+    439,
+    22241,
+    469,
+    53489,
+    35075,
+    12970,
+    8279,
+    5730,
+    2065,
+    40388,
+    449,
+    13149,
+    38,
+    2898
+   ]
+  },
+  {
+   "text": "arXiv preprint 2023",
+   "ids": [
+    277,
+    55,
+    344,
+    864,
+    1374,
+    220,
+    2366,
+    18
+   ]
+  },
+  {
+   "text": "DSGramDynamic Weighting Sub-Metrics for Grammatical Error Correction in the Era of Large Language Models",
+   "ids": [
+    6061,
+    65325,
+    22500,
+    16923,
+    287,
+    3804,
+    5364,
+    13776,
+    369,
+    29937,
+    38344,
+    278,
+    4703,
+    64169,
+    304,
+    279,
+    48688,
+    315,
+    20902,
+    11688,
+    27972
+   ]
+  },
+  {
+   "text": "AAAI 2025",
+   "ids": [
+    6157,
+    15836,
+    220,
+    2366,
+    20
+   ]
+  },
+  {
+   "text": "Cont-COMETExploring Context-Aware Evaluation Metrics for Machine Translation",
+   "ids": [
+    825,
+    7813,
+    71633,
+    45053,
+    5620,
+    9805,
+    6830,
+    1698,
+    40388,
+    55290,
+    369,
+    13257,
+    39141
+   ]
+  },
+  {
+   "text": "EMNLP 2023 Findings",
+   "ids": [
+    2783,
+    45,
+    12852,
+    220,
+    2366,
+    18,
+    7531,
+    826
+   ]
+  },
+  {
+   "text": "Evaluating Data-to-TextHow Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?",
+   "ids": [
+    36,
+    26591,
+    1113,
+    2956,
+    4791,
+    12,
+    1199,
+    4438,
+    3234,
+    24676,
+    17,
+    20794,
+    27972,
+    26050,
+    389,
+    4060,
+    4791,
+    12,
+    3812,
+    2956,
+    4791,
+    12,
+    1199,
+    24367,
+    30
+   ]
+  },
+  {
+   "text": "ACL 2022",
+   "ids": [
+    56493,
+    220,
+    2366,
+    17
+   ]
+  },
+  {
+   "text": "AGENT-XAdaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection",
+   "ids": [
+    91415,
+    31650,
+    2654,
+    28881,
+    12433,
+    4939,
+    6108,
+    33257,
+    8304,
+    369,
+    59179,
+    12862,
+    15592,
+    16581,
+    1028,
+    55,
+    83,
+    18468
+   ]
+  },
+  {
+   "text": "EMNLP 2026",
+   "ids": [
+    2783,
+    45,
+    12852,
+    220,
+    2366,
+    21
+   ]
+  },
+  {
+   "text": "Lazy GroundingAttacking Search Agents with Factual Evidence",
+   "ids": [
+    40866,
+    26486,
+    287,
+    10673,
+    9162,
+    7694,
+    51354,
+    449,
+    435,
+    12210,
+    44796
+   ]
+  },
+  {
+   "text": "EMNLP 2026",
+   "ids": [
+    2783,
+    45,
+    12852,
+    220,
+    2366,
+    21
+   ]
+  },
+  {
+   "text": "DAMONA Dialogue-Aware MCTS Framework for Jailbreaking Large Language Models",
+   "ids": [
+    35,
+    1428,
+    96087,
+    70589,
+    6830,
+    1698,
+    386,
+    95837,
+    24686,
+    369,
+    57246,
+    37757,
+    20902,
+    11688,
+    27972
+   ]
+  },
+  {
+   "text": "EMNLP 2025",
+   "ids": [
+    2783,
+    45,
+    12852,
+    220,
+    2366,
+    20
+   ]
+  },
+  {
+   "text": "← All publications",
+   "ids": [
+    72958,
+    2052,
+    29085
+   ]
+  },
+  {
+   "text": "Xunjian Yin",
+   "ids": [
+    55,
+    70014,
+    1122,
+    83958
+   ]
+  }
+ ]
+}

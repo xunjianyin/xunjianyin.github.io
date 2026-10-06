@@ -46,6 +46,7 @@ html[data-theme="dark"] .tk-c3 { --tk-tint: #e8a0b0; }
 html[data-theme="dark"] .tk-c4 { --tk-tint: #b5a6ec; }
 
 .tk-pre .tk-tile { opacity: 0; }
+.tk-arriving .tk-tile { transition-duration: 0.2s; }   /* arriving from another page: a plain fade */
 .tk-leaving .tk-tiles { opacity: 0; }
 .tk-tile.tk-hover { opacity: var(--tk-hover); transition: none; }
 

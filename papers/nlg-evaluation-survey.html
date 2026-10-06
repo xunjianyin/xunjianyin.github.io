@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="LLMs can evaluate generated text in several distinct ways. This survey organizes the methods and explains the reliability, cost, and control trade-offs behind each choice.">
   <meta name="theme-color" content="#fbfcfa">
@@ -22,6 +23,7 @@
   <link rel="stylesheet" href="demos/judges.css">
   <script src="demos/judges.js" defer></script>
   <script src="paper-page.js" defer></script>
+  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -32,7 +34,7 @@
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>Computational Linguistics 2025</span><span>NLG evaluation · Survey</span></p>
-      <h1>LLM-based NLG Evaluation: Current Status and Challenges</h1>
+      <h1 data-lens-trigger>LLM-based NLG Evaluation: Current Status and Challenges</h1>
       <p class="paper-authors"><span class="author">Mingqi Gao<sup>1*</sup></span>, <span class="author">Xinyu Hu<sup>1*</sup></span>, <span class="author"><a href="../index.html">Xunjian Yin</a><sup>1</sup></span>, <span class="author">Jie Ruan<sup>1</sup></span>, <span class="author">Xiao Pu<sup>1</sup></span>, <span class="author">Xiaojun Wan<sup>1</sup></span></p><p class="author-legend"><span><sup>1</sup> Peking University</span> · <span><sup>*</sup> Equal contribution</span></p>
       <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://aclanthology.org/2025.cl-2.9/">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://arxiv.org/abs/2402.01383">arXiv <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">LLMs can evaluate generated text in several distinct ways. This survey organizes the methods and explains the reliability, cost, and control trade-offs behind each choice.</p>

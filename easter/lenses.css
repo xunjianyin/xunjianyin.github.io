@@ -1,12 +1,19 @@
 /* Lenses core: hidden glyphs (the first egg's technique), the layers lenses draw in, and
    the transient caption. Lens styles live in easter/<id>.css under html.lens-<id>. */
 
-/* Glyphs only: colours, borders, SVG icons and list markers keep theirs. */
-html.lenses-hide-glyphs #site-nav, html.lenses-hide-glyphs #site-nav *,
-html.lenses-hide-glyphs #main-content, html.lenses-hide-glyphs #main-content *,
-html.lenses-hide-glyphs #site-footer, html.lenses-hide-glyphs #site-footer * {
+/* Glyphs only: colours, borders, SVG icons and list markers keep theirs. The scope is the
+   site shell's nav, main and footer, or a paper page's header, main and footer. */
+html.lenses-hide-glyphs :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer),
+html.lenses-hide-glyphs :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) * {
   -webkit-text-fill-color: transparent !important;
   text-shadow: none !important;
+}
+/* Form controls and editable text keep their glyphs: lenses never draw them. */
+html.lenses-hide-glyphs :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer)
+  :is(input, textarea, select, [contenteditable]:not([contenteditable="false"])),
+html.lenses-hide-glyphs :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer)
+  :is(input, textarea, select, [contenteditable]:not([contenteditable="false"])) * {
+  -webkit-text-fill-color: currentColor !important;
 }
 
 /* Layers: a viewport layer, or a document layer that scrolls with the page (its height is
@@ -68,6 +75,16 @@ html[data-theme="dark"] .lenses-caption { color: var(--lenses-caption-color, #9c
 }
 .lenses-caption.is-compact { font-size: 12px; line-height: 15px; }
 .lenses-caption.is-compact .lenses-caption-note { font-size: 11px; line-height: 14px; }
+/* A side note in the page margin; in the left margin it is set flush right, by the text. */
+.lenses-caption.is-margin-left { text-align: right; }
+/* The last resort, when a long title leaves no room: a subtitle at the viewport's foot. */
+.lenses-caption.is-fixed {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  width: min(560px, calc(100vw - 24px));
+  transform: translateX(-50%);
+}
 .lenses-caption.is-still { transition: none; }
 @media (prefers-reduced-motion: reduce) {
   .lenses-caption { transition: none; }

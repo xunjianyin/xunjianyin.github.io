@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>Publications - Xunjian Yin</title>
   <meta name="author" content="Xunjian Yin">
@@ -45,7 +46,7 @@
   <div id="site-nav"></div>
 
   <main id="main-content" class="main-content-wrapper page-shell">
-    <h1 class="page-title">Publications</h1>
+    <h1 class="page-title" data-lens-trigger>Publications</h1>
 
     <div id="publication-index">
       <div class="pub-filters" data-pub-filters></div>
@@ -58,7 +59,7 @@
   <div id="site-footer"></div>
 
   <!-- Load JavaScript files -->
-  <script src="site-shell.js"></script>
+  <script src="site-shell.js?v=lenses-v2"></script>
   <script src="utils.js"></script>
   <script src="data.js"></script>
   <script src="main.js"></script>

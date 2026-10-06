@@ -4,9 +4,9 @@ Run: uv run --with tiktoken python -m unittest tests/test_cl100k_tokens.py
 
 Three checks:
 - easter/cl100k.txt decodes to exactly tiktoken's mergeable ranks (every token, every rank).
-- The browser fixture (tests/fixtures/cl100k_homepage.json, saved by tests/browser_tokens.js from
-  the live homepage) holds the lens's own token ids for every text run it tiled; each must equal
-  tiktoken's encode_ordinary of the same text.
+- The browser fixtures (tests/fixtures/cl100k_*.json, saved by tests/browser_tokens.js from the
+  live homepage and the longest paper page) hold the lens's own token ids for every text run it
+  counted; each must equal tiktoken's encode_ordinary of the same text.
 - Through tests/cl100k_node_runner.js, the current tokens.js encodes the fixture texts, hand-picked
   edge cases and a seeded fuzz corpus exactly as tiktoken does.
 """
@@ -31,7 +31,8 @@ except ImportError:  # pragma: no cover - the suite says how to run it
     tiktoken = None
 
 RANKS = ROOT / "easter" / "cl100k.txt"
-FIXTURE = ROOT / "tests" / "fixtures" / "cl100k_homepage.json"
+FIXTURES = sorted((ROOT / "tests" / "fixtures").glob("cl100k_*.json"))
+HOMEPAGE_FIXTURE = ROOT / "tests" / "fixtures" / "cl100k_homepage.json"
 RUNNER = ROOT / "tests" / "cl100k_node_runner.js"
 NODE = shutil.which("node")
 
@@ -113,9 +114,12 @@ class Cl100kTokensTest(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertEqual(got, self.encoding.encode_ordinary(text))
 
-    def fixture_runs(self) -> list[dict[str, object]]:
-        data = json.loads(FIXTURE.read_text(encoding="utf-8"))
-        return data["runs"]
+    def fixture_runs(self, path: Path | None = None) -> list[dict[str, object]]:
+        """The runs of one fixture, or of every fixture."""
+        runs: list[dict[str, object]] = []
+        for fixture in [path] if path else FIXTURES:
+            runs += json.loads(fixture.read_text(encoding="utf-8"))["runs"]
+        return runs
 
     def test_ranks_file_is_tiktoken_vocabulary(self) -> None:
         lines = RANKS.read_text(encoding="utf-8").split("\n")
@@ -127,13 +131,18 @@ class Cl100kTokensTest(unittest.TestCase):
         for rank, line in enumerate(body):
             self.assertEqual(ranks[unescape_token(line)], rank, f"line {rank + 2}")
 
-    def test_browser_fixture_matches_tiktoken(self) -> None:
-        runs = self.fixture_runs()
-        self.assertGreater(len(runs), 50, "the fixture holds the homepage's text runs")
-        self.assert_matches([str(run["text"]) for run in runs], [list(run["ids"]) for run in runs])
+    def test_browser_fixtures_match_tiktoken(self) -> None:
+        self.assertGreaterEqual(len(FIXTURES), 2, "the homepage and the long paper")
+        for fixture in FIXTURES:
+            with self.subTest(fixture=fixture.name):
+                data = json.loads(fixture.read_text(encoding="utf-8"))
+                runs = data["runs"]
+                self.assertGreater(len(runs), 50, "the fixture holds a page's text runs")
+                self.assertEqual(sum(len(run["ids"]) for run in runs), data["tokens"], "the runs hold the page's count")
+                self.assert_matches([str(run["text"]) for run in runs], [list(run["ids"]) for run in runs])
 
     def test_fixture_covers_the_hard_cases(self) -> None:
-        text = "\n".join(str(run["text"]) for run in self.fixture_runs())
+        text = "\n".join(str(run["text"]) for run in self.fixture_runs(HOMEPAGE_FIXTURE))
         for needle in ("Gödel", "—", "2026", "Duke"):
             with self.subTest(needle=needle):
                 self.assertIn(needle, text)

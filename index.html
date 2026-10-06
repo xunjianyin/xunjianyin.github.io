@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>Xunjian Yin</title>
   <meta name="author" content="Xunjian Yin">
@@ -90,8 +91,6 @@
       line-height: 1.6;
       color: #1a1a1a;
       margin: 0 0 2px;
-      /* Double-tapping the name changes the lens; it must not zoom. */
-      touch-action: manipulation;
     }
 
     .profile-text .pronunciation {
@@ -268,7 +267,7 @@
     <!-- Profile -->
     <div class="profile-section">
       <div class="profile-text">
-        <h1 class="name">Xunjian Yin</h1>
+        <h1 class="name" data-lens-trigger>Xunjian Yin</h1>
         <div class="pronunciation">Xunjian is pronounced as Shwen-Jyen</div>
         <p class="bio">
           I am a CS PhD student at <a href="https://www.duke.edu/">Duke University</a>, co-advised by Prof. <a
@@ -333,7 +332,7 @@
 
   <div id="site-footer"></div>
 
-  <script src="site-shell.js?v=lenses-v1"></script>
+  <script src="site-shell.js?v=lenses-v2"></script>
   <script src="utils.js"></script>
   <script src="data.js"></script>
   <script src="main.js"></script>

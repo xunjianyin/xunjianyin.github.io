@@ -1,13 +1,18 @@
 /* Run with agent-browser eval --stdin against a local static preview of the site.
  * Tests lens II (Through a model's eyes) through the lenses core: the caption and its count,
- * tiles, the hover tooltip (" Duke", the byte-level "Gödel"), link clicks, the decode replay in
- * both directions (rate, dimming, auto-scroll, stopping), relayout when an abstract opens, the
- * dark theme, reduced motion, a mobile viewport and exact restoration. Prints assertions,
- * failures, timings and `fixture`: every tiled text run with the lens's own token ids, which
- * tests/test_cl100k_tokens.py checks against tiktoken. To refresh the fixture:
+ * tiles near the viewport, the hover tooltip (" Duke", the byte-level "Gödel"), link clicks, the
+ * decode replay in both directions (rate, dimming, auto-scroll, stopping), late content (an
+ * abstract opens), the dark theme, reduced motion, exact restoration, then the longest paper
+ * page: arrival from sessionStorage (no caption), an exact count over virtualized tiles, SVG
+ * text and form controls not read, the frame budget while scrolling, the replay on a long
+ * page, and a phone width with tiles clipped to a scrolling table.
+ * Prints assertions, failures, timings and two fixtures, `fixture` (the homepage) and
+ * `paperFixture` (papers/auditing-health-llms.html): every text run with the lens's own token
+ * ids, which tests/test_cl100k_tokens.py checks against tiktoken. To refresh them:
  *   agent-browser eval --stdin < tests/browser_tokens.js > /tmp/tokens.json
  *   python3 -c "import json; d=json.loads(json.load(open('/tmp/tokens.json'))); \
- *     json.dump(d['fixture'], open('tests/fixtures/cl100k_homepage.json','w'), ensure_ascii=False, indent=1)"
+ *     [json.dump(d[k], open(f'tests/fixtures/{f}','w'), ensure_ascii=False, indent=1) \
+ *      for k, f in (('fixture','cl100k_homepage.json'), ('paperFixture','cl100k_paper.json'))]"
  */
 (async () => {
   const failures = [];
@@ -26,16 +31,32 @@
   const storedSeen = localStorage.getItem('lenses-seen');
   const storedSound = localStorage.getItem('spira-sound');
   localStorage.setItem('spira-sound', 'off');
+  // A lens kept for the session would arrive with every page the test opens.
+  const storedActive = sessionStorage.getItem('lenses-active');
+  sessionStorage.removeItem('lenses-active');
+  const storedHinted = sessionStorage.getItem('lenses-tokens-hinted');
+  sessionStorage.removeItem('lenses-tokens-hinted');
   const errors = [];
   const timing = {};
+  let paperFixture = null;
   let doc; let win; let reduced = false;
   let rafLog = null;               // when set, every rAF callback's duration is pushed here
 
-  const load = async (width = 1440, height = 900) => {
+  // Opens a page in the frame. With `core`, loads the lenses core as the site shell does on the
+  // first trigger; without it, the page's own boot brings the core (an arrival).
+  const load = async (width = 1440, height = 900, path = '/', core = true) => {
     frame.style.cssText = `position:fixed;left:0;top:0;width:${width}px;height:${height}px;z-index:200000;border:0;background:white`;
-    await new Promise(resolve => { frame.onload = resolve; frame.src = '/'; });
+    await new Promise(resolve => { frame.onload = resolve; frame.src = path; });
     doc = frame.contentDocument; win = frame.contentWindow;
-    await until(() => doc.querySelector('.easter-egg-footnote') && doc.querySelector('#selected-papers-list li'), 'the page');
+    await until(() => doc.readyState === 'complete' && doc.getElementById('main-content'), 'the page');
+    if (path === '/') await until(() => doc.querySelector('.easter-egg-footnote') && doc.querySelector('#selected-papers-list li'), 'the homepage');
+    // The page's own late content (GitHub star counts, markdown) settles before any snapshot.
+    let last = ''; let since = performance.now();
+    await until(() => {
+      const now = doc.getElementById('main-content').innerHTML;
+      if (now !== last) { last = now; since = performance.now(); }
+      return performance.now() - since > 500;
+    }, 'the page to settle', 10000);
     win.addEventListener('error', event => errors.push(event.message));
     win.addEventListener('unhandledrejection', event => errors.push(String(event.reason)));
     // Reduced motion is simulated through matchMedia, before the core reads it.
@@ -51,13 +72,15 @@
       callback(time);
       if (rafLog) rafLog.push(performance.now() - began);
     });
-    // Load the core as the site shell does on the first trigger.
-    await Promise.all([['link', { rel: 'stylesheet', href: 'easter/lenses.css?v=lenses-v1' }], ['script', { src: 'easter/lenses.js?v=lenses-v1' }]]
-      .map(([tag, attrs]) => new Promise((resolve, reject) => {
-        const el = doc.createElement(tag); Object.assign(el, attrs); el.onload = resolve; el.onerror = reject; doc.head.append(el);
-      })));
+    if (core && !win.SiteLenses) {
+      await Promise.all([['link', { rel: 'stylesheet', href: '/easter/lenses.css?v=lenses-v2' }], ['script', { src: '/easter/lenses.js?v=lenses-v2' }]]
+        .map(([tag, attrs]) => new Promise((resolve, reject) => {
+          const el = doc.createElement(tag); Object.assign(el, attrs); el.onload = resolve; el.onerror = reject; doc.head.append(el);
+        })));
+    }
     await until(() => win.SiteLenses, 'the core');
   };
+  const nearViewport = rect => rect.bottom >= -win.innerHeight * 1.05 && rect.top <= win.innerHeight * 2.05;
   const lenses = () => win.SiteLenses;
   const lens = () => lenses()._debug.lens('tokens');
   const session = () => lens()._session;
@@ -111,8 +134,13 @@
     const captionLines = lenses()._debug.state.caption || [];
     check(captionLines[0] === `II · Through a model’s eyes — This page is ${count.toLocaleString('en-US')} tokens to a language model.`, `caption line: ${captionLines[0]}`);
     check(captionLines[1] === HINT, `the LEDOM hint on the first activation: ${captionLines[1]}`);
-    const tiles = doc.querySelectorAll('.tk-tile');
-    check(tiles.length === session().tileCount && tiles.length >= count * 0.95, `one tile or more per token (${tiles.length} for ${count})`);
+    // Tiles exist for the blocks within a screen of the viewport: the bio now, the footer later.
+    await nextFrames(4);
+    const tiles = [...doc.querySelectorAll('.tk-tile')];
+    check(tiles.length === session().tileCount && tiles.length > 300, `tiles near the viewport (${tiles.length} for ${count} tokens)`);
+    check(tiles.every(el => nearViewport(el.getBoundingClientRect())), 'no tile lies more than a screen away');
+    const bioBox = doc.querySelector('.bio').getBoundingClientRect();
+    check(tiles.filter(el => { const r = el.getBoundingClientRect(); return r.top >= bioBox.top && r.bottom <= bioBox.bottom; }).length > 40, 'the bio on screen is tiled');
     const layer = doc.querySelector('.lenses-layer-page.tk-layer');
     check(layer && win.getComputedStyle(layer).mixBlendMode === 'multiply', 'tiles blend as a highlighter on the light theme');
     check(!layer.classList.contains('tk-pre'), 'tiles have faded in');
@@ -203,6 +231,9 @@
     win.scrollTo({ top: 0, behavior: 'instant' });
     const toggle = doc.querySelector('#selected-papers-list .detail-toggle');
     toggle.click();
+    // Late content reaches the lens through the core's debounced onContentChange.
+    await until(() => session().count !== count, 'the abstract tokens', 3000).catch(() => {});
+    await session().settle();
     await nextFrames(3);
     const content = doc.getElementById(toggle.getAttribute('aria-controls'));
     check(!content.hidden && session().count > count, `opening an abstract adds its tokens (${session().count})`);
@@ -213,7 +244,7 @@
       check(tilesNow.some(r => r.top >= box.top - 1 && r.bottom <= box.bottom + 1 && r.left >= box.left - 1), 'tiles cover the opened abstract');
     }
     toggle.click();
-    await nextFrames(3);
+    await until(() => session().count === count, 'the abstract closing', 3000).catch(() => {});
     check(session().count === count, 'closing it restores the count');
     // The page's own toggle rewrites its button and attributes; restoration is measured from here.
     before = main.innerHTML;
@@ -263,11 +294,123 @@
     check(timing.reducedExitMs < 150 && main.innerHTML === before, `reduced motion leaves at once (${timing.reducedExitMs} ms)${differ(before, main.innerHTML)}`);
     reduced = false;
 
+    // ---- The longest paper page: arrival, exact count, virtualized tiles, budgets -------------
+    sessionStorage.setItem('lenses-active', 'tokens');
+    await load(1440, 900, '/papers/auditing-health-llms.html', false);
+    const longTasks = [];
+    const longFrames = [];
+    try { new win.PerformanceObserver(list => list.getEntries().forEach(e => longTasks.push({ at: Math.round(e.startTime), ms: Math.round(e.duration) }))).observe({ type: 'longtask', buffered: true }); } catch (error) { /* unsupported */ }
+    try { new win.PerformanceObserver(list => list.getEntries().forEach(e => longFrames.push(Math.round(e.duration)))).observe({ type: 'long-animation-frame', buffered: true }); } catch (error) { /* unsupported */ }
+    await until(() => win.SiteLenses && win.SiteLenses.current === 'tokens' && doc.querySelector('.tk-layer') && !doc.querySelector('.tk-layer.tk-pre, .tk-layer.tk-arriving'), 'the arrival');
+    timing.paperShownAt = Math.round(win.performance.now());
+    check(!lenses()._debug.state.caption, 'no caption on arrival');
+    check(!doc.documentElement.hasAttribute('data-lens-arriving'), 'the arrival mark is cleared');
+    const paperMain = doc.getElementById('main-content');
+    await session().settle();
+    const paperBefore = paperMain.innerHTML;
+    const paperCount = session().count;
+    timing.paperTokens = paperCount;
+    timing.paperStats = { ...lens()._stats };
+    paperFixture = {
+      source: 'tests/browser_tokens.js on papers/auditing-health-llms.html at 1440x900',
+      tokenizer: 'easter/tokens.js (cl100k_base, ranks from easter/cl100k.txt)',
+      tokens: paperCount,
+      runs: session().snapshot()
+    };
+    check(paperCount > 4000, `the long paper is counted whole (${paperCount})`);
+    check(session().tileCount < paperCount / 3, `tiles only near the viewport (${session().tileCount} of ${paperCount})`);
+    check(session().reads('svg, input, select, textarea, [contenteditable]') === 0, 'SVG text and form controls are not read');
+    check(session().reads('button') > 0 && session().reads('figcaption') > 0 && session().reads('td, th') > 0, 'buttons, captions and table cells are read');
+    // Scroll the whole page: placement stays within the frame budget.
+    const stats = lens()._stats;
+    stats.placements = 0; stats.placeMaxMs = 0; stats.placeTotalMs = 0;
+    rafLog = [];
+    const bottom = doc.documentElement.scrollHeight - win.innerHeight;
+    while (win.scrollY < bottom - 1) { win.scrollTo({ top: Math.min(bottom, win.scrollY + 40), behavior: 'instant' }); await nextFrames(1); }
+    await delay(300);
+    timing.paperScroll = { frames: rafLog.length, rafMaxMs: +Math.max(...rafLog).toFixed(2), placements: stats.placements, placeMaxMs: +stats.placeMaxMs.toFixed(2), placeAvgMs: +(stats.placeTotalMs / Math.max(1, stats.placements)).toFixed(2), maxLiveTiles: stats.tiles };
+    rafLog = null;
+    check(stats.placeMaxMs <= 6, `placing tiles stays within 6 ms a frame (${stats.placeMaxMs.toFixed(2)} ms)`);
+    // Tiles go with whole blocks, so a tall block near the margin may keep a few a little beyond it.
+    const farAway = rect => rect.bottom < -2 * win.innerHeight || rect.top > 3 * win.innerHeight;
+    check(![...doc.querySelectorAll('.tk-tile')].some(el => farAway(el.getBoundingClientRect())), 'far tiles are released while scrolling');
+    const footerText = doc.querySelector('footer.paper-footer, #site-footer');
+    if (footerText) {
+      const fb = footerText.getBoundingClientRect();
+      check([...doc.querySelectorAll('.tk-tile')].some(el => { const r = el.getBoundingClientRect(); return r.top >= fb.top - 1 && r.bottom <= fb.bottom + 1; }), 'the footer is tiled at the bottom');
+    }
+    // Reading as the integrated suite does: a pointer sweep with jumps of a tenth of the page.
+    // No entry point of the lens (scroll, scroll settling, intersection, placement, hover, a
+    // rebuild) may run longer than 30 ms, leaving margin under the 50 ms long-task line.
+    stats.slowest = {};
+    const tall = doc.documentElement.scrollHeight;
+    for (let k = 0; k <= 40; k++) {
+      doc.dispatchEvent(new win.PointerEvent('pointermove', { bubbles: true, pointerType: 'mouse', clientX: 200 + k * 20, clientY: 150 + (k % 10) * 50 }));
+      if (k % 4 === 0) win.scrollTo({ top: Math.min(tall, (k / 40) * tall * 0.9), behavior: 'instant' });
+      await delay(40);
+    }
+    await delay(300);
+    timing.paperSlowest = { ...stats.slowest };
+    const slowest = Object.entries(stats.slowest).sort((a, b) => b[1].ms - a[1].ms)[0];
+    check(slowest && slowest[1].ms <= 30, `no lens task over 30 ms while reading the paper (${slowest && `${slowest[0]} ${slowest[1].ms} ms`})`);
+    // The replay runs over the whole long page.
+    win.scrollTo({ top: 0, behavior: 'instant' });
+    await delay(150);
+    rafLog = [];
+    key('ArrowRight');
+    await delay(1000);
+    check(session().cursor > 25 && session().cursor < 60, `the replay starts at the first token (${session().cursor})`);
+    key('x');
+    key('ArrowLeft');
+    check(session().cursor === paperCount - 1, '← starts from the last token of the paper');
+    await delay(2500);
+    check(win.scrollY > bottom - 400, `the page follows the reverse replay to the end (scrollY ${Math.round(win.scrollY)} of ${bottom})`);
+    key('x');
+    timing.paperReplayFrameMs = { frames: rafLog.length, avg: +(rafLog.reduce((a, b) => a + b, 0) / rafLog.length).toFixed(3), max: +Math.max(...rafLog).toFixed(3) };
+    rafLog = null;
+    timing.paperLongTasks = longTasks.slice();
+    timing.paperLongFrames = longFrames.slice();
+    // Tasks that began before the lens did belong to the page's own load.
+    const lensBegan = lens()._stats.marks.begin;
+    const lensTasks = longTasks.filter(task => task.at + task.ms > lensBegan);
+    check(lensTasks.length === 0, `no long task once the lens works on the long paper (${JSON.stringify(lensTasks)}; lens began at ${Math.round(lensBegan)} ms)`);
+    // Esc restores the paper and forgets the lens for the session.
+    key('Escape');
+    await until(() => lenses().current === null && !lenses().busy, 'the paper exit');
+    check(paperMain.innerHTML === paperBefore, `exit restores the paper byte for byte${differ(paperBefore, paperMain.innerHTML)}`);
+    check(leftovers().nodes === 0 && leftovers().highlights === 0, 'nothing is left on the paper');
+    check(sessionStorage.getItem('lenses-active') === null, 'Esc forgets the lens for the session');
+
+    // ---- Phone width: the paper's wide table scrolls, its tiles stay inside it --------------
+    await load(390, 844, '/papers/auditing-health-llms.html');
+    await lenses()._debug.goto('tokens');
+    const scroller = [...doc.querySelectorAll('#main-content *')].find(el => {
+      const style = win.getComputedStyle(el);
+      return (style.overflowX === 'auto' || style.overflowX === 'scroll') && el.scrollWidth > el.clientWidth + 20 && el.querySelector('td');
+    });
+    check(scroller, 'a wide table scrolls sideways at 390 px');
+    if (scroller) {
+      scroller.scrollIntoView({ block: 'center', behavior: 'instant' });
+      await delay(250);
+      const box = scroller.getBoundingClientRect();
+      const inside = () => [...doc.querySelectorAll('.tk-tile')].map(el => el.getBoundingClientRect()).filter(r => r.top >= box.top - 1 && r.bottom <= box.bottom + 1);
+      check(inside().length > 20 && inside().every(r => r.left >= box.left - 1 && r.right <= box.right + 1), 'table tiles are clipped to their scrolling box');
+      const cell = [...scroller.querySelectorAll('td')].find(td => { const r = td.getBoundingClientRect(); return r.left > box.left + 30 && r.right < box.right - 30 && td.textContent.trim(); });
+      if (cell) {
+        scroller.scrollLeft += 80;
+        await delay(150);
+        const r = cell.getBoundingClientRect();
+        check(inside().some(t => t.left >= r.left - 2 && t.right <= r.right + 2 && t.top >= r.top - 2 && t.bottom <= r.bottom + 2), 'tiles follow a cell when the table scrolls');
+      }
+    }
+    await lenses().reset({ instant: true });
+
     // ---- Mobile ------------------------------------------------------------------------------
     await load(390, 844);
     const mobileMain = doc.getElementById('main-content').innerHTML;
     await lenses()._debug.goto('tokens');
     check(session().count === count, `the count does not depend on the viewport (${session().count})`);
+    await nextFrames(4);
     const outside = [...doc.querySelectorAll('.tk-tile')].filter(el => el.getBoundingClientRect().right > 391).length;
     check(outside === 0, `tiles stay inside a 390 px viewport (${outside} outside)`);
     const name = doc.querySelector('.profile-text .name');
@@ -282,7 +425,7 @@
     check(doc.getElementById('main-content').innerHTML === mobileMain && leftovers().nodes === 0, 'mobile exit restores the page');
 
     check(errors.length === 0, `no page errors: ${errors.join(' | ')}`);
-    return JSON.stringify({ assertions, failures, timing, fixture });
+    return JSON.stringify({ assertions, failures, timing, fixture, paperFixture });
   } catch (error) {
     failures.push(`threw: ${error && error.stack || error}`);
     return JSON.stringify({ assertions, failures, timing });
@@ -291,5 +434,7 @@
     if (storedTheme === null) localStorage.removeItem('theme'); else localStorage.setItem('theme', storedTheme);
     if (storedSeen === null) localStorage.removeItem('lenses-seen'); else localStorage.setItem('lenses-seen', storedSeen);
     if (storedSound === null) localStorage.removeItem('spira-sound'); else localStorage.setItem('spira-sound', storedSound);
+    if (storedActive === null) sessionStorage.removeItem('lenses-active'); else sessionStorage.setItem('lenses-active', storedActive);
+    if (storedHinted === null) sessionStorage.removeItem('lenses-tokens-hinted'); else sessionStorage.setItem('lenses-tokens-hinted', storedHinted);
   }
 })();

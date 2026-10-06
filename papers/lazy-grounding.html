@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="A search agent can be misled by evidence that is entirely true. Records that correctly answer a nearby variant of the question pull agents toward the variant’s answer: across 12 agent–benchmark settings, accuracy falls by 5.9 pp on average.">
   <meta name="theme-color" content="#fbfcfa">
@@ -22,6 +23,7 @@
   <link rel="stylesheet" href="demos/attacks.css">
   <script src="demos/attacks.js" defer></script>
   <script src="paper-page.js" defer></script>
+  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -32,7 +34,7 @@
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>EMNLP 2026</span><span>Search agents · Red-teaming</span></p>
-      <h1><span class="title-name">Lazy Grounding:</span> Attacking Search Agents with Factual Evidence</h1>
+      <h1 data-lens-trigger><span class="title-name">Lazy Grounding:</span> Attacking Search Agents with Factual Evidence</h1>
       <p class="paper-authors"><span class="author">Yulin Zhang<sup>1*</sup></span>, <span class="author">Yukun Huang<sup>1*</sup></span>, <span class="author">Sanxing Chen<sup>1</sup></span>, <span class="author">Tianyi Lin<sup>1</sup></span>, <span class="author">Ziang Yang<sup>1</sup></span>, <span class="author"><a href="../index.html">Xunjian Yin</a><sup>1</sup></span>, <span class="author">Bhuwan Dhingra<sup>1</sup></span></p><p class="author-legend"><span><sup>1</sup> Duke University</span> · <span><sup>*</sup> Equal contribution</span></p>
       <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://arxiv.org/abs/2608.30303">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://github.com/frankyzha/lazy-grounding">Code <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">A search agent can be misled by evidence that is entirely true. Records that correctly answer a nearby variant of the question pull agents toward the variant’s answer: across 12 agent–benchmark settings, accuracy falls by 5.9 pp on average.</p>

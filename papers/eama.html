@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="News captions need names and events that an image alone cannot reveal. EAMA teaches a multimodal LLM, InstructBLIP, to find the relevant sentences and entities in the article before writing the caption.">
   <meta name="theme-color" content="#fbfcfa">
@@ -22,6 +23,7 @@
   <link rel="stylesheet" href="demos/judges.css">
   <script src="demos/judges.js" defer></script>
   <script src="paper-page.js" defer></script>
+  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -32,7 +34,7 @@
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>TOMM 2026</span><span>Multimodal learning · News captioning</span></p>
-      <h1><span class="title-name">EAMA:</span> Entity-Aware Multimodal Alignment Based Approach for News Image Captioning</h1>
+      <h1 data-lens-trigger><span class="title-name">EAMA:</span> Entity-Aware Multimodal Alignment Based Approach for News Image Captioning</h1>
       <p class="paper-authors"><span class="author">Junzhe Zhang</span>, <span class="author">Huixuan Zhang</span>, <span class="author"><a href="../index.html">Xunjian Yin</a></span>, <span class="author">Xiaojun Wan</span></p><p class="author-legend"><span>Peking University</span></p>
       <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://doi.org/10.1145/3801548">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://arxiv.org/abs/2402.19404">arXiv <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">News captions need names and events that an image alone cannot reveal. EAMA teaches a multimodal LLM, InstructBLIP, to find the relevant sentences and entities in the article before writing the caption.</p>

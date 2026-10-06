@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="ChemAgent turns solved chemistry subproblems into reusable memory, helping an LLM plan, calculate, and refine new solutions with experience retained outside its model weights.">
   <meta name="theme-color" content="#fbfcfa">
@@ -22,6 +23,7 @@
   <link rel="stylesheet" href="demos/agents.css">
   <script src="demos/agents.js" defer></script>
   <script src="paper-page.js" defer></script>
+  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -32,7 +34,7 @@
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>ICLR 2025</span><span>Memory for scientific reasoning</span></p>
-      <h1><span class="title-name">ChemAgent:</span> Self-updating Library in Large Language Models Improves Chemical Reasoning</h1>
+      <h1 data-lens-trigger><span class="title-name">ChemAgent:</span> Self-updating Library in Large Language Models Improves Chemical Reasoning</h1>
       <p class="paper-authors"><span class="author">Xiangru Tang<sup>1*</sup></span>, <span class="author">Tianyu Hu<sup>1*</sup></span>, <span class="author">Muyang Ye<sup>1*</sup></span>, <span class="author">Yanjun Shao<sup>1*</sup></span>, <span class="author"><a href="../index.html">Xunjian Yin</a><sup>1</sup></span>, <span class="author">Siru Ouyang<sup>2</sup></span>, <span class="author">Wangchunshu Zhou</span>, <span class="author">Pan Lu<sup>3</sup></span>, <span class="author">Zhuosheng Zhang<sup>4</sup></span>, <span class="author">Yilun Zhao<sup>1</sup></span>, <span class="author">Arman Cohan<sup>1</sup></span>, <span class="author">Mark Gerstein<sup>1</sup></span></p><p class="author-legend"><span><sup>1</sup> Yale University</span> · <span><sup>2</sup> UIUC</span> · <span><sup>3</sup> Stanford University</span> · <span><sup>4</sup> Shanghai Jiao Tong University</span> · <span><sup>*</sup> Equal contribution</span></p>
       <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://openreview.net/forum?id=kuhIqeVg0e">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://arxiv.org/abs/2501.06590">arXiv <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://github.com/gersteinlab/chemagent">Code <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">ChemAgent turns solved chemistry subproblems into reusable memory, helping an LLM plan, calculate, and refine new solutions with experience retained outside its model weights.</p>

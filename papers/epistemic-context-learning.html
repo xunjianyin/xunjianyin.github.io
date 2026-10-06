@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="An agent that cannot verify a peer&#x27;s answer can still judge the peer&#x27;s track record. ECL estimates from earlier rounds which peer is reliable before it answers, and is misled less by persuasive wrong peers than aggregation that ignores history.">
   <meta name="theme-color" content="#fbfcfa">
@@ -22,6 +23,7 @@
   <link rel="stylesheet" href="demos/trust.css">
   <script src="demos/trust.js" defer></script>
   <script src="paper-page.js" defer></script>
+  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -32,7 +34,7 @@
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>Agentic AI in the Wild Workshop, ICLR 2026</span><span>Trust in multi-agent LLM systems</span></p>
-      <h1><span class="title-name">Epistemic Context Learning:</span> Building Trust the Right Way in LLM-Based Multi-Agent Systems</h1>
+      <h1 data-lens-trigger><span class="title-name">Epistemic Context Learning:</span> Building Trust the Right Way in LLM-Based Multi-Agent Systems</h1>
       <p class="paper-authors"><span class="author">Ruiwen Zhou<sup>1*</sup></span>, <span class="author">Maojia Song<sup>2*</sup></span>, <span class="author">Xiaobao Wu<sup>3</sup></span>, <span class="author">Sitao Cheng<sup>4</sup></span>, <span class="author"><a href="../index.html">Xunjian Yin</a><sup>5</sup></span>, <span class="author">Yuxi Xie<sup>1</sup></span>, <span class="author">Zhuoqun Hao<sup>6</sup></span>, <span class="author">Wenyue Hua<sup>7</sup></span>, <span class="author">Liangming Pan<sup>8</sup></span>, <span class="author">Soujanya Poria<sup>3</sup></span>, <span class="author">Min-Yen Kan<sup>1</sup></span></p><p class="author-legend"><span><sup>1</sup> National University of Singapore</span> · <span><sup>2</sup> Singapore University of Technology and Design</span> · <span><sup>3</sup> Nanyang Technological University</span> · <span><sup>4</sup> University of Waterloo</span> · <span><sup>5</sup> Duke University</span> · <span><sup>6</sup> University of Pennsylvania</span> · <span><sup>7</sup> Microsoft</span> · <span><sup>8</sup> Peking University</span> · <span><sup>*</sup> Equal contribution</span></p>
       <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://arxiv.org/abs/2601.21742">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://github.com/skyriver-2000/epistemic-context-learning">Code <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">An agent that cannot verify a peer&#x27;s answer can still judge the peer&#x27;s track record. ECL estimates from earlier rounds which peer is reliable before it answers, and is misled less by persuasive wrong peers than aggregation that ignores history.</p>

@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="ALCUNA creates fictional organisms to test knowledge that models have not memorized, exposing a gap between reading new facts and connecting them to existing knowledge.">
   <meta name="theme-color" content="#fbfcfa">
@@ -22,6 +23,7 @@
   <link rel="stylesheet" href="demos/benchmarks.css">
   <script src="demos/benchmarks.js" defer></script>
   <script src="paper-page.js" defer></script>
+  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -32,7 +34,7 @@
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>EMNLP 2023</span><span>Learning from new knowledge</span></p>
-      <h1><span class="title-name">ALCUNA:</span> Large Language Models Meet New Knowledge</h1>
+      <h1 data-lens-trigger><span class="title-name">ALCUNA:</span> Large Language Models Meet New Knowledge</h1>
       <p class="paper-authors"><span class="author"><a href="../index.html">Xunjian Yin</a><sup>1*</sup></span>, <span class="author">Baizhou Huang<sup>1*</sup></span>, <span class="author">Xiaojun Wan<sup>1</sup></span></p><p class="author-legend"><span><sup>1</sup> Peking University</span> · <span><sup>*</sup> Equal contribution</span></p>
       <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://aclanthology.org/2023.emnlp-main.87/">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://arxiv.org/abs/2310.14820">arXiv <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://github.com/arvid-pku/alcuna">Code <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://drive.google.com/drive/folders/1P2Yt4XM-uSzfJoec4psIhpk-mfm-K3R1?usp=share_link">Data <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">ALCUNA creates fictional organisms to test knowledge that models have not memorized, exposing a gap between reading new facts and connecting them to existing knowledge.</p>

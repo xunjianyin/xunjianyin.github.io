@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Off-the-shelf coding agents can process long contexts as files. With only a path and a question, Codex and Claude Code search, slice and script through the text, and exceed the best published scores on four of five long-context benchmarks.">
   <meta name="theme-color" content="#fbfcfa">
@@ -22,6 +23,7 @@
   <link rel="stylesheet" href="demos/longcontext.css">
   <script src="demos/longcontext.js" defer></script>
   <script src="paper-page.js" defer></script>
+  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -32,7 +34,7 @@
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>arXiv preprint 2026</span><span>Long-context processing</span></p>
-      <h1>Coding Agents are Effective Long-Context Processors</h1>
+      <h1 data-lens-trigger>Coding Agents are Effective Long-Context Processors</h1>
       <p class="paper-authors"><span class="author">Weili Cao</span>, <span class="author"><a href="../index.html">Xunjian Yin</a></span>, <span class="author">Bhuwan Dhingra</span>, <span class="author">Shuyan Zhou</span></p><p class="author-legend"><span>Duke University</span></p>
       <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://arxiv.org/abs/2603.20432">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://github.com/weilicao/Coding_Agents_are_Effective_Long_Context_Processors">Code <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">Off-the-shelf coding agents can process long contexts as files. With only a path and a question, Codex and Claude Code search, slice and script through the text, and exceed the best published scores on four of five long-context benchmarks.</p>

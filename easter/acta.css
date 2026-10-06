@@ -1,10 +1,19 @@
 /* Lens IV · Acta Eruditorum, 1692 (easter/acta.js).
-   The page set as a 17th-century learned journal. Fonts, colours and ornaments only; no
-   word changes. Page rules are scoped to html.lens-acta (the switched-on state) or to the
-   view-transition classes; the rest style the script's own elements in the core's layers,
-   so this sheet is inert until the switch. The page selectors carry an
-   id (through :is()) to outrank the site's own rules, including the dark-theme ones: the
-   lens always shows paper.
+   Any page of the site set as a 17th-century learned journal. Fonts, colours and ornaments
+   only; no word changes. Page rules are scoped to html.lens-acta (the switched-on state) or
+   to the view-transition classes; the rest style the script's own elements in the core's
+   layers, so this sheet is inert until the switch.
+
+   The scope is the page's nav, main and footer: #site-nav / header.site-header,
+   #main-content, #site-footer / footer.paper-footer. Two ways of colouring:
+     lens-acta-shell  site-shell pages (home, site pages, blog posts; light or dark theme):
+                      explicit ink, oxblood and paper, outranking the site's own rules (the
+                      selectors carry an id through :is());
+     lens-acta-paper  paper pages: one colour matrix (#lens-acta-print) maps white to paper
+                      and black to ink, keeping hues, so every panel, demo and chart is
+                      printed on the same sheet. Colours set here for paper pages are
+                      therefore given before that map (black prints as ink).
+   lens-acta-home marks the homepage, whose sizes are tuned by hand below.
 
    IM Fell English and IM Fell English SC (Igino Marini's revivals of the Fell types) come
    from Google Fonts; the script adds them through the FontFace API. The Google build keeps
@@ -17,8 +26,15 @@ html.lens-acta {
   --lens-acta-ink-soft: rgba(42, 29, 18, 0.76);
   --lens-acta-ink-faint: rgba(42, 29, 18, 0.6);
   --lens-acta-oxblood: #6e2416;
+  --lens-acta-dropcap: var(--lens-acta-ink);
   --lens-acta-serif: "IM Fell English", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --lens-acta-caps: "IM Fell English SC", "IM Fell English", "Palatino Linotype", Palatino, Georgia, serif;
+  --lenses-caption-color: #6a4a30;
+  color-scheme: light;
+  background: #f2e8d3 var(--lens-acta-paper, none) repeat 0 0 / 624px 624px !important;
+}
+
+html.lens-acta.lens-acta-shell {
   --text-color: #2a1d12;
   --primary-color: #6e2416;
   --secondary-color: #4a1309;
@@ -26,25 +42,32 @@ html.lens-acta {
   --border-color: rgba(42, 29, 18, 0.32);
   --section-bg: rgba(42, 29, 18, 0.035);
   --hover-bg: rgba(110, 36, 22, 0.06);
-  --lenses-caption-color: #6a4a30;
-  color-scheme: light;
-  background: #f2e8d3 var(--lens-acta-paper, none) repeat 0 0 / 624px 624px !important;
+}
+
+/* Paper pages: their own palette, given as the colours that print as ink and oxblood. */
+html.lens-acta.lens-acta-paper {
+  --ink: #000000;
+  --muted: #3f3c38;
+  --accent: #570905;
+  --lens-acta-dropcap: #000000;
 }
 
 /* The script keeps the reader's place itself while the type reflows. */
 html.lens-acta-hold { overflow-anchor: none; }
 
 html.lens-acta body,
-html.lens-acta #main-content,
-html.lens-acta :is(#main-content, #site-footer) table {
+html.lens-acta #main-content {
   background: transparent !important;
 }
 
 html.lens-acta ::selection { background: rgba(110, 36, 22, 0.16); }
 
-/* ---- Type: IM Fell everywhere in the scope, ink with a faint spread ---- */
-html.lens-acta :is(#site-nav, #main-content, #site-footer),
-html.lens-acta :is(#site-nav, #main-content, #site-footer) * {
+/* ===================== Type, every page ===================== */
+
+/* IM Fell for all text in the scope; code stays monospace and SVG text keeps its own font
+   (charts place their labels by its metrics). */
+html.lens-acta :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer),
+html.lens-acta :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) :not(svg, svg *, code, pre, kbd, samp, code *, pre *) {
   font-family: var(--lens-acta-serif);
   font-synthesis: style small-caps;           /* IM Fell has one weight: never fake a bold */
   font-variant-ligatures: common-ligatures historical-ligatures;
@@ -52,11 +75,153 @@ html.lens-acta :is(#site-nav, #main-content, #site-footer) * {
   text-shadow: 0 0 0.3px rgba(42, 29, 18, 0.25);
 }
 
-html.lens-acta :is(#site-nav, #main-content, #site-footer) :is(p, li, div, span, strong, b, td) {
+/* IM Fell's small x-height, matched to the site's sans (the homepage is sized by hand). */
+html.lens-acta:not(.lens-acta-home) :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) {
+  font-size-adjust: 0.5;
+}
+
+html.lens-acta :is(#main-content, #site-footer, body > footer.paper-footer) :is(svg, code, pre, kbd, samp) {
+  font-size-adjust: none;
+}
+
+html.lens-acta #main-content :is(h1, h2, h3, h4, h5, b, strong, th, dt) { font-weight: 400; }
+html.lens-acta #main-content :is(h3, figcaption, blockquote, cite) { font-style: italic; }
+html.lens-acta #main-content :is(h4, h5, dt, th) {
+  font-family: var(--lens-acta-caps);
+  letter-spacing: 0.04em;
+}
+
+/* Running text, justified and hyphenated as it was set, except in headers, figures and demos. */
+html.lens-acta #main-content p:not(header p, figure p, nav p, aside p, table p, [data-paper-demo] p, .paper-demo p, .paper-takeaway, [class*="header"] p) {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+/* Tables with thin period rules. */
+html.lens-acta #main-content :is(th, td) { border-color: rgba(42, 29, 18, 0.35); }
+html.lens-acta #main-content thead th { border-bottom: 1px solid rgba(42, 29, 18, 0.8); }
+
+/* Form controls stay plain and usable: paper and ink, square. */
+html.lens-acta #main-content :is(input, select, textarea) {
+  border-radius: 0;
+}
+
+/* Without IM Fell English SC (offline), small capitals are synthesized in the fallback serif. */
+html.lens-acta.lens-acta-fallback :is(#site-nav, #main-content, body > header.site-header) :is(.name, h2, h4, dt, th, b, strong, .new-badge, .nav-button, .site-name) {
+  font-variant-caps: small-caps;
+}
+
+/* ===================== Site-shell pages: ink, oxblood, paper ===================== */
+
+html.lens-acta.lens-acta-shell :is(#site-nav, #main-content, #site-footer) :is(p, li, div, span, strong, b, td, th, dt, dd, h1, h2, h3, h4, h5, figcaption, blockquote, label, small, code, pre, kbd) {
   color: var(--lens-acta-ink);
 }
 
-/* The name and the headings in small capitals (the SC face draws lowercase as small caps). */
+html.lens-acta.lens-acta-shell :is(#main-content, #site-footer) :is(.pronunciation, .paper_rest, .gallery-intro, .photo-meta, .pub-status, .filter-label, .article-kicker, .article-dek, .article-meta, .post-meta, figcaption, small, time) {
+  color: var(--lens-acta-ink-soft);
+}
+
+/* Panels lose their fills; their rules turn to faint ink. */
+html.lens-acta.lens-acta-shell :is(#main-content, #site-footer) :is(pre, code, kbd, samp, mark, table, thead, tbody, tr, th, td, blockquote, details, summary, .article-note, .article-toc, .tag, .highlight, .detail-content, input, select, textarea) {
+  background: transparent !important;
+}
+
+html.lens-acta.lens-acta-shell :is(#site-nav, #main-content, #site-footer) :where(*) {
+  border-color: rgba(42, 29, 18, 0.3);
+}
+
+/* Plates: images and canvases in sepia, printed onto the sheet (white takes the paper). */
+html.lens-acta.lens-acta-shell #main-content :is(img, canvas, video):not(.profile-photo) {
+  filter: grayscale(1) sepia(0.6) contrast(1.05) brightness(0.97);
+  mix-blend-mode: multiply;
+}
+
+/* Links: oxblood with a thin underline. */
+html.lens-acta.lens-acta-shell :is(#main-content, #site-footer) :is(a, .abstract-toggle, .citation-toggle, .filter-option) {
+  color: var(--lens-acta-oxblood);
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-decoration-color: rgba(110, 36, 22, 0.5);
+  text-underline-offset: 2.5px;
+}
+
+html.lens-acta.lens-acta-shell :is(#main-content, #site-footer) :is(.filter-option) { text-decoration: none; }
+html.lens-acta.lens-acta-shell :is(#main-content, #site-footer) .filter-option[aria-pressed="true"] { color: var(--lens-acta-ink); }
+html.lens-acta.lens-acta-shell :is(#main-content, #site-footer) a.project-link { color: var(--lens-acta-ink); text-decoration-color: rgba(42, 29, 18, 0.45); }
+html.lens-acta.lens-acta-shell :is(#main-content, #site-footer) a.project-stars { text-decoration: none; color: var(--lens-acta-ink-faint); }
+
+html.lens-acta.lens-acta-shell :is(#site-nav, #main-content, #site-footer) :is(a, .abstract-toggle, .citation-toggle, .filter-option):is(:hover, :focus-visible) {
+  color: #4a1309;
+  text-decoration-color: currentColor;
+}
+
+/* Page titles and headings of the site pages. */
+html.lens-acta.lens-acta-shell #main-content :is(.page-title, .article-title, .about-page h1) {
+  font-family: var(--lens-acta-caps);
+  letter-spacing: 0.04em;
+}
+
+html.lens-acta.lens-acta-shell #main-content :is(.pub-year-heading, .project-group-heading, .about-section h2, .post-content h2, .longform-article h2) {
+  text-transform: none;
+  font-family: var(--lens-acta-caps);
+  letter-spacing: 0.08em;
+}
+
+/* Navigation and footer. */
+html.lens-acta #site-nav .nav-button {
+  font-family: var(--lens-acta-caps);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--lens-acta-oxblood);
+}
+
+html.lens-acta #site-nav .nav-button[aria-current="page"] { color: var(--lens-acta-ink); }
+html.lens-acta #site-footer .footer-social a { color: var(--lens-acta-ink); opacity: 0.7; }
+html.lens-acta #site-footer .footer-copyright { font-size: 14.5px; font-style: italic; color: var(--lens-acta-ink-soft); opacity: 1; }
+html.lens-acta #site-footer .site-footer { border-top-color: rgba(42, 29, 18, 0.3); }
+
+/* ===================== Paper pages ===================== */
+
+html.lens-acta.lens-acta-paper :is(body > header.site-header, #main-content, body > footer.paper-footer) {
+  filter: url(#lens-acta-print);
+}
+
+/* The site header becomes a running head: small capitals over a double rule. */
+html.lens-acta.lens-acta-paper body > header.site-header {
+  border-bottom: 3px double #000000;
+}
+
+html.lens-acta.lens-acta-paper body > header.site-header :is(.site-name, .site-name span, nav a) {
+  font-family: var(--lens-acta-caps);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: none;
+  color: #000000;
+}
+
+html.lens-acta.lens-acta-paper body > header.site-header nav a { color: #570905; }
+html.lens-acta.lens-acta-paper body > footer.paper-footer { font-style: italic; }
+
+/* Labels set in spaced capitals read as small capitals. */
+html.lens-acta.lens-acta-paper #main-content :is(.paper-eyebrow, .section-label, .demo-tag, .paper-glance dt) {
+  font-family: var(--lens-acta-caps);
+}
+
+/* Plates: photographs and figures in sepia ink; charts and canvases toned but still told
+   apart by hue (before the page's paper map). */
+html.lens-acta.lens-acta-paper #main-content img {
+  filter: grayscale(1) sepia(0.55) contrast(1.05);
+}
+
+html.lens-acta.lens-acta-paper #main-content :is(svg, canvas) {
+  filter: saturate(0.7) sepia(0.3);
+}
+
+/* ===================== The homepage ===================== */
+
+/* The homepage's profile text, by hand. */
 html.lens-acta #main-content .profile-text .name {
   font-family: var(--lens-acta-caps);
   font-size: 34px;
@@ -81,7 +246,7 @@ html.lens-acta #main-content .profile-text .bio {
   color: var(--lens-acta-ink);
 }
 
-/* A three-line drop cap on the first paragraph. */
+/* A three-line drop cap on the first paragraph (other pages: a rule the script adds). */
 html.lens-acta #main-content .profile-text p.bio:first-of-type::first-letter {
   -webkit-initial-letter: 3;
   initial-letter: 3;
@@ -102,11 +267,6 @@ html.lens-acta #main-content .profile-text p.bio:first-of-type::first-letter {
 html.lens-acta #main-content .profile-links {
   font-size: 17px;
   word-spacing: 0.12em;             /* IM Fell's space is narrow beside the slashes */
-}
-
-/* Without IM Fell English SC (offline), small capitals are synthesized in the fallback serif. */
-html.lens-acta.lens-acta-fallback :is(#site-nav, #main-content) :is(.name, h2, b, strong, .new-badge, .nav-button) {
-  font-variant-caps: small-caps;
 }
 
 /* Section headings: spaced small caps, centred over an engraved thick-thin rule that breaks
@@ -152,25 +312,19 @@ html.lens-acta #main-content .homepage-section h2::before {
   color: var(--lens-acta-ink);
 }
 
-/* News, papers, projects. */
-html.lens-acta #main-content .news-list li { font-size: 17.5px; line-height: 1.55; }
-html.lens-acta #main-content .news-date { font-style: italic; font-weight: 400; }
+/* News, papers, projects: colours on every site-shell page, sizes on the homepage (other
+   pages take IM Fell at the site's sizes, with font-size-adjust). */
+html.lens-acta.lens-acta-home #main-content .news-list li { font-size: 17.5px; line-height: 1.55; }
+html.lens-acta.lens-acta-shell #main-content .news-date { font-style: italic; font-weight: 400; }
 
-html.lens-acta #main-content .papertitle {
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1.4;
-  color: var(--lens-acta-ink);
-}
+html.lens-acta.lens-acta-shell #main-content .papertitle { font-weight: 400; color: var(--lens-acta-ink); }
+html.lens-acta.lens-acta-home #main-content .papertitle { font-size: 18px; line-height: 1.4; }
 
-html.lens-acta #main-content .paper_rest {
-  font-size: 15.5px;
-  line-height: 1.45;
-  color: var(--lens-acta-ink-soft);
-}
+html.lens-acta.lens-acta-shell #main-content .paper_rest { color: var(--lens-acta-ink-soft); }
+html.lens-acta.lens-acta-home #main-content .paper_rest { font-size: 15.5px; line-height: 1.45; }
 
-html.lens-acta #main-content :is(.paper-venue, .venue) { color: var(--lens-acta-ink-faint); }
-html.lens-acta #main-content .paper-links { font-size: 16.5px; }
+html.lens-acta.lens-acta-shell #main-content :is(.paper-venue, .venue) { color: var(--lens-acta-ink-faint); }
+html.lens-acta.lens-acta-home #main-content .paper-links { font-size: 16.5px; }
 
 html.lens-acta #main-content :is(b, strong, .new-badge) {
   font-family: var(--lens-acta-caps);
@@ -178,14 +332,15 @@ html.lens-acta #main-content :is(b, strong, .new-badge) {
   letter-spacing: 0.03em;
 }
 
-html.lens-acta #main-content .new-badge {
-  font-size: 15px;
+html.lens-acta.lens-acta-shell #main-content .new-badge {
   text-transform: none;
   letter-spacing: 0.08em;
   color: var(--lens-acta-oxblood);
 }
 
-html.lens-acta #main-content #projects-list li {
+html.lens-acta.lens-acta-home #main-content .new-badge { font-size: 15px; }
+
+html.lens-acta.lens-acta-home #main-content #projects-list li {
   font-size: 17px;
   line-height: 1.55;
   text-align: justify;
@@ -193,39 +348,8 @@ html.lens-acta #main-content #projects-list li {
   hyphens: auto;
 }
 
-html.lens-acta #main-content :is(.view-all, .project-stars) { font-size: 15px; }
-html.lens-acta #main-content .project-stars { color: var(--lens-acta-ink-faint); }
-
-/* Links: oxblood with a thin underline. */
-html.lens-acta :is(#main-content, #site-footer) :is(a, .abstract-toggle, .citation-toggle) {
-  color: var(--lens-acta-oxblood);
-  text-decoration: underline;
-  text-decoration-thickness: 0.5px;
-  text-decoration-color: rgba(110, 36, 22, 0.5);
-  text-underline-offset: 2.5px;
-}
-
-html.lens-acta :is(#main-content, #site-footer) a.project-link { color: var(--lens-acta-ink); text-decoration-color: rgba(42, 29, 18, 0.45); }
-html.lens-acta :is(#main-content, #site-footer) a.project-stars { text-decoration: none; color: var(--lens-acta-ink-faint); }
-
-html.lens-acta :is(#site-nav, #main-content, #site-footer) :is(a, .abstract-toggle, .citation-toggle):is(:hover, :focus-visible) {
-  color: #4a1309;
-  text-decoration-color: currentColor;
-}
-
-/* Navigation and footer. */
-html.lens-acta #site-nav .nav-button {
-  font-family: var(--lens-acta-caps);
-  font-size: 16px;
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  color: var(--lens-acta-oxblood);
-}
-
-html.lens-acta #site-nav .nav-button[aria-current="page"] { color: var(--lens-acta-ink); }
-html.lens-acta #site-footer .footer-social a { color: var(--lens-acta-ink); opacity: 0.7; }
-html.lens-acta #site-footer .footer-copyright { font-size: 14.5px; font-style: italic; color: var(--lens-acta-ink-soft); opacity: 1; }
-html.lens-acta #site-footer .site-footer { border-top-color: rgba(42, 29, 18, 0.3); }
+html.lens-acta.lens-acta-home #main-content :is(.view-all, .project-stars) { font-size: 15px; }
+html.lens-acta.lens-acta-shell #main-content .project-stars { color: var(--lens-acta-ink-faint); }
 
 /* The photo gives way to its engraving (drawn by the script in the page layer). */
 html.lens-acta.lens-acta-portrait #main-content .profile-photo { visibility: hidden; }
@@ -233,6 +357,13 @@ html.lens-acta.lens-acta-portrait #main-content .profile-photo { visibility: hid
 .lens-acta-engraving {
   position: absolute;
   display: block;
+}
+
+.lens-acta-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .lens-acta-vignette {

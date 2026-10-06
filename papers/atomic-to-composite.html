@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="In a controlled reasoning setting, RL helps models combine internal knowledge with new context when supervised training has first established both component skills.">
   <meta name="theme-color" content="#fbfcfa">
@@ -22,6 +23,7 @@
   <link rel="stylesheet" href="demos/reasoning.css">
   <script src="demos/reasoning.js" defer></script>
   <script src="paper-page.js" defer></script>
+  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -32,7 +34,7 @@
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>SPOT Workshop, ICLR 2026</span><span>Compositional reasoning</span></p>
-      <h1>From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning</h1>
+      <h1 data-lens-trigger>From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning</h1>
       <p class="paper-authors"><span class="author">Sitao Cheng<sup>1</sup></span>, <span class="author"><a href="../index.html">Xunjian Yin</a><sup>2</sup></span>, <span class="author">Ruiwen Zhou<sup>3</sup></span>, <span class="author">Yuxuan Li<sup>1</sup></span>, <span class="author">Xinyi Wang<sup>4</sup></span>, <span class="author">Liangming Pan<sup>5</sup></span>, <span class="author">William Yang Wang<sup>6</sup></span>, <span class="author">Victor Zhong<sup>1</sup></span></p><p class="author-legend"><span><sup>1</sup> University of Waterloo</span> · <span><sup>2</sup> Duke University</span> · <span><sup>3</sup> National University of Singapore</span> · <span><sup>4</sup> Princeton University</span> · <span><sup>5</sup> Peking University</span> · <span><sup>6</sup> University of California, Santa Barbara</span></p>
       <div class="paper-links" aria-label="Research resources"><a class="resource-link primary" href="https://arxiv.org/abs/2512.01970">Paper <span aria-hidden="true">↗</span></a><a class="resource-link" href="https://github.com/sitaocheng/from_atomic_to_composite">Code <span aria-hidden="true">↗</span></a></div>
       <p class="paper-takeaway">In a controlled reasoning setting, RL helps models combine internal knowledge with new context when supervised training has first established both component skills.</p>

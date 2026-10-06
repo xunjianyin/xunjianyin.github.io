@@ -4,21 +4,33 @@
  * Every glyph in the lens scope is redrawn as fine luminous particles on a night
  * ground. Each word is rendered offscreen in its exact computed font and sampled on
  * a grid of about 0.09 em; a particle sits at the ink centroid of every covered cell,
- * so letters keep their shape and stay readable. The portrait becomes a point cloud
- * of its own luminance.
+ * so letters keep their shape and stay readable. The homepage portrait becomes a
+ * point cloud of its own luminance.
  *
- * The page DOM is never edited. The core hides the glyphs (links stay clickable under
- * the particles); this lens adds classes on <html> for the night ground and draws on
- * two canvases in the core's fixed layer:
+ * The page DOM is never edited. The core hides the glyphs (links, buttons and demo
+ * controls stay usable under the particles); this lens adds classes on <html> for the
+ * night ground and draws on two canvases in the core's fixed layer:
  *   - ink (Canvas2D), used in transitions only: crisp word sprites in device pixels,
  *     identical to the page's glyphs, dissolve into dust on enter and condense back
  *     on exit. It also draws the faint shockwave rings.
- *   - dust (WebGL2, else WebGL1): one draw call of points. Home positions, colours and
- *     seeds are static buffers; the vertex shader computes the shimmer, the enter puff,
- *     the exit condensation, shockwaves, the scroll lag and link highlights from
- *     uniforms. Only the pointer wind is simulated on the CPU, for the particles it
- *     has disturbed, and only that range of the offset buffer is uploaded.
- *     Without WebGL, a Canvas2D pixel plotter draws the same particles more simply.
+ *   - dust (WebGL2, else WebGL1; a Canvas2D pixel plotter without WebGL): points in
+ *     groups, one draw call each. Home positions, colours and seeds are static buffers;
+ *     the vertex shader computes the shimmer, the enter puff, the exit condensation,
+ *     shockwaves, the scroll lag and link highlights from uniforms. Only the pointer
+ *     wind is simulated on the CPU, for the particles it has disturbed, and only that
+ *     range of the offsets is uploaded.
+ *
+ * Long pages are windowed. Text in normal flow is cut into bands of the document,
+ * built for the viewport and 1.5 screens either side in slices of a few milliseconds
+ * and evicted far away. Text inside a container that clips and scrolls (a wide table
+ * on a phone, a citation block) or that is fixed or sticky forms its own group, which
+ * follows the container and is clipped to it. Late content (rendered markdown, demos,
+ * toggled abstracts) is re-measured; only groups whose words changed are re-sampled.
+ *
+ * On a light page the main column is inverted (hue kept): light panels sink into the
+ * night, borders become faint, colour tints that carry data stay distinguishable, and
+ * SVG figures turn into light ink. Images, canvases and video are filtered back and
+ * dimmed, so they show as dimmed originals.
  */
 (() => {
   'use strict';
@@ -26,14 +38,19 @@
   /* ---------------------------------------------------------------------------
    * Constants. Lengths are CSS px, times are seconds unless marked ms.
    * ------------------------------------------------------------------------- */
-  const NIGHT_RGB = [6, 8, 12];          // the ground, #06080c (stardust.css uses the same)
+  const NIGHT_RGB = [6, 8, 12];          // the ground, #06080c (stardust.css and the pre-paint rule use it)
   const PHOTO_SELECTOR = '.profile-photo';
-  const CLASS_NIGHT = 'lens-stardust';           // night colours (the ground's target)
+  const CLASS_NIGHT = 'lens-stardust';           // the night (ground, inversion, marks)
+  const CLASS_BODY = 'lens-stardust-body';       // the body paints its own ground: turn it to night too
+  const CLASS_INVERT = 'lens-stardust-invert';   // a light page: the main column is inverted
   const CLASS_GROUND = 'lens-stardust-ground';   // transitions for the ground; kept through the exit
   const CLASS_LEAVING = 'lens-stardust-leaving'; // the shorter exit duration
   const CLASS_PHOTO = 'lens-stardust-photo';     // hides the portrait under its point cloud
-  const CLASS_STILL = 'lens-stardust-still';     // no colour fades at all (reduced motion, instant exit)
+  const CLASS_STILL = 'lens-stardust-still';     // no transitions at all (reduced motion, arrival, instant exit)
   const CLASS_CAPTION = 'lens-stardust-caption'; // the core's caption in a light tone, once the ground is dark
+  // Never drawn as particles: SVG text (painted with fill), form controls and editable text.
+  const EXCLUDE = 'script, style, noscript, template, svg, textarea, select, option, input, [contenteditable]:not([contenteditable="false"])';
+  // Marks whose colours stardust.css changes (flushed without transitions on an instant exit).
   const MARKS = '.homepage-section h2, .project-link, #theme-toggle, .footer-social a, .back-to-top, .nav-button';
 
   // Sampling the glyphs
@@ -50,9 +67,19 @@
   const ALPHA_MIN = 0.42;                // alpha of the faintest particle
   const ATLAS_W = 2048;                  // sampling and sprite atlases
   const ATLAS_H = 2048;
-  const SAMPLE_PAGE_H = 512;             // the enter samples in pages this tall, yielding between them
-  const PARTICLE_CAP = 200000;           // a safety bound; the homepage needs about a third
+  const SAMPLE_PAGE_H = 64;              // one sampling pass renders this tall a strip of words (a taller word: its own)
   const LINE_SLACK = 3;                  // baselines within this many px form one line
+  const THIN_ERODE = 0.28;               // css px shaved off ink sprites of antialiased (thinner) page text
+
+  // Windowing
+  const BAND_H = 512;                    // document bands for text in normal flow
+  const BUILD_SCREENS = 1.5;             // build the viewport and this many screens either side ...
+  const KEEP_SCREENS = 3.5;              // ... and evict groups farther than this
+  const PARTICLE_CAP = 160000;           // live particles at most; the nearest groups win
+  const SLICE_MS = 5;                    // building yields to the page after this much work (a step past it stays under 8 ms)
+  const GROUP_FADE = 0.25;               // a group built while live fades in (it may be on screen)
+  const ARRIVE_REST_MS = 600;            // arriving: after the first frame, the page's first paint goes first
+  const CONTENT_MS = 200;                // class and style changes in the scope settle this long
 
   // The portrait as a point cloud
   const PHOTO_STEP = 1.6;                // px between samples
@@ -97,11 +124,11 @@
   const LAG_TAU = 0.075;                 // scroll lag settles in about 4 tau (0.3 s)
   const LAG_MAX = 28;                    // px: soft bound of the lag
   const HOVER_TAU = 0.08;
-  const REBUILD_MS = 220;                // after a resize or a theme switch
 
   // Rendering budget (as the first egg)
   const DPR_MAX = 2;
   const MAX_BACKING_PIXELS = 8.3e6;
+  const CELL = 24;                       // the wind's spatial grid
 
   const TAU = Math.PI * 2;
   const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -129,6 +156,7 @@
     const hex = h[1].length === 3 ? h[1].replace(/./g, c => c + c) : h[1];
     return [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16)).concat(1);
   }
+  const luma = ([r, g, b]) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
   function hsl(h, s, l) {
     const a = s * Math.min(l, 1 - l);
     const f = n => { const k = (n + h / 30) % 12; return 255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))); };
@@ -137,13 +165,15 @@
   /*
    * Night colours. Greys become pale cool greys that keep their emphasis (dark body
    * text bright, muted text dimmer, headings and bold brightest); saturated colours
-   * (links) become a pale tint of their own hue.
+   * (links) become a pale tint of their own hue. On a light page, near-white text sits on
+   * a dark fill that the inversion turns light, so it turns dark as well.
    */
-  function nightColour([r, g, b], emphasis, darkSite) {
+  function nightColour([r, g, b], emphasis, darkPage) {
     const max = Math.max(r, g, b); const min = Math.min(r, g, b);
     if ((max - min) / 255 < 0.16) {
-      const luma = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-      const strength = darkSite ? luma : 1 - luma;
+      const l = luma([r, g, b]);
+      if (!darkPage && l > 0.82) return [30, 33, 38];
+      const strength = darkPage ? l : 1 - l;
       const level = emphasis ? 1.07 : 0.55 + 0.45 * strength;
       return [226, 233, 242].map(v => Math.min(255, v * level));
     }
@@ -154,34 +184,54 @@
     return hsl((hue * 60 + 360) % 360, 0.82, emphasis ? 0.86 : 0.8);
   }
   // Draw a word with its letter-spacing; fall back to measured per-glyph advances.
-  function fillSpaced(g, text, x, y, spacing, native) {
-    if (native || !spacing) { g.fillText(text, x, y); return; }
-    for (const ch of text) { g.fillText(ch, x, y); x += g.measureText(ch).width + spacing; }
+  function fillSpaced(g, text, x, y, spacing, native, stroke = false) {
+    const draw = stroke ? (t, px) => g.strokeText(t, px, y) : (t, px) => g.fillText(t, px, y);
+    if (native || !spacing) { draw(text, x); return; }
+    for (const ch of text) { draw(ch, x); x += g.measureText(ch).width + spacing; }
   }
   const makeCanvas = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  // Yield to the page between slices of work (a message is not clamped like a timeout).
+  let channel = null; const waiting = [];
+  function nextTask() {
+    if (!channel) { channel = new MessageChannel(); channel.port1.onmessage = () => { const go = waiting.shift(); if (go) go(); }; }
+    return new Promise(resolve => { waiting.push(resolve); channel.port2.postMessage(0); });
+  }
+  function hashString(text, h = 2166136261) {
+    for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+    return h >>> 0;
+  }
 
   /* ---------------------------------------------------------------------------
-   * Capture: every visible word of the scope, with exact typography and colour
+   * The page model: every visible text node of the scope, where it is and how it
+   * looks, rebuilt (in slices) whenever the content or the layout changes.
    * ------------------------------------------------------------------------- */
-  function capture(scope) {
-    const words = [];
-    const links = new Map();             // link or button element -> id (1-based)
-    const styles = new Map(); const opacities = new Map(); const sizes = new Map();
+  // Is the page light (dark text)? Read from the main text, which no pre-paint rule touches.
+  function pageIsLight(scope) {
+    const main = document.getElementById('main-content') || scope[0] || document.body;
+    const colour = parseColour(getComputedStyle(main).color);
+    return !colour || luma(colour) < 0.5;
+  }
+
+  async function buildModel(state) {
+    const scope = state.ctx.scope;
+    const model = {
+      gen: ++state.gen, entries: [], boxes: new Map(), words: new Map(),
+      styles: new Map(), opacities: new Map(), anchors: new Map(), excluded: new Map(), sizes: new Map(),
+      darkPage: !state.light, docW: document.documentElement.scrollWidth, docH: document.documentElement.scrollHeight
+    };
     const html = document.documentElement;
-    const darkSite = html.dataset.theme === 'dark';
     const sx = window.scrollX; const sy = window.scrollY;
-    const range = document.createRange();
-    const measure = makeCanvas(1, 1).getContext('2d');
-    // Opacity multiplies down the tree (the footer copyright is at 0.6).
+    const measure = state.measure || (state.measure = makeCanvas(1, 1).getContext('2d'));
+    // (The body's own opacity is left out: it is 0 while a lens arrives with the page.)
     const opacityOf = el => {
-      if (!el || el === html) return 1;
-      if (opacities.has(el)) return opacities.get(el);
+      if (!el || el === html || el === document.body) return 1;
+      if (model.opacities.has(el)) return model.opacities.get(el);
       const value = (parseFloat(getComputedStyle(el).opacity) || 0) * opacityOf(el.parentElement);
-      opacities.set(el, value);
+      model.opacities.set(el, value);
       return value;
     };
     const styleOf = el => {
-      if (styles.has(el)) return styles.get(el);
+      if (model.styles.has(el)) return model.styles.get(el);
       const cs = getComputedStyle(el);
       const rgba = parseColour(cs.color);
       const alpha = rgba ? rgba[3] * opacityOf(el) : 0;
@@ -199,96 +249,203 @@
           font, size, step: clamp(STEP_EM * size, STEP_MIN, STEP_MAX),
           spacing: cs.letterSpacing === 'normal' ? 0 : parseFloat(cs.letterSpacing) || 0,
           transform: cs.textTransform,
+          thin: cs.webkitFontSmoothing === 'antialiased',
           ascent: metrics.fontBoundingBoxAscent || size * 0.8,
-          day, night: nightColour(day, emphasis, darkSite).concat(alpha),
+          day, night: nightColour(day, emphasis, model.darkPage).concat(alpha),
           dayCss: `rgba(${day[0]},${day[1]},${day[2]},${alpha.toFixed(3)})`
         };
         info.nightCss = `rgba(${info.night.slice(0, 3).map(Math.round).join(',')},${alpha.toFixed(3)})`;
+        info.key = `${font}|${info.dayCss}|${info.spacing}|${info.transform}`;
       }
-      styles.set(el, info);
+      model.styles.set(el, info);
       return info;
+    };
+    const excluded = el => {
+      if (model.excluded.has(el)) return model.excluded.get(el);
+      const value = !!el.closest(EXCLUDE);
+      model.excluded.set(el, value);
+      return value;
     };
     // Visually hidden text (a 1 px clip box) is not drawn by the page either.
     const tiny = el => {
-      if (sizes.has(el)) return sizes.get(el);
+      if (model.sizes.has(el)) return model.sizes.get(el);
       const r = el.getBoundingClientRect();
-      const value = r.width <= 1 || r.height <= 1;
-      sizes.set(el, value);
+      const value = r.width <= 1 || r.height <= 1 ? null : [r.top + sy, r.bottom + sy];
+      model.sizes.set(el, value);
       return value;
     };
-    const linkOf = el => {
-      const a = el.closest('a[href], button');
-      if (!a || !scope.some(root => root.contains(a))) return 0;
-      if (!links.has(a)) links.set(a, links.size + 1);
-      return links.get(a);
+    // A box anchors text that does not move with the page alone: the innermost ancestor
+    // that is fixed, sticky (and can stick), or that clips content which overflows it.
+    const clips = cs => cs.overflowX !== 'visible' || cs.overflowY !== 'visible';
+    const overflows = el => el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1;
+    const ownAnchor = (el, root) => {
+      const cs = getComputedStyle(el);
+      if (cs.position === 'fixed') return true;
+      if (cs.position === 'sticky') {
+        for (let a = el.parentElement; a && a !== html; a = a.parentElement) {
+          if (clips(getComputedStyle(a))) return overflows(a);
+          if (a === root) break;
+        }
+        return true;                   // it sticks to the page
+      }
+      return clips(cs) && overflows(el);
     };
-    const transform = (text, mode, atStart) => {
+    const anchorOf = (el, root) => {
+      if (model.anchors.has(el)) return model.anchors.get(el);
+      let value = null;
+      if (ownAnchor(el, root)) value = el;
+      else if (el !== root && el.parentElement) value = anchorOf(el.parentElement, root);
+      model.anchors.set(el, value);
+      return value;
+    };
+    let began = performance.now();
+    for (const root of scope) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (performance.now() - began > SLICE_MS) {
+          if (performance.now() - began > (state.perf.sliceMax || 0)) state.perf.sliceMax = performance.now() - began;
+          await nextTask();
+          if (state.dead || state.gen !== model.gen) return null;
+          began = performance.now();
+        }
+        const parent = node.parentElement;
+        if (!parent || !/\S/.test(node.data) || excluded(parent)) continue;
+        const style = styleOf(parent);
+        if (!style) continue;
+        const span = tiny(parent);
+        if (!span) continue;
+        const entry = { node, parent, style, link: linkId(state, parent), anchor: anchorOf(parent, root), top: span[0], bottom: span[1] };
+        if (entry.anchor) {
+          let box = model.boxes.get(entry.anchor);
+          if (!box) box = makeBox(entry.anchor, root);
+          model.boxes.set(entry.anchor, box);
+          box.entries.push(entry);
+        } else {
+          model.entries.push(entry);
+        }
+      }
+    }
+    // Box placement on the page (for windowing) and its clip chain.
+    for (const box of model.boxes.values()) {
+      const r = box.el.getBoundingClientRect();
+      box.top = r.top + sy; box.bottom = r.bottom + sy;
+      if (box.fixed) { box.top = -Infinity; box.bottom = Infinity; }
+    }
+    model.entries.sort((a, b) => a.top - b.top);
+    return model;
+  }
+
+  // A box group's anchor: what clips it, whether it lags with the page scroll, and whether
+  // it hides what scrolls beneath it (a sticky table column with its own background).
+  function makeBox(el, root) {
+    const html = document.documentElement;
+    const clipEls = []; let fixed = false; let rigid = false;
+    const own = getComputedStyle(el);
+    const bg = parseColour(own.backgroundColor);
+    const occludes = (own.position === 'sticky' || own.position === 'fixed') && !!bg && bg[3] > 0.9;
+    for (let a = el; a && a !== html; a = a.parentElement) {
+      const cs = getComputedStyle(a);
+      if (cs.overflowX !== 'visible' || cs.overflowY !== 'visible') clipEls.push(a);
+      if (cs.position === 'fixed') { fixed = true; rigid = true; }
+      if (cs.position === 'sticky') rigid = true;
+      if (a === root) break;
+    }
+    return { el, clipEls, fixed, occludes, lagShare: rigid ? 0 : 1, entries: [], top: 0, bottom: 0 };
+  }
+
+  // A link (or button) gets a stable id for the hover highlight.
+  function linkId(state, el) {
+    const a = el.closest('a[href], button, summary, [role="button"]');
+    if (!a || !state.ctx.scope.some(root => root.contains(a))) return 0;
+    let id = state.linkIds.get(a);
+    if (!id) { id = ++state.linkCount; state.linkIds.set(a, id); }
+    return id;
+  }
+
+  // The origin of a box's coordinates in the viewport: its content, as scrolled now.
+  function boxOrigin(el) {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + el.clientLeft - el.scrollLeft, y: r.top + el.clientTop - el.scrollTop };
+  }
+
+  /*
+   * The words of a text node, measured once per model: text, box and style. x and y are
+   * in the group's coordinates: the document for text in flow, a box's scrolled content
+   * otherwise. `mid` is the document y of the word's middle (it picks the band).
+   */
+  function wordsOf(state, model, entry) {
+    const cached = model.words.get(entry.node);
+    if (cached) return cached;
+    const words = [];
+    const node = entry.node; const style = entry.style;
+    const range = state.range || (state.range = document.createRange());
+    const sx = window.scrollX; const sy = window.scrollY;
+    const origin = entry.anchor ? boxOrigin(entry.anchor) : { x: -sx, y: -sy };
+    const transform = (text, atStart) => {
+      const mode = style.transform;
       if (mode === 'uppercase') return text.toUpperCase();
       if (mode === 'lowercase') return text.toLowerCase();
       if (mode === 'capitalize' && atStart) return text.charAt(0).toUpperCase() + text.slice(1);
       return text;
     };
-    for (const root of scope) {
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-        const parent = node.parentElement;
-        if (!parent || !/\S/.test(node.data) || parent.closest('script, style, noscript, template')) continue;
-        const style = styleOf(parent);
-        if (!style || tiny(parent)) continue;
-        const link = linkOf(parent);
-        const take = (start, end, atStart) => {
-          range.setStart(node, start); range.setEnd(node, end);
-          const r = range.getBoundingClientRect();
-          // The skip link waits above the page; nothing outside the document is drawn.
-          if (!r.width || !r.height || r.bottom + sy < 0 || r.right + sx < 0) return;
-          words.push({
-            text: transform(node.data.slice(start, end), style.transform, atStart),
-            left: r.left, top: r.top, width: r.width, height: r.height,
-            docLeft: r.left + sx, docTop: r.top + sy, style, link, line: -1
-          });
-        };
-        for (const match of node.data.matchAll(/\S+/gu)) {
-          const from = match.index; const to = from + match[0].length;
-          range.setStart(node, from); range.setEnd(node, to);
-          const rects = range.getClientRects();
-          let single = true;
-          for (let i = 1; i < rects.length; i++) if (Math.abs(rects[i].top - rects[0].top) >= 1) single = false;
-          if (single) { take(from, to, true); continue; }
-          // A word wrapped across lines (at a hyphen) is taken once per line.
-          let start = from; let offset = from; let top = null;
-          for (const character of match[0]) {
-            range.setStart(node, offset); range.setEnd(node, offset + character.length);
-            const r = range.getBoundingClientRect();
-            if (top !== null && Math.abs(r.top - top) > 1) { take(start, offset, start === from); start = offset; }
-            top = r.top; offset += character.length;
-          }
-          take(start, offset, start === from);
-        }
+    const take = (start, end, atStart) => {
+      range.setStart(node, start); range.setEnd(node, end);
+      const r = range.getBoundingClientRect();
+      // The skip link waits above the page; nothing outside the document is drawn.
+      if (!r.width || !r.height || r.bottom + sy < 0 || r.right + sx < 0) return;
+      words.push({
+        text: transform(node.data.slice(start, end), atStart),
+        x: r.left - origin.x, y: r.top - origin.y, width: r.width, height: r.height,
+        mid: (r.top + r.bottom) / 2 + sy, style, link: entry.link, line: -1
+      });
+    };
+    for (const match of node.data.matchAll(/\S+/gu)) {
+      const from = match.index; const to = from + match[0].length;
+      range.setStart(node, from); range.setEnd(node, to);
+      const rects = range.getClientRects();
+      let single = true;
+      for (let i = 1; i < rects.length; i++) if (Math.abs(rects[i].top - rects[0].top) >= 1) single = false;
+      if (single) { take(from, to, true); continue; }
+      // A word wrapped across lines (at a hyphen) is taken once per line.
+      let start = from; let offset = from; let top = null;
+      for (const character of match[0]) {
+        range.setStart(node, offset); range.setEnd(node, offset + character.length);
+        const r = range.getBoundingClientRect();
+        if (top !== null && Math.abs(r.top - top) > 1) { take(start, offset, start === from); start = offset; }
+        top = r.top; offset += character.length;
       }
+      take(start, offset, start === from);
     }
-    range.detach();
-    return { words, links, darkSite, lines: groupLines(words) };
+    model.words.set(entry.node, words);
+    return words;
   }
 
-  // Visual lines: words whose baselines agree, in reading order from the top.
+  // Visual lines of a group: words whose baselines agree, in reading order from the top.
   function groupLines(words) {
     const order = words.map((w, i) => i);
-    const base = i => words[i].docTop + words[i].style.ascent;
-    order.sort((a, b) => base(a) - base(b) || words[a].docLeft - words[b].docLeft);
+    const base = i => words[i].y + words[i].style.ascent;
+    order.sort((a, b) => base(a) - base(b) || words[a].x - words[b].x);
     const lines = []; let current = null;
     for (const i of order) {
       const w = words[i]; const b = base(i);
       if (!current || b - current.base > LINE_SLACK) {
-        current = { base: b, top: w.docTop, bottom: w.docTop + w.height, words: [], delayIn: -10, delayOut: 0 };
+        current = { base: b, top: w.y, bottom: w.y + w.height, words: [], delayIn: -10, delayOut: 0 };
         lines.push(current);
       }
       current.words.push(w);
-      current.top = Math.min(current.top, w.docTop);
-      current.bottom = Math.max(current.bottom, w.docTop + w.height);
+      current.top = Math.min(current.top, w.y);
+      current.bottom = Math.max(current.bottom, w.y + w.height);
       w.line = lines.length - 1;
     }
     for (const line of lines) line.mid = (line.top + line.bottom) / 2;
     return lines;
+  }
+
+  // A cheap fingerprint of what a group would draw: unchanged groups are kept.
+  function signature(words, extra = '') {
+    let h = hashString(extra);
+    for (const w of words) h = hashString(`${w.text}|${Math.round(w.x * 4)}|${Math.round(w.y * 4)}|${w.style.key}|${w.link}`, h);
+    return h;
   }
 
   /* ---------------------------------------------------------------------------
@@ -300,7 +457,6 @@
     return { n: 0, f: new Float32Array(8 * 4096), c: new Uint8ClampedArray(8 * 4096) };
   }
   function pushParticle(list, x, y, seed, size, link, font, rowY, day, night, alpha, dayAlpha) {
-    if (list.n >= PARTICLE_CAP) return;
     if (list.n * 8 >= list.f.length) {
       const f = new Float32Array(list.f.length * 2); f.set(list.f); list.f = f;
       const c = new Uint8ClampedArray(list.c.length * 2); c.set(list.c); list.c = c;
@@ -314,85 +470,86 @@
   }
 
   /*
-   * Render every word, white on transparent, into a sampling atlas at SUPER pixels
-   * per grid step, then read the alpha back once per atlas page: each cell's mean
-   * alpha is its ink coverage, and the alpha-weighted mean of its subsamples is the
-   * ink centroid, where the particle goes.
+   * One sampling pass, from words[from]: render a strip of words, white on transparent,
+   * at SUPER pixels per grid step, read the alpha back once, and harvest. Each cell's
+   * mean alpha is its ink coverage; the alpha-weighted mean of its subsamples is the ink
+   * centroid, where the particle goes. Returns the index of the next word.
    */
-  async function sampleWords(words, list, random, pause) {
-    const canvas = makeCanvas(ATLAS_W, 1);
-    const g = canvas.getContext('2d', { willReadFrequently: true });
-    const native = 'letterSpacing' in g;
-    let i = 0;
-    while (i < words.length) {
-      let x = 0; let y = 0; let shelf = 0; const start = i;
-      for (; i < words.length; i++) {
-        const w = words[i]; const st = w.style;
-        const padX = Math.ceil(0.4 * st.size + Math.abs(st.spacing)); const padY = Math.ceil(0.2 * st.size);
-        const cols = Math.ceil((w.width + 2 * padX) / st.step); const rows = Math.ceil((w.height + 2 * padY) / st.step);
-        const pw = cols * SUPER; const ph = rows * SUPER;
-        w.slot = null;
-        if (pw > ATLAS_W || ph > SAMPLE_PAGE_H) continue;
-        if (x + pw > ATLAS_W) { x = 0; y += shelf + 2; shelf = 0; }
-        if (y + ph > SAMPLE_PAGE_H) break;
-        w.slot = [x, y, cols, rows, padX, padY];
-        x += pw + 2; shelf = Math.max(shelf, ph);
-      }
-      if (i === start) { i++; continue; }
-      const height = y + shelf;
-      canvas.height = height;            // also clears the page
-      g.fillStyle = '#fff'; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
-      for (let k = start; k < i; k++) {
-        const w = words[k]; if (!w.slot) continue;
-        const [ax, ay, cols, rows, padX, padY] = w.slot; const st = w.style; const s = SUPER / st.step;
-        g.save();
-        g.beginPath(); g.rect(ax, ay, cols * SUPER, rows * SUPER); g.clip();
-        g.setTransform(s, 0, 0, s, ax - (w.left - padX) * s, ay - (w.top - padY) * s);
-        g.font = st.font;
-        if (native) g.letterSpacing = `${st.spacing}px`;
-        // The page paints each baseline on a whole CSS pixel (as measured for the first egg).
-        fillSpaced(g, w.text, w.left, Math.round(w.top + st.ascent), st.spacing, native);
-        g.restore();
-      }
-      // One 32-bit read per subsample; alpha is the top byte (little-endian RGBA).
-      const pixels = new Uint32Array(g.getImageData(0, 0, ATLAS_W, height).data.buffer);
-      const minSum = COVER_MIN * 255 * SUPER * SUPER;
-      for (let k = start; k < i; k++) {
-        const w = words[k]; if (!w.slot) continue;
-        const [ax, ay, cols, rows, padX, padY] = w.slot; const st = w.style; const s = SUPER / st.step;
-        const x0 = w.docLeft - padX; const y0 = w.docTop - padY;
-        for (let cy = 0; cy < rows; cy++) {
-          const rowBase = (ay + cy * SUPER) * ATLAS_W + ax;
-          for (let cx = 0; cx < cols; cx++) {
-            const base = rowBase + cx * SUPER;
-            // Most cells are empty: sum first, centroid only for the kept ones.
-            let sum = 0;
-            for (let j = 0, p = base; j < SUPER; j++, p += ATLAS_W) for (let q = 0; q < SUPER; q++) sum += pixels[p + q] >>> 24;
-            if (sum < minSum) continue;
-            let mx = 0; let my = 0;
-            for (let j = 0, p = base; j < SUPER; j++, p += ATLAS_W) {
-              for (let q = 0; q < SUPER; q++) { const a = pixels[p + q] >>> 24; mx += a * (q + 0.5); my += a * (j + 0.5); }
-            }
-            const cover = sum / (255 * SUPER * SUPER);
-            const b = smooth(COVER_MIN, COVER_FULL, cover);
-            // Rim particles stay on the outline; inside a stroke they scatter more, like dust.
-            const jitter = (JITTER[0] + (JITTER[1] - JITTER[0]) * b) * st.step;
-            const px = x0 + (cx * SUPER + mx / sum) / s + (random() - 0.5) * 2 * jitter;
-            const py = y0 + (cy * SUPER + my / sum) / s + (random() - 0.5) * 2 * jitter;
-            // Larger type gets slightly larger grains (up to 1.4x for the name).
-            const grain = clamp(st.step / (STEP_EM * 16), 1, 1.4);
-            const size = grain * (SIZE_MIN + (SIZE_MAX - SIZE_MIN) * clamp(b + (random() - 0.5) * 0.25, 0, 1));
-            const alpha = st.day[3] * (ALPHA_MIN + (1 - ALPHA_MIN) * b) * (1 - GRAIN * random());
-            // The row tag (>= 0) is the word's line; freeze() turns it into the line's middle.
-            pushParticle(list, px, py, random(), size, w.link, st.size, w.line, st.day, st.night, alpha, alpha);
+  let sampler = null;
+  function samplePass(words, from, list, random) {
+    if (!sampler) {
+      const canvas = makeCanvas(ATLAS_W, 1);
+      const g = canvas.getContext('2d', { willReadFrequently: true });
+      sampler = { canvas, g, native: 'letterSpacing' in g };
+    }
+    const { canvas, g, native } = sampler;
+    let x = 0; let y = 0; let shelf = 0; let i = from; let pageH = SAMPLE_PAGE_H;
+    for (; i < words.length; i++) {
+      const w = words[i]; const st = w.style;
+      const padX = Math.ceil(0.4 * st.size + Math.abs(st.spacing)); const padY = Math.ceil(0.2 * st.size);
+      const cols = Math.ceil((w.width + 2 * padX) / st.step); const rows = Math.ceil((w.height + 2 * padY) / st.step);
+      const pw = cols * SUPER; const ph = rows * SUPER;
+      w.slot = null;
+      if (pw > ATLAS_W || ph > ATLAS_H) continue;
+      if (i === from && ph > pageH) pageH = ph;
+      if (x + pw > ATLAS_W) { x = 0; y += shelf + 2; shelf = 0; }
+      if (y + ph > pageH) break;
+      w.slot = [x, y, cols, rows, padX, padY];
+      x += pw + 2; shelf = Math.max(shelf, ph);
+    }
+    const height = y + shelf;
+    if (!height) return Math.max(i, from + 1);
+    canvas.height = height;              // also clears the strip
+    g.fillStyle = '#fff'; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    for (let k = from; k < i; k++) {
+      const w = words[k]; if (!w.slot) continue;
+      const [ax, ay, cols, rows, padX, padY] = w.slot; const st = w.style; const s = SUPER / st.step;
+      g.save();
+      g.beginPath(); g.rect(ax, ay, cols * SUPER, rows * SUPER); g.clip();
+      g.setTransform(s, 0, 0, s, ax - (w.x - padX) * s, ay - (w.y - padY) * s);
+      g.font = st.font;
+      if (native) g.letterSpacing = `${st.spacing}px`;
+      // The page paints each baseline on a whole CSS pixel (as measured for the first egg).
+      fillSpaced(g, w.text, w.x, Math.round(w.y + st.ascent), st.spacing, native);
+      g.restore();
+    }
+    // One 32-bit read per subsample; alpha is the top byte (little-endian RGBA).
+    const pixels = new Uint32Array(g.getImageData(0, 0, ATLAS_W, height).data.buffer);
+    const minSum = COVER_MIN * 255 * SUPER * SUPER;
+    for (let k = from; k < i; k++) {
+      const w = words[k]; if (!w.slot) continue;
+      const [ax, ay, cols, rows, padX, padY] = w.slot; const st = w.style; const s = SUPER / st.step;
+      const x0 = w.x - padX; const y0 = w.y - padY;
+      // Larger type gets slightly larger grains (up to 1.4x for a name).
+      const grain = clamp(st.step / (STEP_EM * 16), 1, 1.4);
+      for (let cy = 0; cy < rows; cy++) {
+        const rowBase = (ay + cy * SUPER) * ATLAS_W + ax;
+        for (let cx = 0; cx < cols; cx++) {
+          const base = rowBase + cx * SUPER;
+          // Most cells are empty: sum first, centroid only for the kept ones.
+          let sum = 0;
+          for (let j = 0, p = base; j < SUPER; j++, p += ATLAS_W) for (let q = 0; q < SUPER; q++) sum += pixels[p + q] >>> 24;
+          if (sum < minSum) continue;
+          let mx = 0; let my = 0;
+          for (let j = 0, p = base; j < SUPER; j++, p += ATLAS_W) {
+            for (let q = 0; q < SUPER; q++) { const a = pixels[p + q] >>> 24; mx += a * (q + 0.5); my += a * (j + 0.5); }
           }
+          const b = smooth(COVER_MIN, COVER_FULL, sum / (255 * SUPER * SUPER));
+          // Rim particles stay on the outline; inside a stroke they scatter more, like dust.
+          const jitter = (JITTER[0] + (JITTER[1] - JITTER[0]) * b) * st.step;
+          const px = x0 + (cx * SUPER + mx / sum) / s + (random() - 0.5) * 2 * jitter;
+          const py = y0 + (cy * SUPER + my / sum) / s + (random() - 0.5) * 2 * jitter;
+          const size = grain * (SIZE_MIN + (SIZE_MAX - SIZE_MIN) * clamp(b + (random() - 0.5) * 0.25, 0, 1));
+          const alpha = st.day[3] * (ALPHA_MIN + (1 - ALPHA_MIN) * b) * (1 - GRAIN * random());
+          // The row tag (>= 0) is the word's line; freeze() turns it into the line's middle.
+          pushParticle(list, px, py, random(), size, w.link, st.size, w.line, st.day, st.night, alpha, alpha);
         }
       }
-      if (pause && i < words.length && await pause()) return;
     }
+    return i;
   }
 
-  // The portrait: luminance sampled into a point cloud in desaturated original colour.
+  // The homepage portrait: luminance sampled into a point cloud in desaturated original colour.
   function samplePhoto(img, list, random) {
     if (!img || !img.complete || !img.naturalWidth) return null;
     const cs = getComputedStyle(img);
@@ -418,19 +575,18 @@
       for (let i = 0; i < cols; i++) {
         const k = (j * cols + i) * 4;
         const cr = data[k]; const cg = data[k + 1]; const cb = data[k + 2];
-        const luma = (0.2126 * cr + 0.7152 * cg + 0.0722 * cb) / 255;
+        const l = luma([cr, cg, cb]);
         // Brightness by luminance with a little more contrast; the square's edges
         // fade into the night, so the cloud is an oval with soft borders.
         const vignette = 1 - smooth(0.68, 1.08, Math.hypot((i + 0.5) / cols * 2 - 1, (j + 0.5) / rows * 2 - 1));
-        const glow = Math.pow(smooth(PHOTO_MIN_LUMA, 0.82, luma), 0.85) * vignette;
+        const glow = Math.pow(smooth(PHOTO_MIN_LUMA, 0.82, l), 0.85) * vignette;
         if (glow < 0.04) continue;
-        const grey = luma * 255;
+        const grey = l * 255;
         const night = [cr, cg, cb].map(v => Math.min(255, (grey + (v - grey) * (1 - PHOTO_DESATURATE)) * PHOTO_LIFT + 18));
         const x = cx + (i + 0.5 + (random() - 0.5) * 0.6) * dx;
         const y = cy + (j + 0.5 + (random() - 0.5) * 0.6) * dy;
-        const size = 0.85 + 0.7 * glow;
         // Full alpha on the day page (it dissolves out of the photo), luminance at night.
-        pushParticle(list, x, y, random(), size, 0, PHOTO_FONT, -1 - y, [cr, cg, cb], night,
+        pushParticle(list, x, y, random(), 0.85 + 0.7 * glow, 0, PHOTO_FONT, -1 - y, [cr, cg, cb], night,
           (0.12 + 0.88 * glow) * box.opacity, box.opacity);
       }
     }
@@ -438,27 +594,31 @@
   }
 
   /*
-   * Freeze the list into GPU-ready arrays, sorted by grid cell (row-major) so that
-   * the wind's neighbourhood is a few contiguous index ranges: one per cell row.
+   * Freeze a list into GPU-ready arrays, sorted by grid cell (row-major over the group's
+   * bounding box) so that the wind's neighbourhood is a few contiguous index ranges.
    */
-  const CELL = 24;
   function freeze(list, lines) {
     const n = list.n;
-    let maxX = 1; let maxY = 1;
-    for (let i = 0; i < n; i++) { maxX = Math.max(maxX, list.f[i * 8]); maxY = Math.max(maxY, list.f[i * 8 + 1]); }
-    const cols = Math.ceil((maxX + 1) / CELL) + 1; const rows = Math.ceil((maxY + 1) / CELL) + 1;
+    let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity;
+    for (let i = 0; i < n; i++) {
+      const x = list.f[i * 8]; const y = list.f[i * 8 + 1];
+      if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y;
+    }
+    if (!n) { minX = minY = 0; maxX = maxY = 1; }
+    const gx0 = Math.floor(minX / CELL) * CELL; const gy0 = Math.floor(minY / CELL) * CELL;
+    const cols = Math.floor((maxX - gx0) / CELL) + 1; const rows = Math.floor((maxY - gy0) / CELL) + 1;
     const cellOf = new Int32Array(n); const counts = new Int32Array(cols * rows + 1);
     for (let i = 0; i < n; i++) {
-      const cx = clamp(Math.floor(list.f[i * 8] / CELL), 0, cols - 1);
-      const cy = clamp(Math.floor(list.f[i * 8 + 1] / CELL), 0, rows - 1);
+      const cx = clamp(Math.floor((list.f[i * 8] - gx0) / CELL), 0, cols - 1);
+      const cy = clamp(Math.floor((list.f[i * 8 + 1] - gy0) / CELL), 0, rows - 1);
       cellOf[i] = cy * cols + cx; counts[cellOf[i] + 1]++;
     }
     for (let k = 1; k <= cols * rows; k++) counts[k] += counts[k - 1];
     const cellStart = counts.slice();
     const fill = counts.slice(0, cols * rows);
-    const statics = new Float32Array(n * 6);   // x, y, seed, size, link, font
+    const statics = new Float32Array(n * 6);       // x, y, seed, size, link, font
     const colours = new Uint8ClampedArray(n * 8);  // day rgba, night rgba
-    const rowY = new Float32Array(n);          // y that times the sweep (the line's middle, or own y)
+    const rowY = new Float32Array(n);              // y that times the sweep (the line's middle, or own y)
     for (let i = 0; i < n; i++) {
       const to = fill[cellOf[i]]++;
       const f = i * 8; const s6 = to * 6; const c8 = to * 8;
@@ -467,11 +627,11 @@
       const tag = list.f[f + 6];
       rowY[to] = tag >= 0 ? lines[tag].mid : -1 - tag;
     }
-    return { n, statics, colours, rowY, cellStart, cols, rows };
+    return { n, statics, colours, rowY, cellStart, cols, rows, gx0, gy0, x0: minX, y0: minY, x1: maxX, y1: maxY };
   }
 
   /* ---------------------------------------------------------------------------
-   * WebGL renderer: one program, one draw call of points
+   * WebGL renderer: one program; one draw call per group of points
    * ------------------------------------------------------------------------- */
   const VERTEX = `
 precision highp float;
@@ -481,11 +641,12 @@ attribute vec4 aDay;    // colour on the day page, premultiplied in the shader
 attribute vec4 aNight;  // colour on the night ground
 attribute vec2 aOff;    // wind displacement (CPU, sparse)
 attribute vec2 aDelay;  // start of this particle's line: enter, exit (s)
-uniform vec4 uView;     // viewport w, h; scroll x, y
+uniform vec4 uView;     // viewport w, h (css px)
+uniform vec4 uGroup;    // the group's origin in the viewport (x, y), its share of the scroll lag, alpha
 uniform vec4 uClock;    // shimmer time, shimmer amplitude, night mix, scroll lag
 uniform vec3 uPhase;    // time since the enter began, since the exit began (<0: not leaving), dpr
 uniform vec4 uHover;    // link id, amount; previous link id, amount
-uniform vec4 uRing[${RING_MAX}];  // x, y (document), age (s), strength
+uniform vec4 uRing[${RING_MAX}];  // x, y (viewport), age (s), strength
 varying vec4 vColour;
 varying vec2 vDot;      // radius and sprite size, device px
 void main() {
@@ -501,11 +662,12 @@ void main() {
   float reach = aMeta.w * (0.15 + 0.5 * h1);
   float puff = 6.75 * e * (1.0 - e) * (1.0 - e);        // out fast, settle slowly (peak at e = 1/3)
   float stir = 0.18 * sin(3.14159265 * min(x / 0.7, 1.0));
-  vec2 p = aHome + aOff * home + dir * reach * (puff * home + stir);
+  vec2 base = aHome + uGroup.xy;
+  vec2 p = base + aOff * home + dir * reach * (puff * home + stir);
   float glow = 0.0;
   for (int k = 0; k < ${RING_MAX}; k++) {
     vec4 r = uRing[k];
-    vec2 d = aHome - r.xy;
+    vec2 d = base - r.xy;
     float dist = length(d) + 0.001;
     float q = (dist - r.z * ${RING_SPEED.toFixed(1)}) / ${RING_WIDTH.toFixed(1)};
     float g = r.w * exp(-q * q - r.z / ${RING_DECAY.toFixed(3)}) / (1.0 + dist / 600.0);
@@ -513,17 +675,16 @@ void main() {
     glow += g;
   }
   // Scroll: the grains lag by an amount that grows down the screen, like sand.
-  float sy = p.y - uView.w;
-  float lag = clamp(0.25 + 0.55 * sy / uView.y + 0.2 * h2, 0.0, 1.0);
-  vec2 s = vec2(p.x - uView.z, sy - uClock.w * lag);
+  float lag = clamp(0.25 + 0.55 * p.y / uView.y + 0.2 * h2, 0.0, 1.0) * uGroup.z;
+  vec2 s = vec2(p.x, p.y - uClock.w * lag);
   gl_Position = vec4(s.x / uView.x * 2.0 - 1.0, 1.0 - s.y / uView.y * 2.0, 0.0, 1.0);
   vec4 c = mix(aDay, aNight, uClock.z);
   float hover = (abs(aMeta.z - uHover.x) < 0.5 ? uHover.y : 0.0) + (abs(aMeta.z - uHover.z) < 0.5 ? uHover.w : 0.0);
   hover *= uClock.z;
   c.rgb = mix(c.rgb, vec3(1.0), 0.45 * hover);
   float a = c.a * (1.0 + uClock.y * sin(uClock.x * (0.5 + 0.9 * h2) + h3 * 6.2831853));
-  a *= smoothstep(0.0, 0.15, e) * (1.0 - smoothstep(0.6, 1.0, x)) * (1.0 - 0.3 * puff);
-  a = min(1.0, a * (1.0 + 0.5 * hover) + 0.3 * glow);
+  a *= smoothstep(0.0, 0.15, e) * (1.0 - smoothstep(0.6, 1.0, x)) * (1.0 - 0.3 * puff) * uGroup.w;
+  a = min(1.0, a * (1.0 + 0.5 * hover) + 0.3 * glow * uGroup.w);
   float size = aMeta.y * (1.0 + 0.35 * (1.0 - smoothstep(0.0, 0.3, e)) + 0.35 * smoothstep(0.3, 0.85, x) + 0.15 * hover);
   // An antialiased disc at its sub-pixel position: the sprite has a pixel of margin.
   float radius = 0.5 * size * uPhase.z;
@@ -561,59 +722,88 @@ void main() {
     gl.useProgram(program);
     const attr = name => gl.getAttribLocation(program, name);
     const A = { home: attr('aHome'), meta: attr('aMeta'), day: attr('aDay'), night: attr('aNight'), off: attr('aOff'), delay: attr('aDelay') };
+    for (const loc of Object.values(A)) if (loc >= 0) gl.enableVertexAttribArray(loc);
     const U = {};
-    for (const name of ['uView', 'uClock', 'uPhase', 'uHover', 'uRing']) U[name] = gl.getUniformLocation(program, name);
-    const buffers = { statics: gl.createBuffer(), colours: gl.createBuffer(), off: gl.createBuffer(), delay: gl.createBuffer() };
-    const bind = (buffer, loc, size, type, normalised, stride, offset) => {
+    for (const name of ['uView', 'uGroup', 'uClock', 'uPhase', 'uHover', 'uRing']) U[name] = gl.getUniformLocation(program, name);
+    const pointer = (buffer, loc, size, type, normalised, stride, offset) => {
       if (loc < 0) return;
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.enableVertexAttribArray(loc);
       gl.vertexAttribPointer(loc, size, type, normalised, stride, offset);
     };
     gl.disable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);   // premultiplied "over"
     gl.clearColor(0, 0, 0, 0);
-    let count = 0;
+    const array = (data, usage) => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, usage); return b; };
     return {
       kind: v2 ? 'webgl2' : 'webgl1',
-      upload(data, offsets, delays) {
-        count = data.n;
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.statics); gl.bufferData(gl.ARRAY_BUFFER, data.statics, gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colours); gl.bufferData(gl.ARRAY_BUFFER, data.colours, gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.off); gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.DYNAMIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.delay); gl.bufferData(gl.ARRAY_BUFFER, delays, gl.DYNAMIC_DRAW);
-        bind(buffers.statics, A.home, 2, gl.FLOAT, false, 24, 0);
-        bind(buffers.statics, A.meta, 4, gl.FLOAT, false, 24, 8);
-        bind(buffers.colours, A.day, 4, gl.UNSIGNED_BYTE, true, 8, 0);
-        bind(buffers.colours, A.night, 4, gl.UNSIGNED_BYTE, true, 8, 4);
-        bind(buffers.off, A.off, 2, gl.FLOAT, false, 8, 0);
-        bind(buffers.delay, A.delay, 2, gl.FLOAT, false, 8, 0);
+      // A group's buffers: statics and colours once, offsets and delays as they change.
+      create(group) {
+        const d = group.data;
+        group.buf = {
+          statics: array(d.statics, gl.STATIC_DRAW), colours: array(d.colours, gl.STATIC_DRAW),
+          off: array(group.off, gl.DYNAMIC_DRAW), delay: array(group.delays, gl.DYNAMIC_DRAW)
+        };
       },
-      uploadDelays(delays) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.delay); gl.bufferSubData(gl.ARRAY_BUFFER, 0, delays);
+      release(group) {
+        if (!group.buf) return;
+        for (const b of Object.values(group.buf)) gl.deleteBuffer(b);
+        group.buf = null;
       },
-      // Only the disturbed range of the offsets goes to the GPU.
-      uploadOffsets(offsets, lo, hi) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.off);
-        if (v2) gl.bufferSubData(gl.ARRAY_BUFFER, lo * 8, offsets, lo * 2, (hi - lo + 1) * 2);
-        else gl.bufferSubData(gl.ARRAY_BUFFER, lo * 8, offsets.subarray(lo * 2, (hi + 1) * 2));
+      uploadDelays(group) {
+        if (!group.buf) return;
+        gl.bindBuffer(gl.ARRAY_BUFFER, group.buf.delay); gl.bufferSubData(gl.ARRAY_BUFFER, 0, group.delays);
       },
-      draw(u) {
+      // Only the disturbed range of a group's offsets goes to the GPU.
+      uploadOffsets(group, lo, hi) {
+        if (!group.buf) return;
+        gl.bindBuffer(gl.ARRAY_BUFFER, group.buf.off);
+        if (v2) gl.bufferSubData(gl.ARRAY_BUFFER, lo * 8, group.off, lo * 2, (hi - lo + 1) * 2);
+        else gl.bufferSubData(gl.ARRAY_BUFFER, lo * 8, group.off.subarray(lo * 2, (hi + 1) * 2));
+      },
+      begin(u) {
         gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.disable(gl.SCISSOR_TEST);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        if (!count) return;
-        gl.uniform4f(U.uView, u.w, u.h, u.scrollX, u.scrollY);
+        gl.uniform4f(U.uView, u.w, u.h, 0, 0);
         gl.uniform4f(U.uClock, u.time, u.shimmer, u.night, u.lag);
         gl.uniform3f(U.uPhase, u.enterT, u.exitT, u.dpr);
         gl.uniform4f(U.uHover, u.hoverId, u.hoverAmount, u.prevId, u.prevAmount);
         gl.uniform4fv(U.uRing, u.rings);
-        gl.drawArrays(gl.POINTS, 0, count);
       },
-      clear() { gl.viewport(0, 0, canvas.width, canvas.height); gl.clear(gl.COLOR_BUFFER_BIT); },
+      draw(group, u) {
+        const b = group.buf; if (!b || !group.data.n) return;
+        pointer(b.statics, A.home, 2, gl.FLOAT, false, 24, 0);
+        pointer(b.statics, A.meta, 4, gl.FLOAT, false, 24, 8);
+        pointer(b.colours, A.day, 4, gl.UNSIGNED_BYTE, true, 8, 0);
+        pointer(b.colours, A.night, 4, gl.UNSIGNED_BYTE, true, 8, 4);
+        pointer(b.off, A.off, 2, gl.FLOAT, false, 8, 0);
+        pointer(b.delay, A.delay, 2, gl.FLOAT, false, 8, 0);
+        gl.uniform4f(U.uGroup, group.origin.x, group.origin.y, group.lagShare, group.alpha);
+        const c = group.clip;
+        if (c) {
+          // The scissor box is in device pixels from the bottom-left.
+          const k = u.dpr; const x0 = Math.max(0, Math.floor(c.x0 * k)); const x1 = Math.min(canvas.width, Math.ceil(c.x1 * k));
+          const y0 = Math.max(0, Math.floor((u.h - c.y1) * k)); const y1 = Math.min(canvas.height, Math.ceil((u.h - c.y0) * k));
+          if (x1 <= x0 || y1 <= y0) return;
+          gl.enable(gl.SCISSOR_TEST); gl.scissor(x0, y0, x1 - x0, y1 - y0);
+        } else {
+          gl.disable(gl.SCISSOR_TEST);
+        }
+        gl.drawArrays(gl.POINTS, 0, group.data.n);
+      },
+      // Clear a box (viewport css px) of everything drawn so far.
+      occlude(c, u) {
+        const k = u.dpr; const x0 = Math.max(0, Math.floor(c.x0 * k)); const x1 = Math.min(canvas.width, Math.ceil(c.x1 * k));
+        const y0 = Math.max(0, Math.floor((u.h - c.y1) * k)); const y1 = Math.min(canvas.height, Math.ceil((u.h - c.y0) * k));
+        if (x1 <= x0 || y1 <= y0) return;
+        gl.enable(gl.SCISSOR_TEST); gl.scissor(x0, y0, x1 - x0, y1 - y0); gl.clear(gl.COLOR_BUFFER_BIT);
+      },
+      end() {},
+      clear() { gl.viewport(0, 0, canvas.width, canvas.height); gl.disable(gl.SCISSOR_TEST); gl.clear(gl.COLOR_BUFFER_BIT); },
       lost: () => gl.isContextLost(),
-      dispose() {
-        for (const b of Object.values(buffers)) gl.deleteBuffer(b);
+      dispose(groups) {
+        for (const group of groups) this.release(group);
         gl.deleteProgram(program);
         const lose = gl.getExtension('WEBGL_lose_context');
         if (lose) lose.loseContext();
@@ -622,46 +812,55 @@ void main() {
   }
 
   /*
-   * Canvas2D fallback: plots the particles of the visible cell rows into an ImageData
-   * at DPR 1 (wind, scroll lag, fades and colours; no puff, rings or shimmer).
+   * Canvas2D fallback: plots the particles of the visible part of each group into an
+   * ImageData at DPR 1 (wind, scroll lag, fades and colours; no puff, rings or shimmer).
    */
-  function pixelRenderer(canvas, state) {
+  function pixelRenderer(canvas) {
     const g = canvas.getContext('2d');
     if (!g) return null;
     let image = null; let pixels = null;
     return {
       kind: 'canvas2d',
-      upload() {}, uploadDelays() {}, uploadOffsets() {},
-      draw(u) {
+      create() {}, release() {}, uploadDelays() {}, uploadOffsets() {},
+      begin() {
         const w = canvas.width; const h = canvas.height;
         if (!image || image.width !== w || image.height !== h) { image = g.createImageData(w, h); pixels = new Uint32Array(image.data.buffer); }
         pixels.fill(0);
-        const d = state.data; const off = state.off; const delays = state.delays;
-        const r0 = clamp(Math.floor((u.scrollY - LAG_MAX) / CELL) - 1, 0, d.rows - 1);
-        const r1 = clamp(Math.ceil((u.scrollY + h + LAG_MAX) / CELL) + 1, 0, d.rows - 1);
+      },
+      draw(group, u) {
+        const d = group.data; if (!d.n) return;
+        const w = canvas.width; const h = canvas.height; const off = group.off; const delays = group.delays;
+        const ox = group.origin.x; const oy = group.origin.y - u.lag * 0.5 * group.lagShare;
+        const c = group.clip || { x0: 0, y0: 0, x1: w, y1: h };
+        const r0 = clamp(Math.floor((-oy - d.gy0 - LAG_MAX) / CELL) - 1, 0, d.rows - 1);
+        const r1 = clamp(Math.ceil((h - oy - d.gy0 + LAG_MAX) / CELL) + 1, 0, d.rows - 1);
         const from = d.cellStart[r0 * d.cols]; const to = d.cellStart[(r1 + 1) * d.cols];
-        const n = u.night;
+        const n = u.night; const col = d.colours;
         for (let i = from; i < to; i++) {
           const e = clamp((u.enterT - delays[i * 2]) / ENTER_DUR, 0, 1);
           const x = u.exitT < 0 ? 0 : clamp((u.exitT - delays[i * 2 + 1]) / EXIT_DUR, 0, 1);
-          const k = i * 8; const c = d.colours;
-          let a = ((c[k + 3] + (c[k + 7] - c[k + 3]) * n) / 255) * smooth(0, 0.15, e) * (1 - smooth(0.6, 1, x));
+          const k = i * 8;
+          let a = ((col[k + 3] + (col[k + 7] - col[k + 3]) * n) / 255) * smooth(0, 0.15, e) * (1 - smooth(0.6, 1, x)) * group.alpha;
           if (a < 0.02) continue;
-          const settle = 1 - smooth(0, 0.7, x);
-          const px = Math.round(d.statics[i * 6] + off[i * 2] * settle - u.scrollX);
-          const py = Math.round(d.statics[i * 6 + 1] + off[i * 2 + 1] * settle - u.scrollY - u.lag * 0.5);
-          if (px < 0 || py < 0 || px >= w || py >= h) continue;
+          const home = 1 - smooth(0, 0.7, x);
+          const px = Math.round(d.statics[i * 6] + off[i * 2] * home + ox);
+          const py = Math.round(d.statics[i * 6 + 1] + off[i * 2 + 1] * home + oy);
+          if (px < c.x0 || py < c.y0 || px >= c.x1 || py >= c.y1 || px < 0 || py < 0 || px >= w || py >= h) continue;
           const hover = (d.statics[i * 6 + 4] === u.hoverId ? u.hoverAmount : 0) * n;
           a = Math.min(1, a * (1 + 0.5 * hover));
-          const mix = ch => (c[k + ch] + (c[k + 4 + ch] - c[k + ch]) * n) * (1 - 0.45 * hover) + 255 * 0.45 * hover;
-          const p = py * w + px; const old = pixels[p];
-          const keep = 1 - a;
+          const mix = ch => (col[k + ch] + (col[k + 4 + ch] - col[k + ch]) * n) * (1 - 0.45 * hover) + 255 * 0.45 * hover;
+          const p = py * w + px; const old = pixels[p]; const keep = 1 - a;
           const rr = mix(0) * a + (old & 255) * keep; const gg = mix(1) * a + ((old >>> 8) & 255) * keep;
           const bb = mix(2) * a + ((old >>> 16) & 255) * keep; const aa = 255 * a + (old >>> 24) * keep;
           pixels[p] = ((aa & 255) << 24 | (bb & 255) << 16 | (gg & 255) << 8 | (rr & 255)) >>> 0;
         }
-        g.putImageData(image, 0, 0);
       },
+      occlude(c) {
+        const w = canvas.width; const h = canvas.height;
+        const x0 = clamp(Math.floor(c.x0), 0, w); const x1 = clamp(Math.ceil(c.x1), 0, w);
+        for (let y = clamp(Math.floor(c.y0), 0, h); y < clamp(Math.ceil(c.y1), 0, h); y++) pixels.fill(0, y * w + x0, y * w + x1);
+      },
+      end() { g.putImageData(image, 0, 0); },
       clear() { g.clearRect(0, 0, canvas.width, canvas.height); },
       lost: () => false,
       dispose() { image = null; pixels = null; }
@@ -669,15 +868,286 @@ void main() {
   }
 
   /* ---------------------------------------------------------------------------
-   * Ink: crisp sprites of the page's words (and the portrait) for the transitions
+   * Groups: a band of the document, or a box that follows its own container
    * ------------------------------------------------------------------------- */
-  // Day and night sprites of every word on the lines near the viewport, in device
-  // pixels, so that at full alpha each sprite is blitted 1:1 onto its glyphs.
+  // Word lists for a band (text in flow whose middle falls in it) or a box (its text),
+  // measured in slices. Resolves null if the build stopped.
+  async function groupWords(state, model, spec, pause) {
+    const words = [];
+    const entries = spec.kind === 'band' ? model.entries : spec.box.entries;
+    const y0 = spec.y0; const y1 = spec.y1;
+    for (const entry of entries) {
+      if (spec.kind === 'band') {
+        if (entry.top > y1 + 40) break;
+        if (entry.bottom < y0 - 40) continue;
+      }
+      for (const w of wordsOf(state, model, entry)) if (spec.kind !== 'band' || (w.mid >= y0 && w.mid < y1)) words.push(w);
+      if (await pause()) return null;
+    }
+    return words;
+  }
+
+  // Build (or confirm) one group, in slices. Resolves with the group, or null if stopped.
+  async function buildGroup(state, model, spec, old) {
+    let began = state.sliceAt = performance.now();
+    const pause = async () => {
+      const spent = performance.now() - began;
+      if (spent > (state.perf.sliceMax || 0)) state.perf.sliceMax = spent;
+      if (spent < SLICE_MS) return false;
+      await nextTask();
+      began = state.sliceAt = performance.now();
+      return state.dead || state.gen !== model.gen || state.phase === 'exiting';
+    };
+    const words = await groupWords(state, model, spec, pause);
+    if (!words) return null;
+    const lines = groupLines(words);
+    // The homepage portrait belongs to the band that holds its middle.
+    let photoImg = null;
+    if (spec.kind === 'band' && state.photoImg) {
+      const r = state.photoImg.getBoundingClientRect(); const mid = (r.top + r.bottom) / 2 + window.scrollY;
+      if (mid >= spec.y0 && mid < spec.y1) photoImg = state.photoImg;
+    }
+    const sig = signature(words, photoImg ? `photo:${Math.round(photoImg.getBoundingClientRect().top + window.scrollY)}` : '');
+    if (old && old.sig === sig && old.data) {
+      // Nothing it draws has changed: keep the particles, take the fresh word records.
+      old.gen = model.gen; old.words = words; old.lines = lines; old.spec = spec;
+      if (spec.kind === 'box') old.box = spec.box;
+      return old;
+    }
+    const random = seeded(spec.kind === 'band' ? 0x5eed + spec.k : hashString(spec.key));
+    const list = particleList();
+    for (let i = 0; i < words.length;) {
+      i = samplePass(words, i, list, random);
+      if (i < words.length && await pause()) return null;
+    }
+    let photo = null;
+    if (photoImg) { if (await pause()) return null; photo = samplePhoto(photoImg, list, random); }
+    if (await pause()) return null;
+    const data = freeze(list, lines);
+    // The upload that follows starts a slice of its own.
+    await nextTask();
+    state.sliceAt = performance.now();
+    if (state.dead || state.gen !== model.gen || state.phase === 'exiting') return null;
+    const n = data.n;
+    const group = {
+      key: spec.key, kind: spec.kind, spec, k: spec.k, box: spec.box || null, gen: model.gen, sig,
+      words, lines, data, photo,
+      off: new Float32Array(n * 2), vel: new Float32Array(n * 2), delays: new Float32Array(n * 2),
+      awake: new Uint8Array(n), awakeList: new Int32Array(n), awakeCount: 0,
+      buf: null, bornAt: performance.now(), fade: 0, alpha: 1,
+      origin: { x: 0, y: 0 }, clip: null, visible: false, lagShare: spec.kind === 'box' ? spec.box.lagShare : 1
+    };
+    for (let i = 0; i < n; i++) group.delays[i * 2] = -10;
+    return group;
+  }
+
+  // The groups the window needs, nearest first: bands in reach of the viewport, and boxes.
+  function neededGroups(state, model) {
+    const H = state.H; const sy = window.scrollY;
+    const top = sy - BUILD_SCREENS * H; const bottom = sy + H + BUILD_SCREENS * H;
+    const centre = sy + H / 2;
+    // Distance: the gap between a group and the viewport (0 on screen), shorter ahead of the
+    // scroll than behind it; ties go to the centre.
+    const ahead = state.scrollDir || 1;
+    const gap = (a, b) => {
+      const below = a - (sy + H); const above = sy - b;
+      if (below > 0) return below * (ahead > 0 ? 0.6 : 1.4);
+      if (above > 0) return above * (ahead < 0 ? 0.6 : 1.4);
+      return 0;
+    };
+    const near = (a, b) => Math.abs((a + b) / 2 - centre);
+    const specs = [];
+    const k0 = Math.max(0, Math.floor(top / BAND_H)); const k1 = Math.floor(Math.min(bottom, model.docH + BAND_H) / BAND_H);
+    for (let k = k0; k <= k1; k++) {
+      const y0 = k * BAND_H; const y1 = y0 + BAND_H;
+      specs.push({ kind: 'band', key: `b${k}`, k, y0, y1, distance: gap(y0, y1), order: near(y0, y1) });
+    }
+    for (const box of model.boxes.values()) {
+      if (!box.el.isConnected) continue;
+      const fixedTop = box.fixed ? sy : box.top; const fixedBottom = box.fixed ? sy + H : box.bottom;
+      if (fixedBottom < top || fixedTop > bottom) continue;
+      let id = state.boxIds.get(box.el);
+      if (!id) { id = ++state.boxCount; state.boxIds.set(box.el, id); }
+      specs.push({ kind: 'box', key: `x${id}`, box, distance: gap(fixedTop, fixedBottom), order: near(Math.max(fixedTop, top), Math.min(fixedBottom, bottom)) });
+    }
+    specs.sort((a, b) => a.distance - b.distance || a.order - b.order);
+    return specs;
+  }
+
+  // A new group in the window (it fades in), or a re-sampled one in place of the old.
+  function addGroup(state, group, replaced, fade) {
+    if (replaced) removeGroup(state, replaced);
+    if (state.renderer) state.renderer.create(group);
+    group.fade = fade && !replaced && !state.ctx.motion.matches ? GROUP_FADE : 0;
+    group.bornAt = performance.now();
+    state.groups.set(group.key, group);
+    state.particles += group.data.n;
+    state.dirty = true;
+  }
+  function removeGroup(state, group) {
+    if (state.groups.get(group.key) === group) state.groups.delete(group.key);
+    state.particles -= group.data ? group.data.n : 0;
+    if (state.renderer) state.renderer.release(group);
+    group.data = null;
+  }
+
+  /*
+   * The builder: one at a time, brings the window up to date with the model (new bands,
+   * re-measured groups after a change), nearest first, under the particle cap, and evicts
+   * far groups. Re-run whenever the window or the content changes.
+   */
+  function schedule(state) {
+    if (state.dead || state.phase === 'exiting') return;
+    state.buildWanted = true;
+    if (!state.building) runBuilder(state);
+  }
+  async function runBuilder(state) {
+    state.building = true;
+    try {
+      while (state.buildWanted && !state.dead && state.phase !== 'exiting') {
+        state.buildWanted = false;
+        if (!state.model || state.modelStale) {
+          state.modelStale = false;
+          const m0 = performance.now();
+          const model = await buildModel(state);
+          state.perf.models = (state.perf.models || 0) + 1; state.perf.modelMs = performance.now() - m0;
+          if (!model) { state.buildWanted = true; continue; }
+          state.model = model;
+        }
+        await fillWindow(state, state.model, true);
+      }
+    } finally {
+      state.building = false;
+    }
+  }
+  async function fillWindow(state, model, fade) {
+    const specs = neededGroups(state, model);
+    const needed = new Set(specs.map(spec => spec.key));
+    // Evict first what lies beyond reach (or whose container is gone) ...
+    const sy = window.scrollY; const H = state.H;
+    const keepTop = sy - KEEP_SCREENS * H; const keepBottom = sy + H + KEEP_SCREENS * H;
+    const evict = force => {
+      const far = [...state.groups.values()].filter(group => !needed.has(group.key))
+        .map(group => { const [top, bottom] = groupSpan(group); return { group, top, bottom, d: Math.max(top - sy, sy - bottom) }; })
+        .sort((a, b) => b.d - a.d);
+      for (const { group, top, bottom } of far) {
+        const gone = group.kind === 'box' && !group.box.el.isConnected;
+        if (gone || bottom < keepTop || top > keepBottom || (force && state.particles > PARTICLE_CAP)) removeGroup(state, group);
+      }
+    };
+    evict(false);
+    // ... then build the window, nearest first. Near the cap a farther group (behind the
+    // scroll, usually) makes room for a nearer one, or the window stops growing.
+    const distanceOf = new Map(specs.map(spec => [spec.key, spec.distance]));
+    for (const spec of specs) {
+      if (state.dead || state.phase === 'exiting' || state.gen !== model.gen) return;
+      const old = state.groups.get(spec.key) || null;
+      if (old && old.gen === model.gen) continue;
+      while (!old && spec.distance > 0 && state.particles > PARTICLE_CAP * 0.88) {
+        let farthest = null; let far = spec.distance;
+        for (const group of state.groups.values()) {
+          const d = distanceOf.has(group.key) ? distanceOf.get(group.key) : Infinity;
+          if (d > far) { far = d; farthest = group; }
+        }
+        if (!farthest) break;
+        removeGroup(state, farthest);
+      }
+      if (!old && spec.distance > 0 && state.particles > PARTICLE_CAP * 0.88) break;
+      const b0 = performance.now();
+      const group = await buildGroup(state, model, spec, old);
+      if (!group || state.dead || state.gen !== model.gen) return;
+      if (group !== old) {
+        state.perf.builds = (state.perf.builds || 0) + 1; state.perf.buildWall = (state.perf.buildWall || 0) + performance.now() - b0;
+        addGroup(state, group, state.groups.get(spec.key) || null, fade);
+        if (state.phase === 'entering') enterDelays(state, group, true);
+      }
+      if (state.particles > PARTICLE_CAP) trimToCap(state);
+      // The slice that finished this group (freeze and upload included).
+      state.perf.sliceMax = Math.max(state.perf.sliceMax || 0, performance.now() - state.sliceAt);
+      await nextTask();
+      wake(state);
+    }
+  }
+  // Over the cap: drop the groups farthest from the viewport, never one on screen.
+  function trimToCap(state) {
+    const sy = window.scrollY; const H = state.H;
+    const far = [...state.groups.values()]
+      .map(group => { const [top, bottom] = groupSpan(group); return { group, d: Math.max(top - (sy + H), sy - bottom) }; })
+      .filter(item => item.d > 0).sort((a, b) => b.d - a.d);
+    for (const { group } of far) { if (state.particles <= PARTICLE_CAP) break; removeGroup(state, group); }
+  }
+  // A group's extent in document y (for eviction).
+  function groupSpan(group) {
+    if (group.kind === 'band') return [group.spec.y0, group.spec.y1];
+    if (group.box.fixed) return [-Infinity, Infinity];
+    const r = group.box.el.getBoundingClientRect();
+    return [r.top + window.scrollY, r.bottom + window.scrollY];
+  }
+
+  // Where each group is this frame: its origin in the viewport, clip and visibility.
+  function placeGroups(state) {
+    const W = state.W; const H = state.H; const sx = window.scrollX; const sy = window.scrollY;
+    const now = performance.now();
+    for (const group of state.groups.values()) {
+      const d = group.data; if (!d) continue;
+      if (group.kind === 'band') {
+        group.origin.x = -sx; group.origin.y = -sy; group.clip = null; group.cover = null;
+        group.visible = d.y1 - sy > -LAG_MAX - 20 && d.y0 - sy < H + LAG_MAX + 20 && d.x1 - sx > -20 && d.x0 - sx < W + 20;
+      } else {
+        const el = group.box.el;
+        if (!el.isConnected) { group.visible = false; continue; }
+        const o = boxOrigin(el);
+        group.origin.x = o.x; group.origin.y = o.y;
+        let clip = null;
+        for (const c of group.box.clipEls) {
+          const r = c.getBoundingClientRect();
+          const box = { x0: r.left + c.clientLeft, y0: r.top + c.clientTop, x1: r.left + c.clientLeft + c.clientWidth, y1: r.top + c.clientTop + c.clientHeight };
+          clip = clip ? { x0: Math.max(clip.x0, box.x0), y0: Math.max(clip.y0, box.y0), x1: Math.min(clip.x1, box.x1), y1: Math.min(clip.y1, box.y1) } : box;
+        }
+        group.clip = clip;
+        if (group.box.occludes) {
+          const r = el.getBoundingClientRect();
+          let c = { x0: r.left, y0: r.top, x1: r.right, y1: r.bottom };
+          if (clip) c = { x0: Math.max(c.x0, clip.x0), y0: Math.max(c.y0, clip.y0), x1: Math.min(c.x1, clip.x1), y1: Math.min(c.y1, clip.y1) };
+          group.cover = c;
+        } else {
+          group.cover = null;
+        }
+        const x0 = d.x0 + o.x; const x1 = d.x1 + o.x; const y0 = d.y0 + o.y; const y1 = d.y1 + o.y;
+        group.visible = y1 > -LAG_MAX - 20 && y0 < H + LAG_MAX + 20 && x1 > -20 && x0 < W + 20 &&
+          (!clip || (clip.x1 > clip.x0 && clip.y1 > clip.y0 && clip.y1 > 0 && clip.y0 < H));
+      }
+      group.alpha = group.fade > 0 ? clamp((now - group.bornAt) / 1000 / group.fade, 0, 1) : 1;
+    }
+  }
+
+  // Enter timing for a group: line by line from the top of the viewport (or settled).
+  function enterDelays(state, group, settled) {
+    const d = group.data; if (!d) return;
+    const oy = group.kind === 'band' ? -window.scrollY : boxOrigin(group.box.el).y;
+    const H = state.H;
+    const delay = y => (settled ? -10 : ENTER_START + ENTER_SWEEP * clamp((y + oy) / H, 0, 1));
+    for (const line of group.lines) line.delayIn = delay(line.mid);
+    for (let i = 0; i < d.n; i++) group.delays[i * 2] = delay(d.rowY[i]);
+    state.renderer.uploadDelays(group);
+  }
+  function exitDelays(state, group) {
+    const d = group.data; if (!d) return;
+    const oy = group.origin.y; const H = state.H;
+    const delay = y => EXIT_SWEEP * clamp((y + oy) / H, 0, 1);
+    for (const line of group.lines) line.delayOut = delay(line.mid);
+    for (let i = 0; i < d.n; i++) group.delays[i * 2 + 1] = delay(d.rowY[i]);
+    state.renderer.uploadDelays(group);
+  }
+
+  /* ---------------------------------------------------------------------------
+   * Ink: crisp sprites of the visible words (and the portrait) for the transitions
+   * ------------------------------------------------------------------------- */
+  // Day and night sprites of every word on visible lines, in device pixels, so that at
+  // full alpha each sprite is blitted 1:1 onto its glyphs. Per group, as placed now.
   function buildInk(state) {
-    const dpr = state.dpr; const sx = window.scrollX; const sy = window.scrollY;
-    const top = sy - 0.25 * state.H; const bottom = sy + 1.25 * state.H;
-    const lines = state.lines.filter(line => line.bottom > top && line.top < bottom);
-    const measure = makeCanvas(1, 1).getContext('2d');
+    const dpr = state.dpr; const H = state.H;
+    const measure = state.measure || (state.measure = makeCanvas(1, 1).getContext('2d'));
     const native = 'letterSpacing' in measure;
     const heights = [0]; let page = 0; let x = 0; let y = 0; let shelf = 0;
     const place = (w, h) => {
@@ -687,20 +1157,30 @@ void main() {
       x += w + 2; shelf = Math.max(shelf, h); heights[page] = Math.max(heights[page], y + h);
       return spot;
     };
-    const items = [];
-    for (const line of lines) {
-      line.ink = [];
-      for (const w of line.words) {
-        const size = w.style.size;
-        const left = w.docLeft - sx; const wtop = w.docTop - sy;
-        const padX = Math.ceil((2 + 0.3 * size) * dpr); const padY = Math.ceil((2 + 0.25 * size) * dpr);
-        const ox = Math.floor(left * dpr) - padX; const oy = Math.floor(wtop * dpr) - padY;
-        const sw = Math.ceil((left + w.width) * dpr) + padX - ox; const sh = Math.ceil((wtop + w.height) * dpr) + padY - oy;
-        if (sw > ATLAS_W || sh > ATLAS_H) continue;
-        const item = { w, left, top: wtop, ox, oy, sw, sh, day: place(sw, sh), night: place(sw, sh) };
-        line.ink.push(item); items.push(item);
+    placeGroups(state);
+    const items = []; const sets = [];
+    for (const group of state.groups.values()) {
+      if (!group.visible) continue;
+      const o = { x: group.origin.x, y: group.origin.y };
+      const set = { group, origin: o, lines: [] };
+      for (const line of group.lines) {
+        if (line.bottom + o.y < -0.25 * H || line.top + o.y > 1.25 * H) continue;
+        line.ink = [];
+        for (const w of line.words) {
+          const size = w.style.size;
+          const left = w.x + o.x; const top = w.y + o.y;
+          const padX = Math.ceil((2 + 0.3 * size) * dpr); const padY = Math.ceil((2 + 0.25 * size) * dpr);
+          const ox = Math.floor(left * dpr) - padX; const oy = Math.floor(top * dpr) - padY;
+          const sw = Math.ceil((left + w.width) * dpr) + padX - ox; const sh = Math.ceil((top + w.height) * dpr) + padY - oy;
+          if (sw > ATLAS_W || sh > ATLAS_H) continue;
+          const item = { w, left, top, ox, oy, sw, sh, day: place(sw, sh), night: place(sw, sh) };
+          line.ink.push(item); items.push(item);
+        }
+        set.lines.push(line);
       }
+      if (set.lines.length || group.photo) sets.push(set);
     }
+    sets.sort((a, b) => (a.group.cover ? 1 : 0) - (b.group.cover ? 1 : 0));
     const atlases = heights.map(h => makeCanvas(ATLAS_W, Math.max(1, h)));
     const contexts = atlases.map(c => c.getContext('2d'));
     for (const item of items) {
@@ -712,14 +1192,23 @@ void main() {
         g.setTransform(dpr, 0, 0, dpr, spot[1] - item.ox, spot[2] - item.oy);
         g.font = style.font; g.fillStyle = colour; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
         if (native) g.letterSpacing = `${style.spacing}px`;
-        fillSpaced(g, item.w.text, item.left, Math.round(item.top + style.ascent), style.spacing, native);
+        const baseline = Math.round(item.top + style.ascent);
+        fillSpaced(g, item.w.text, item.left, baseline, style.spacing, native);
+        if (style.thin) {
+          // -webkit-font-smoothing: antialiased draws thinner than canvas text: shave the rim.
+          g.globalCompositeOperation = 'destination-out';
+          g.lineWidth = THIN_ERODE; g.strokeStyle = '#000';
+          fillSpaced(g, item.w.text, item.left, baseline, style.spacing, native, true);
+        }
         g.restore();
       }
     }
     // The portrait with its border, pre-scaled to device pixels and drawn in strips.
     let photo = null;
-    const box = state.photo;
-    if (box && box.top + box.height > top && box.top < bottom) {
+    for (const group of state.groups.values()) {
+      const box = group.photo;
+      if (!box || !group.visible) continue;
+      const sx = window.scrollX; const sy = window.scrollY;
       const left = Math.round((box.left - sx) * dpr); const ptop = Math.round((box.top - sy) * dpr);
       const w = Math.round(box.width * dpr); const h = Math.round(box.height * dpr);
       const c = makeCanvas(w, h); const g = c.getContext('2d');
@@ -733,9 +1222,9 @@ void main() {
       const strip = Math.max(1, Math.round(PHOTO_STRIP * dpr));
       const strips = [];
       for (let s = 0; s < h; s += strip) strips.push({ y: s, h: Math.min(strip, h - s), docY: box.top + (s + strip / 2) / dpr, delayIn: -10, delayOut: 0 });
-      photo = { canvas: c, left, top: ptop, w, h, strips };
+      photo = { canvas: c, left, top: ptop, w, h, strips, scrollX: sx, scrollY: sy };
     }
-    return { lines, atlases, photo, scrollX: sx, scrollY: sy };
+    return { sets, atlases, photo };
   }
 
   /* ---------------------------------------------------------------------------
@@ -744,38 +1233,82 @@ void main() {
   let st = null;                         // the live activation
   let lastPerf = null;
 
-  async function enter(ctx) {
+  function createState(ctx) {
+    return {
+      ctx, phase: 'build', dead: false, applied: new Set(), glyphs: false, hadClass: false,
+      W: 0, H: 0, dpr: 1, layer: null, renderer: null, canvas: null, inkCanvas: null, ink: null, inkG: null,
+      gen: 0, model: null, modelStale: false, groups: new Map(), particles: 0, building: false, buildWanted: false,
+      linkIds: new WeakMap(), linkCount: 0, boxIds: new WeakMap(), boxCount: 0, photoImg: null, light: true,
+      enterAt: 0, enterT: 0, enterEnd: 0, exitAt: 0, exitT: -1, exitEnd: 0, enterScroll: 0,
+      night: 0, dayGround: [255, 255, 255], groundBody: true, startedAt: performance.now(),
+      pointer: { in: false, x: 0, y: 0, vx: 0, vy: 0, at: 0 },
+      rings: new Float32Array(RING_MAX * 4), ringAt: new Float64Array(RING_MAX), ringNext: 0,
+      ringView: new Float32Array(RING_MAX * 4),
+      hover: { id: -1, amount: 0, prevId: -1, prevAmount: 0, target: -1 },
+      scrollSmooth: window.scrollY, lag: 0, lastScrollY: window.scrollY, scrollDir: 1, lastScrollX: window.scrollX, windowAt: window.scrollY,
+      ticking: false, unframe: null, frameToken: 0, lastRender: 0, dirty: true, ringsDrawn: false,
+      shimmerTimer: 0, exitTimer: 0, contentTimer: 0, restTimer: 0,
+      perf: { frames: 0, total: 0, max: 0, last: 0, uploads: 0, uploaded: 0, render: 0, byPhase: {} },
+      uniforms: {
+        w: 0, h: 0, time: 0, shimmer: 0, night: 0, lag: 0,
+        enterT: 0, exitT: -1, dpr: 1, hoverId: -1, hoverAmount: 0, prevId: -1, prevAmount: 0, rings: null
+      }
+    };
+  }
+
+  // Prepare an activation: the model and the groups on screen, the canvases, the listeners.
+  async function prepare(ctx) {
     if (st && !st.dead) finishExit(st);  // a previous activation that was never exited
     const state = st = createState(ctx);
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    if (state.dead || ctx.signal.aborted) return null;
+    const t0 = performance.now();
+    state.light = pageIsLight(ctx.scope);
+    state.photoImg = ctx.scope.map(root => root.querySelector(PHOTO_SELECTOR)).find(Boolean) || null;
+    measureViewport(state);
+    const model = await buildModel(state);
+    if (!model || state.dead || ctx.signal.aborted) return null;
+    state.model = model;
+    // Only what is on screen before the swap; the rest of the window follows.
+    const specs = neededGroups(state, model).filter(spec => spec.distance === 0);
+    const groups = [];
+    for (const spec of specs) {
+      const group = await buildGroup(state, model, spec, null);
+      if (!group || state.dead || ctx.signal.aborted) return null;
+      groups.push(group);
+    }
+    mount(state);
+    for (const group of groups) addGroup(state, group, null, false);
+    listen(state);
+    state.perf.prepareMs = performance.now() - t0;
+    return state;
+  }
+
+  async function enter(ctx) {
+    let state = null;
     try {
-      if (document.fonts && document.fonts.ready) await document.fonts.ready;
-      if (state.dead || ctx.signal.aborted) return;
-      if (!(await build(state, true)) || state.dead || ctx.signal.aborted) return;
-      await new Promise(resolve => setTimeout(resolve, 0));
-      if (state.dead || ctx.signal.aborted) return;
-      mount(state);
-      listen(state);
-      const reduced = ctx.motion.matches;
-      state.dayGround = dayGround();
-      if (reduced) {
+      state = await prepare(ctx);
+      if (!state) return;
+      // Read the day before anything changes it.
+      readDay(state, false);
+      if (ctx.motion.matches) {
         // Instant: no ground transition, no ink, particles at rest.
         state.enterT = 1e4; state.night = 1; state.phase = 'live';
         swapIn(state, false);
         captionTone(state, 1);
         render(state, performance.now());
+        schedule(state);
         return;
       }
       // Sweep timing: line by line from the top of the viewport.
-      const y0 = state.enterScroll = window.scrollY; const H = state.H;
-      const delayIn = y => ENTER_START + ENTER_SWEEP * clamp((y - y0) / H, 0, 1);
-      for (const line of state.lines) line.delayIn = delayIn(line.mid);
-      const d = state.data;
-      for (let i = 0; i < d.n; i++) state.delays[i * 2] = delayIn(d.rowY[i]);
-      state.renderer.uploadDelays(state.delays);
+      state.enterScroll = window.scrollY;
+      placeGroups(state);
+      for (const group of state.groups.values()) enterDelays(state, group, false);
       const inkAt = performance.now();
       state.ink = buildInk(state);
       state.perf.enterInk = performance.now() - inkAt;
-      if (state.ink.photo) for (const strip of state.ink.photo.strips) strip.delayIn = delayIn(strip.docY);
+      const H = state.H;
+      if (state.ink.photo) for (const strip of state.ink.photo.strips) strip.delayIn = ENTER_START + ENTER_SWEEP * clamp((strip.docY - window.scrollY) / H, 0, 1);
       state.enterEnd = Math.max(ENTER_START + ENTER_SWEEP + ENTER_DUR, GROUND_IN);
       state.enterAt = performance.now(); state.enterT = 0; state.night = 0;
       // The swap: the ink sprites are exactly the page's glyphs, drawn in the same task.
@@ -783,6 +1316,7 @@ void main() {
       swapIn(state, true);
       state.phase = 'entering';
       wake(state);
+      schedule(state);
       await new Promise(resolve => {
         state.entered = resolve;
         // Leaving (or a reset) before the enter has settled resolves it at once.
@@ -790,73 +1324,38 @@ void main() {
       });
     } catch (error) {
       // Never leave the page with hidden glyphs: restore, then let the core skip the lens.
-      if (!state.dead) { finishExit(state); throw error; }
+      if (st && !st.dead && st.ctx === ctx) { finishExit(st); throw error; }
     }
   }
 
-  function createState(ctx) {
-    return {
-      ctx, phase: 'build', dead: false, applied: new Set(), glyphs: false,
-      W: 0, H: 0, dpr: 1, data: null, off: null, vel: null, delays: null,
-      awake: null, awakeList: null, awakeCount: 0,
-      words: [], lines: [], links: new Map(), photo: null,
-      layer: null, renderer: null, canvas: null, inkCanvas: null, ink: null, inkG: null,
-      enterAt: 0, enterT: 0, enterEnd: 0, exitAt: 0, exitT: -1, exitEnd: 0,
-      night: 0, dayGround: [255, 255, 255], startedAt: performance.now(),
-      pointer: { in: false, x: 0, y: 0, vx: 0, vy: 0, at: 0 },
-      rings: new Float32Array(RING_MAX * 4), ringAt: new Float64Array(RING_MAX), ringNext: 0,
-      hover: { id: -1, amount: 0, prevId: -1, prevAmount: 0, target: -1 },
-      scrollSmooth: window.scrollY, lag: 0, lastScrollY: window.scrollY,
-      ticking: false, unframe: null, frameToken: 0, lastRender: 0, dirty: true, ringsDrawn: false,
-      rebuildTimer: 0, rebuildWanted: false, shimmerTimer: 0,
-      perf: { frames: 0, total: 0, max: 0, last: 0, uploads: 0, uploaded: 0, render: 0, byPhase: {} },
-      uniforms: {
-        w: 0, h: 0, scrollX: 0, scrollY: 0, time: 0, shimmer: 0, night: 0, lag: 0,
-        enterT: 0, exitT: -1, dpr: 1, hoverId: -1, hoverAmount: 0, prevId: -1, prevAmount: 0, rings: null
-      }
-    };
+  // Arriving with a page: the ground is already night; the particles fade in, no sweep.
+  async function arrive(ctx) {
+    try {
+      const state = await prepare(ctx);
+      if (!state) return;
+      readDay(state, false);             // the body's own ground (the root's is the pre-paint night)
+      state.enterT = 1e4; state.night = 1; state.phase = 'live';
+      // The particles are there in the first frame; they appear as the core fades the page in.
+      for (const group of state.groups.values()) group.fade = 0;
+      swapIn(state, false);
+      captionTone(state, 1);
+      placeGroups(state);
+      render(state, performance.now());
+      state.perf.arrivedAt = performance.now();
+      // Then the page appears (the core fades the body in) and paints itself for the first
+      // time, which can keep the GPU busy (the photography page's photos); a WebGL frame then
+      // would wait for it on the main thread. The next frame waits until that has passed,
+      // unless the reader moves first.
+      state.restUntil = performance.now() + ARRIVE_REST_MS;
+      state.restTimer = setTimeout(() => { state.restUntil = 0; wake(state); schedule(state); }, ARRIVE_REST_MS);
+    } catch (error) {
+      if (st && !st.dead && st.ctx === ctx) { finishExit(st); throw error; }
+    }
   }
 
-  /*
-   * Capture and sample the whole scope, then commit. With `chunked` (the enter) the work
-   * yields to the event loop between atlas pages, so no single task is long; it resolves
-   * false if the activation ended meanwhile. Allocates the simulation arrays.
-   */
-  async function build(state, chunked) {
-    let busy = 0; let t0 = performance.now(); const began = t0;
-    // Resolves true when the activation has ended (the caller stops).
-    const pause = chunked ? () => new Promise(resolve => {
-      busy += performance.now() - t0;
-      setTimeout(() => { t0 = performance.now(); resolve(state.dead); }, 0);
-    }) : null;
-    const random = seeded(0x5eed);
-    const captured = capture(state.ctx.scope);
-    const t1 = performance.now();
-    const list = particleList();
-    await sampleWords(captured.words, list, random, pause);
-    if (state.dead || (pause && await pause())) return false;
-    const t2 = performance.now();
-    const img = state.ctx.scope.map(root => root.querySelector(PHOTO_SELECTOR)).find(Boolean);
-    const photo = samplePhoto(img, list, random);
-    const t3 = performance.now();
-    const data = freeze(list, captured.lines);
-    state.words = captured.words; state.lines = captured.lines; state.links = captured.links;
-    state.photo = photo; state.data = data;
-    state.perf.steps = { capture: t1 - began, photo: t3 - t2, freeze: performance.now() - t3 };
-    const n = state.data.n;
-    state.off = new Float32Array(n * 2); state.vel = new Float32Array(n * 2);
-    state.delays = new Float32Array(n * 2);
-    for (let i = 0; i < n; i++) state.delays[i * 2] = -10;
-    state.awake = new Uint8Array(n); state.awakeList = new Int32Array(n); state.awakeCount = 0;
-    state.perf.build = busy + performance.now() - t0;     // main-thread time, without the yields
-    state.perf.particles = n; state.perf.words = state.words.length; state.perf.lines = state.lines.length;
-    return true;
-  }
-
-  // The canvases fill the core's fixed layer; its size is the viewport they cover (on a
-  // phone it follows the URL bar).
   function measureViewport(state) {
     const html = document.documentElement; const layer = state.layer;
+    // The canvases fill the core's fixed layer (on a phone it follows the URL bar).
     state.W = (layer && layer.clientWidth) || html.clientWidth || window.innerWidth;
     state.H = (layer && layer.clientHeight) || html.clientHeight || window.innerHeight;
     let dpr = Math.min(window.devicePixelRatio || 1, DPR_MAX);
@@ -875,52 +1374,81 @@ void main() {
     c.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;';
     return c;
   }
+  function makeRenderer(state) {
+    let renderer = null;
+    try { renderer = glRenderer(state.canvas); } catch (error) { renderer = null; }
+    if (!renderer) {
+      // A canvas keeps its first context type: the fallback needs a fresh one.
+      const fresh = canvasEl(); state.canvas.replaceWith(fresh); state.canvas = fresh;
+      renderer = pixelRenderer(fresh);
+    }
+    return renderer;
+  }
   function mount(state) {
     const layer = state.layer = state.ctx.layer('fixed');
     state.inkCanvas = canvasEl(); state.canvas = canvasEl();
     layer.append(state.inkCanvas, state.canvas);
     state.inkG = state.inkCanvas.getContext('2d');
     measureViewport(state);
-    let renderer = null;
-    try { renderer = glRenderer(state.canvas); } catch (error) { renderer = null; }
-    if (!renderer) {
-      // A canvas keeps its first context type: the fallback needs a fresh one.
-      const fresh = canvasEl(); state.canvas.replaceWith(fresh); state.canvas = fresh;
-      renderer = pixelRenderer(fresh, state);
-    }
-    state.renderer = renderer;
+    state.renderer = makeRenderer(state);
     sizeCanvases(state);
-    renderer.upload(state.data, state.off, state.delays);
-    state.uniforms.rings = state.rings;
-    state.perf.renderer = renderer.kind;
+    state.uniforms.rings = state.ringView;
+    state.perf.renderer = state.renderer.kind;
   }
 
-  // Hide the glyphs (and the portrait) and turn the ground to night.
+  // Night: the ground, the main column's inversion on a light page, the hidden glyphs.
   function swapIn(state, animate) {
     const html = document.documentElement;
     state.hadClass = html.hasAttribute('class');
     const add = name => { html.classList.add(name); state.applied.add(name); };
     add(animate ? CLASS_GROUND : CLASS_STILL);
+    if (state.groundBody) add(CLASS_BODY);
+    if (state.light) add(CLASS_INVERT);
     add(CLASS_NIGHT);
-    if (state.photo) add(CLASS_PHOTO);
+    if (state.photoImg) add(CLASS_PHOTO);
     state.ctx.hideGlyphs(true); state.glyphs = true;
+    if (!animate) {
+      // Settle without transitions, then let the page's own transitions run again.
+      void getComputedStyle(document.body).backgroundColor;
+      html.classList.remove(CLASS_STILL); state.applied.delete(CLASS_STILL);
+    }
   }
 
-  // The day ground under the lens: the theme's background colour.
-  function dayGround() {
+  /*
+   * The day as it is under the lens: the ground's colour and whether the body paints its
+   * own. Read with the night lifted for a moment (without transitions) when it is on.
+   */
+  function readDay(state, lifted) {
     const html = document.documentElement;
-    const value = getComputedStyle(html).getPropertyValue('--bg-color').trim();
-    const rgb = parseColour(value) || parseColour(getComputedStyle(document.body).backgroundColor);
-    return rgb && rgb[3] > 0 ? rgb.slice(0, 3) : [255, 255, 255];
+    const removed = [];
+    if (lifted) {
+      html.classList.add(CLASS_STILL);
+      for (const name of [CLASS_NIGHT, CLASS_BODY, CLASS_INVERT]) if (html.classList.contains(name)) { html.classList.remove(name); removed.push(name); }
+    }
+    const body = parseColour(getComputedStyle(document.body).backgroundColor);
+    const root = parseColour(getComputedStyle(html).backgroundColor);
+    state.groundBody = !!(body && body[3] > 0.5);
+    const ground = state.groundBody ? body : root;
+    const isNight = ground && Math.abs(ground[0] - NIGHT_RGB[0]) + Math.abs(ground[1] - NIGHT_RGB[1]) + Math.abs(ground[2] - NIGHT_RGB[2]) < 3;
+    state.dayGround = ground && ground[3] > 0.5 && !isNight ? ground.slice(0, 3) : (state.light === false ? [31, 31, 31] : [255, 255, 255]);
+    state.light = pageIsLight(state.ctx.scope);
+    if (lifted) {
+      for (const name of removed) html.classList.add(name);
+      void getComputedStyle(document.body).backgroundColor;
+      html.classList.remove(CLASS_STILL);
+    }
   }
-  // How far the body's background has travelled from day to night (0..1), read from
-  // the running CSS transition so that the ink and particles stay in step with it.
+  // How far the ground has travelled from day to night (0..1), read from the running CSS
+  // transition so that the ink and particles stay in step with it.
   function groundProgress(state) {
-    const now = parseColour(getComputedStyle(document.body).backgroundColor);
+    const el = state.groundBody ? document.body : document.documentElement;
+    const now = parseColour(getComputedStyle(el).backgroundColor);
     const day = state.dayGround;
     if (!now) return state.phase === 'exiting' ? 0 : 1;
+    // A transparent root turning to night: weigh its colour by its alpha over the day.
+    const a = now[3];
     let num = 0; let den = 0;
-    for (let k = 0; k < 3; k++) { const d = NIGHT_RGB[k] - day[k]; num += (now[k] - day[k]) * d; den += d * d; }
+    for (let k = 0; k < 3; k++) { const d = NIGHT_RGB[k] - day[k]; num += (now[k] * a + day[k] * (1 - a) - day[k]) * d; den += d * d; }
     return den < 1 ? (state.phase === 'exiting' ? 0 : 1) : clamp(num / den, 0, 1);
   }
   // The caption turns light when the ground passes mid-grey (it fades in on the day page).
@@ -931,13 +1459,11 @@ void main() {
   // Text colour follows the ground. On a light page it flips quickly as the ground passes
   // mid-grey, so the text is always on the far side of the ground and stays legible.
   function nightMix(state, p) {
-    const day = state.dayGround;
-    const light = (0.2126 * day[0] + 0.7152 * day[1] + 0.0722 * day[2]) / 255 > 0.5;
-    return light ? smooth(0.44, 0.56, p) : p;
+    return luma(state.dayGround) > 0.5 ? smooth(0.44, 0.56, p) : p;
   }
 
   /* ---------------------------------------------------------------------------
-   * Interaction
+   * Interaction and change
    * ------------------------------------------------------------------------- */
   function listen(state) {
     const { ctx } = state; const signal = ctx.signal;
@@ -948,9 +1474,8 @@ void main() {
       const dt = Math.max(0.004, (now - pointer.at) / 1000);
       if (pointer.in && now - pointer.at < 120) {
         // Smoothed client-space velocity of the pointer.
-        const k = 0.5;
-        pointer.vx += ((event.clientX - pointer.x) / dt - pointer.vx) * k;
-        pointer.vy += ((event.clientY - pointer.y) / dt - pointer.vy) * k;
+        pointer.vx += ((event.clientX - pointer.x) / dt - pointer.vx) * 0.5;
+        pointer.vy += ((event.clientY - pointer.y) / dt - pointer.vy) * 0.5;
       } else { pointer.vx = 0; pointer.vy = 0; }
       pointer.x = event.clientX; pointer.y = event.clientY; pointer.at = now; pointer.in = true;
       if (!ctx.motion.matches) wake(state);
@@ -967,18 +1492,20 @@ void main() {
       state.rings[k * 4 + 2] = 0; state.rings[k * 4 + 3] = 1; state.ringAt[k] = performance.now();
       wake(state);
     }, opts);
-    window.addEventListener('scroll', () => wake(state), opts);
+    // The page and any container inside it (a wide table on a phone) scroll.
+    document.addEventListener('scroll', () => wake(state), { passive: true, capture: true, signal });
     window.addEventListener('resize', () => {
-      // The canvases follow at once. Text reflows only with the width, so only then are the
-      // particles re-sampled (a phone's URL bar changes the height alone).
+      // The canvases follow at once. Text reflows only with the width, so only then is the
+      // page re-measured (a phone's URL bar changes the height alone).
       const width = state.W;
       sizeCanvases(state); state.dirty = true; wake(state);
-      if (state.W !== width) scheduleRebuild(state);
+      if (state.W !== width) contentChanged(state, 0);
+      else schedule(state);
     }, opts);
     // Links brighten under the pointer and with keyboard focus.
     const target = el => {
-      const a = el && el.closest ? el.closest('a[href], button') : null;
-      return a && state.links.has(a) ? state.links.get(a) : -1;
+      const a = el && el.closest ? el.closest('a[href], button, summary, [role="button"]') : null;
+      return (a && state.linkIds.get(a)) || -1;
     };
     const setHover = id => {
       const h = state.hover;
@@ -998,72 +1525,76 @@ void main() {
       wake(state);
     };
     if (ctx.motion.addEventListener) ctx.motion.addEventListener('change', onMotion, { signal });
-    // A theme switch changes the text colours; a reflow moves the words.
-    const observer = new MutationObserver(() => scheduleRebuild(state));
+    // Late content (markdown, star counts, abstracts, demos) and layout changes.
+    if (typeof ctx.onContentChange === 'function') ctx.onContentChange(() => contentChanged(state, 0));
+    const observer = new MutationObserver(records => {
+      // Class and style changes in the scope (a demo's state, a toggled section); a theme
+      // switch on <html>; and, without the core's watcher, any text change.
+      for (const record of records) {
+        if (record.target === document.documentElement && record.attributeName !== 'data-theme') continue;
+        contentChanged(state, CONTENT_MS);
+        return;
+      }
+    });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    const watchText = typeof ctx.onContentChange !== 'function';
+    for (const root of ctx.scope) observer.observe(root, { subtree: true, attributes: true, attributeFilter: ['class', 'style'], childList: watchText, characterData: watchText });
     let first = true;
     const resized = typeof ResizeObserver === 'function' ? new ResizeObserver(() => {
       if (first) { first = false; return; }
-      scheduleRebuild(state);
+      contentChanged(state, CONTENT_MS);
     }) : null;
     if (resized) resized.observe(document.body);
-    signal.addEventListener('abort', () => { observer.disconnect(); if (resized) resized.disconnect(); clearTimeout(state.rebuildTimer); }, { once: true });
-    // Lost GPU context: fall back to drawing nothing until it is restored, then rebuild.
+    signal.addEventListener('abort', () => { observer.disconnect(); if (resized) resized.disconnect(); clearTimeout(state.contentTimer); }, { once: true });
     state.canvas.addEventListener('webglcontextlost', event => event.preventDefault(), { signal });
-    state.canvas.addEventListener('webglcontextrestored', () => scheduleRebuild(state, true), { signal });
+    state.canvas.addEventListener('webglcontextrestored', () => restoreContext(state), { signal });
+  }
+
+  // The content or the layout changed: re-measure (soon); unchanged groups are kept.
+  function contentChanged(state, wait) {
+    if (state.dead) return;
+    state.perf.changes = (state.perf.changes || 0) + 1;
+    clearTimeout(state.contentTimer);
+    state.contentTimer = setTimeout(() => {
+      if (state.dead || state.phase === 'exiting') return;
+      const light = pageIsLight(state.ctx.scope);
+      if (light !== state.light && state.applied.has(CLASS_NIGHT)) {
+        // The site theme switched: the inversion follows the page's lightness.
+        state.light = light;
+        document.documentElement.classList.toggle(CLASS_INVERT, light);
+        if (light) state.applied.add(CLASS_INVERT);
+      }
+      state.gen++;                        // the current model is stale; groups refresh in place
+      state.modelStale = true;
+      schedule(state);
+    }, wait);
+  }
+
+  // A lost GPU context: a fresh renderer, with every group uploaded again.
+  function restoreContext(state) {
+    if (state.dead) return;
+    const old = state.canvas;
+    const fresh = canvasEl(); old.replaceWith(fresh); state.canvas = fresh;
+    state.renderer = makeRenderer(state);
+    sizeCanvases(state);
+    for (const group of state.groups.values()) { group.buf = null; state.renderer.create(group); }
+    state.dirty = true; wake(state);
   }
 
   function calm(state) {
-    state.off.fill(0); state.vel.fill(0); state.awake.fill(0); state.awakeCount = 0;
-    if (state.data.n) state.renderer.uploadOffsets(state.off, 0, state.data.n - 1);
-    state.rings.fill(0); state.lag = 0; state.scrollSmooth = window.scrollY;
-  }
-
-  // Rebuild after a resize, a theme switch or a reflow (only while live).
-  function scheduleRebuild(state, hard) {
-    if (state.dead) return;
-    if (hard) state.hardRebuild = true;
-    clearTimeout(state.rebuildTimer);
-    state.rebuildTimer = setTimeout(() => {
-      if (state.dead || state.phase === 'exiting') return;
-      if (state.phase !== 'live') { state.rebuildWanted = true; return; }
-      rebuild(state);
-    }, REBUILD_MS);
-  }
-  async function rebuild(state) {
-    state.rebuildWanted = false;
-    // Capture needs the page's own styles; the hidden glyphs keep their colours, so
-    // only the portrait class (visibility) has to be lifted while it is measured.
-    const html = document.documentElement;
-    const photoHidden = html.classList.contains(CLASS_PHOTO);
-    if (photoHidden) html.classList.remove(CLASS_PHOTO);
-    const built = await build(state, false);   // not chunked: no frame passes before the class returns
-    if (photoHidden) html.classList.add(CLASS_PHOTO);
-    if (!built || state.dead) return;
-    state.dayGround = dayGround();
-    if (!state.photo) html.classList.remove(CLASS_PHOTO);
-    else if (state.glyphs) { html.classList.add(CLASS_PHOTO); state.applied.add(CLASS_PHOTO); }
-    if (state.hardRebuild || (state.renderer && state.renderer.lost && state.renderer.lost())) {
-      state.hardRebuild = false;
-      try { state.renderer.dispose(); } catch (error) { /* already gone */ }
-      const layer = state.canvas.parentNode;
-      const fresh = canvasEl(); layer.replaceChild(fresh, state.canvas); state.canvas = fresh;
-      let renderer = null;
-      try { renderer = glRenderer(fresh); } catch (error) { renderer = null; }
-      if (!renderer) { const c2 = canvasEl(); layer.replaceChild(c2, fresh); state.canvas = c2; renderer = pixelRenderer(c2, state); }
-      state.renderer = renderer;
+    for (const group of state.groups.values()) {
+      if (!group.data) continue;
+      group.off.fill(0); group.vel.fill(0); group.awake.fill(0); group.awakeCount = 0;
+      if (group.data.n) state.renderer.uploadOffsets(group, 0, group.data.n - 1);
     }
-    sizeCanvases(state);
-    state.renderer.upload(state.data, state.off, state.delays);
-    state.dirty = true; wake(state);
+    state.rings.fill(0); state.lag = 0; state.scrollSmooth = window.scrollY;
   }
 
   /* ---------------------------------------------------------------------------
    * The frame
    * ------------------------------------------------------------------------- */
   // The core's shared loop calls tick() while it is registered; when nothing moves the
-  // lens unregisters. Each registration carries a token, so a stale callback (if the
-  // core keeps one) does nothing.
+  // lens unregisters. Each registration carries a token, so a stale callback does nothing.
   function wake(state) {
     if (state.dead || state.ticking) return;
     state.ticking = true;
@@ -1113,16 +1644,26 @@ void main() {
       state.lag = lag / (1 + Math.abs(lag) / LAG_MAX);
       if (lag) busy = true;
     }
-    if (scrollY !== state.lastScrollY) { state.lastScrollY = scrollY; state.dirty = true; }
+    if (scrollY !== state.lastScrollY || window.scrollX !== state.lastScrollX) {
+      if (scrollY !== state.lastScrollY) state.scrollDir = scrollY > state.lastScrollY ? 1 : -1;
+      state.lastScrollY = scrollY; state.lastScrollX = window.scrollX; state.dirty = true;
+      // The window moved far enough: build ahead (the builder runs between frames).
+      if (Math.abs(scrollY - state.windowAt) > BAND_H / 2) { state.windowAt = scrollY; schedule(state); }
+    }
+    placeGroups(state);
     // Wind (while leaving, disturbed particles only spring home)
-    if ((state.awakeCount || (!reduced && state.pointer.in)) && stepWind(state, dt, reduced)) busy = true;
-    // Rings
+    if (stepWind(state, dt, reduced)) busy = true;
+    // Rings, in viewport coordinates for the shader
     let ringsLive = false;
     for (let k = 0; k < RING_MAX; k++) {
+      state.ringView[k * 4 + 3] = 0;
       if (state.rings[k * 4 + 3] <= 0) continue;
       const age = (began - state.ringAt[k]) / 1000;
-      if (age > RING_LIFE || reduced) { state.rings[k * 4 + 3] = 0; state.rings[k * 4 + 2] = 0; state.dirty = true; continue; }
-      state.rings[k * 4 + 2] = age; busy = true; ringsLive = true;
+      if (age > RING_LIFE || reduced) { state.rings[k * 4 + 3] = 0; state.dirty = true; continue; }
+      state.rings[k * 4 + 2] = age;
+      state.ringView[k * 4] = state.rings[k * 4] - window.scrollX; state.ringView[k * 4 + 1] = state.rings[k * 4 + 1] - scrollY;
+      state.ringView[k * 4 + 2] = age; state.ringView[k * 4 + 3] = 1;
+      busy = true; ringsLive = true;
     }
     // Hover
     const h = state.hover;
@@ -1135,6 +1676,8 @@ void main() {
       if (Math.abs(h.amount - goal) < 0.01) h.amount = goal;
       busy = true; state.dirty = true;
     }
+    // Groups still fading in
+    for (const group of state.groups.values()) if (group.visible && group.alpha < 1) { busy = true; break; }
     if (state.phase === 'entering' || state.phase === 'exiting' || ringsLive || state.ringsDrawn) drawInk(state);
     const shimmer = !reduced && state.phase !== 'build';
     if (busy || state.dirty || (shimmer && began - state.lastRender >= 1000 / SHIMMER_FPS - 4)) render(state, began);
@@ -1156,7 +1699,7 @@ void main() {
 
   function render(state, now) {
     const u = state.uniforms; const r0 = performance.now();
-    u.w = state.W; u.h = state.H; u.scrollX = window.scrollX; u.scrollY = window.scrollY;
+    u.w = state.W; u.h = state.H;
     u.time = (now - state.startedAt) / 1000; u.shimmer = state.ctx.motion.matches ? 0 : SHIMMER;
     u.night = state.night; u.lag = state.lag;
     u.enterT = state.phase === 'live' || state.phase === 'exiting' && state.enterT >= state.enterEnd ? 1e4 : state.enterT;
@@ -1164,79 +1707,96 @@ void main() {
     u.dpr = state.renderer.kind === 'canvas2d' ? 1 : state.dpr;
     const h = state.hover;
     u.hoverId = h.id; u.hoverAmount = h.amount; u.prevId = h.prevId; u.prevAmount = h.prevAmount;
-    state.renderer.draw(u);
+    const renderer = state.renderer;
+    renderer.begin(u);
+    let drawn = 0;
+    // Groups that hide what scrolls beneath them go last, over a cleared box.
+    for (const group of state.groups.values()) if (group.visible && group.data && !group.cover) { renderer.draw(group, u); drawn++; }
+    for (const group of state.groups.values()) {
+      if (!group.visible || !group.data || !group.cover) continue;
+      renderer.occlude(group.cover, u); renderer.draw(group, u); drawn++;
+    }
+    renderer.end();
     state.lastRender = now; state.dirty = false;
-    state.perf.render = performance.now() - r0;
+    state.perf.render = performance.now() - r0; state.perf.drawn = drawn;
   }
 
   /*
    * The pointer as a gentle wind: particles within WIND_RADIUS are pushed away (and
    * along the pointer's motion) in proportion to its speed, then spring home with
-   * damping. Only awake particles are integrated, and only their index range of the
-   * offset buffer is uploaded.
+   * damping. Only awake particles are integrated, and only their index range of each
+   * group's offsets is uploaded.
    */
   function stepWind(state, dt, reduced) {
-    const d = state.data; const off = state.off; const vel = state.vel; const st6 = d.statics;
-    const awake = state.awake; const list = state.awakeList;
     const pointer = state.pointer;
-    let lo = d.n; let hi = -1;
-    // The pointer's speed fades when it stops moving.
     const quiet = (performance.now() - pointer.at) / 1000;
     if (quiet > 0.03) { const k = Math.exp(-dt / POINTER_TAU); pointer.vx *= k; pointer.vy *= k; }
     const speed = Math.hypot(pointer.vx, pointer.vy);
     const gust = reduced || state.phase === 'exiting' || !pointer.in ? 0 : Math.min(speed / WIND_SPEED_REF, WIND_GUST_MAX);
-    if (gust > 0.02) {
-      const px = pointer.x + window.scrollX; const py = pointer.y + window.scrollY;
-      const ux = pointer.vx / (speed || 1); const uy = pointer.vy / (speed || 1);
-      const R = WIND_RADIUS; const R2 = R * R; const reach = R + 8;
-      const c0 = clamp(Math.floor((px - reach) / CELL), 0, d.cols - 1); const c1 = clamp(Math.floor((px + reach) / CELL), 0, d.cols - 1);
-      const r0 = clamp(Math.floor((py - reach) / CELL), 0, d.rows - 1); const r1 = clamp(Math.floor((py + reach) / CELL), 0, d.rows - 1);
-      const push = WIND_ACCEL * gust * dt;
-      for (let row = r0; row <= r1; row++) {
-        const from = d.cellStart[row * d.cols + c0]; const to = d.cellStart[row * d.cols + c1 + 1];
-        for (let i = from; i < to; i++) {
-          const x = st6[i * 6] + off[i * 2]; const y = st6[i * 6 + 1] + off[i * 2 + 1];
-          const dx = x - px; const dy = y - py; const d2 = dx * dx + dy * dy;
-          if (d2 >= R2) continue;
-          const dist = Math.sqrt(d2) + 0.01; const fall = 1 - dist / R;
-          const seed = st6[i * 6 + 2];
-          const f = push * fall * fall * (0.3 + 1.4 * ((seed * 7.13) % 1));
-          const nx = dx / dist; const ny = dy / dist;
-          const swirl = WIND_SWIRL * (((seed * 31.37) % 1) - 0.5) * 2;
-          vel[i * 2] += f * (nx * (1 - WIND_ALONG) + ux * WIND_ALONG - ny * swirl);
-          vel[i * 2 + 1] += f * (ny * (1 - WIND_ALONG) + uy * WIND_ALONG + nx * swirl);
-          if (!awake[i]) { awake[i] = 1; list[state.awakeCount++] = i; }
+    let moving = false;
+    const R = WIND_RADIUS; const R2 = R * R; const reach = R + 8;
+    const ux = pointer.vx / (speed || 1); const uy = pointer.vy / (speed || 1);
+    const push = WIND_ACCEL * gust * dt;
+    const damp = Math.exp(-DAMPING * dt);
+    for (const group of state.groups.values()) {
+      const d = group.data; if (!d || !d.n) continue;
+      const off = group.off; const vel = group.vel; const st6 = d.statics;
+      const awake = group.awake; const list = group.awakeList;
+      let lo = d.n; let hi = -1;
+      if (gust > 0.02 && group.visible) {
+        // The pointer in the group's coordinates
+        const px = pointer.x - group.origin.x; const py = pointer.y - group.origin.y;
+        if (px + reach >= d.x0 && px - reach <= d.x1 && py + reach >= d.y0 && py - reach <= d.y1) {
+          const c0 = clamp(Math.floor((px - reach - d.gx0) / CELL), 0, d.cols - 1); const c1 = clamp(Math.floor((px + reach - d.gx0) / CELL), 0, d.cols - 1);
+          const r0 = clamp(Math.floor((py - reach - d.gy0) / CELL), 0, d.rows - 1); const r1 = clamp(Math.floor((py + reach - d.gy0) / CELL), 0, d.rows - 1);
+          for (let row = r0; row <= r1; row++) {
+            const from = d.cellStart[row * d.cols + c0]; const to = d.cellStart[row * d.cols + c1 + 1];
+            for (let i = from; i < to; i++) {
+              const x = st6[i * 6] + off[i * 2]; const y = st6[i * 6 + 1] + off[i * 2 + 1];
+              const dx = x - px; const dy = y - py; const d2 = dx * dx + dy * dy;
+              if (d2 >= R2) continue;
+              const dist = Math.sqrt(d2) + 0.01; const fall = 1 - dist / R;
+              const seed = st6[i * 6 + 2];
+              const f = push * fall * fall * (0.3 + 1.4 * ((seed * 7.13) % 1));
+              const nx = dx / dist; const ny = dy / dist;
+              const swirl = WIND_SWIRL * (((seed * 31.37) % 1) - 0.5) * 2;
+              vel[i * 2] += f * (nx * (1 - WIND_ALONG) + ux * WIND_ALONG - ny * swirl);
+              vel[i * 2 + 1] += f * (ny * (1 - WIND_ALONG) + uy * WIND_ALONG + nx * swirl);
+              if (!awake[i]) { awake[i] = 1; list[group.awakeCount++] = i; }
+            }
+          }
+          moving = true;
         }
       }
-    }
-    // Integrate the awake particles (semi-implicit Euler) and put the settled to sleep.
-    let kept = 0;
-    const damp = Math.exp(-DAMPING * dt);
-    for (let k = 0; k < state.awakeCount; k++) {
-      const i = list[k];
-      const seed = st6[i * 6 + 2];
-      const spring = SPRING * (0.6 + 0.8 * ((seed * 13.71) % 1));
-      let vx = vel[i * 2]; let vy = vel[i * 2 + 1]; let ox = off[i * 2]; let oy = off[i * 2 + 1];
-      vx = (vx - spring * ox * dt) * damp; vy = (vy - spring * oy * dt) * damp;
-      ox += vx * dt; oy += vy * dt;
-      // A soft bound keeps a hard flick from throwing dust across the page.
-      const r = Math.hypot(ox, oy);
-      if (r > DRIFT_MAX) { const s = DRIFT_MAX / r; ox *= s; oy *= s; vx *= 0.5; vy *= 0.5; }
-      if (i < lo) lo = i; if (i > hi) hi = i;
-      if (Math.abs(ox) < SLEEP_OFFSET && Math.abs(oy) < SLEEP_OFFSET && Math.abs(vx) < SLEEP_SPEED && Math.abs(vy) < SLEEP_SPEED) {
-        off[i * 2] = 0; off[i * 2 + 1] = 0; vel[i * 2] = 0; vel[i * 2 + 1] = 0; awake[i] = 0;
-        continue;
+      if (!group.awakeCount) continue;
+      // Integrate the awake particles (semi-implicit Euler) and put the settled to sleep.
+      let kept = 0;
+      for (let k = 0; k < group.awakeCount; k++) {
+        const i = list[k];
+        const seed = st6[i * 6 + 2];
+        const spring = SPRING * (0.6 + 0.8 * ((seed * 13.71) % 1));
+        let vx = vel[i * 2]; let vy = vel[i * 2 + 1]; let ox = off[i * 2]; let oy = off[i * 2 + 1];
+        vx = (vx - spring * ox * dt) * damp; vy = (vy - spring * oy * dt) * damp;
+        ox += vx * dt; oy += vy * dt;
+        // A soft bound keeps a hard flick from throwing dust across the page.
+        const r = Math.hypot(ox, oy);
+        if (r > DRIFT_MAX) { const s = DRIFT_MAX / r; ox *= s; oy *= s; vx *= 0.5; vy *= 0.5; }
+        if (i < lo) lo = i; if (i > hi) hi = i;
+        if (Math.abs(ox) < SLEEP_OFFSET && Math.abs(oy) < SLEEP_OFFSET && Math.abs(vx) < SLEEP_SPEED && Math.abs(vy) < SLEEP_SPEED) {
+          off[i * 2] = 0; off[i * 2 + 1] = 0; vel[i * 2] = 0; vel[i * 2 + 1] = 0; awake[i] = 0;
+          continue;
+        }
+        off[i * 2] = ox; off[i * 2 + 1] = oy; vel[i * 2] = vx; vel[i * 2 + 1] = vy;
+        list[kept++] = i;
       }
-      off[i * 2] = ox; off[i * 2 + 1] = oy; vel[i * 2] = vx; vel[i * 2 + 1] = vy;
-      list[kept++] = i;
+      group.awakeCount = kept;
+      if (hi >= lo) {
+        state.renderer.uploadOffsets(group, lo, hi);
+        state.perf.uploads++; state.perf.uploaded += hi - lo + 1;
+        moving = true;
+      }
     }
-    state.awakeCount = kept;
-    if (hi >= lo) {
-      state.renderer.uploadOffsets(off, lo, hi);
-      state.perf.uploads++; state.perf.uploaded += hi - lo + 1;
-      return true;
-    }
-    return gust > 0.02;
+    return moving;
   }
 
   // The ink canvas: word sprites and portrait strips in transitions, rings while live.
@@ -1248,9 +1808,7 @@ void main() {
     g.clearRect(0, 0, cw, ch);
     state.ringsDrawn = false;
     if (ink && (state.phase === 'entering' || state.phase === 'exiting')) {
-      const n = state.night;
-      const dx = Math.round((ink.scrollX - window.scrollX) * state.dpr);
-      const dy = Math.round((ink.scrollY - window.scrollY) * state.dpr);
+      const n = state.night; const dpr = state.dpr;
       const eT = state.enterT;            // frozen once the exit begins
       const xT = state.phase === 'exiting' ? state.exitT : -1;
       const alphaOf = (delayIn, delayOut) => {
@@ -1258,19 +1816,31 @@ void main() {
         const x = xT < 0 ? 0 : clamp((xT - delayOut) / EXIT_DUR, 0, 1);
         return Math.max(inkEnter(e), inkExit(x));
       };
-      for (const line of ink.lines) {
-        const a = alphaOf(line.delayIn, line.delayOut);
-        if (a < 0.004) continue;
-        const dayA = a * (1 - n); const nightA = a * n;
-        for (const item of line.ink) {
-          const x = item.ox + dx; const y = item.oy + dy;
-          if (x > cw || y > ch || x + item.sw < 0 || y + item.sh < 0) continue;
-          if (dayA > 0.004) { g.globalAlpha = dayA; g.drawImage(ink.atlases[item.day[0]], item.day[1], item.day[2], item.sw, item.sh, x, y, item.sw, item.sh); }
-          if (nightA > 0.004) { g.globalAlpha = nightA; g.drawImage(ink.atlases[item.night[0]], item.night[1], item.night[2], item.sw, item.sh, x, y, item.sw, item.sh); }
+      for (const set of ink.sets) {
+        const group = set.group;
+        if (group.cover) g.clearRect(group.cover.x0 * dpr, group.cover.y0 * dpr, (group.cover.x1 - group.cover.x0) * dpr, (group.cover.y1 - group.cover.y0) * dpr);
+        // A band follows the scroll even if it was re-sampled meanwhile; a box its container.
+        const now = group.kind === 'band' ? { x: -window.scrollX, y: -window.scrollY } : group.origin;
+        const dx = Math.round((now.x - set.origin.x) * dpr);
+        const dy = Math.round((now.y - set.origin.y) * dpr);
+        const clip = group.kind === 'box' ? group.clip : null;
+        if (clip) { g.save(); g.beginPath(); g.rect(clip.x0 * dpr, clip.y0 * dpr, (clip.x1 - clip.x0) * dpr, (clip.y1 - clip.y0) * dpr); g.clip(); }
+        for (const line of set.lines) {
+          const a = alphaOf(line.delayIn, line.delayOut);
+          if (a < 0.004) continue;
+          const dayA = a * (1 - n); const nightA = a * n;
+          for (const item of line.ink) {
+            const x = item.ox + dx; const y = item.oy + dy;
+            if (x > cw || y > ch || x + item.sw < 0 || y + item.sh < 0) continue;
+            if (dayA > 0.004) { g.globalAlpha = dayA; g.drawImage(ink.atlases[item.day[0]], item.day[1], item.day[2], item.sw, item.sh, x, y, item.sw, item.sh); }
+            if (nightA > 0.004) { g.globalAlpha = nightA; g.drawImage(ink.atlases[item.night[0]], item.night[1], item.night[2], item.sw, item.sh, x, y, item.sw, item.sh); }
+          }
         }
+        if (clip) g.restore();
       }
       const photo = ink.photo;
       if (photo) {
+        const dx = Math.round((photo.scrollX - window.scrollX) * dpr); const dy = Math.round((photo.scrollY - window.scrollY) * dpr);
         for (const strip of photo.strips) {
           const a = alphaOf(strip.delayIn, strip.delayOut);
           if (a < 0.004) continue;
@@ -1284,7 +1854,7 @@ void main() {
     if (state.phase !== 'exiting' && !state.ctx.motion.matches) {
       const dpr = state.dpr;
       for (let k = 0; k < RING_MAX; k++) {
-        const strength = state.rings[k * 4 + 3]; if (strength <= 0) continue;
+        if (state.rings[k * 4 + 3] <= 0) continue;
         const age = state.rings[k * 4 + 2];
         const radius = age * RING_SPEED; if (radius < 1) continue;
         const a = RING_ALPHA * state.night * Math.exp(-age / RING_DECAY) * (1 - smooth(RING_LIFE * 0.6, RING_LIFE, age));
@@ -1307,39 +1877,37 @@ void main() {
     drawInk(state);
     state.dirty = true;
     if (state.entered) { state.entered(); state.entered = null; }
-    if (state.rebuildWanted) rebuild(state);
+    schedule(state);
   }
 
   async function exit(ctx) {
     const state = st;
     if (!state || state.dead) return;
     if (state.entered) { state.entered(); state.entered = null; }   // an enter in progress gives way
-    const instant = ctx.instant === true || ctx.motion.matches || !state.data || !state.renderer || state.phase === 'build';
+    const instant = ctx.instant === true || ctx.motion.matches || !state.renderer || state.phase === 'build' || !state.groups.size;
     if (instant) { finishExit(state); return; }
     if (state.phase === 'exiting') return state.exited;
     // Freeze the enter where it stands; a line still in ink stays ink.
     const wasEntering = state.phase === 'entering';
     if (!wasEntering) state.enterT = 1e4;
     state.phase = 'exiting';
-    const y0 = window.scrollY; const H = state.H;
-    const delayOut = y => EXIT_SWEEP * clamp((y - y0) / H, 0, 1);
-    for (const line of state.lines) line.delayOut = delayOut(line.mid);
-    const d = state.data;
-    for (let i = 0; i < d.n; i++) state.delays[i * 2 + 1] = delayOut(d.rowY[i]);
-    state.renderer.uploadDelays(state.delays);
+    readDay(state, true);
+    placeGroups(state);
+    for (const group of state.groups.values()) if (group.visible) exitDelays(state, group);
     // Fresh ink for the current viewport (the night classes leave the text colours alone).
     const inkAt = performance.now();
     state.ink = buildInk(state);
     state.perf.exitBuild = performance.now() - inkAt;
     if (state.ink.photo) {
+      const H = state.H;
       const delayIn = y => (wasEntering ? ENTER_START + ENTER_SWEEP * clamp((y - state.enterScroll) / H, 0, 1) : -10);
-      for (const strip of state.ink.photo.strips) { strip.delayIn = delayIn(strip.docY); strip.delayOut = delayOut(strip.docY); }
+      for (const strip of state.ink.photo.strips) { strip.delayIn = delayIn(strip.docY); strip.delayOut = EXIT_SWEEP * clamp((strip.docY - window.scrollY) / H, 0, 1); }
     }
     state.exitEnd = Math.max(EXIT_SWEEP + EXIT_DUR, GROUND_OUT);
     state.exitAt = performance.now(); state.exitT = 0;
     const html = document.documentElement;
     html.classList.add(CLASS_GROUND, CLASS_LEAVING); state.applied.add(CLASS_GROUND); state.applied.add(CLASS_LEAVING);
-    html.classList.remove(CLASS_NIGHT);
+    html.classList.remove(CLASS_NIGHT, CLASS_INVERT);
     state.exited = new Promise(resolve => { state.resolveExit = resolve; });
     wake(state);
     // If frames stop (a hidden tab), finish on a timer.
@@ -1347,19 +1915,21 @@ void main() {
     return state.exited;
   }
 
-  // Complete restoration: glyphs back, classes off, canvases cleared, GPU released.
+  // Complete restoration: glyphs back, classes off, canvases gone, GPU released.
   function finishExit(state) {
     if (state.dead) return;
     state.dead = true;
-    clearTimeout(state.exitTimer); clearTimeout(state.rebuildTimer); clearTimeout(state.shimmerTimer);
+    clearTimeout(state.exitTimer); clearTimeout(state.contentTimer); clearTimeout(state.shimmerTimer); clearTimeout(state.restTimer);
     if (state.glyphs) { state.ctx.hideGlyphs(false); state.glyphs = false; }
     const html = document.documentElement;
     if (html.classList.contains(CLASS_NIGHT)) {
-      // An instant exit: the day returns without the site's own colour fades. The still
-      // class stays until the change is flushed. (An animated exit has finished its fades.)
+      // An instant exit: the day returns without colour fades. The still class stays until
+      // the change is flushed. (An animated exit has finished its fades by now.)
       html.classList.add(CLASS_STILL);
       for (const name of state.applied) if (name !== CLASS_STILL) html.classList.remove(name);
       for (const el of document.querySelectorAll(MARKS)) void getComputedStyle(el).color;
+      const main = document.getElementById('main-content');
+      if (main) void getComputedStyle(main).filter;
       void getComputedStyle(document.body).backgroundColor;
       html.classList.remove(CLASS_STILL);
     } else {
@@ -1368,16 +1938,17 @@ void main() {
     state.applied.clear();
     if (!state.hadClass && html.hasAttribute('class') && !html.classList.length) html.removeAttribute('class');
     // The canvases vanish at once; the GPU and backing stores are released just after.
-    const renderer = state.renderer; const canvases = [state.canvas, state.inkCanvas].filter(Boolean);
+    const renderer = state.renderer; const groups = [...state.groups.values()];
+    const canvases = [state.canvas, state.inkCanvas].filter(Boolean);
     canvases.forEach(c => { c.style.display = 'none'; });
     setTimeout(() => {
-      if (renderer) { try { renderer.dispose(); } catch (error) { /* context gone */ } }
+      if (renderer) { try { renderer.dispose(groups); } catch (error) { /* context gone */ } }
       canvases.forEach(c => { c.width = 1; c.height = 1; });
     }, 0);
     sleep(state);
-    state.ink = null; state.data = null; state.off = state.vel = state.delays = null;
+    state.ink = null; state.model = null; state.groups = new Map();
     state.phase = 'done';
-    lastPerf = { byPhase: state.perf.byPhase, exitBuildMs: state.perf.exitBuild, buildMs: state.perf.build, enterInkMs: state.perf.enterInk };
+    lastPerf = { byPhase: state.perf.byPhase, exitBuildMs: state.perf.exitBuild, prepareMs: state.perf.prepareMs, enterInkMs: state.perf.enterInk };
     if (state.entered) { state.entered(); state.entered = null; }
     if (state.resolveExit) { state.resolveExit(); state.resolveExit = null; }
     if (st === state) st = null;
@@ -1387,22 +1958,36 @@ void main() {
     id: 'stardust', order: 1, numeral: 'I', label: 'Stardust',
     line: 'Every letter is made of smaller things.',
     css: true,
-    enter, exit,                          // no caption(): the static line shows as the enter begins
+    enter, exit, arrive,                  // no caption(): the static line shows as the enter begins
     // Test hook: counts and frame timing of the live activation.
     get _stats() {
       if (!st) return null;
       const p = st.perf;
+      let visible = 0; let awake = 0;
+      for (const g of st.groups.values()) { if (g.visible) visible++; awake += g.awakeCount || 0; }
+      // Bands on screen that hold text but are not built (yet), or still fading in.
+      let missing = 0;
+      if (st.model) {
+        const sy = window.scrollY;
+        for (let k = Math.floor(sy / BAND_H); k * BAND_H < sy + st.H; k++) {
+          const y0 = k * BAND_H; const y1 = y0 + BAND_H;
+          const hasText = st.model.entries.some(e => e.top < y1 && e.bottom > y0);
+          const g = st.groups.get(`b${k}`);
+          if (hasText && (!g || g.alpha < 0.5)) missing++;
+        }
+      }
       return {
-        phase: st.phase, renderer: p.renderer, particles: p.particles, words: p.words, lines: p.lines,
-        buildMs: +(p.build || 0).toFixed(1), frames: p.frames, avgMs: p.frames ? +(p.total / p.frames).toFixed(3) : 0,
-        maxMs: +p.max.toFixed(2), lastMs: +p.last.toFixed(3), awake: st.awakeCount,
+        phase: st.phase, renderer: p.renderer, particles: st.particles, groups: st.groups.size, visibleGroups: visible, missing,
+        boxes: [...st.groups.values()].filter(g => g.kind === 'box').length, building: st.building, gen: st.gen,
+        prepareMs: +(p.prepareMs || 0).toFixed(1), arrivedAt: p.arrivedAt ? Math.round(p.arrivedAt) : null, frames: p.frames, avgMs: p.frames ? +(p.total / p.frames).toFixed(3) : 0,
+        maxMs: +p.max.toFixed(2), lastMs: +p.last.toFixed(3), awake,
         uploads: p.uploads, avgUploaded: p.uploads ? Math.round(p.uploaded / p.uploads) : 0, renderMs: +p.render.toFixed(3),
         exitBuildMs: +(p.exitBuild || 0).toFixed(1), enterInkMs: +(p.enterInk || 0).toFixed(1),
-        steps: p.steps && Object.fromEntries(Object.entries(p.steps).map(([k, v]) => [k, +v.toFixed(1)])),
+        sliceMaxMs: +(p.sliceMax || 0).toFixed(1), changes: p.changes || 0, models: p.models || 0, modelMs: +(p.modelMs || 0).toFixed(1), builds: p.builds || 0, buildWallMs: p.builds ? +(p.buildWall / p.builds).toFixed(1) : 0,
         byPhase: Object.fromEntries(Object.entries(p.byPhase).map(([k, v]) => [k, { frames: v.frames, avgMs: +(v.total / v.frames).toFixed(3), maxMs: +v.max.toFixed(2) }]))
       };
     },
-    _reset() { if (st) { Object.assign(st.perf, { frames: 0, total: 0, max: 0, uploads: 0, uploaded: 0, byPhase: {} }); } },
+    _reset() { if (st) { Object.assign(st.perf, { frames: 0, total: 0, max: 0, uploads: 0, uploaded: 0, byPhase: {}, sliceMax: 0 }); } },
     // Test hook: the timing of the last activation, kept after its exit.
     get _lastPerf() { return lastPerf; }
   };

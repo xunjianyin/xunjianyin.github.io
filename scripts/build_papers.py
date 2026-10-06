@@ -41,6 +41,14 @@ RESEARCH_THREADS: dict[str, list[str]] = {
 }
 # Figures wider than this aspect ratio keep a legible minimum width on phones.
 WIDE_FIGURE_RATIO = 2.4
+# Lenses (easter/): the reader's lens follows them onto paper pages. The first snippet is
+# identical on every page of the site; it marks html before the first paint (see
+# easter/boot.js). Boot binds the lens trigger (the h1) and brings the lens back.
+LENSES_PREPAINT = ("<script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */"
+                   "try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))"
+                   "document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>")
+LENSES_BOOT = ('<script src="../easter/boot.js?v=lenses-v2" defer '
+               "onerror=\"document.documentElement.removeAttribute('data-lens-arriving')\"></script>")
 # Numbers, optionally signed, with a unit, a ± interval, or a significance mark.
 NUMERIC_CELL = re.compile(r'^[−+\-]?\s?\d[\d,.]*\s?(%|pp|x|×)?(\s?±\s?\d[\d.]*)?[*†‡]*(\s[↑↓][\d.]+)?$|^[−\-–—/]$')
 # A change printed next to a value in the source table, e.g. "30.31 ↑28.09".
@@ -401,6 +409,7 @@ def render(slug: str, meta: dict[str, Any], item: dict[str, Any], insight: dict[
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  {LENSES_PREPAINT}
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{e(item['takeaway'])}">
   <meta name="theme-color" content="#fbfcfa">
@@ -419,6 +428,7 @@ def render(slug: str, meta: dict[str, Any], item: dict[str, Any], insight: dict[
   <link rel="stylesheet" href="paper-page.css">
   {demo_assets}
   <script src="paper-page.js" defer></script>
+  {LENSES_BOOT}
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -429,7 +439,7 @@ def render(slug: str, meta: dict[str, Any], item: dict[str, Any], insight: dict[
   <main id="main-content" class="paper-container">
     <header class="paper-header">
       <p class="paper-eyebrow"><span>{e(meta['venue'])}</span><span>{e(item['topic'])}</span></p>
-      <h1>{title_html}</h1>
+      <h1 data-lens-trigger>{title_html}</h1>
       {authors}
       <div class="paper-links" aria-label="Research resources">{links}</div>
       <p class="paper-takeaway">{e(item['takeaway'])}</p>{glance}
