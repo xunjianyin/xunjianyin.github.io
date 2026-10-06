@@ -378,12 +378,12 @@
     [2023, 'evaluation', 'context-aware-evaluation', 'Cont-COMET', 'Exploring Context-Aware Evaluation Metrics for Machine Translation', 'EMNLP 2023 Findings'],
     [2023, 'knowledge', 'alcuna', 'ALCUNA', 'ALCUNA: Large Language Models Meet New Knowledge', 'EMNLP 2023'],
     [2024, 'evaluation', 'themis', 'Themis', 'Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability', 'EMNLP 2024'],
-    [2024, 'evaluation', 'contrasolver', 'ContraSolver', 'ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions', 'arXiv preprint 2024'],
     [2024, 'knowledge', 'history-matters', 'History Matters', 'History Matters: Temporal Knowledge Editing in Large Language Model', 'AAAI 2024'],
     [2024, 'knowledge', 'knowledge-boundary', 'Knowledge Boundary', 'Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation', 'ACL 2024 · Main Conference'],
     [2024, 'grounding', 'contextual-asr', 'Contextual ASR', 'Contextual Modeling for Document-level ASR Error Correction', 'LREC-COLING 2024'],
     [2024, 'grounding', 'error-robust-retrieval', 'RERIC', 'Error-Robust Retrieval for Chinese Spelling Check', 'LREC-COLING 2024'],
     [2024, 'reasoning', 'coral', 'COrAL', 'COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement', 'AFM Workshop, NeurIPS 2024'],
+    [2024, 'improvement', 'contrasolver', 'ContraSolver', 'ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions', 'arXiv preprint 2024'],
     [2025, 'evaluation', 'dsgram', 'DSGram', 'DSGram: Dynamic Weighting Sub-Metrics for Grammatical Error Correction in the Era of Large Language Models', 'AAAI 2025'],
     [2025, 'evaluation', 'nlg-evaluation-survey', 'LLMs as Evaluators', 'LLM-based NLG Evaluation: Current Status and Challenges', 'Computational Linguistics 2025'],
     [2025, 'evaluation', 'damon', 'DAMON', 'DAMON: A Dialogue-Aware MCTS Framework for Jailbreaking Large Language Models', 'EMNLP 2025'],
@@ -395,13 +395,13 @@
     [2026, 'evaluation', 'auditing-health-llms', 'Challenges of Auditing', 'Challenges of Auditing: Variability in Outputs of Large Language Models for Health', 'arXiv preprint 2026'],
     [2026, 'evaluation', 'agent-x', 'AGENT-X', 'AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection', 'EMNLP 2026'],
     [2026, 'grounding', 'eama', 'EAMA', 'EAMA: Entity-Aware Multimodal Alignment Based Approach for News Image Captioning', 'TOMM 2026'],
+    [2026, 'grounding', 'epistemic-context-learning', 'Epistemic Context Learning', 'Epistemic Context Learning: Building Trust the Right Way in LLM-Based Multi-Agent Systems', 'Agentic AI in the Wild Workshop, ICLR 2026'],
     [2026, 'grounding', 'coding-agents-long-context', 'Coding Agents for Long Context', 'Coding Agents are Effective Long-Context Processors', 'arXiv preprint 2026'],
     [2026, 'grounding', 'lazy-grounding', 'Lazy Grounding', 'Lazy Grounding: Attacking Search Agents with Factual Evidence', 'EMNLP 2026'],
     [2026, 'reasoning', 'geometry-of-reasoning', 'The Geometry of Reasoning', 'The Geometry of Reasoning: Flowing Logics in Representation Space', 'ICLR 2026'],
     [2026, 'reasoning', 'atomic-to-composite', 'Atomic to Composite', 'From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning', 'SPOT Workshop, ICLR 2026'],
     [2026, 'reasoning', 'reverse-lm', 'LEDOM', 'LEDOM: Reverse Language Model', 'ACL 2026'],
-    [2026, 'improvement', 'derl', 'DERL', 'Differentiable Evolutionary Reinforcement Learning', 'Recursive Self-Improvement Workshop, ICLR 2026'],
-    [2026, 'improvement', 'epistemic-context-learning', 'Epistemic Context Learning', 'Epistemic Context Learning: Building Trust the Right Way in LLM-Based Multi-Agent Systems', 'Agentic AI in the Wild Workshop, ICLR 2026']
+    [2026, 'improvement', 'derl', 'DERL', 'Differentiable Evolutionary Reinforcement Learning', 'Recursive Self-Improvement Workshop, ICLR 2026']
   ].map(([year, theme, slug, name, title, venue]) => ({
     year, slug, name, title, venue, theme: THEMES.findIndex(t => t.id === theme)
   }));

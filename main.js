@@ -60,7 +60,7 @@ function populatePublications(publications, listId) {
 
   publications.forEach(pub => {
     const li = document.createElement('li');
-    li.dataset.topic = pub.topic || '';
+    li.dataset.topics = (pub.topics || []).join(' ');
     li.dataset.type = publicationType(pub);
     li.dataset.lead = String(isLeadAuthor(pub));
 
@@ -214,10 +214,16 @@ function renderPublicationIndex(container) {
   });
 
   const facets = [
-    { key: 'topic', param: 'topic', label: 'Topic', options: PUBLICATION_TOPICS, value: pub => pub.topic },
-    { key: 'type', param: 'type', label: 'Type', options: PUBLICATION_TYPES, value: publicationType },
-    { key: 'lead', param: 'author', label: 'Author', options: [{ id: 'true', label: 'First or co-first' }], value: pub => String(isLeadAuthor(pub)) }
+    { key: 'topic', param: 'topic', label: 'Topic', options: PUBLICATION_TOPICS, matches: (pub, id) => (pub.topics || []).includes(id) },
+    { key: 'type', param: 'type', label: 'Type', options: PUBLICATION_TYPES, matches: (pub, id) => publicationType(pub) === id },
+    { key: 'lead', param: 'author', label: 'Author', options: [{ id: 'true', label: 'First or co-first' }], matches: (pub, id) => String(isLeadAuthor(pub)) === id }
   ];
+  // A rendered paper matches a facet when the facet is "all" or the paper carries the chosen value.
+  const itemMatches = {
+    topic: (li, id) => li.dataset.topics.split(' ').includes(id),
+    type: (li, id) => li.dataset.type === id,
+    lead: (li, id) => li.dataset.lead === id
+  };
   const params = new URLSearchParams(window.location.search);
   const state = {};
   facets.forEach(facet => {
@@ -235,7 +241,7 @@ function renderPublicationIndex(container) {
     label.textContent = facet.label;
     row.appendChild(label);
     [{ id: 'all', label: 'All' }, ...facet.options].forEach(option => {
-      const count = option.id === 'all' ? ordered.length : ordered.filter(pub => facet.value(pub) === option.id).length;
+      const count = option.id === 'all' ? ordered.length : ordered.filter(pub => facet.matches(pub, option.id)).length;
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'filter-option';
@@ -253,7 +259,7 @@ function renderPublicationIndex(container) {
     yearsRoot.querySelectorAll('.pub-year').forEach(section => {
       let visible = 0;
       section.querySelectorAll('.publication-list > li').forEach(li => {
-        const match = ['topic', 'type', 'lead'].every(key => state[key] === 'all' || li.dataset[key] === state[key]);
+        const match = ['topic', 'type', 'lead'].every(key => state[key] === 'all' || itemMatches[key](li, state[key]));
         li.hidden = !match;
         if (match) visible++;
       });

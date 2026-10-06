@@ -95,7 +95,7 @@
     type();
     await until(() => egg()?.open, 'the password to open the egg');
     check(assets().length === 2, 'The full password loads the script and stylesheet once');
-    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v8')), 'Asset URLs carry v=spira-v8');
+    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v9')), 'Asset URLs carry v=spira-v9');
     check(egg().spira.keyCount === 37, `The key sentence is found in full (${egg().spira.keyCount} of 37 tokens)`);
     await dismiss();
 
@@ -286,9 +286,9 @@
       for (let c = 0; c < buffer.numberOfChannels; c++) { const data = buffer.getChannelData(c); for (let i = 0; i < data.length; i++) { const v = Math.abs(data[i]); if (v > peak) peak = v; } }
       return { peak: +peak.toFixed(4), scheduled };
     };
-    const melody = [[2022, 0], [2023, 0], [2023, 0], [2023, 1], [2024, 0], [2024, 0], [2024, 1], [2024, 1], [2024, 2], [2024, 2], [2024, 3],
+    const melody = [[2022, 0], [2023, 0], [2023, 0], [2023, 1], [2024, 0], [2024, 1], [2024, 1], [2024, 2], [2024, 2], [2024, 3], [2024, 4],
       [2025, 0], [2025, 0], [2025, 0], [2025, 1], [2025, 2], [2025, 2], [2025, 4], [2025, 4],
-      [2026, 0], [2026, 0], [2026, 2], [2026, 2], [2026, 2], [2026, 3], [2026, 3], [2026, 3], [2026, 4], [2026, 4]];
+      [2026, 0], [2026, 0], [2026, 2], [2026, 2], [2026, 2], [2026, 2], [2026, 3], [2026, 3], [2026, 3], [2026, 4]];
     const renders = {
       ignition: await render(3, audio => audio.cue.ignite(0.05)),
       melody: await render(5.5, audio => melody.forEach(([year, theme], i) => audio.cue.paper(0.05 + i * 0.14, theme, year, (i % 5) / 2.5 - 0.8))),

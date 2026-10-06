@@ -184,9 +184,9 @@
       if (eggLoading) return;
       const script = document.createElement('script');
       const style = document.createElement('link');
-      script.src = toRootHref('easter-egg.js?v=spira-v8');
+      script.src = toRootHref('easter-egg.js?v=spira-v9');
       style.rel = 'stylesheet';
-      style.href = toRootHref('easter-egg.css?v=spira-v8');
+      style.href = toRootHref('easter-egg.css?v=spira-v9');
       if (footnote) footnote.setAttribute('aria-busy', 'true');
       eggLoading = Promise.all([script, style].map(asset => new Promise((resolve, reject) => {
         asset.onload = resolve;
