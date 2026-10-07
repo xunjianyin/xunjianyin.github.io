@@ -1,6 +1,6 @@
 {
  "source": "tests/browser_tokens.js on the homepage (index.html) at 1440x900",
- "tokenizer": "easter/tokens.js (cl100k_base, ranks from easter/cl100k.txt)",
+ "tokenizer": "easter/lenses/tokens.js (cl100k_base, ranks from easter/lenses/data/cl100k.txt)",
  "tokens": 852,
  "runs": [
   {

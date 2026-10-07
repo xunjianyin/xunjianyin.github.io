@@ -164,101 +164,52 @@
     const footerMount = document.getElementById('site-footer');
     if (footerMount) {
       footerMount.innerHTML = buildFooter();
-    }
-
-    // Match before loading, so the first attempt also works on a cold cache.
-    let eggLoading = null;
-    let eggReady = false;
-    const footnote = document.querySelector('.easter-egg-footnote');
-    // Browsers start audio only inside a user gesture, and this runs in the keydown or click
-    // that opens the egg: create and resume an AudioContext now, unless the visitor turned the
-    // sound off. The egg adopts it (and creates its own later if this fails).
-    function primeEggAudio() {
-      try {
-        if (window.__spiraAudioContext || localStorage.getItem('spira-sound') === 'off') return;
-        const Context = window.AudioContext || window.webkitAudioContext;
-        if (!Context) return;
-        const context = new Context();
-        if (context.resume) context.resume().catch(() => {});
-        window.__spiraAudioContext = context;
-      } catch (error) { /* sound is optional */ }
-    }
-    function openEasterEgg() {
-      // A lens restyles the page the egg captures: return to normal first, without animation,
-      // and forget it, so the next page opens normal too.
-      const lenses = window.SiteLenses;
-      const lensesSettled = lenses && (lenses.current || lenses.busy) ? lenses.reset({ instant: true }) : null;
-      if (!lensesSettled) {
-        try { sessionStorage.removeItem('lenses-active'); } catch (error) { /* storage is optional */ }
-        document.documentElement.removeAttribute('data-lens-arriving');
-      }
-      primeEggAudio();
-      if (eggReady) {
-        if (lensesSettled) lensesSettled.then(() => window.SiteEasterEgg.open());
-        else window.SiteEasterEgg.open();
-        return;
-      }
-      if (eggLoading) return;
-      const script = document.createElement('script');
-      const style = document.createElement('link');
-      script.src = toRootHref('easter-egg.js?v=spira-v9');
-      style.rel = 'stylesheet';
-      style.href = toRootHref('easter-egg.css?v=spira-v9');
-      if (footnote) footnote.setAttribute('aria-busy', 'true');
-      eggLoading = Promise.all([script, style].map(asset => new Promise((resolve, reject) => {
-        asset.onload = resolve;
-        asset.onerror = reject;
-        document.head.append(asset);
-      })).concat(lensesSettled || [])).then(() => {
-        if (!window.SiteEasterEgg) throw new Error('Easter egg did not initialize.');
-        eggReady = true;
-        window.SiteEasterEgg.open();
-      }).catch(() => {
-        script.remove();
-        style.remove();
-        try { window.__spiraAudioContext?.close().catch(() => {}); } catch (error) { /* already closed */ }
-        window.__spiraAudioContext = undefined;
-        if (footnote) footnote.title = 'Could not load. Click to try again.';
-      }).finally(() => {
-        eggLoading = null;
-        if (footnote) footnote.removeAttribute('aria-busy');
+      // A click on "*" before the egg boot has run opens Spira once the boot is there.
+      footerMount.querySelector('.easter-egg-footnote')?.addEventListener('click', () => {
+        if (!window.SiteLensesBoot) spiraWanted = true;
       });
     }
-    footnote?.addEventListener('click', openEasterEgg);
-    const password = 'yxjgogogo';
-    let sequence = '';
-    let lastKeyAt = 0;
-    document.addEventListener('keydown', event => {
-      const target = event.target;
-      if (event.defaultPrevented || event.isComposing || event.repeat || event.ctrlKey || event.metaKey || event.altKey ||
-          target.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], dialog[open]')) {
-        sequence = '';
-        return;
-      }
-      const now = performance.now();
-      if (now - lastKeyAt > 1800) sequence = '';
-      lastKeyAt = now;
-      const key = event.key?.toLowerCase();
-      sequence += key?.length === 1 ? key : '\0';
-      while (sequence && !password.startsWith(sequence)) sequence = sequence.slice(1);
-      if (sequence === password) { sequence = ''; openEasterEgg(); }
-    });
   }
 
-  /* Lenses: easter/boot.js binds the lens triggers ([data-lens-trigger]) and brings the
-   * reader's lens to this page when one is active. It loads as early as possible: a page
-   * opened with a lens stays hidden until the lens arrives. */
-  function loadLensesBoot() {
-    if (window.SiteLensesBoot) return;
+  /* The easter eggs (easter/README.md): easter/boot.js binds both eggs' triggers (the
+   * [data-lens-trigger] names and titles; the footer's "*" and the typed password) and brings
+   * the reader's lens to this page when one is active. It loads as early as possible: a page
+   * opened with a lens stays hidden until the lens arrives. then(boot) runs once it is there.
+   * Both Spira triggers live in the boot: while it is missing only the footer's "*" (which
+   * loads it again) can open Spira; the typed password works again once the boot is there. */
+  let spiraWanted = false;
+  let footnoteTitle = null;           // the "*"'s own title, kept while it says the boot failed
+  function loadEasterBoot(then) {
+    if (window.SiteLensesBoot) { if (then) then(window.SiteLensesBoot); return; }
     const script = document.createElement('script');
-    script.src = toRootHref('easter/boot.js?v=lenses-v2');
+    script.src = toRootHref('easter/boot.js?v=lenses-v3');
+    script.onload = () => {
+      const boot = window.SiteLensesBoot;
+      if (boot && then) then(boot);
+      else if (boot && spiraWanted) boot.openSpira();
+      spiraWanted = false;
+    };
     script.onerror = () => {
       script.remove();
+      // A page opened with a lens shows as it is, without the ground.
       document.documentElement.removeAttribute('data-lens-arriving');
+      document.getElementById('lenses-prepaint')?.remove();
+      // Without the boot the footer's "*" cannot open Spira: say so, and try again on a click.
+      whenReady(() => {
+        const footnote = document.querySelector('.easter-egg-footnote');
+        if (!footnote) return;
+        if (footnoteTitle === null) footnoteTitle = footnote.title;   // not the failure text of a retry
+        footnote.title = 'Could not load. Click to try again.';
+        footnote.addEventListener('click', () => loadEasterBoot(boot => {
+          footnote.title = footnoteTitle;
+          footnoteTitle = null;
+          boot.openSpira();
+        }), { once: true });
+      });
     };
     document.head.append(script);
   }
 
-  loadLensesBoot();
+  loadEasterBoot();
   whenReady(injectSiteShell);
 })();

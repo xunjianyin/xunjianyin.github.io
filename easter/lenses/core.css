@@ -1,5 +1,15 @@
-/* Lenses core: hidden glyphs (the first egg's technique), the layers lenses draw in, and
-   the transient caption. Lens styles live in easter/<id>.css under html.lens-<id>. */
+/* Lenses core: hidden glyphs (the first egg's technique), the layers lenses draw in, the
+   transient caption and the arrival's fade. Lens styles live in easter/lenses/<id>.css under
+   html.lens-<id>. */
+
+/* Arrival: a page opened while a lens is active was hidden over the lens's ground before its
+   first paint (the <head> snippet's #lenses-prepaint). Once the lens has arrived the core
+   fades the body in over that ground (html[data-lens-revealing]), then lifts the ground. */
+html[data-lens-revealing] body { animation: lenses-reveal 180ms ease-out both; }
+@keyframes lenses-reveal { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-lens-revealing] body { animation: none; }
+}
 
 /* Glyphs only: colours, borders, SVG icons and list markers keep theirs. The scope is the
    site shell's nav, main and footer, or a paper page's header, main and footer. */

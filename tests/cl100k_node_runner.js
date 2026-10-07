@@ -1,4 +1,4 @@
-/* Node runner for the cl100k tokenizer in easter/tokens.js (used by tests/test_cl100k_tokens.py).
+/* Node runner for the cl100k tokenizer in easter/lenses/tokens.js (used by tests/test_cl100k_tokens.py).
  *
  * Usage: node tests/cl100k_node_runner.js < strings.json
  * Reads a JSON array of strings on stdin and prints {"parseMs": …, "ids": [[…], …]}: the token ids
@@ -20,12 +20,12 @@ const sandbox = {
   console
 };
 vm.createContext(sandbox);
-vm.runInContext(fs.readFileSync(path.join(ROOT, 'easter/tokens.js'), 'utf8'), sandbox, { filename: 'easter/tokens.js' });
-if (!lens || !lens._tokenizer) throw new Error('easter/tokens.js did not register a lens with _tokenizer');
+vm.runInContext(fs.readFileSync(path.join(ROOT, 'easter/lenses/tokens.js'), 'utf8'), sandbox, { filename: 'easter/lenses/tokens.js' });
+if (!lens || !lens._tokenizer) throw new Error('easter/lenses/tokens.js did not register a lens with _tokenizer');
 
 const { parseRanks, encode } = lens._tokenizer;
 const began = performance.now();
-const ranks = parseRanks(fs.readFileSync(path.join(ROOT, 'easter/cl100k.txt'), 'utf8'));
+const ranks = parseRanks(fs.readFileSync(path.join(ROOT, 'easter/lenses/data/cl100k.txt'), 'utf8'));
 const parseMs = performance.now() - began;
 const strings = JSON.parse(fs.readFileSync(0, 'utf8'));
 const ids = strings.map(text => Array.from(encode(ranks, text), token => token.id));

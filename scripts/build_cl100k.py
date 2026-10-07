@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build easter/cl100k.txt, the compact cl100k_base ranks file read by easter/tokens.js.
+"""Build easter/lenses/data/cl100k.txt, the compact cl100k_base ranks file read by easter/lenses/tokens.js.
 
 Run: uv run --with tiktoken python scripts/build_cl100k.py [--check]
 
@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "easter" / "cl100k.txt"
+OUTPUT = ROOT / "easter" / "lenses" / "data" / "cl100k.txt"
 ENCODING = "cl100k_base"
 FORMAT = "utf8-escaped-v1"
 
@@ -64,7 +64,7 @@ def escape_token(token: bytes) -> str:
 
 
 def unescape_token(line: str) -> bytes:
-    """Inverse of escape_token, mirroring the parser in easter/tokens.js."""
+    """Inverse of escape_token, mirroring the parser in easter/lenses/tokens.js."""
     out = bytearray()
     i = 0
     while i < len(line):

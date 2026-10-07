@@ -1,9 +1,9 @@
-"""The cl100k_base tokenizer in easter/tokens.js reproduces tiktoken exactly.
+"""The cl100k_base tokenizer in easter/lenses/tokens.js reproduces tiktoken exactly.
 
 Run: uv run --with tiktoken python -m unittest tests/test_cl100k_tokens.py
 
 Three checks:
-- easter/cl100k.txt decodes to exactly tiktoken's mergeable ranks (every token, every rank).
+- easter/lenses/data/cl100k.txt decodes to exactly tiktoken's mergeable ranks (every token, every rank).
 - The browser fixtures (tests/fixtures/cl100k_*.json, saved by tests/browser_tokens.js from the
   live homepage and the longest paper page) hold the lens's own token ids for every text run it
   counted; each must equal tiktoken's encode_ordinary of the same text.
@@ -30,7 +30,7 @@ try:
 except ImportError:  # pragma: no cover - the suite says how to run it
     tiktoken = None
 
-RANKS = ROOT / "easter" / "cl100k.txt"
+RANKS = ROOT / "easter" / "lenses" / "data" / "cl100k.txt"
 FIXTURES = sorted((ROOT / "tests" / "fixtures").glob("cl100k_*.json"))
 HOMEPAGE_FIXTURE = ROOT / "tests" / "fixtures" / "cl100k_homepage.json"
 RUNNER = ROOT / "tests" / "cl100k_node_runner.js"

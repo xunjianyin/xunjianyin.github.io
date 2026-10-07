@@ -1,13 +1,16 @@
 /* Run with agent-browser eval --stdin against a local static preview of the site (any page).
- * The suite takes minutes: run it as a background promise and poll for its result, e.g.
- *   eval: window.__r = null; Promise.resolve(<this file>).then(r => { window.__r = r; }); 'started'
- *   then poll: window.__r
+ * The suite takes minutes: tests/run_easter_suites.sh lenses_pages starts it as a background
+ * promise (one eval stores the result on window when the promise resolves) and polls for it.
  * Tests the lenses across the site: the lens follows the reader from page to page (no flash
- * of the normal style at the first frame of the next page), a back/forward return (pagehide
- * and pageshow with persisted), Esc on a subpage, the triggers on every page kind, the first
- * egg from a subpage, every lens arriving on a sample of pages and leaving them byte for
- * byte, and the frame budget on the longest paper page. It iterates the lens modules that
- * exist. Prints assertions, failures, first-frame samples, arrival times and frame budgets.
+ * of the normal style at the first frame of the next page: the <head> snippet hides the page
+ * over the lens's ground, or shows it at once for a lens without one, and #lenses-prepaint is
+ * gone after the reveal), a back/forward return (pagehide and pageshow with persisted), an
+ * unknown stored lens, Esc on a subpage, the triggers on every page kind, the first egg from a
+ * subpage, ctx.onLayoutChange on a lazy photo and a padding change, every lens arriving on a
+ * sample of pages and leaving them byte for byte, and the frame budget on the longest paper
+ * page. The lenses and their grounds are read from the core (lenses listed but not written
+ * yet are skipped). Prints assertions, failures, first-frame samples, arrival times and frame
+ * budgets.
  */
 (async () => {
   const failures = [];
@@ -29,9 +32,11 @@
   const keys = ['theme', 'lenses-seen', 'spira-sound'];
   const stored = Object.fromEntries(keys.map(key => [key, localStorage.getItem(key)]));
   const storedLens = sessionStorage.getItem('lenses-active');
+  const storedGround = sessionStorage.getItem('lenses-ground');
   localStorage.setItem('theme', 'light'); localStorage.setItem('lenses-seen', '1'); localStorage.setItem('spira-sound', 'off');
-  sessionStorage.removeItem('lenses-active');
-  const GROUND = { stardust: 'rgb(6, 8, 12)', blueprint: 'rgb(15, 58, 99)', acta: 'rgb(242, 232, 211)', lamplight: 'rgb(11, 8, 6)' };
+  sessionStorage.removeItem('lenses-active'); sessionStorage.removeItem('lenses-ground');
+  const grounds = {};                // lens id -> '#rrggbb' or null, from each registered lens
+  const rgb = hex => `rgb(${[1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(', ')})`;
   const LONGEST_PAPER = '/papers/auditing-health-llms.html';
   const SAMPLE = {
     publications: '/publications.html',
@@ -89,7 +94,8 @@
           arriving: d.documentElement.getAttribute('data-lens-arriving') || d.documentElement.getAttribute('data-lens-revealing'),
           active: w.SiteLenses ? w.SiteLenses.current : null,
           bodyOpacity: d.body ? w.getComputedStyle(d.body).opacity : null,
-          ground: w.getComputedStyle(d.documentElement).backgroundColor
+          ground: w.getComputedStyle(d.documentElement).backgroundColor,
+          prepaint: !!d.getElementById('lenses-prepaint')
         })));
         break;
       }
@@ -100,8 +106,13 @@
     await until(() => win.SiteLensesBoot, `${label}: the lens boot`);
     return first;
   };
-  const load = (path, lens = null) => {
+  // Opens a page as if the reader came with `lens` (its ground stored as the core stores it).
+  const remember = (lens, ground = grounds[lens]) => {
     if (lens) sessionStorage.setItem('lenses-active', lens); else sessionStorage.removeItem('lenses-active');
+    if (lens && ground) sessionStorage.setItem('lenses-ground', ground); else sessionStorage.removeItem('lenses-ground');
+  };
+  const load = (path, lens = null) => {
+    remember(lens);
     return navigate(() => { frame.src = `${path}${path.includes('?') ? '&' : '?'}r=${Math.random().toString(36).slice(2)}`; }, path);
   };
   const lenses = () => win.SiteLenses;
@@ -132,7 +143,7 @@
     }
   };
   // What a lens could leave behind (the core's own assets may stay once loaded).
-  const ours = el => /easter\/(boot|lenses)\.(js|css)/.test(el.getAttribute('src') || el.getAttribute('href') || '');
+  const ours = el => /easter\/(boot|lenses\/core)\.(js|css)/.test(el.getAttribute('src') || el.getAttribute('href') || '');
   const snapshot = () => ({
     main: doc.querySelector('#main-content').innerHTML,
     nav: (doc.querySelector('#site-nav, body > header.site-header') || {}).innerHTML || '',
@@ -177,12 +188,16 @@
     const registered = await boot._debug.loadAll();
     report.lenses = registered;
     check(registered.length > 0, `At least one lens module exists (found ${registered.join(', ')})`);
+    registered.forEach(id => { grounds[id] = boot._debug.lens(id).ground || null; });
+    report.grounds = grounds;
     for (const page of ['/', '/publications.html', '/cv.html', '/blogs/agents-that-learn-after-deployment.html', '/papers/godel-agent.html']) {
       const html = await (await fetch(page)).text();
       const head = html.slice(0, html.indexOf('</head>'));
-      const snippet = head.indexOf("sessionStorage.getItem('lenses-active')");
+      const snippet = head.indexOf('<script>/* Lenses:');
       const firstSheet = head.search(/<link[^>]+stylesheet/);
-      check(snippet > 0 && (firstSheet < 0 || snippet < firstSheet), `${page}: the pre-paint snippet runs in <head> before any stylesheet`);
+      check(snippet > 0 && snippet === head.indexOf('<script') && (firstSheet < 0 || snippet < firstSheet), `${page}: the pre-paint snippet is the first script in <head>, before any stylesheet`);
+      const text = head.slice(snippet, head.indexOf('</script>', snippet));
+      check(text.includes("'lenses-ground'") && !boot._debug.lenses.some(id => text.includes(id)), `${page}: the snippet is generic (names no lens)`);
     }
 
     /* 1. The lens follows the reader: home > publications > a paper, with no flash. */
@@ -192,15 +207,23 @@
       check(sessionStorage.getItem('lenses-active') === id, `${id}: the lens is remembered once it has entered`);
       const toPublications = await navigate(() => doc.querySelector('#site-nav a[href$="publications.html"]').click(), `${id} home > publications`);
       report.firstFrames.push({ lens: id, ...toPublications });
-      const hidden = id === 'tokens' || toPublications.active === id || toPublications.bodyOpacity === null || toPublications.bodyOpacity === '0';
-      check((toPublications.arriving === id || toPublications.active === id) && hidden && (!GROUND[id] || toPublications.ground === GROUND[id]),
-        `${id}: publications opens marked, hidden over the lens ground at its first frame (${JSON.stringify(toPublications)})`);
+      check(sessionStorage.getItem('lenses-ground') === grounds[id], `${id}: its ground is remembered with it (${sessionStorage.getItem('lenses-ground')})`);
+      const ground = grounds[id];
+      if (ground) {
+        const hidden = toPublications.active === id || toPublications.bodyOpacity === null || toPublications.bodyOpacity === '0';
+        check((toPublications.arriving === id || toPublications.active === id) && hidden && toPublications.prepaint && toPublications.ground === rgb(ground),
+          `${id}: publications opens marked, hidden over the lens ground ${ground} at its first frame (${JSON.stringify(toPublications)})`);
+      } else {
+        check((toPublications.arriving === id || toPublications.active === id) && !toPublications.prepaint && toPublications.bodyOpacity === '1',
+          `${id}: a lens without a ground: publications opens marked and shows at once (${JSON.stringify(toPublications)})`);
+      }
       await arrived(id);
       check(!doc.querySelector('.lenses-caption') && win.getComputedStyle(doc.body).opacity === '1', `${id}: the lens arrives on publications without a caption, and the page shows`);
+      check(!doc.getElementById('lenses-prepaint'), `${id}: #lenses-prepaint is removed once the page is revealed`);
       const paperLink = doc.querySelector('#main-content a[href*="papers/"]');
       const toPaper = await navigate(() => paperLink.click(), `${id} publications > paper`);
       report.firstFrames.push({ lens: id, ...toPaper });
-      check((toPaper.arriving === id || toPaper.active === id) && (id === 'tokens' || toPaper.active === id || toPaper.bodyOpacity === null || toPaper.bodyOpacity === '0'),
+      check((toPaper.arriving === id || toPaper.active === id) && (!ground || toPaper.active === id || toPaper.bodyOpacity === null || toPaper.bodyOpacity === '0'),
         `${id}: the paper page opens marked and hidden at its first frame (${JSON.stringify(toPaper)})`);
       await arrived(id);
       check(lenses().page.kind === 'paper', `${id}: the core knows a paper page`);
@@ -208,16 +231,18 @@
       win.dispatchEvent(new win.PageTransitionEvent('pagehide', { persisted: true }));
       await idle();
       check(lenses().current === null && doc.documentElement.getAttribute('data-lens-arriving') === id && sessionStorage.getItem('lenses-active') === id,
-        `${id}: pagehide (persisted) resets the lens, keeps it remembered and keeps the page hidden`);
+        `${id}: pagehide (persisted) resets the lens, keeps it remembered and keeps the page marked`);
+      check(!!doc.getElementById('lenses-prepaint') === !!ground && (!ground || win.getComputedStyle(doc.body).opacity === '0'),
+        `${id}: pagehide (persisted) ${ground ? 'hides the page over the ground again' : 'leaves a lens without a ground visible'}`);
       win.dispatchEvent(new win.PageTransitionEvent('pageshow', { persisted: true }));
       await arrived(id);
-      check(lenses().current === id, `${id}: pageshow (persisted) brings the lens back`);
+      check(lenses().current === id && !doc.getElementById('lenses-prepaint'), `${id}: pageshow (persisted) brings the lens back and lifts the ground`);
       const back = await navigate(() => win.history.back(), `${id} paper > back`);
       check(back.arriving === id || back.active === id, `${id}: going back opens publications with the lens`);
       await arrived(id);
       // Esc on a subpage forgets the lens.
       escape(); await idle();
-      check(lenses().current === null && sessionStorage.getItem('lenses-active') === null, `${id}: Esc on a subpage returns to normal and forgets the lens`);
+      check(lenses().current === null && sessionStorage.getItem('lenses-active') === null && sessionStorage.getItem('lenses-ground') === null, `${id}: Esc on a subpage returns to normal and forgets the lens and its ground`);
       const next = await navigate(() => doc.querySelector('#site-nav a[href$="cv.html"]').click(), `${id} after Esc > cv`);
       check(next.arriving === null && !win.SiteLenses, `${id}: after Esc the next page opens normal (no core loaded)`);
     }
@@ -277,7 +302,63 @@
     const afterEgg = snapshot();
     check(afterEgg.main === eggBase.main, 'After the egg on a subpage the markup is unchanged');
 
-    /* 3b. Content changes reach the lens: an abstract toggled open, late blog markdown. */
+    /* 3a. An unknown stored lens (a newer page's lens, or garbage): the page is hidden over the
+     * stored ground at first, then the core forgets the id and shows the page. */
+    {
+      remember('nosuchlens', '#123456');
+      const first = await navigate(() => { frame.src = `/publications.html?r=${Math.random().toString(36).slice(2)}`; }, 'unknown lens');
+      // Either still marked over the stored ground at the first frame, or already dropped before
+      // anything was painted (the core can load before the first frame): never a half state.
+      const marked = first.arriving === 'nosuchlens' && first.prepaint && first.ground === 'rgb(18, 52, 86)' && first.bodyOpacity === '0';
+      const dropped = !first.paintedBefore && first.arriving === null && !first.prepaint && first.bodyOpacity === '1';
+      check(marked || dropped, `An unknown lens: the first frame is hidden over the stored ground, or the lens was already dropped (${JSON.stringify(first)})`);
+      await until(() => win.SiteLenses && !win.SiteLenses.busy && !doc.documentElement.hasAttribute('data-lens-arriving'), 'the unknown lens to be dropped');
+      await delay(100);
+      check(!doc.getElementById('lenses-prepaint') && win.getComputedStyle(doc.body).opacity === '1' && lenses().current === null,
+        'The core drops an unknown lens: no ground, the page shows, no lens');
+      check(sessionStorage.getItem('lenses-active') === null && sessionStorage.getItem('lenses-ground') === null, 'An unknown lens is forgotten');
+    }
+
+    /* 3b. ctx.onLayoutChange reports a lazy photo loading (photography's masonry). */
+    {
+      const id = registered[registered.length - 1];
+      await load('/photography.html', id);
+      await arrived(id);
+      let calls = 0;
+      lenses()._debug.ctx.onLayoutChange(() => { calls++; });
+      // The gallery's photos may already be in the memory cache (they then load at once), so a
+      // lazy image with a fresh URL goes at the end of the page: it loads only when scrolled to.
+      const lazy = doc.createElement('img');
+      lazy.alt = ''; lazy.loading = 'lazy'; lazy.width = 320; lazy.height = 320;
+      lazy.src = `/figures/me-320.jpg?lazy=${Math.random().toString(36).slice(2)}`;
+      doc.getElementById('main-content').append(lazy);
+      await delay(600);
+      const quiet = calls;
+      check(!lazy.complete || lazy.naturalWidth === 0, 'A lazy image far below the viewport has not loaded');
+      lazy.scrollIntoView({ block: 'center' });
+      await until(() => lazy.complete && lazy.naturalWidth > 0, 'the lazy image to load', 15000);
+      await delay(400);
+      check(calls > quiet && calls - quiet <= 4, `onLayoutChange fires (debounced) when a lazy image loads (${calls - quiet} calls)`);
+      // A padding change moves the content without changing the content box (the border box).
+      const main = doc.getElementById('main-content');
+      const style = main.getAttribute('style');
+      const padded = calls;
+      main.style.paddingBottom = '37px';
+      await delay(400);
+      check(calls > padded, `onLayoutChange fires when a scope element's padding changes (${calls - padded} calls)`);
+      if (style === null) main.removeAttribute('style'); else main.setAttribute('style', style);
+      await delay(400);
+      lazy.remove();
+      win.scrollTo({ top: 0, behavior: 'instant' });
+      await delay(400);
+      const before = calls;
+      escape();
+      win.dispatchEvent(new win.Event('resize'));
+      await idle(); await delay(300);
+      check(calls === before, `onLayoutChange is silent once the exit has begun (${calls - before} late calls)`);
+    }
+
+    /* 3c. Content changes reach the lens: an abstract toggled open, late blog markdown. */
     await load('/publications.html', registered[registered.length - 1]);
     await arrived(registered[registered.length - 1]);
     const changes = [];
@@ -287,7 +368,7 @@
     await delay(400);
     check(changes.length === 1 && changes[0] > 0, `Toggling an abstract three times reports one debounced content change (${JSON.stringify(changes)})`);
     toggle.click(); escape(); await idle();
-    sessionStorage.setItem('lenses-active', registered[registered.length - 1]);
+    remember(registered[registered.length - 1]);
     await navigate(() => { frame.src = '/blog-post.html?id=self-referential-agent'; }, 'blog-post (late markdown)');
     await arrived(registered[registered.length - 1]);
     await until(() => doc.querySelector('#main-content h1.post-title'), 'the blog post markdown');
@@ -352,6 +433,7 @@
     frame.remove();
     for (const [key, value] of Object.entries(stored)) { if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, value); }
     if (storedLens === null) sessionStorage.removeItem('lenses-active'); else sessionStorage.setItem('lenses-active', storedLens);
+    if (storedGround === null) sessionStorage.removeItem('lenses-ground'); else sessionStorage.setItem('lenses-ground', storedGround);
   }
   /* 7. No uncaught errors or console.error calls. */
   assertions++;

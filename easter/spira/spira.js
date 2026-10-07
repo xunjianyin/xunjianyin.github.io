@@ -9,7 +9,7 @@
  */
 (() => {
   'use strict';
-  const ROOT = new URL('.', (document.currentScript && document.currentScript.src) || location.href);
+  const ROOT = new URL('../../', (document.currentScript && document.currentScript.src) || location.href);   // easter/spira/spira.js → the site root
   const TAU = Math.PI * 2;
 
   /* ---------------------------------------------------------------------------

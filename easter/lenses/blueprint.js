@@ -827,6 +827,7 @@
     numeral: 'III',
     label: 'Blueprint',
     line: 'The page, reading its own structure.',
+    ground: '#0f3a63',           // blueprint paper, painted before a page arrives
     css: true,
     enter,
     arrive,

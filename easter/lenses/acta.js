@@ -474,7 +474,7 @@
 
   // Writes the drop cap rule into this lens's own stylesheet (removed with it after exit).
   function setDropCap(st) {
-    const sheet = [...document.styleSheets].find(sh => (sh.href || '').includes('easter/acta.css'));
+    const sheet = [...document.styleSheets].find(sh => (sh.href || '').includes('easter/lenses/acta.css'));
     if (!sheet) return;
     const target = dropCapParagraph(st);
     const path = target && pathTo(target);
@@ -681,6 +681,7 @@
     numeral: 'IV',
     label: 'Acta Eruditorum, 1692',
     line: 'As it might have been printed when Bernoulli named the spira mirabilis.',
+    ground: '#f2e8d3',           // laid paper, painted before a page arrives
     css: true,
     enter,
     arrive,

@@ -3,9 +3,11 @@
  * synthetic double-tap, lazy loading, the cycle order and its queue, Esc, exact restoration
  * for every registered lens (light and dark theme, scrolled), links and the theme toggle
  * reachable inside each lens, reduced motion, the first egg opened from inside a lens, a lens
- * that fails to load, the caption, the bell's peak, pagehide, a phone viewport, and frame
- * budgets. It iterates the lens modules that exist, so it runs before all of them are
- * written. Prints assertions, failures, the lenses found, frame timing and switch times.
+ * that fails to load, a lens that declines (supported() false), the digit keys, the caption,
+ * the bell's peak, pagehide, a phone viewport, and frame budgets. The cycle is read from
+ * SiteLenses._debug.lenses and it iterates the lens modules that exist, so a lens listed in the
+ * core but not written yet is skipped. Prints assertions, failures, the lenses found, frame
+ * timing and switch times.
  */
 (async () => {
   const failures = [];
@@ -29,7 +31,7 @@
   const pending = new Set();
 
   const load = async (path = '/') => {
-    sessionStorage.removeItem('lenses-active');   // a remembered lens would arrive with the page
+    sessionStorage.removeItem('lenses-active'); sessionStorage.removeItem('lenses-ground');   // a remembered lens would arrive with the page
     await new Promise(resolve => { frame.onload = resolve; frame.src = path; });
     doc = frame.contentDocument; win = frame.contentWindow;
     await until(() => doc.querySelector('.easter-egg-footnote') && doc.querySelector('#selected-papers-list li') && win.SiteLensesBoot, 'the site shell and the lens boot');
@@ -67,7 +69,7 @@
   const idle = () => until(() => lenses() && !lenses().busy, 'the lenses to settle', 20000);
   const name = () => doc.querySelector('.profile-text .name');
   const centre = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
-  const assets = () => doc.querySelectorAll('script[src*="easter/lenses.js"],link[href*="easter/lenses.css"]');
+  const assets = () => doc.querySelectorAll('script[src*="easter/lenses/core.js"],link[href*="easter/lenses/core.css"]');
 
   // A real double-click sequence on the name; returns whether the second mousedown was prevented.
   const dblclick = () => {
@@ -168,17 +170,22 @@
     const prevented = dblclick();
     check(prevented, 'A double-click on the name does not select its text');
     await until(() => win.SiteLenses, 'the core to load');
-    check(assets().length === 2 && [...assets()].every(a => (a.src || a.href).includes('v=lenses-v2')), 'The core script and stylesheet load once, versioned lenses-v2');
+    const version = win.SiteLensesBoot.version;
+    check(assets().length === 2 && [...assets()].every(a => (a.src || a.href).includes(`v=${version}`)) && lenses()._debug.version === version,
+      `The core script and stylesheet load once, versioned ${version} like the boot`);
     check(!!win.__lensesAudioContext || state().audio !== null || localStorage.getItem('spira-sound') === 'off', 'The trigger primes an AudioContext inside the gesture');
     await idle();
     const registered = await lenses()._debug.loadAll();
     report.lenses = registered;
     const manifest = lenses()._debug.lenses;
-    check(JSON.stringify(manifest) === JSON.stringify(['stardust', 'tokens', 'blueprint', 'acta', 'lamplight']), 'The cycle is Stardust, tokens, Blueprint, Acta, Lamplight');
+    check(manifest.length > 0 && manifest.length <= 9 && new Set(manifest).size === manifest.length && manifest.every(id => /^[a-z]{2,20}$/.test(id)),
+      `The cycle lists at most nine distinct lens ids (${manifest.join(', ')})`);
     check(registered.length > 0, `At least one lens module exists (found ${registered.join(', ')})`);
+    check(JSON.stringify(registered) === JSON.stringify(manifest.filter(id => registered.includes(id))), 'The lenses found keep the cycle order');
     for (const id of registered) {
       const lens = lenses()._debug.lens(id);
       check(lens.order === manifest.indexOf(id) + 1 && typeof lens.numeral === 'string' && lens.label && lens.line, `Lens ${id}: order, numeral, label and line match the cycle`);
+      check(lens.ground === null || /^#[0-9a-f]{6}$/i.test(lens.ground), `Lens ${id}: ground is null or #rrggbb (${lens.ground})`);
     }
     const first = registered[0];
     check(lenses().current === first, `The first double-click enters the first lens (${lenses().current})`);
@@ -231,6 +238,53 @@
     await idle();
     check(lenses().current === (registered[1] || null), `Four quick triggers advance two steps (at ${lenses().current})`);
     await lenses().reset();
+
+    /* 4b. Digit keys: 1-9 jump to that place in the cycle while a lens is active, 0 returns;
+     * nothing on a normal page, in a text field, or with a modifier. */
+    {
+      const key = (k, target = doc.body, extra = {}) => target.dispatchEvent(new win.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true, ...extra }));
+      const settle = async () => { await delay(60); await idle(); };
+      await idle();
+      key('1'); await settle();
+      check(lenses().current === null && !state().busy, 'A digit on a normal page does nothing');
+      await lenses()._debug.goto(first);
+      const second = manifest[1];
+      const target = registered.includes(second) ? second : first;
+      key('2'); await settle();
+      check(lenses().current === target, `Key 2 jumps to the second lens of the cycle, ${second} (at ${lenses().current})`);
+      if (target !== first) {
+        check(state().caption && state().caption[0].startsWith(`${lenses()._debug.lens(second).numeral} · `), `The jump to ${second} shows its caption`);
+      }
+      const input = doc.createElement('input');
+      doc.body.append(input); input.focus();
+      key('1', input); await settle();
+      check(lenses().current === target, 'A digit typed in a text field does not jump');
+      input.remove();
+      key('1', doc.body, { ctrlKey: true }); key('1', doc.body, { altKey: true }); await settle();
+      check(lenses().current === target, 'A digit with a modifier does not jump');
+      const missing = manifest.findIndex(id => !registered.includes(id));
+      if (missing >= 0) {
+        key(String(missing + 1)); await delay(200); await idle();
+        check(lenses().current === target, `A digit for a lens that is not there (${manifest[missing]}) changes nothing`);
+      }
+      key('0'); await settle();
+      check(lenses().current === null && sessionStorage.getItem('lenses-active') === null, 'Key 0 returns to normal and forgets the lens');
+    }
+
+    /* 4c. A lens whose supported() returns false (or throws) is skipped silently. */
+    if (registered.length >= 3) {
+      const declining = lenses()._debug.lens(registered[1]);
+      const warned = warnings.length;
+      for (const [how, supported] of [['returns false', () => false], ['throws', () => { throw new Error('declined'); }]]) {
+        declining.supported = supported;
+        await lenses()._debug.goto(first);
+        await delay(750); dblclick(); await idle();
+        check(lenses().current === registered[2], `A lens whose supported() ${how} is skipped (at ${lenses().current})`);
+        await lenses().reset();
+      }
+      delete declining.supported;
+      check(!state().failed.includes(registered[1]) && warnings.length === warned, 'A declining lens is not warned about or counted as failed');
+    }
 
     /* 5. Every lens: enter, links reachable, interaction, exit restores everything (light, scrolled). */
     for (const id of registered) {
@@ -346,7 +400,7 @@
     await load('/');
     const append = doc.head.append.bind(doc.head);
     doc.head.append = (...nodes) => {
-      const script = nodes.find(node => node.tagName === 'SCRIPT' && node.src.includes(`easter/${first}.js`));
+      const script = nodes.find(node => node.tagName === 'SCRIPT' && node.src.includes(`easter/lenses/${first}.js`));
       if (script) { setTimeout(() => script.onerror(new win.Event('error')), 0); return; }
       append(...nodes);
     };
@@ -359,6 +413,23 @@
     check(!win.__lensesAudioContext && state().audio === null, 'With the sound off no AudioContext is created');
     doc.head.append = append;
     await lenses().reset();
+
+    /* 12b. The last key wins: on this fresh page a digit for a lens whose module has not loaded
+     * yet, then 0 in the same task, ends normal (the late module does not bring the lens). */
+    {
+      const unloaded = registered.filter(id => id !== first && !state().registered.includes(id));
+      const far = unloaded[unloaded.length - 1];
+      if (far && registered[1]) {
+        const key = k => doc.body.dispatchEvent(new win.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+        await lenses()._debug.goto(registered[1]);
+        key(String(manifest.indexOf(far) + 1)); key('0');
+        await until(() => state().registered.includes(far) || state().failed.includes(far), `the ${far} module to load`);
+        await delay(100); await idle(); await delay(100); await idle();
+        check(lenses().current === null && sessionStorage.getItem('lenses-active') === null,
+          `A digit for ${far} (not loaded yet) followed by 0 ends normal (at ${lenses().current})`);
+      }
+      report.raceLens = far || null;
+    }
     localStorage.removeItem('spira-sound');
 
     /* 13. Phone: the double-tap cycles every lens without horizontal overflow, and restores. */
@@ -385,7 +456,7 @@
   } catch (error) { failures.push(error.stack || String(error)); }
   finally {
     frame.remove();
-    sessionStorage.removeItem('lenses-active');
+    sessionStorage.removeItem('lenses-active'); sessionStorage.removeItem('lenses-ground');
     for (const [key, value] of Object.entries(stored)) { if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, value); }
   }
   /* 14. No uncaught errors or console.error calls. */

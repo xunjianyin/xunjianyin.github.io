@@ -41,14 +41,25 @@ RESEARCH_THREADS: dict[str, list[str]] = {
 }
 # Figures wider than this aspect ratio keep a legible minimum width on phones.
 WIDE_FIGURE_RATIO = 2.4
-# Lenses (easter/): the reader's lens follows them onto paper pages. The first snippet is
-# identical on every page of the site; it marks html before the first paint (see
-# easter/boot.js). Boot binds the lens trigger (the h1) and brings the lens back.
-LENSES_PREPAINT = ("<script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */"
-                   "try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))"
-                   "document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>")
-LENSES_BOOT = ('<script src="../easter/boot.js?v=lenses-v2" defer '
-               "onerror=\"document.documentElement.removeAttribute('data-lens-arriving')\"></script>")
+# Lenses (easter/README.md): the reader's lens follows them across the site. LENSES_PREPAINT
+# is the canonical <head> snippet, the first <script> of every page (the hand-written pages
+# carry this exact string; tests/test_lenses_prepaint.py checks it). Before the first paint it
+# marks html[data-lens-arriving] with the stored lens and, when that lens has a ground, hides
+# the body over it (#lenses-prepaint, rules keyed on the attributes; the core lifts it). It
+# names no lens (the list lives only in easter/lenses/core.js) and declares no global (an
+# IIFE). LENSES_BOOT loads the boot, which binds the paper title (the trigger) and brings the
+# lens.
+LENSES_PREPAINT = ("<script>/* Lenses: the reader's lens follows them across pages (easter/README.md). */"
+                   "(function(){try{var s=sessionStorage,l=s.getItem('lenses-active'),g=s.getItem('lenses-ground'),d=document,t;"
+                   "if(l&&/^[a-z]{2,20}$/.test(l)){d.documentElement.setAttribute('data-lens-arriving',l);"
+                   "if(g&&/^#[0-9a-f]{6}$/i.test(g)){t=d.createElement('style');t.id='lenses-prepaint';"
+                   "t.textContent='html[data-lens-arriving],html[data-lens-revealing]{background:'+g+'!important}"
+                   "html[data-lens-arriving] body{opacity:0;animation:lenses-failsafe 0s linear 3s forwards}"
+                   "@keyframes lenses-failsafe{to{opacity:1}}';d.head.appendChild(t)}}}catch(e){}})()</script>")
+# A boot that fails to load shows the page as it is (the mark and the ground go).
+LENSES_BOOT = ('<script src="../easter/boot.js?v=lenses-v3" defer '
+               "onerror=\"document.documentElement.removeAttribute('data-lens-arriving');"
+               "var p=document.getElementById('lenses-prepaint');p&&p.remove()\"></script>")
 # Numbers, optionally signed, with a unit, a ± interval, or a significance mark.
 NUMERIC_CELL = re.compile(r'^[−+\-]?\s?\d[\d,.]*\s?(%|pp|x|×)?(\s?±\s?\d[\d.]*)?[*†‡]*(\s[↑↓][\d.]+)?$|^[−\-–—/]$')
 # A change printed next to a value in the source table, e.g. "30.31 ↑28.09".

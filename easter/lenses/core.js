@@ -1,19 +1,28 @@
 /**
  * Lenses. Double-click (or double-tap) a name or a page title ([data-lens-trigger]) and the
- * page is seen through another lens; the content never changes, only how it is drawn:
- *   normal → I Stardust → II Through a model's eyes → III Blueprint → IV Acta Eruditorum, 1692
- *   → V Lamplight → normal → …   Esc returns to normal from any lens.
+ * page is seen through another lens; the content never changes, only how it is drawn. The
+ * cycle is LENSES below (normal → the first lens → … → the last → normal); Esc returns to
+ * normal from any lens. easter/README.md is the map of the eggs; this header is the contract.
  * The active lens follows the reader across the site: it is kept in sessionStorage
- * ('lenses-active'), every page's <head> marks html[data-lens-arriving] before the first
- * paint, and easter/boot.js calls SiteLenses.arrive(id), which enters silently and quickly.
+ * ('lenses-active', with its ground in 'lenses-ground'), every page's <head> marks
+ * html[data-lens-arriving] before the first paint and paints the ground (#lenses-prepaint),
+ * and easter/boot.js calls SiteLenses.arrive(id), which enters silently and quickly.
  *
  * This file is the core: the cycle, the lens contract, the caption, the bell, one shared
  * animation loop, and the bookkeeping that restores the page exactly. Each lens lives in
- * easter/<id>.js (plus easter/<id>.css when it declares css: true) and is loaded the first
- * time it is needed; after a lens has entered, the next one is prefetched.
+ * easter/lenses/<id>.js (plus easter/lenses/<id>.css when it declares css: true) and is
+ * loaded the first time it is needed; after a lens has entered, the next one is prefetched.
+ * A lens whose module is missing or fails is skipped with one console warning.
  *
  * Lens contract:
- *   SiteLenses.register({ id, order, numeral, label, line, css, enter(ctx), exit(ctx), arrive(ctx), caption(ctx) })
+ *   SiteLenses.register({ id, order, numeral, label, line, ground, css, supported(), enter(ctx),
+ *                         exit(ctx), arrive(ctx), caption(ctx) })
+ *   id, order   the id as listed in LENSES, and its 1-based place there
+ *   numeral, label, line   the caption: "numeral · label — line"
+ *   ground      '#rrggbb': the colour a page opening with this lens is painted with until the
+ *               lens has arrived (the page is hidden over it); null: the page shows at once
+ *   css         true when easter/lenses/<id>.css exists (attached per activation)
+ *   supported() optional: false (or a throw) skips the lens silently on this device or page
  *   enter(ctx)  builds the lens and plays its entering transition; resolves when settled.
  *   arrive(ctx) optional: the lens on a page opened while it is active, at most 350 ms, with
  *               the ground already painted. Without it the core calls enter(ctx) with
@@ -32,7 +41,7 @@
  *                so a lens that honours reduced motion in exit() also leaves instantly then.
  *   instant      true while the current exit must finish without animation
  *   signal       aborted when exit() begins (or when a reset interrupts enter())
- *   root         the site root URL, for assets: new URL('easter/x.txt', ctx.root)
+ *   root         the site root URL, for assets: new URL('easter/lenses/data/x.txt', ctx.root)
  *   pointer      the last known pointer position { x, y } in viewport px, or null
  *   hideGlyphs(on)  toggles html.lenses-hide-glyphs: transparent glyphs in the scope
  *   layer(kind)  'fixed' (viewport) or 'page' (document, scrolls with it) container on <body>,
@@ -42,14 +51,26 @@
  *                hidden / open / src / aria-expanded attributes), debounced 150 ms (at most
  *                1 s apart while changes continue). Late markdown, star counts, toggled
  *                abstracts and demos all report here. Returns an unsubscribe function.
- *   frame(fn)    fn(dt, now) runs once per animation frame (dt in s, at most 0.1). Return false
+ *   onLayoutChange(fn)  fn() after the scope's layout may have moved without a DOM change: an
+ *                img / video / iframe in the scope loaded (or failed), web fonts finished
+ *                loading, a scope element changed size (its content box or its border box, so
+ *                a padding or border change counts), a <details> toggled, or the window
+ *                resized. Debounced 120 ms (at most 500 ms apart while changes continue); never
+ *                called once exit() has begun. Returns an unsubscribe function.
+ *   media(options)  a Promise of a media handle that redraws the scope's images on canvases
+ *                laid over them (easter/lenses/media.js, loaded once; see its header):
+ *                options { render(source), ground, select }; the handle has overlays, ready,
+ *                refresh(), each(fn) and dispose(), and is disposed after exit() resolves.
+ *   mediaKit()   a Promise of window.SiteLensesMedia alone (readable, draw, drawAsync, sample,
+ *                classify, stats), for a lens that only needs pixels and makes no overlays.
+ *   frame(fn)   fn(dt, now) runs once per animation frame (dt in s, at most 0.1). Return false
  *                to stop. Registering the same fn again only wakes the loop, so a lens may call
  *                ctx.frame(tick) from any event. Returns an unregister function. Callbacks keep
  *                running during exit() and are dropped once exit() resolves. The one shared
  *                loop stops when no callback is left and pauses while the tab is hidden.
  *
- * After exit() resolves the core removes the layers, the lens stylesheet, the glyph class and
- * any html class that starts with lens-<id>.
+ * After exit() resolves the core disposes the media handles, removes the layers, the lens
+ * stylesheet, the glyph class and any html class that starts with lens-<id>.
  */
 (() => {
   'use strict';
@@ -58,22 +79,32 @@
   /* ---------------------------------------------------------------------------
    * Constants
    * ------------------------------------------------------------------------- */
-  const VERSION = 'lenses-v2';
+  const VERSION = 'lenses-v3';        // the ?v= of every lens asset; bump it when any lens file changes
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
-  const ROOT = new URL('../', SCRIPT_SRC).href;               // easter/lenses.js → the site root
-  const LENSES = ['stardust', 'tokens', 'blueprint', 'acta', 'lamplight'];   // the cycle, in order
+  const ROOT = new URL('../../', SCRIPT_SRC).href;            // easter/lenses/core.js → the site root
+  const LENS_DIR = 'easter/lenses/';  // <id>.js, <id>.css and media.js, from the site root
+  // The cycle, in order: the only list of lenses on the site. Keys 1-9 jump to these places.
+  const LENSES = ['stardust', 'tokens', 'blueprint', 'acta', 'lamplight', 'ink', 'chalk', 'shannon', 'darkroom'];
   // The scope: nav, main and footer, as the site shell or a paper page builds them.
   const SCOPE_SELECTORS = ['#site-nav, body > header.site-header', '#main-content', '#site-footer, body > footer.paper-footer'];
   const GLYPH_CLASS = 'lenses-hide-glyphs';
   const TRIGGER_SELECTOR = '[data-lens-trigger]';
   const NAME_SELECTOR = '.profile-text .name';
   const STORE_KEY = 'lenses-active';  // sessionStorage: the lens that follows the reader
+  const GROUND_KEY = 'lenses-ground'; // sessionStorage: its ground ('#rrggbb'), absent for none
+  const GROUND_FORMAT = /^#[0-9a-f]{6}$/i;
   const ARRIVING_ATTR = 'data-lens-arriving';
   const REVEALING_ATTR = 'data-lens-revealing';
+  const PREPAINT_ID = 'lenses-prepaint';  // the <style> that paints the ground before a lens arrives
   const REVEAL_MS = 180;              // the body fades in this fast once a lens has arrived
   const CONTENT_DEBOUNCE_MS = 150;
   const CONTENT_MAX_WAIT_MS = 1000;
   const CONTENT_ATTRIBUTES = ['hidden', 'open', 'src', 'aria-expanded'];
+  const LAYOUT_DEBOUNCE_MS = 120;
+  const LAYOUT_MAX_WAIT_MS = 500;
+  const LAYOUT_MEDIA = new Set(['IMG', 'VIDEO', 'IFRAME']);
+  // Digit keys jump to a lens; never while typing, inside a paper's demo, or with a dialog open.
+  const JUMP_IGNORE = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-paper-demo], .paper-demo';
 
   // Transitions and limits (ms)
   const ENTER_LIMIT_MS = 20000;       // an enter() that never settles counts as a failure
@@ -135,6 +166,7 @@
   const pointer = { x: 0, y: 0, known: false };
   let triggerEl = null;                // the element the last trigger was given on (the caption sits by it)
   let holdArrival = false;             // pagehide kept html[data-lens-arriving] for a back/forward return
+  let jumpSeq = 0;                     // a digit's jump waits for its module; any later step cancels it
   const page = pageKind();
 
   // The page kind and its path from the site root.
@@ -147,9 +179,28 @@
   }
   const scopeElements = () => [...new Set(SCOPE_SELECTORS.map(selector => document.querySelector(selector)).filter(Boolean))];
 
-  // The lens that follows the reader from page to page.
-  const remember = id => { try { sessionStorage.setItem(STORE_KEY, id); } catch (error) { /* storage is optional */ } };
-  const forget = () => { try { sessionStorage.removeItem(STORE_KEY); } catch (error) { /* storage is optional */ } };
+  // The lens that follows the reader from page to page, with the ground the next page is
+  // painted with before it arrives (read by the <head> snippet, LENSES_PREPAINT in
+  // scripts/build_papers.py).
+  const groundOf = lens => (lens && typeof lens.ground === 'string' && GROUND_FORMAT.test(lens.ground) ? lens.ground : null);
+  const remember = lens => {
+    try {
+      sessionStorage.setItem(STORE_KEY, lens.id);
+      const ground = groundOf(lens);
+      if (ground) sessionStorage.setItem(GROUND_KEY, ground); else sessionStorage.removeItem(GROUND_KEY);
+    } catch (error) { /* storage is optional */ }
+  };
+  const forget = () => { try { sessionStorage.removeItem(STORE_KEY); sessionStorage.removeItem(GROUND_KEY); } catch (error) { /* storage is optional */ } };
+
+  // The pre-paint ground, as the <head> snippet writes it (the same rules; keep them equal).
+  // Its rules are keyed on the arrival attributes, so removing html[data-lens-arriving] alone
+  // already shows the page; the element itself goes once the reveal is over.
+  function prepaint(ground) {
+    let style = document.getElementById(PREPAINT_ID);
+    if (!ground) { if (style) style.remove(); return; }
+    if (!style) { style = document.createElement('style'); style.id = PREPAINT_ID; document.head.append(style); }
+    style.textContent = `html[data-lens-arriving],html[data-lens-revealing]{background:${ground}!important}html[data-lens-arriving] body{opacity:0;animation:lenses-failsafe 0s linear 3s forwards}@keyframes lenses-failsafe{to{opacity:1}}`;
+  }
 
   // One console warning per lens (or for the core, or the sound), then silence.
   const warnOnce = (key, error, note = 'failed and is skipped') => {
@@ -254,18 +305,25 @@
   const exitGrace = instant => (instant ? INSTANT_GRACE_MS : null);
   const call = (fn, ctx) => { try { return Promise.resolve(fn(ctx)); } catch (error) { return Promise.reject(error); } };
 
+  // A lens may decline this device or page (lens.supported() false, or a throw): it is then
+  // skipped silently, like a lens that is not there, but it is not counted as failed.
+  function supported(lens) {
+    if (typeof lens.supported !== 'function') return true;
+    try { return lens.supported() !== false; } catch (error) { return false; }
+  }
+
   // Loads, styles and enters one lens. True when it entered (or a reset made trying moot).
   // An arrival comes with a page load: silent, without a caption, through lens.arrive().
   async function arrive(id, arrival = false) {
     const lens = await loadModule(id);
     if (resetWanted) return true;
-    if (!lens) return false;
+    if (!lens || !supported(lens)) return false;
     const ctx = createContext(lens, arrival);
     const book = contexts.get(ctx);
     if (lens.css) {
       const styled = await attachStyle(lens, book);
       if (resetWanted || !styled) {
-        if (!styled) { failed.add(id); warnOnce(id, new Error(`easter/${id}.css did not load`)); }
+        if (!styled) { failed.add(id); warnOnce(id, new Error(`${LENS_DIR}${id}.css did not load`)); }
         finish(ctx);
         return resetWanted;
       }
@@ -284,7 +342,7 @@
     }
     if (entry.phase === 'entering') entry.phase = 'active';
     if (!resetWanted) {
-      remember(id);
+      remember(lens);
       if (arrival) reveal();
       else if (!shown) showCaption(lens, ctx, true);
       else placeCaption();                      // the lens may have moved the trigger
@@ -293,17 +351,23 @@
     return true;
   }
 
-  // The page was hidden before the first paint (html[data-lens-arriving]) until the lens
-  // arrived: fade the body in over the ground the pre-paint rule painted.
+  // The page was marked before the first paint (html[data-lens-arriving]) until the lens
+  // arrived. When it was hidden over a ground (#lenses-prepaint), the body fades in over that
+  // ground (html[data-lens-revealing], core.css), and the ground goes after the fade; a lens
+  // without a ground showed the page all along. Every path that ends an arrival (a reset, a
+  // failure, an unknown id) comes through here.
   let revealTimer = 0;
   function reveal(instant = motionView.matches) {
     const id = html.getAttribute(ARRIVING_ATTR);
-    if (id === null) return;
+    const ground = document.getElementById(PREPAINT_ID);
     html.removeAttribute(ARRIVING_ATTR);
-    if (instant) return;
+    if (id === null || instant || !ground) {
+      if (ground && !html.hasAttribute(REVEALING_ATTR)) ground.remove();
+      return;
+    }
     clearTimeout(revealTimer);
     html.setAttribute(REVEALING_ATTR, id);
-    revealTimer = setTimeout(() => html.removeAttribute(REVEALING_ATTR), REVEAL_MS + 60);
+    revealTimer = setTimeout(() => { html.removeAttribute(REVEALING_ATTR); prepaint(null); }, REVEAL_MS + 60);
   }
 
   // Plays the lens's exit, then removes everything the core added for it.
@@ -327,6 +391,9 @@
     book.dead = true;
     book.controller.abort();
     stopContentWatch(book);
+    stopLayoutWatch(book);
+    book.media.forEach(handle => { try { handle.dispose(); } catch (error) { warnOnce(`${book.lens.id}:media`, error, 'media handle failed to dispose'); } });
+    book.media.clear();
     frames.forEach((owner, fn) => { if (owner === book) frames.delete(fn); });
     book.layers.forEach(layer => { pageLayers.delete(layer); layer.remove(); });
     book.layers.length = 0;
@@ -368,13 +435,13 @@
         script.remove();                       // the module has run; no node is left behind
         loading.delete(id);
         const lens = registry.get(id) || null;
-        if (!lens) { failed.add(id); warnOnce(id, error || new Error(`easter/${id}.js did not register`)); }
+        if (!lens) { failed.add(id); warnOnce(id, error || new Error(`${LENS_DIR}${id}.js did not register`)); }
         resolve(lens);
       };
       script.onload = () => done(null);
-      script.onerror = () => done(new Error(`easter/${id}.js could not be loaded`));
-      timer = setTimeout(() => done(new Error(`easter/${id}.js timed out`)), LOAD_LIMIT_MS);
-      script.src = asset(`easter/${id}.js`);
+      script.onerror = () => done(new Error(`${LENS_DIR}${id}.js could not be loaded`));
+      timer = setTimeout(() => done(new Error(`${LENS_DIR}${id}.js timed out`)), LOAD_LIMIT_MS);
+      script.src = asset(`${LENS_DIR}${id}.js`);
       document.head.append(script);
     });
     loading.set(id, promise);
@@ -386,7 +453,7 @@
     return new Promise(resolve => {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = asset(`easter/${lens.id}.css`);
+      link.href = asset(`${LENS_DIR}${lens.id}.css`);
       link.onload = () => { link.onload = link.onerror = null; resolve(true); };
       link.onerror = () => { link.onload = link.onerror = null; link.remove(); book.style = null; resolve(false); };
       book.style = link;
@@ -398,8 +465,30 @@
   function prefetch(id) {
     if (!id) return;
     loadModule(id).then(lens => {
-      if (lens && lens.css) fetch(asset(`easter/${id}.css`)).catch(() => {});
+      if (lens && lens.css && supported(lens)) fetch(asset(`${LENS_DIR}${id}.css`)).catch(() => {});
     });
+  }
+
+  // The media helper (easter/lenses/media.js), loaded the first time a lens asks for it.
+  let mediaLoading = null;
+  function loadMedia() {
+    if (window.SiteLensesMedia) return Promise.resolve(window.SiteLensesMedia);
+    if (mediaLoading) return mediaLoading;
+    mediaLoading = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      const done = error => {
+        script.onload = script.onerror = null;
+        script.remove();
+        if (!error && window.SiteLensesMedia) { resolve(window.SiteLensesMedia); return; }
+        mediaLoading = null;                     // a later call may try again
+        reject(error || new Error(`${LENS_DIR}media.js did not initialize`));
+      };
+      script.onload = () => done(null);
+      script.onerror = () => done(new Error(`${LENS_DIR}media.js could not be loaded`));
+      script.src = asset(`${LENS_DIR}media.js`);
+      document.head.append(script);
+    });
+    return mediaLoading;
   }
 
   /* ---------------------------------------------------------------------------
@@ -410,6 +499,8 @@
     const book = {
       lens, controller, dead: false, layers: [], style: null, glyphs: false,
       content: null,                           // { fns, observer, changed, timer, first } once watched
+      layout: null,                            // { fns, timer, first, stop } once watched
+      media: new Set(),                        // media handles, disposed after exit
       // The root attributes as they were, restored exactly after exit (a safety net).
       attrs: ROOT_ATTRS.map(([el, name]) => el.getAttribute(name))
     };
@@ -443,6 +534,24 @@
         if (book.dead || typeof fn !== 'function') return () => {};
         watchContent(book, ctx.scope).fns.add(fn);
         return () => { if (book.content) book.content.fns.delete(fn); };
+      },
+      onLayoutChange(fn) {
+        if (book.dead || controller.signal.aborted || typeof fn !== 'function') return () => {};
+        watchLayout(book, ctx.scope).fns.add(fn);
+        return () => { if (book.layout) book.layout.fns.delete(fn); };
+      },
+      media(options) {
+        if (book.dead) return Promise.reject(new Error('media() after exit'));
+        return loadMedia().then(helper => {
+          if (book.dead) throw new Error('media() after exit');
+          const handle = helper.create(ctx, options || {});
+          book.media.add(handle);
+          return handle;
+        });
+      },
+      mediaKit() {
+        if (book.dead) return Promise.reject(new Error('mediaKit() after exit'));
+        return loadMedia();
       },
       frame(fn) {
         if (book.dead || typeof fn !== 'function') return () => {};
@@ -517,6 +626,74 @@
     clearTimeout(watch.timer);
     if (watch.observer) watch.observer.disconnect();
     watch.observer = null; watch.changed.clear(); watch.fns.clear();
+  }
+
+  /* ---------------------------------------------------------------------------
+   * Layout changes in the scope without a DOM change (images, video and frames loading, web
+   * fonts, element resizes, <details> toggles, window resizes), debounced. One set of
+   * listeners and one timer per ctx, all removed when exit() begins.
+   * ------------------------------------------------------------------------- */
+  function watchLayout(book, scope) {
+    if (book.layout) return book.layout;
+    const watch = { fns: new Set(), timer: 0, first: 0, stop: null };
+    book.layout = watch;
+    const signal = book.controller.signal;
+    const inScope = node => scope.some(root => root.contains(node));
+    const flush = () => {
+      watch.timer = 0; watch.first = 0;
+      if (book.dead || signal.aborted) return;
+      watch.fns.forEach(fn => {
+        try { fn(); } catch (error) { warnOnce(`${book.lens.id}:layout`, error, 'threw in onLayoutChange'); }
+      });
+    };
+    // Trailing debounce, but never more than LAYOUT_MAX_WAIT_MS behind a stream of changes.
+    const schedule = () => {
+      if (book.dead || signal.aborted) return;
+      const now = performance.now();
+      if (!watch.first) watch.first = now;
+      clearTimeout(watch.timer);
+      watch.timer = setTimeout(flush, Math.max(0, Math.min(LAYOUT_DEBOUNCE_MS, watch.first + LAYOUT_MAX_WAIT_MS - now)));
+    };
+    // load / error / loadedmetadata and toggle do not bubble: one capturing listener each.
+    const onMedia = event => { const el = event.target; if (el && LAYOUT_MEDIA.has(el.tagName) && inScope(el)) schedule(); };
+    const onToggle = event => { const el = event.target; if (el && el.tagName === 'DETAILS' && inScope(el)) schedule(); };
+    const options = { capture: true, passive: true, signal };
+    ['load', 'error', 'loadedmetadata'].forEach(type => document.addEventListener(type, onMedia, options));
+    document.addEventListener('toggle', onToggle, options);
+    window.addEventListener('resize', schedule, { passive: true, signal });
+    if (document.fonts && typeof document.fonts.addEventListener === 'function') document.fonts.addEventListener('loadingdone', schedule, { signal });
+    // Size changes of the scope elements, of the content box and of the border box (a padding
+    // or border change moves the content without changing the content box). A ResizeObserver
+    // reports every element once when it starts: only later sizes count.
+    let observers = [];
+    if (typeof ResizeObserver !== 'undefined') {
+      observers = ['content-box', 'border-box'].map(box => {
+        const sizes = new Map();
+        const observer = new ResizeObserver(entries => {
+          let changed = false;
+          for (const entry of entries) {
+            const border = box === 'border-box' && entry.borderBoxSize && entry.borderBoxSize[0];
+            const size = border ? `${Math.round(border.inlineSize)}x${Math.round(border.blockSize)}`
+              : `${Math.round(entry.contentRect.width)}x${Math.round(entry.contentRect.height)}`;
+            if (sizes.has(entry.target) && sizes.get(entry.target) !== size) changed = true;
+            sizes.set(entry.target, size);
+          }
+          if (changed) schedule();
+        });
+        scope.forEach(root => { try { observer.observe(root, { box }); } catch (error) { observer.observe(root); } });
+        return observer;
+      });
+    }
+    watch.stop = () => { observers.forEach(observer => observer.disconnect()); observers = []; };
+    signal.addEventListener('abort', () => stopLayoutWatch(book), { once: true });
+    return watch;
+  }
+  function stopLayoutWatch(book) {
+    const watch = book.layout;
+    if (!watch) return;
+    clearTimeout(watch.timer); watch.timer = 0;
+    if (watch.stop) watch.stop();
+    watch.stop = null; watch.fns.clear();
   }
 
   /* ---------------------------------------------------------------------------
@@ -817,6 +994,7 @@
     if (options && options.pointerType) triggerType = String(options.pointerType);
     if (options && options.trigger instanceof Element) triggerEl = options.trigger;
     wakeAudio();
+    jumpSeq++;
     queued = true; queuedTarget = undefined; queuedArrival = false;
     kick();
     return whenIdle();
@@ -826,7 +1004,8 @@
   // set): the lens enters silently, without a caption, then the body fades in.
   function arriveWith(id) {
     holdArrival = false;
-    if (!LENSES.includes(id)) { forget(); reveal(true); return Promise.resolve(); }
+    jumpSeq++;
+    if (!LENSES.includes(id)) { forget(); reveal(true); return Promise.resolve(); }   // also lifts the ground
     queued = true; queuedTarget = id; queuedArrival = true;
     kick();
     return whenIdle().then(() => reveal());
@@ -836,6 +1015,7 @@
   // { keep: true } keeps the lens for the next page (pagehide).
   function reset(options) {
     const instant = !!(options && options.instant);
+    jumpSeq++;                                  // a digit typed earlier does not outlive a reset
     if (!(options && options.keep)) forget();
     if (!active && !working) { removeCaption(); if (!holdArrival) reveal(true); return Promise.resolve(); }
     resetWanted = true; queued = false; queuedTarget = undefined; queuedArrival = false;
@@ -846,6 +1026,20 @@
     return whenIdle();
   }
 
+  // Straight to a lens from a key: the module loads first, so a digit for a lens that is not
+  // there (or declines this page) changes nothing. Runs inside the key gesture for the bell.
+  // The last key wins: a trigger, a reset (0, Esc) or another digit while the module loads
+  // cancels this jump.
+  function jump(id) {
+    wakeAudio();
+    const seq = ++jumpSeq;
+    loadModule(id).then(lens => {
+      if (seq !== jumpSeq || !lens || !supported(lens) || (!active && !working)) return;
+      queued = true; queuedTarget = id; queuedArrival = false;
+      kick();
+    });
+  }
+
   // Esc returns to normal (a lens can consume Esc first with preventDefault on document).
   window.addEventListener('keydown', event => {
     if (event.key !== 'Escape' || event.defaultPrevented || (!active && !working)) return;
@@ -853,12 +1047,31 @@
     reset();
   });
 
+  // While a lens is active (or a transition runs), keys 1-9 go to that place in LENSES and 0
+  // returns to normal. On a normal page digits do nothing here.
+  window.addEventListener('keydown', event => {
+    const key = event.key;
+    if (typeof key !== 'string' || key.length !== 1 || key < '0' || key > '9' || (!active && !working)) return;
+    if (event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.repeat ||
+        event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+    const target = event.target instanceof Element ? event.target : null;
+    if ((target && target.closest(JUMP_IGNORE)) || document.querySelector('dialog[open]')) return;
+    if (key === '0') { reset(); return; }
+    const id = LENSES[Number(key) - 1];
+    if (id && !failed.has(id)) jump(id);
+  });
+
   // Leaving the page: the lens must be gone before the page is frozen or restored, but it
-  // stays the reader's lens. A page kept for back/forward returns hidden until boot brings
-  // the lens back (pageshow), so the normal page never flashes.
+  // stays the reader's lens. A page kept for back/forward returns hidden over the lens's
+  // ground until boot brings the lens back (pageshow), so the normal page never flashes.
   window.addEventListener('pagehide', event => {
-    const id = active ? active.lens.id : null;
-    if (event.persisted && id) { holdArrival = true; html.setAttribute(ARRIVING_ATTR, id); }
+    const lens = active ? active.lens : null;
+    if (event.persisted && lens) {
+      holdArrival = true;
+      clearTimeout(revealTimer); html.removeAttribute(REVEALING_ATTR);
+      html.setAttribute(ARRIVING_ATTR, lens.id);
+      prepaint(groundOf(lens));
+    }
     if (active || working) reset({ instant: true, keep: true });
     if (audio.context && audio.context.state === 'running') audio.context.suspend().catch(() => {});
   });
@@ -887,6 +1100,7 @@
       goto(id) {
         if (id === null || id === undefined) return reset();
         if (!LENSES.includes(id)) return Promise.reject(new Error(`Unknown lens ${id}`));
+        jumpSeq++;
         queued = true; queuedTarget = id; queuedArrival = false;
         kick();
         return whenIdle();
@@ -913,6 +1127,9 @@
           audio: audio.context ? audio.context.state : null,
           page,
           stored: (() => { try { return sessionStorage.getItem(STORE_KEY); } catch (error) { return null; } })(),
+          storedGround: (() => { try { return sessionStorage.getItem(GROUND_KEY); } catch (error) { return null; } })(),
+          prepaint: !!document.getElementById(PREPAINT_ID),
+          media: active ? contexts.get(active.ctx).media.size : 0,
           frameStats: Object.fromEntries(Object.entries(frameStats).map(([id, s]) => [id, {
             frames: s.frames, avgMs: +(s.totalMs / Math.max(1, s.frames)).toFixed(3), maxMs: +s.maxMs.toFixed(3)
           }]))

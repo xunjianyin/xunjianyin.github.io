@@ -1957,6 +1957,7 @@ void main() {
   const lens = {
     id: 'stardust', order: 1, numeral: 'I', label: 'Stardust',
     line: 'Every letter is made of smaller things.',
+    ground: '#06080c',                    // the night sky a page opens on while it arrives
     css: true,
     enter, exit, arrive,                  // no caption(): the static line shows as the enter begins
     // Test hook: counts and frame timing of the live activation.

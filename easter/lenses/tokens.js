@@ -4,7 +4,7 @@
  * Every token of the page, as GPT-4's cl100k_base tokenizer splits it, gets a soft tinted
  * tile behind it. The tokenizer is a faithful port of tiktoken: the same regex pre-tokenizer,
  * then byte-pair merges by rank over the UTF-8 bytes of each piece. The ranks come from
- * easter/cl100k.txt (built by scripts/build_cl100k.py), fetched the first time the lens enters.
+ * easter/lenses/data/cl100k.txt (built by scripts/build_cl100k.py), fetched the first time the lens enters.
  *
  * Text is read, never written: tiles are absolute boxes drawn from Range rects in the core's
  * page layer, and the decode replay dims not-yet-emitted text with the CSS Custom Highlight API
@@ -25,7 +25,7 @@
   if (!lenses) return;
 
   // ---- Constants ---------------------------------------------------------------------------
-  const RANKS_URL = 'easter/cl100k.txt?v=cl100k-v1';
+  const RANKS_URL = 'easter/lenses/data/cl100k.txt?v=cl100k-v1';
   const RANKS_HEADER = '#cl100k_base';
   const RANKS_FORMAT = 'utf8-escaped-v1';
   const TINTS = 5;                       // tile colours cycle through tk-c0 … tk-c4
@@ -1385,6 +1385,7 @@
     numeral: 'II',
     label: 'Through a model’s eyes',
     line: 'This page, in the tokens a language model reads.',
+    ground: null,                // the page itself is the ground: it shows at once on arrival
     css: true,
     enter(ctx) { return begin(ctx, Boolean(ctx.arriving)); },
     // From another page with this lens on: no sweep and no caption, the tiles just fade in.

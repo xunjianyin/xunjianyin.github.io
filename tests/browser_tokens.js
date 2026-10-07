@@ -33,7 +33,8 @@
   localStorage.setItem('spira-sound', 'off');
   // A lens kept for the session would arrive with every page the test opens.
   const storedActive = sessionStorage.getItem('lenses-active');
-  sessionStorage.removeItem('lenses-active');
+  const storedGround = sessionStorage.getItem('lenses-ground');
+  sessionStorage.removeItem('lenses-active'); sessionStorage.removeItem('lenses-ground');
   const storedHinted = sessionStorage.getItem('lenses-tokens-hinted');
   sessionStorage.removeItem('lenses-tokens-hinted');
   const errors = [];
@@ -73,7 +74,9 @@
       if (rafLog) rafLog.push(performance.now() - began);
     });
     if (core && !win.SiteLenses) {
-      await Promise.all([['link', { rel: 'stylesheet', href: '/easter/lenses.css?v=lenses-v2' }], ['script', { src: '/easter/lenses.js?v=lenses-v2' }]]
+      await until(() => win.SiteLensesBoot, 'the boot');
+      const version = win.SiteLensesBoot.version;   // the same cache key as the boot's own loads
+      await Promise.all([['link', { rel: 'stylesheet', href: `/easter/lenses/core.css?v=${version}` }], ['script', { src: `/easter/lenses/core.js?v=${version}` }]]
         .map(([tag, attrs]) => new Promise((resolve, reject) => {
           const el = doc.createElement(tag); Object.assign(el, attrs); el.onload = resolve; el.onerror = reject; doc.head.append(el);
         })));
@@ -95,7 +98,7 @@
   const leftovers = () => ({
     nodes: doc.querySelectorAll('.tk-tile, .tk-tip, .tk-dot, .tk-tiles, .lenses-layer').length,
     classes: [...doc.documentElement.classList].filter(name => name.startsWith('lens-tokens') || name === 'lenses-hide-glyphs'),
-    style: doc.querySelectorAll('link[href*="easter/tokens.css"]').length,
+    style: doc.querySelectorAll('link[href*="easter/lenses/tokens.css"]').length,
     highlights: win.CSS.highlights ? win.CSS.highlights.size : 0,
     inline: doc.documentElement.getAttribute('style') || ''
   });
@@ -147,7 +150,7 @@
     const snapshot = session().snapshot();
     const fixture = {
       source: 'tests/browser_tokens.js on the homepage (index.html) at 1440x900',
-      tokenizer: 'easter/tokens.js (cl100k_base, ranks from easter/cl100k.txt)',
+      tokenizer: 'easter/lenses/tokens.js (cl100k_base, ranks from easter/lenses/data/cl100k.txt)',
       tokens: count,
       runs: snapshot
     };
@@ -295,7 +298,7 @@
     reduced = false;
 
     // ---- The longest paper page: arrival, exact count, virtualized tiles, budgets -------------
-    sessionStorage.setItem('lenses-active', 'tokens');
+    sessionStorage.setItem('lenses-active', 'tokens'); sessionStorage.removeItem('lenses-ground');   // the page itself is its ground
     await load(1440, 900, '/papers/auditing-health-llms.html', false);
     const longTasks = [];
     const longFrames = [];
@@ -313,7 +316,7 @@
     timing.paperStats = { ...lens()._stats };
     paperFixture = {
       source: 'tests/browser_tokens.js on papers/auditing-health-llms.html at 1440x900',
-      tokenizer: 'easter/tokens.js (cl100k_base, ranks from easter/cl100k.txt)',
+      tokenizer: 'easter/lenses/tokens.js (cl100k_base, ranks from easter/lenses/data/cl100k.txt)',
       tokens: paperCount,
       runs: session().snapshot()
     };
@@ -435,6 +438,7 @@
     if (storedSeen === null) localStorage.removeItem('lenses-seen'); else localStorage.setItem('lenses-seen', storedSeen);
     if (storedSound === null) localStorage.removeItem('spira-sound'); else localStorage.setItem('spira-sound', storedSound);
     if (storedActive === null) sessionStorage.removeItem('lenses-active'); else sessionStorage.setItem('lenses-active', storedActive);
+    if (storedGround === null) sessionStorage.removeItem('lenses-ground'); else sessionStorage.setItem('lenses-ground', storedGround);
     if (storedHinted === null) sessionStorage.removeItem('lenses-tokens-hinted'); else sessionStorage.setItem('lenses-tokens-hinted', storedHinted);
   }
 })();

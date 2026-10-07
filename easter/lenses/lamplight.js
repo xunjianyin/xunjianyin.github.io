@@ -349,6 +349,7 @@
     numeral: 'V',
     label: 'Lamplight',
     line: 'Read by the light you carry.',
+    ground: '#0b0806',           // the dark, painted before a page arrives
     css: true,
 
     // Dusk: the dark closes in from the edges until only the lamp is left.

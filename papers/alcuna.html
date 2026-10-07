@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
+  <script>/* Lenses: the reader's lens follows them across pages (easter/README.md). */(function(){try{var s=sessionStorage,l=s.getItem('lenses-active'),g=s.getItem('lenses-ground'),d=document,t;if(l&&/^[a-z]{2,20}$/.test(l)){d.documentElement.setAttribute('data-lens-arriving',l);if(g&&/^#[0-9a-f]{6}$/i.test(g)){t=d.createElement('style');t.id='lenses-prepaint';t.textContent='html[data-lens-arriving],html[data-lens-revealing]{background:'+g+'!important}html[data-lens-arriving] body{opacity:0;animation:lenses-failsafe 0s linear 3s forwards}@keyframes lenses-failsafe{to{opacity:1}}';d.head.appendChild(t)}}}catch(e){}})()</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="ALCUNA creates fictional organisms to test knowledge that models have not memorized, exposing a gap between reading new facts and connecting them to existing knowledge.">
   <meta name="theme-color" content="#fbfcfa">
@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="demos/benchmarks.css">
   <script src="demos/benchmarks.js" defer></script>
   <script src="paper-page.js" defer></script>
-  <script src="../easter/boot.js?v=lenses-v2" defer onerror="document.documentElement.removeAttribute('data-lens-arriving')"></script>
+  <script src="../easter/boot.js?v=lenses-v3" defer onerror="document.documentElement.removeAttribute('data-lens-arriving');var p=document.getElementById('lenses-prepaint');p&&p.remove()"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>

@@ -25,13 +25,15 @@
   const audioPeaks = {};
   const errors = [];
   const frameStats = {};
+  let meteorRespawned = false;       // the Space check had to put its meteor back in view (slow frames)
   let doc; let win;
   let reduced = false; let queries = [];
   const pending = new Set();
   const load = async (path = '/') => {
     await new Promise(resolve => { frame.onload = resolve; frame.src = path; });
     doc = frame.contentDocument; win = frame.contentWindow;
-    await until(() => doc.querySelector('.easter-egg-footnote'), 'the site shell');
+    // easter/boot.js (loaded by the site shell) binds the footnote and the password.
+    await until(() => doc.querySelector('.easter-egg-footnote') && win.SiteLensesBoot, 'the site shell and the egg boot');
     win.addEventListener('error', event => errors.push(`${path}: ${event.message}`));
     win.addEventListener('unhandledrejection', event => errors.push(`${path}: ${event.reason}`));
     const consoleError = win.console.error.bind(win.console);
@@ -59,7 +61,7 @@
   };
   const egg = () => doc.querySelector('#spira');
   const phase = () => egg()?.spira?.phase;
-  const assets = () => doc.querySelectorAll('script[src*="easter-egg.js"],link[href*="easter-egg.css"]');
+  const assets = () => doc.querySelectorAll('script[src*="easter/spira/spira.js"],link[href*="easter/spira/spira.css"]');
   const nextPaint = () => new Promise(resolve => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve)));
   const openFast = async (scale = 4) => { win.SiteEasterEgg.open({ timeScale: scale }); await until(() => egg()?.open, 'the dialog'); };
   const dismiss = async () => { keepStats(); egg().dispatchEvent(new win.Event('cancel', { cancelable: true })); await until(() => !egg(), 'the dialog to close'); };
@@ -95,7 +97,9 @@
     type();
     await until(() => egg()?.open, 'the password to open the egg');
     check(assets().length === 2, 'The full password loads the script and stylesheet once');
-    check([...assets()].every(asset => (asset.src || asset.href).includes('v=spira-v9')), 'Asset URLs carry v=spira-v9');
+    const spiraVersion = win.SiteLensesBoot && win.SiteLensesBoot.spiraVersion;
+    check(/^spira-v\d+$/.test(spiraVersion) && [...assets()].every(asset => (asset.src || asset.href).includes(`v=${spiraVersion}`)),
+      `Asset URLs carry the boot's Spira version (v=${spiraVersion})`);
     check(egg().spira.keyCount === 37, `The key sentence is found in full (${egg().spira.keyCount} of 37 tokens)`);
     await dismiss();
 
@@ -421,6 +425,11 @@
     check(nominal >= 1100 && sky.spira.meteorSpeed < 0.7 * nominal, `Bullet time slows a meteor near the pointer (${Math.round(nominal)} > ${Math.round(sky.spira.meteorSpeed)} px/s)`);
     skyStage.dispatchEvent(new win.PointerEvent('pointerleave', { pointerId: 6, pointerType: 'mouse', bubbles: true }));
     check(doc.activeElement === skyStage, 'The stage keeps focus, so Space reaches it');
+    // On a loaded machine the paints above can be slow enough for the fast meteor to leave
+    // the view: put the same question back in view. Spawn and Space run in one task, so no
+    // frame can move it out before Space.
+    meteorRespawned = !sky.spira.meteorHead();
+    if (meteorRespawned) sky.spira.spawnMeteor(second);
     skyStage.dispatchEvent(new win.KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
     check(second >= 0 && sky.spira.caught === 2, 'Space catches the visible meteor');
     keepStats();
@@ -571,7 +580,7 @@
     await load('/blogs/agents-that-learn-after-deployment.html');
     doc.querySelector('.easter-egg-footnote').click();
     await until(() => egg()?.open, 'the egg on a nested route');
-    check([...assets()].every(asset => new URL(asset.src || asset.href).pathname.startsWith('/easter-egg.')), 'Nested routes load the assets from the site root');
+    check([...assets()].every(asset => new URL(asset.src || asset.href).pathname.startsWith('/easter/spira/spira.')), 'Nested routes load the assets from the site root');
     check([...egg().querySelectorAll('.spira-index-link')].every(a => new URL(a.href).pathname.startsWith('/papers/')), 'Nested routes link papers from the site root');
     check(egg().spira.wordCount > 10, 'Nested routes capture their own words');
     keepStats();
@@ -581,7 +590,7 @@
     await load('/');
     const append = doc.head.append.bind(doc.head); let failOnce = true;
     doc.head.append = (...nodes) => {
-      const script = nodes.find(node => node.tagName === 'SCRIPT' && node.src.includes('easter-egg.js'));
+      const script = nodes.find(node => node.tagName === 'SCRIPT' && node.src.includes('easter/spira/spira.js'));
       if (script && failOnce) { failOnce = false; setTimeout(() => script.onerror(new win.Event('error')), 0); }
       else append(...nodes);
     };
@@ -604,5 +613,5 @@
   assertions++;
   if (errors.length) failures.push(`Errors: ${errors.join(' | ')}`);
   mergeStats();
-  return { assertions, failures, frameStats, audioPeaks };
+  return { assertions, failures, frameStats, audioPeaks, meteorRespawned };
 })();

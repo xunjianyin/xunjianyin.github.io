@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <script>/* Lenses: keep the reader's lens across pages (see easter/boot.js). */try{var l=sessionStorage.getItem('lenses-active');if(/^(stardust|tokens|blueprint|acta|lamplight)$/.test(l))document.documentElement.setAttribute('data-lens-arriving',l)}catch(e){}</script>
+  <script>/* Lenses: the reader's lens follows them across pages (easter/README.md). */(function(){try{var s=sessionStorage,l=s.getItem('lenses-active'),g=s.getItem('lenses-ground'),d=document,t;if(l&&/^[a-z]{2,20}$/.test(l)){d.documentElement.setAttribute('data-lens-arriving',l);if(g&&/^#[0-9a-f]{6}$/i.test(g)){t=d.createElement('style');t.id='lenses-prepaint';t.textContent='html[data-lens-arriving],html[data-lens-revealing]{background:'+g+'!important}html[data-lens-arriving] body{opacity:0;animation:lenses-failsafe 0s linear 3s forwards}@keyframes lenses-failsafe{to{opacity:1}}';d.head.appendChild(t)}}}catch(e){}})()</script>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>Publications - Xunjian Yin</title>
   <meta name="author" content="Xunjian Yin">
@@ -59,7 +59,7 @@
   <div id="site-footer"></div>
 
   <!-- Load JavaScript files -->
-  <script src="site-shell.js?v=lenses-v2"></script>
+  <script src="site-shell.js?v=lenses-v3"></script>
   <script src="utils.js"></script>
   <script src="data.js"></script>
   <script src="main.js"></script>

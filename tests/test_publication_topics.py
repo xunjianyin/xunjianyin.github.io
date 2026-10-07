@@ -23,7 +23,7 @@ def data_js_publications() -> list[dict[str, object]]:
 
 def egg_themes() -> dict[str, str]:
     """Slug -> theme id from the easter egg's PAPERS table."""
-    source = (ROOT / "easter-egg.js").read_text()
+    source = (ROOT / "easter" / "spira" / "spira.js").read_text()
     return dict((slug, theme) for theme, slug in re.findall(r"\[\d{4}, '(\w+)', '([a-z0-9-]+)'", source))
 
 
@@ -35,7 +35,7 @@ def topic_ids() -> list[str]:
 
 class PublicationTopicsTest(unittest.TestCase):
     def test_topic_vocabulary_matches_egg_themes(self) -> None:
-        source = (ROOT / "easter-egg.js").read_text()
+        source = (ROOT / "easter" / "spira" / "spira.js").read_text()
         themes = re.findall(r"\{ id: '([a-z]+)', label: '[^']+', colour:", source)
         self.assertEqual(topic_ids(), themes)
 
@@ -57,7 +57,7 @@ class PublicationTopicsTest(unittest.TestCase):
 
     def test_egg_rows_are_separate_array_entries(self) -> None:
         # A row without its trailing comma still parses ([a][b] is an index expression) but merges two stars.
-        source = (ROOT / "easter-egg.js").read_text()
+        source = (ROOT / "easter" / "spira" / "spira.js").read_text()
         block = source[source.index("const PAPERS = ["):source.index("].map(", source.index("const PAPERS = ["))]
         rows = [line.strip() for line in block.splitlines()[1:] if line.strip()]
         self.assertEqual(len(rows), len(egg_themes()))
