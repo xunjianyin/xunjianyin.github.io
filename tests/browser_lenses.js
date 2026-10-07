@@ -4,7 +4,12 @@
  * for every registered lens (light and dark theme, scrolled), links and the theme toggle
  * reachable inside each lens, reduced motion, the first egg opened from inside a lens, a lens
  * that fails to load, a lens that declines (supported() false), the digit keys, the caption,
- * the bell's peak, pagehide, a phone viewport, and frame budgets. The cycle is read from
+ * the bell's peak, pagehide, a phone viewport, and frame budgets. Through a stand-in (the
+ * first lens's module with enter, exit and caption replaced for a moment) it tests the core's
+ * own contracts: a hidden tab pauses the enter and exit limits but not a reset's grace; an
+ * instant reset during an animated exit leaves no CSS transition running; content and layout
+ * changes before a lens subscribes reach its first subscription; a deferred caption shows as
+ * soon as it is ready; the caption has a halo of the page's ground. The cycle is read from
  * SiteLenses._debug.lenses and it iterates the lens modules that exist, so a lens listed in the
  * core but not written yet is skipped. Prints assertions, failures, the lenses found, frame
  * timing and switch times.
@@ -111,6 +116,12 @@
     return `at ${i}: ...${a.slice(Math.max(0, i - 40), i + 40)}... became ...${b.slice(Math.max(0, i - 40), i + 40)}...`;
   };
   const tags = root => [...root.querySelectorAll('*')].map(el => el.tagName).join(',');
+  // A computed text-shadow as [{ colour, x, y, blur }] (Chrome writes the colour first).
+  const shadowsOf = value => (value === 'none' ? [] : String(value).split(/,(?![^(]*\))/).map(part => {
+    const colour = (/rgba?\([^)]*\)/.exec(part) || [''])[0];
+    const [x = 0, y = 0, blur = 0] = part.replace(colour, '').trim().split(/\s+/).map(parseFloat);
+    return { colour, x, y, blur };
+  }));
   // `loose`: an empty class or style attribute counts as none (the first egg leaves them).
   const restored = (before, label, loose = false) => {
     const now = snapshot();
@@ -394,6 +405,276 @@
     }
     report.audioPeak = +peak.toFixed(4);
     check(peak > 0.02 && peak <= 0.2, `The bell is audible and soft (peak ${peak.toFixed(3)} <= 0.2)`);
+
+    /* 11b. Core contracts, through a stand-in: the first lens's module with its enter, exit and
+     * caption replaced for a moment (restored after each part). A hidden tab pauses the enter
+     * and exit limits, while a reset's grace keeps wall-clock time; an instant reset during
+     * an animated exit leaves no CSS transition running; content and layout changes before a
+     * lens subscribes reach its first subscription; a deferred caption shows as soon as it is
+     * ready; the caption carries a halo of the ground. */
+    {
+      const lens = lenses()._debug.lens(first);
+      const own = Object.fromEntries(['enter', 'exit', 'arrive', 'caption'].map(key => [key, Object.prototype.hasOwnProperty.call(lens, key) ? lens[key] : undefined]));
+      const restore = () => Object.entries(own).forEach(([key, value]) => { if (value === undefined) delete lens[key]; else lens[key] = value; });
+      const limits = lenses()._debug.limits; const savedLimits = { ...limits };
+      const htmlEl = doc.documentElement;
+      // A promise that resolves after n animation frames of the core's shared loop (it pauses
+      // while the tab is hidden), or when the activation is abandoned (if `abort`).
+      const frames = (ctx, n, abort = false) => new Promise(resolve => {
+        let k = 0;
+        if (abort) ctx.signal.addEventListener('abort', () => resolve(), { once: true });
+        ctx.frame(() => { if (++k < n) return undefined; resolve(); return false; });
+      });
+      let hidden = false;
+      const setHidden = value => { hidden = value; doc.dispatchEvent(new win.Event('visibilitychange')); };
+      try {
+        /* C1. A hidden tab: the limits wait, the graces do not. */
+        Object.defineProperty(doc, 'hidden', { configurable: true, get: () => hidden });
+        Object.defineProperty(doc, 'visibilityState', { configurable: true, get: () => (hidden ? 'hidden' : 'visible') });
+        limits.enter = 1000; limits.exit = 1000;
+        delete lens.arrive; delete lens.caption;
+        lens.enter = ctx => frames(ctx, 20, true);
+        lens.exit = ctx => frames(ctx, 20);
+        const warned = warnings.length;
+        const entering = lenses()._debug.goto(first);
+        await until(() => state().phase === 'entering', 'the stand-in to start entering');
+        setHidden(true);
+        await delay(1700);
+        check(state().phase === 'entering' && !state().failed.includes(first),
+          `C1: an enter() driven by ctx.frame waits in a hidden tab past the enter limit without failing (phase ${state().phase})`);
+        setHidden(false);
+        await entering;
+        check(lenses().current === first && !state().failed.includes(first), 'C1: the enter settles once the tab is visible again, and the lens is not marked failed');
+        const leaving = lenses().reset();
+        await until(() => state().phase === 'exiting', 'the stand-in to start exiting');
+        setHidden(true);
+        await delay(1700);
+        check(state().phase === 'exiting' && state().frames > 0, `C1: an exit() driven by ctx.frame waits in a hidden tab past the exit limit (not cleaned up mid-exit; phase ${state().phase})`);
+        setHidden(false);
+        await leaving;
+        check(lenses().current === null && warnings.length === warned, `C1: the exit finishes once the tab is visible again, with no warning (${warnings.slice(warned).join(' | ') || 'none'})`);
+        const again = lenses()._debug.goto(first);
+        await until(() => state().phase === 'entering', 'the stand-in to start entering again');
+        setHidden(true);
+        const instantAt = performance.now();
+        await lenses().reset({ instant: true });
+        const instantMs = Math.round(performance.now() - instantAt);
+        await again;
+        check(lenses().current === null && instantMs < 1200 && !state().failed.includes(first) && warnings.length === warned,
+          `C1: an instant reset in a hidden tab still ends within its wall-clock grace (${instantMs} ms), with no failure or warning`);
+        setHidden(false);
+        delete doc.hidden; delete doc.visibilityState;
+        Object.assign(limits, savedLimits);
+
+        /* C3. An instant reset during an animated exit: no transition runs on afterwards. As a
+         * lens does, the stand-in declares its transitions in one class and its values in
+         * another, and its exit drops only the values (so they ease back); the reset then
+         * removes the transitions' class, which leaves the values as they were, and Chrome lets
+         * the running transitions go on. */
+        const id = first;
+        const sheet = doc.createElement('style');
+        sheet.textContent = `
+          html.lens-${id}-c3t body { transition: background-color 3s linear !important; }
+          html.lens-${id}-c3v body { background-color: rgb(250, 240, 200) !important; }
+          html.lens-${id}-c3t #main-content { transition: filter 3s linear !important; }
+          html.lens-${id}-c3v #main-content { filter: sepia(0.6); }
+          html.lens-${id}-c3t #main-content .bio a { transition: color 3s linear !important; }
+          html.lens-${id}-c3v #main-content .bio a { color: rgb(180, 30, 30) !important; }
+          @keyframes c3-page-own { from { outline-color: rgb(0, 0, 0); } to { outline-color: rgb(0, 0, 255); } }
+          #main-content .profile-text .name { animation: c3-page-own 4s linear infinite; }`;
+        doc.head.append(sheet);
+        // The values first, without a transition, then the transitions' class: the exit then
+        // eases the whole way back (3 s), not the reversed, shortened rest of an entering
+        // transition (which could end before it is counted).
+        lens.enter = () => {
+          htmlEl.classList.add(`lens-${id}-c3v`);
+          void win.getComputedStyle(doc.body).backgroundColor; void win.getComputedStyle(main).filter;
+          htmlEl.classList.add(`lens-${id}-c3t`);
+          return delay(400);
+        };
+        lens.exit = () => new Promise(resolve => { htmlEl.classList.remove(`lens-${id}-c3v`); setTimeout(resolve, 3200); });
+        const ourTransitions = () => doc.getAnimations().filter(a => a instanceof win.CSSTransition && a.playState === 'running' &&
+          a.effect && a.effect.target && (a.effect.target === htmlEl || a.effect.target === doc.body || main.contains(a.effect.target)));
+        await lenses()._debug.goto(id);
+        const exiting = lenses().reset();
+        await delay(400);
+        const during = ourTransitions().length;
+        await lenses().reset({ instant: true });
+        await exiting; await nextPaint();
+        const left = ourTransitions().map(a => `${a.effect.target.tagName}.${a.transitionProperty}`);
+        check(during > 0 && left.length === 0, `C3: an instant reset during an animated exit leaves no CSS transition running on <html>, <body> or the scope (${during} running in the exit, ${left.join(', ') || 'none'} after)`);
+        const ownAnimation = doc.getAnimations().find(a => a instanceof win.CSSAnimation && a.animationName === 'c3-page-own');
+        check(ownAnimation && ownAnimation.playState === 'running', 'C3: the page\'s own CSS animation keeps running');
+
+        /* R5. An animated exit that resolves while its transitions still run (a hair from done,
+         * or, here, far from it): the core finishes them after every exit, not only instant ones. */
+        lens.exit = () => new Promise(resolve => { htmlEl.classList.remove(`lens-${id}-c3v`); setTimeout(resolve, 150); });
+        await lenses()._debug.goto(id);
+        await lenses().reset(); await nextPaint();
+        const after5 = ourTransitions().map(a => `${a.effect.target.tagName}.${a.transitionProperty}`);
+        check(after5.length === 0 && lenses().current === null, `R5: an animated exit that resolves with transitions running leaves none running on <html>, <body> or the scope (${after5.join(', ') || 'none'})`);
+        const ownAnimation5 = doc.getAnimations().find(a => a instanceof win.CSSAnimation && a.animationName === 'c3-page-own');
+        check(ownAnimation5 && ownAnimation5.playState === 'running', 'R5: the page\'s own CSS animation keeps running after an animated exit');
+        sheet.remove();
+
+        /* C4. The watchers start with the ctx. */
+        lens.enter = () => delay(1800);
+        lens.exit = () => Promise.resolve();
+        const mainStyle = main.getAttribute('style');
+        const holder = main.querySelector('.bio') || main;
+        const entering4 = lenses()._debug.goto(id);
+        await until(() => state().phase === 'entering', 'the stand-in to start entering (watchers)');
+        await nextPaint();
+        const ctx = lenses()._debug.ctx;
+        const late = doc.createElement('span'); late.textContent = ' (late)';
+        holder.append(late);
+        main.style.paddingBottom = '23px';
+        await delay(450);                    // past both debounces, before anyone subscribes
+        let changed = null; let moved = 0;
+        ctx.onContentChange(elements => { changed = changed || elements; });
+        ctx.onLayoutChange(() => { moved++; });
+        await delay(500);
+        check(changed && changed.includes(holder), `C4: content added before the first onContentChange subscription is reported to it (${changed ? changed.length : 'no'} elements)`);
+        check(moved > 0, `C4: a layout change before the first onLayoutChange subscription is reported to it (${moved} calls)`);
+        late.remove();
+        if (mainStyle === null) main.removeAttribute('style'); else main.setAttribute('style', mainStyle);
+        await entering4;
+        await lenses().reset();
+
+        /* C7. A deferred caption shows as soon as it is ready, before enter() resolves. */
+        let ready = false;
+        lens.caption = () => (ready ? 'ready mid-enter' : null);
+        lens.enter = () => delay(1600);
+        const entering7 = lenses()._debug.goto(id);
+        await until(() => state().phase === 'entering', 'the stand-in to start entering (caption)');
+        await delay(250);
+        check(!state().caption, 'C7: no caption while caption() is not ready');
+        ready = true;
+        const readyAt = performance.now();
+        await until(() => state().caption, 'the deferred caption', 1500).catch(() => {});
+        const waited = Math.round(performance.now() - readyAt);
+        const shownEl = doc.querySelector('.lenses-caption');
+        check(state().phase === 'entering' && state().caption && state().caption[0].endsWith('ready mid-enter') && waited < 400,
+          `C7: a caption that becomes ready mid-enter shows before enter() resolves (${waited} ms after it was ready, phase ${state().phase})`);
+        /* C2b. The caption carries a halo of the ground: the page's own background here (the
+         * first opaque background from the element under the caption up). */
+        if (shownEl) {
+          await delay(320);                  // the halo's colour eases in with the caption
+          const box = shownEl.getBoundingClientRect();
+          let under = doc.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2) || doc.body;
+          let ground = null;
+          for (; under && !ground; under = under.parentElement) {
+            const c = win.getComputedStyle(under).backgroundColor;
+            if (c !== 'transparent' && !/rgba\([^)]*,\s*0(\.0*)?\)$/.test(c)) ground = c;
+          }
+          const halo = shownEl.style.getPropertyValue('--lenses-caption-halo').trim();
+          const look = win.getComputedStyle(shownEl);
+          const shadow = look.textShadow;
+          // R3. The halo is rounded: rings of small text-shadows of the ground (at most 5 px
+          // out, then a glow), and no -webkit-text-stroke, whose mitred joins spike.
+          const shadows = shadowsOf(shadow);
+          const rings = shadows.filter(x => x.blur <= 2.5);
+          const rounded = (parseFloat(look.webkitTextStrokeWidth) || 0) === 0 && rings.length >= 24 &&
+            rings.every(x => Math.hypot(x.x, x.y) <= 5) && new Set(rings.map(x => `${Math.sign(Math.round(x.x * 10))},${Math.sign(Math.round(x.y * 10))}`)).size === 8;
+          // (one colour throughout, the halo's: compared within a few levels, as the halo may be
+          // easing to a new reading of the ground just now)
+          const near = (a, b) => { const x = (a.match(/[\d.]+/g) || []).map(Number); const y = (b.match(/[\d.]+/g) || []).map(Number); return x.length >= 3 && y.length >= 3 && [0, 1, 2].every(k => Math.abs(x[k] - y[k]) <= 6); };
+          check(ground && near(halo, ground) && shadows.length > 0 && shadows.every(x => x.colour === shadows[0].colour) && near(shadows[0].colour, halo) && state().phase === 'entering',
+            `C2b: the caption has a halo of the page's ground (halo ${halo}, ground ${ground}; text-shadow ${shadow.slice(0, 48)})`);
+          check(rounded, `R3: the halo is rounded: ${rings.length} small text-shadows around the glyphs in every direction, no mitred stroke (stroke ${look.webkitTextStrokeWidth}; ${shadows.length} shadows)`);
+          // R3. ctx.captionGround(colour) sets the halo's ground at once (no re-read, no easing).
+          const ctx7 = lenses()._debug.ctx;
+          const hook = typeof ctx7.captionGround === 'function';
+          if (hook) ctx7.captionGround('rgb(10, 20, 30)');
+          const now = shadowsOf(win.getComputedStyle(shownEl).textShadow);
+          check(hook && now.length > 0 && now.every(x => x.colour === 'rgb(10, 20, 30)'),
+            `R3: ctx.captionGround(colour) sets the halo's ground in the same task (${hook ? (now[0] && now[0].colour) : 'no ctx.captionGround'})`);
+          if (hook) ctx7.captionGround(null);
+          check(!hook || (!shownEl.style.getPropertyValue('--lenses-caption-ground') && !shownEl.classList.contains('is-grounded')), 'R3: ctx.captionGround(null) returns the halo to the ground the core reads');
+        }
+        await entering7;
+        check(doc.querySelector('.lenses-caption') === shownEl && shownEl && shownEl.isConnected, 'C7: the same caption stays once enter() resolves (it is not shown twice)');
+        await lenses().reset();
+        ready = false; lens.enter = () => delay(400);
+        await lenses()._debug.goto(id);
+        const fallback = `${lens.numeral} · ${lens.label} — ${lens.line}`;
+        check(state().caption && state().caption[0] === fallback, `C7: a caption still not ready when enter() resolves falls back to the lens's line (${state().caption && state().caption[0]})`);
+        await lenses().reset();
+
+        /* R1. Root attributes. A lens owns only its class tokens (lens-*, lenses-*) and the
+         * custom properties it added on <html> and <body>. What the page changes there while a
+         * lens is on (the photography lightbox locks the body's scroll) survives the exit,
+         * without a warning; what the lens leaves is removed, with one warning. */
+        {
+          const rootAttrs = () => [htmlEl.getAttribute('class'), htmlEl.getAttribute('style'), doc.body.getAttribute('class'), doc.body.getAttribute('style')];
+          const putBack = values => [[htmlEl, 'class'], [htmlEl, 'style'], [doc.body, 'class'], [doc.body, 'style']].forEach(([el, name], i) => {
+            if (values[i] === null) el.removeAttribute(name); else el.setAttribute(name, values[i]);
+          });
+          const was1 = rootAttrs();
+          const leaks = () => warnings.filter(w => w.includes(`"${id}"`) && /left/.test(w)).length;
+          const leaked = leaks();
+          lens.enter = () => delay(150); lens.exit = () => Promise.resolve();
+          await lenses()._debug.goto(id);
+          doc.body.style.overflow = 'hidden'; htmlEl.classList.add('page-r1');          // the page, meanwhile
+          await lenses().reset(); await idle();
+          check(doc.body.style.overflow === 'hidden' && htmlEl.classList.contains('page-r1') && leaks() === leaked,
+            `R1: what the page changed on <html> and <body> while a lens was on survives its exit, without a warning (body style ${JSON.stringify(doc.body.getAttribute('style'))}, ${leaks() - leaked} warnings)`);
+          putBack(was1);
+          lens.enter = () => { doc.body.classList.add('lenses-r1-left'); htmlEl.style.setProperty('--lens-r1-left', '2px'); return delay(150); };
+          await lenses()._debug.goto(id);
+          doc.body.style.overflow = 'hidden';
+          await lenses().reset(); await idle();
+          check(!doc.body.classList.contains('lenses-r1-left') && !htmlEl.style.getPropertyValue('--lens-r1-left') && doc.body.style.overflow === 'hidden',
+            `R1: a lenses-* class and a custom property the lens left are removed, and the page's change stays (${JSON.stringify(rootAttrs())})`);
+          check(leaks() === leaked + 1, `R1: what the lens left is warned about once (${leaks() - leaked} warnings)`);
+          putBack(was1);
+          lens.enter = () => { htmlEl.style.setProperty('--lens-r1-left', '2px'); return delay(150); };
+          lens.exit = () => { htmlEl.style.removeProperty('--lens-r1-left'); return Promise.resolve(); };
+          await lenses()._debug.goto(id);
+          await lenses().reset(); await idle();
+          check(JSON.stringify(rootAttrs()) === JSON.stringify(was1), `R1: with no change from the page the root attributes come back byte for byte (${JSON.stringify(rootAttrs())} vs ${JSON.stringify(was1)})`);
+          putBack(was1);
+        }
+
+        /* R6. A ground that follows the theme (a getter, as Shannon's): a theme change while the
+         * lens is active stores its new ground for the next page. */
+        {
+          const groundOwn = Object.getOwnPropertyDescriptor(lens, 'ground');
+          Object.defineProperty(lens, 'ground', { configurable: true, enumerable: true, get: () => (htmlEl.dataset.theme === 'dark' ? '#202122' : '#fafbfc') });
+          lens.enter = () => delay(150); lens.exit = () => Promise.resolve();
+          try {
+            await lenses()._debug.goto(id);
+            const light = sessionStorage.getItem('lenses-ground');
+            htmlEl.dataset.theme = 'dark';
+            await delay(30);
+            const dark = sessionStorage.getItem('lenses-ground');
+            htmlEl.dataset.theme = 'light';
+            await delay(30);
+            check(light === '#fafbfc' && dark === '#202122' && sessionStorage.getItem('lenses-ground') === '#fafbfc',
+              `R6: a theme change while a lens is active stores the ground the lens has now (${light} > ${dark} > ${sessionStorage.getItem('lenses-ground')})`);
+            await lenses().reset();
+          } finally {
+            if (groundOwn) Object.defineProperty(lens, 'ground', groundOwn); else delete lens.ground;
+          }
+        }
+
+        /* C1 (last: it marks the lens failed for this page). The limit still counts visible
+         * time: an enter() that never settles in a visible tab fails after it. */
+        limits.enter = 600;
+        delete lens.caption;
+        lens.enter = () => new Promise(() => {});
+        lens.exit = () => Promise.resolve();
+        const stuckAt = performance.now();
+        await lenses()._debug.goto(id);
+        check(state().failed.includes(id) && performance.now() - stuckAt < 3000, `C1: in a visible tab an enter() that never settles still fails after the limit (${Math.round(performance.now() - stuckAt)} ms)`);
+      } finally {
+        hidden = false;
+        delete doc.hidden; delete doc.visibilityState;
+        Object.assign(limits, savedLimits);
+        restore();
+        await idle();
+      }
+    }
 
     /* 12. A lens that fails to load is skipped with one warning; sound off primes nothing. */
     localStorage.setItem('spira-sound', 'off');

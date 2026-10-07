@@ -9,7 +9,11 @@
  * made earlier farther than 1.5 screens away are drawn again at their new size when they
  * come near; at a high device pixel ratio the render cache evicts within its budget
  * and never blanks an overlay on screen; images in a fixed ancestor or under 24 px are skipped;
- * an overlay is rounded like its image's content box; object-position calc() is honoured; at a
+ * an overlay is rounded like its image's content box; object-position calc() is honoured (and
+ * plan() is public); with fixed: true an image in a fixed ancestor is redrawn in a fixed layer,
+ * and the photography lightbox (outside the scope) gets an overlay above it that follows next,
+ * previous, close and the exit, never takes the pointer and is cut out along the arrows that
+ * cross the photo on a phone (1280 and 390 px wide); at a
  * phone width a .figure-scroll overlay is clipped to the scroller and follows its horizontal
  * scroll; dispose() and the lens's exit remove everything (the page is byte-identical); no long
  * task while scrolling; draw() honours its size cap; classify() calls the portrait and the
@@ -36,7 +40,7 @@
   localStorage.setItem('theme', 'light'); localStorage.setItem('lenses-seen', '1'); localStorage.setItem('spira-sound', 'off');
   const errors = []; const warnings = [];
   const report = { overlays: {}, renders: {}, misclassified: [], longTasks: {}, kinds: {} };
-  let doc; let win; let longTasks = [];
+  let doc; let win; let longTasks = []; let frames = [];
 
   const load = async (path, width = 1280, height = 900) => {
     sessionStorage.removeItem('lenses-active'); sessionStorage.removeItem('lenses-ground');
@@ -55,6 +59,14 @@
       new win.PerformanceObserver(list => list.getEntries().forEach(entry => longTasks.push({ at: entry.startTime, ms: Math.round(entry.duration) })))
         .observe({ type: 'longtask', buffered: true });
     } catch (error) { /* long tasks are not observable here */ }
+    // Long animation frames, with the scripts that ran in them (who caused a long task).
+    frames = [];
+    try {
+      new win.PerformanceObserver(list => list.getEntries().forEach(entry => frames.push({
+        at: entry.startTime, ms: Math.round(entry.duration),
+        scripts: (entry.scripts || []).map(x => ({ src: String(x.sourceURL || ''), fn: String(x.sourceFunctionName || ''), invoker: String(x.invoker || ''), ms: Math.round(x.duration) }))
+      }))).observe({ type: 'long-animation-frame', buffered: true });
+    } catch (error) { frames = null; }
     let last = ''; let since = performance.now();
     await until(() => {
       const now = doc.getElementById('main-content').innerHTML;
@@ -63,6 +75,14 @@
     }, `${path}: the page to settle`, 10000);
   };
   const lenses = () => win.SiteLenses;
+  // The long tasks since `since` (over 50 ms), and those the lenses' own scripts caused: a long
+  // animation frame in which scripts from easter/ (the core, the helper, the lens, and the
+  // render() the helper calls) ran 50 ms or more. null when long animation frames are not
+  // observable here.
+  const longSince = since => longTasks.filter(task => task.at >= since && task.ms > 50).map(task => task.ms);
+  const ownLongSince = since => (frames ? frames.filter(f => f.at >= since && f.ms > 50)
+    .map(f => ({ ms: f.ms, own: f.scripts.filter(x => /\/easter\//.test(x.src)).reduce((sum, x) => sum + x.ms, 0), scripts: f.scripts.slice(0, 4) }))
+    .filter(f => f.own >= 50) : null);
   const snapshot = () => ({
     main: doc.getElementById('main-content').innerHTML,
     headKids: [...doc.head.children].filter(el => !/easter\/(boot|lenses\/core)\./.test(el.getAttribute('src') || el.getAttribute('href') || '')).map(el => el.outerHTML).join('\n'),
@@ -278,6 +298,8 @@
     media.refresh(); await delay(400); await stable(media, 'photography refresh');
     check(renders.size === rendered && [...renders.values()].every(count => count === 1), 'refresh() re-places overlays without rendering again');
     report.renders.photography = rendered;
+    check(typeof media.kindOf === 'function' && media.overlays.every(o => media.kindOf(o.img) === o.kind) && media.kindOf(new win.Image()) === null,
+      'M6: media.kindOf(img) gives the helper\'s classification of an image it has classified, null for one it has not');
 
     /* 2. Scrolling the gallery keeps the overlays exact and raises no long task. */
     const since = win.performance.now();
@@ -365,17 +387,183 @@
       const radius = round && win.getComputedStyle(round.canvas).borderTopLeftRadius;
       check(radius === '4px', `A bordered, padded, rounded image's overlay has its content box's radius (12 - 3 - 5 = 4 px; got ${radius})`);
       const M = win.SiteLensesMedia;
+      check(typeof M.plan === 'function' && M._plan === M.plan, 'plan() is a public utility (_plan stays as its alias)');
       const computed = win.getComputedStyle(placed);
       const scale = Math.min(240 / placed.naturalWidth, 120 / placed.naturalHeight);
       const free = [240 - placed.naturalWidth * scale, 120 - placed.naturalHeight * scale];
-      const got = M._plan(placed, 240, 120, 1, computed);
-      const want = M._plan(placed, 240, 120, 1, { objectFit: 'contain', objectPosition: `${free[0] - 10}px ${free[1] - 5}px` });
+      const got = M.plan(placed, 240, 120, 1, computed);
+      const want = M.plan(placed, 240, 120, 1, { objectFit: 'contain', objectPosition: `${free[0] - 10}px ${free[1] - 5}px` });
       check(!!overlayOf(placed) && /calc\(/.test(computed.objectPosition) && ['dx', 'dy', 'sx', 'sy', 'dw', 'dh'].every(k => Math.abs(got[k] - want[k]) < 0.5),
         `object-position as calc() (${computed.objectPosition}) places the image (dx ${got.dx && got.dx.toFixed(1)}, expected ${want.dx && want.dx.toFixed(1)})`);
+      // With fixed: true the image in the fixed ancestor is redrawn, in the fixed layer.
+      const pinnedToo = await lenses()._debug.ctx.media({ render: source => source.canvas, ground: '#ffffff', fixed: true });
+      await pinnedToo.ready; await stable(pinnedToo, 'edge cases (fixed)');
+      const pinnedOverlay = pinnedToo.overlays.find(o => o.img === pinned);
+      const pinnedBox = pinned.getBoundingClientRect(); const pinnedAt = pinnedOverlay && pinnedOverlay.canvas.getBoundingClientRect();
+      check(!!pinnedOverlay && pinnedOverlay.fixed && pinnedOverlay.canvas.closest('.lenses-media-fixed.lenses-layer-fixed') &&
+        Math.abs(pinnedAt.left - pinnedBox.left) < 0.6 && Math.abs(pinnedAt.top - pinnedBox.top) < 0.6,
+        'fixed: true redraws an image in a position: fixed ancestor of the scope, over it, in the fixed layer');
+      pinnedToo.dispose();
+      check(!doc.querySelector('.lenses-media-fixed'), 'dispose() removes the fixed layer');
       edge.dispose();
       await lenses()._debug.goto(null);
       holder.remove();
     }
+
+    /* 4c. fixed: true and the photography lightbox (outside the scope, position: fixed, opened
+     * by a click on a photo): its photo is redrawn in a fixed layer stacked above the lightbox,
+     * over the photo's content box; the overlay follows next and previous, never takes the
+     * pointer (the photo and the arrows are hit), keeps the arrows visible where they cross the
+     * photo (a mask cut along their glyphs, on a phone), and is gone after close and after the
+     * exit. A handle without the option leaves the lightbox alone. At 1280 x 900 and 390 x 844. */
+    for (const [width, height] of [[1280, 900], [390, 844]]) {
+      const label = `lightbox ${width}`;
+      await load('/photography.html', width, height);
+      const box = doc.getElementById('lightbox'); const big = doc.getElementById('lightbox-img');
+      const open = async index => { doc.querySelectorAll('#main-content .photo-item')[index].click(); await until(() => box.classList.contains('active'), `${label}: the lightbox to open`); };
+      const close = () => doc.getElementById('close-lightbox').click();
+      // The lightbox writes the body's style and its own image: one round first, so the
+      // snapshot is the page as the reader leaves it after a look at a photo.
+      await open(0); close(); await delay(50);
+      const before = snapshot();
+      await (await win.SiteLensesBoot.loadCore())._debug.goto('tokens');
+      const ctx = lenses()._debug.ctx;
+      const plain = await ctx.media({ render: invert });
+      const drawn = new WeakMap();       // a render's canvas -> the src of the photo it holds
+      const lit = await ctx.media({ render: source => { const canvas = invert(source); drawn.set(canvas, source.img.getAttribute('src')); return canvas; }, fixed: true });
+      await Promise.all([plain.ready, lit.ready]);
+      check(!lit.overlays.some(o => o.img === big) && !doc.querySelector('.lenses-media-fixed canvas'), `${label}: while the lightbox is closed it has no overlay`);
+      const of = handle => handle.overlays.find(o => o.img === big);
+      // The overlay is current: placed over the photo and holding the photo now shown, inverted.
+      const current = () => { const o = of(lit); return !!o && o.canvas.isConnected && inverted(o); };
+      const onPhoto = async (index, step) => {
+        if (step) doc.getElementById(step).click(); else if (index !== null) await open(index);
+        const src = big.getAttribute('src');
+        // Polled slowly: current() draws the photo again to compare (a large draw).
+        for (const began = performance.now(); performance.now() - began < 15000; await delay(150)) {
+          if (big.complete && big.getAttribute('src') === src && current()) break;
+        }
+        return src;
+      };
+      const first = await onPhoto(1);
+      const o = of(lit);
+      check(!!o && current(), `${label}: the open lightbox's photo gets an overlay holding it, inverted (${first})`);
+      if (o) {
+        const a = o.canvas.getBoundingClientRect(); const r = big.getBoundingClientRect();
+        const layer = o.canvas.closest('.lenses-layer');
+        check(o.fixed && layer && layer.classList.contains('lenses-layer-fixed') && layer.classList.contains('lenses-media-fixed') && layer.classList.contains('lenses-media-layer'),
+          `${label}: the overlay lives in a fixed layer (lenses-media-layer lenses-media-fixed)`);
+        check(Math.abs(a.left - r.left) < 0.6 && Math.abs(a.top - r.top) < 0.6 && Math.abs(a.width - r.width) < 0.6 && Math.abs(a.height - r.height) < 0.6,
+          `${label}: the overlay covers the photo's box in viewport coordinates`);
+        check(+win.getComputedStyle(layer).zIndex > +win.getComputedStyle(box).zIndex, `${label}: the fixed layer is stacked above the lightbox (${win.getComputedStyle(layer).zIndex} > ${win.getComputedStyle(box).zIndex})`);
+        const hit = doc.elementFromPoint(a.left + a.width / 2, a.top + a.height / 2);
+        const arrows = ['lightbox-prev', 'lightbox-next', 'close-lightbox'].map(id => doc.getElementById(id));
+        const hits = arrows.map(el => { const c = el.getBoundingClientRect(); return doc.elementFromPoint(c.left + c.width / 2, c.top + c.height / 2) === el; });
+        check(hit === big && hits.every(Boolean) && win.getComputedStyle(o.canvas).pointerEvents === 'none', `${label}: the overlay never takes the pointer (the photo, the arrows and the close control are hit)`);
+        // Arrows over the photo are cut out of the overlay along their glyphs; none: no mask.
+        const crossing = arrows.filter(el => { const c = el.getBoundingClientRect(); return c.right > r.left && c.left < r.right && c.bottom > r.top && c.top < r.bottom; });
+        const mask = win.getComputedStyle(o.canvas).maskImage;
+        const holes = (mask.match(/url\(/g) || []).length;
+        report.lightboxMask = report.lightboxMask || {};
+        report.lightboxMask[width] = { crossing: crossing.map(el => el.id), holes };
+        check(crossing.length ? holes >= crossing.length : mask === 'none', `${label}: the overlay is cut out where the lightbox's controls cross the photo (${crossing.map(el => el.id).join(', ') || 'none cross'}; ${holes} holes)`);
+      }
+      check(!of(plain), `${label}: a handle without the fixed option leaves the lightbox alone`);
+      // M2. Next and previous: in the first frame after the click no render of the photo
+      // before (stretched over the new one's box) shows; the new one shows once it is ready.
+      // (The gallery's photos are loaded, so the lightbox's img is complete at once.)
+      const shownStale = () => [...doc.querySelectorAll('.lenses-media-fixed canvas.lenses-media')].filter(c => {
+        const look = win.getComputedStyle(c);
+        return look.display !== 'none' && look.visibility !== 'hidden' && +look.opacity > 0 && drawn.get(c) !== big.getAttribute('src');
+      }).map(c => `${c.width}x${c.height} of ${drawn.get(c)}`);
+      const firstFrame = step => new Promise(resolve => { doc.getElementById(step).click(); win.requestAnimationFrame(() => resolve(shownStale())); });
+      const staleNext = await firstFrame('lightbox-next');
+      const second = await onPhoto(null, null);
+      check(second !== first && current() && lit.overlays.filter(x => x.img === big).length === 1, `${label}: the overlay follows the next photo (${second})`);
+      check(big.complete && staleNext.length === 0, `M2 ${label}: in the first frame after next, no render of the photo before shows (${staleNext.join(', ') || 'none'})`);
+      const stalePrev = await firstFrame('lightbox-prev');
+      const back = await onPhoto(null, null);
+      check(back === first && current(), `${label}: the overlay follows the previous photo`);
+      check(stalePrev.length === 0, `M2 ${label}: in the first frame after previous, no render of the photo before shows (${stalePrev.join(', ') || 'none'})`);
+      close();
+      await until(() => !of(lit), `${label}: the overlay to go with the lightbox`, 4000).catch(() => {});
+      check(!of(lit) && !doc.querySelector('.lenses-media-fixed canvas'), `${label}: closing the lightbox removes its overlay`);
+      await onPhoto(2);
+      check(current(), `${label}: reopened, the lightbox has its overlay again`);
+      report.slices[label] = lit._state.maxSliceMs;
+      // M3. A handle made while the lightbox is already open (and nothing in it changes) draws
+      // it at once; here it selects the lightbox's image alone, so no in-scope image's
+      // observer wakes the queue.
+      if (width === 1280) {
+        const late = await ctx.media({ select: '#lightbox img', fixed: true, render: source => source.canvas });
+        await until(() => late.overlays.some(x => x.img === big), 'the late handle to draw the open lightbox', 4000).catch(() => {});
+        check(late.overlays.some(x => x.img === big && x.canvas.isConnected), `M3 ${label}: a handle made with the lightbox already open draws its photo without a change in the lightbox`);
+        late.dispose();
+      }
+      // The exit with the lightbox open: every overlay and both layers go.
+      await lenses()._debug.goto(null);
+      check(lit.disposed && !doc.querySelector('.lenses-media-fixed, .lenses-layer'), `${label}: the exit removes the lightbox overlay and the fixed layer`);
+      close(); await delay(50);
+      same(before, `${label} after the exit and a closed lightbox`);
+    }
+
+    /* 4c'. M4. At a device pixel ratio of 2 the lightbox's photo (a landscape one fills about
+     * 984 x 738 CSS px at 1280 x 900) is drawn at full device resolution: images in a fixed
+     * container may take up to 3.2 MP (other images 1.6 MP), and each task stays under 8 ms. */
+    {
+      await load('/photography.html');
+      Object.defineProperty(win, 'devicePixelRatio', { configurable: true, get: () => 2 });
+      const box = doc.getElementById('lightbox'); const big = doc.getElementById('lightbox-img');
+      const items = [...doc.querySelectorAll('#main-content .photo-item')];
+      let wide = -1;
+      for (let k = 0; k < items.length && wide < 0; k++) {
+        items[k].click(); await until(() => box.classList.contains('active') && big.complete, 'the lightbox to open (M4)');
+        const r = big.getBoundingClientRect();
+        if (r.width * r.height * 4 > 1.6e6 * 1.2) wide = k;
+        else doc.getElementById('close-lightbox').click();
+      }
+      await (await win.SiteLensesBoot.loadCore())._debug.goto('tokens');
+      const sharp = await lenses()._debug.ctx.media({ render: source => source.canvas, fixed: true });
+      await until(() => sharp.overlays.some(x => x.img === big), 'the lightbox overlay at dpr 2', 8000).catch(() => {});
+      const o = sharp.overlays.find(x => x.img === big);
+      const r = big.getBoundingClientRect();
+      const want = [Math.round(r.width * 2), Math.round(r.height * 2)];
+      report.lightboxDpr2 = { photo: wide, css: [Math.round(r.width), Math.round(r.height)], canvas: o ? [o.canvas.width, o.canvas.height] : null, maxSliceMs: sharp._state.maxSliceMs };
+      check(wide >= 0 && !!o && o.canvas.width === want[0] && o.canvas.height === want[1] && o.canvas.width * o.canvas.height <= 3.2e6,
+        `M4: at dpr 2 the lightbox photo is drawn at its full device size, not upscaled (${JSON.stringify(report.lightboxDpr2)})`);
+      check(sharp._state.maxSliceMs <= 8, `M4: drawing it keeps the helper within 8 ms per task (max ${sharp._state.maxSliceMs} ms)`);
+      await lenses()._debug.goto(null);
+      doc.getElementById('close-lightbox').click();
+      delete win.devicePixelRatio;
+    }
+
+    /* 4d. M1. Order and decodes: the photos near the viewport are drawn nearest first by where
+     * they are when the next one is picked (not where they were when they were queued), and up
+     * to two file decodes run at once. A slow render() keeps the queue long; one screen down
+     * while the first renders, the photos now in view must all be drawn before any of those
+     * now off screen (the ones that were at the top). */
+    {
+      await load('/photography.html');
+      await Promise.all([...doc.querySelectorAll('#main-content img')].map(img => img.decode().catch(() => {})));
+      win.scrollTo({ top: 0, behavior: 'instant' });
+      await (await win.SiteLensesBoot.loadCore())._debug.goto('tokens');
+      const began = new Map();
+      const ordered = await lenses()._debug.ctx.media({ render: async source => { began.set(source.img, win.performance.now()); await delay(90); return source.canvas; } });
+      await until(() => ordered._state.unseen === 0 && began.size >= 1, 'the first render');
+      win.scrollTo({ top: win.innerHeight, behavior: 'instant' });
+      const scrolledAt = win.performance.now();
+      await stable(ordered, 'photography one screen down');
+      const inView = img => { const r = img.getBoundingClientRect(); return r.bottom > 0 && r.top < win.innerHeight; };
+      const after = [...began].filter(([, at]) => at > scrolledAt + 20).sort((a, b) => a[1] - b[1]).map(([img]) => inView(img));
+      const firstOff = after.indexOf(false);
+      const late = firstOff < 0 ? 0 : after.slice(firstOff).filter(Boolean).length;
+      report.order = { renders: after.map(v => (v ? 'in' : 'off')).join(' '), decodes: ordered._state.decodes };
+      check(after.some(Boolean) && late === 0, `M1: one screen down, the photos now in view are drawn before those now off screen (${report.order.renders})`);
+      const decodes = ordered._state.decodes;
+      check(!!decodes && decodes.peak === 2 && decodes.ahead > 0 && decodes.used > 0, `M1: up to two file decodes run at once, started ahead for the next photos (${JSON.stringify(decodes)})`);
+      await lenses()._debug.goto(null);
+    }
+
 
     /* 5. A paper page: figures (SVG and PNG) are graphics; the longest paper scrolls without a long task. */
     await load('/papers/godel-agent.html');
@@ -387,6 +575,28 @@
     compareOverlays(paper, 'godel-agent', true);
     check(paper.overlays.length > 0 && paper.overlays.every(o => o.kind === 'graphic'), `godel-agent: the figures are graphics (${paper.overlays.map(o => `${o.img.getAttribute('src')}=${o.kind}`).join(', ')})`);
     report.renders['godel-agent'] = renders.size;
+    /* M5. A jump back to figures whose overlays were dropped (more than 4 screens away): their
+     * cached renders are back in the first frame after the scroll (put back by the scroll
+     * event, before the paint), not one or two frames later when the observers report. */
+    {
+      const robots = [...doc.querySelectorAll('#main-content img')].filter(img => /godel-robot-\d\.svg/.test(img.getAttribute('src')));
+      robots[0]?.scrollIntoView({ block: 'center' });
+      await delay(200); await stable(paper, 'godel-agent (the robots)');
+      const at = win.scrollY;
+      const target = robots.find(img => { const r = img.getBoundingClientRect(); return r.top > 0 && r.bottom < win.innerHeight && paper.overlays.some(o => o.img === img); });
+      win.scrollTo({ top: doc.documentElement.scrollHeight, behavior: 'instant' });
+      await delay(300); await stable(paper, 'godel-agent (the end)');
+      const dropped = !!target && !paper.overlays.some(o => o.img === target);
+      const back = await new Promise(resolve => {
+        win.scrollTo({ top: at, behavior: 'instant' });
+        win.requestAnimationFrame(() => resolve(!!target && paper.overlays.some(o => o.img === target && o.canvas.isConnected)));
+      });
+      check(dropped && back, `M5: after a jump back, a figure whose overlay was dropped has it again in the first frame (dropped ${dropped}, back in the first frame ${back})`);
+      await stable(paper, 'godel-agent (the robots again)');
+      compareOverlays(paper, 'godel-agent (after the jump)');
+      win.scrollTo({ top: 0, behavior: 'instant' });
+      await delay(200); await stable(paper, 'godel-agent (top after the jump)');
+    }
     // A resize (a rotated phone, a zoom): overlays made earlier, now between NEAR and FAR
     // screens below, keep their old size until they come near; scrolled into view, each is
     // drawn again for its new content box.
@@ -427,17 +637,28 @@
     const longest = await lenses()._debug.ctx.media({ render: invert, ground: '#ffffff' });
     await longest.ready; await stable(longest, 'auditing-health-llms');
     compareOverlays(longest, 'auditing-health-llms (top)', true);
-    const paperSince = win.performance.now();
+    // Two passes down the page (the second after a return to the top). A long task the lenses'
+    // own scripts caused (long animation frame attribution) fails the check at once; one of
+    // the browser's own (its decode, raster or layout, slowed by a loaded machine) fails it
+    // only if both passes have one. Both passes are reported.
     const paperHeight = doc.documentElement.scrollHeight;
-    for (let k = 1; k <= 16; k++) { win.scrollTo({ top: Math.min(paperHeight, (k / 16) * paperHeight), behavior: 'instant' }); await delay(200); }
-    await stable(longest, 'auditing-health-llms (bottom)');
-    compareOverlays(longest, 'auditing-health-llms (bottom)');
-    const paperTasks = longTasks.filter(task => task.at >= paperSince && task.ms > 50).map(task => task.ms);
-    report.longTasks['auditing-health-llms'] = paperTasks;
+    const passes = [];
+    for (let pass = 0; pass < 2; pass++) {
+      if (pass) { win.scrollTo({ top: 0, behavior: 'instant' }); await delay(300); await stable(longest, 'auditing-health-llms (top again)'); }
+      const paperSince = win.performance.now();
+      for (let k = 1; k <= 16; k++) { win.scrollTo({ top: Math.min(paperHeight, (k / 16) * paperHeight), behavior: 'instant' }); await delay(200); }
+      await stable(longest, 'auditing-health-llms (bottom)');
+      if (!pass) compareOverlays(longest, 'auditing-health-llms (bottom)');
+      passes.push({ tasks: longSince(paperSince), own: ownLongSince(paperSince) });
+      if (!passes[0].tasks.length) break;
+    }
+    report.longTasks['auditing-health-llms'] = passes;
     // Reported, not checked: the first draw of an SVG includes the browser's one-time layout of
     // the SVG document (see the header of media.js).
     report.slices['auditing-health-llms'] = longest._state;
-    check(paperTasks.length === 0, `No long task while scrolling the longest paper page with overlays (${paperTasks.join(', ')} ms)`);
+    const ownTasks = passes.flatMap(x => x.own || []);
+    check(ownTasks.length === 0 && (passes.length < 2 || passes[1].tasks.length === 0),
+      `No long task while scrolling the longest paper page with overlays (${passes.map((x, i) => `pass ${i + 1}: ${x.tasks.join(', ') || 'none'} ms, ${x.own ? `${x.own.length} by the lenses' scripts` : 'unattributed'}`).join('; ')})`);
     await lenses()._debug.goto(null);
 
     /* 6. Phone width: a wide figure scrolls sideways in .figure-scroll; its overlay is clipped

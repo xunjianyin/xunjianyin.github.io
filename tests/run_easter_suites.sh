@@ -11,6 +11,19 @@
 #   EASTER_SESSION  the session name prefix (default easter): sessions are <prefix>-<name>
 #   EASTER_RESULTS  where each suite's full JSON result is saved (default $TMPDIR/easter-suites)
 #   EASTER_LIMIT    seconds a suite may run before it counts as hung (default 600)
+#   EASTER_DPR      optional device pixel ratio (e.g. 2): each session opens a blank page, sets
+#                   its viewport to EASTER_VIEWPORT at that ratio, then opens the site (the
+#                   suites' frames take it from the page). Unset: agent-browser's default (1)
+#   EASTER_VIEWPORT the viewport "W H" used with EASTER_DPR (default "1280 900")
+#   AGENT_BROWSER_ARGS  Chrome's launch switches (agent-browser reads it). Unset, the runner
+#                   chooses per suite: while the Mac's display sleeps, headless Chrome renders no
+#                   frames (no requestAnimationFrame, no IntersectionObserver callbacks, view
+#                   transitions never finish) and the suites hang or fail, so a suite that starts
+#                   with the display asleep (system_profiler: "Display Asleep: Yes") gets
+#                   FRAME_SWITCHES, which keep frames coming; with the display awake it gets none,
+#                   because --disable-frame-rate-limit makes frames back to back, which stalls
+#                   Stardust's frames on the longest paper page (270-350 ms, a lenses_pages
+#                   failure). Set it to choose yourself (an empty value: never any switches)
 #
 # Every suite is an async IIFE that resolves with { assertions, failures, ... }. It is started
 # as a background promise (one eval) and polled, since some suites take minutes and a single
@@ -23,6 +36,12 @@ BASE=${EASTER_BASE:-http://localhost:8781}
 PREFIX=${EASTER_SESSION:-easter}
 RESULTS=${EASTER_RESULTS:-${TMPDIR:-/tmp}/easter-suites}
 LIMIT=${EASTER_LIMIT:-600}
+DPR=${EASTER_DPR:-}
+VIEWPORT=${EASTER_VIEWPORT:-1280 900}
+# Frames while the display sleeps (see the header): chosen per suite unless the caller set it.
+FRAME_SWITCHES=--disable-gpu-vsync,--disable-frame-rate-limit
+CHOOSE_SWITCHES=$([ -z "${AGENT_BROWSER_ARGS+set}" ] && echo 1 || echo 0)
+display_asleep() { system_profiler SPDisplaysDataType 2>/dev/null | grep -q 'Display Asleep: Yes'; }
 POLL_S=5                 # seconds between polls
 COMMAND_S=60             # watchdog for one agent-browser command
 mkdir -p "$RESULTS"
@@ -46,6 +65,7 @@ if ! curl -s -o /dev/null "$BASE/"; then
   exit 2
 fi
 
+printf 'Chrome switches: %s; viewport: %s\n' "$([ "$CHOOSE_SWITCHES" = 1 ] && printf '%s while the display sleeps' "$FRAME_SWITCHES" || printf '%s' "${AGENT_BROWSER_ARGS:-none}")" "$([ -n "$DPR" ] && printf '%s at %s' "$VIEWPORT" "$DPR" || printf 'agent-browser default')"
 status=0
 for file in $SUITES; do
   name=$(basename "$file" .js); name=${name#browser_}
@@ -53,7 +73,18 @@ for file in $SUITES; do
   out="$RESULTS/$name.json"
   if [ ! -f "$file" ]; then printf '%-14s missing (%s)\n' "$name" "$file"; status=1; continue; fi
   rm -f "$out"
+  note=''
+  if [ "$CHOOSE_SWITCHES" = 1 ]; then
+    if display_asleep; then AGENT_BROWSER_ARGS=$FRAME_SWITCHES; note=" [display asleep: $FRAME_SWITCHES]"; else AGENT_BROWSER_ARGS=''; fi
+    export AGENT_BROWSER_ARGS
+  fi
   began=$(date +%s)
+  if [ -n "$DPR" ]; then
+    # (agent-browser applies a viewport set on an open page; a blank one comes first.)
+    ab "$session" open about:blank >/dev/null 2>&1
+    # shellcheck disable=SC2086 # VIEWPORT is "W H": two arguments
+    ab "$session" set viewport $VIEWPORT "$DPR" >/dev/null 2>&1 || { printf '%-14s could not set the viewport %s at %s\n' "$name" "$VIEWPORT" "$DPR"; status=1; continue; }
+  fi
   ab "$session" open "$BASE/" >/dev/null 2>&1 || { printf '%-14s could not open %s\n' "$name" "$BASE/"; status=1; continue; }
   # Start the suite in the page and keep its result on window.
   started=$({
@@ -93,7 +124,7 @@ for failure in failures[:8]:
 sys.exit(1 if failures else 0)
 PY
   ) || status=1
-  printf '%s\n' "$line"
+  printf '%s\n' "$line" | sed "1s|\$|$note|"
 done
 echo "Full results: $RESULTS"
 exit $status

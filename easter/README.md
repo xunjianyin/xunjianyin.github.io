@@ -66,14 +66,53 @@ supported, enter, exit, arrive, caption })`. The full contract is the header of
 | --- | --- |
 | `page`, `arriving`, `scope`, `root`, `pointer` | where the lens runs: page kind, arrival with a page, the nav/main/footer elements, the site root URL, the pointer |
 | `motion`, `instant`, `signal` | reduced motion (also true during an instant reset), the instant flag, an AbortSignal that fires when exit begins |
-| `hideGlyphs(on)`, `layer(kind)` | transparent text in the scope; a `fixed` or `page` layer that never takes the pointer |
-| `bell(step)`, `frame(fn)` | the soft bell; one shared animation loop |
-| `onContentChange(fn)`, `onLayoutChange(fn)` | the scope's content changed; its layout may have moved without a DOM change (images or fonts loaded, resizes, `<details>` toggles) |
-| `media(options)`, `mediaKit()` | the media helper's handle (below); the helper's utilities alone |
+| `hideGlyphs(on)`, `layer(kind)` | transparent text in the scope (also the text of `::before`, `::after` and `::marker`, below); a `fixed` or `page` layer that never takes the pointer |
+| `bell(step)`, `frame(fn)` | the soft bell; one shared animation loop (it pauses while the tab is hidden) |
+| `captionGround(colour)` | the caption's halo ground, set at once (for a ground that changes while the caption shows; `null` returns to the ground the core reads) |
+| `onContentChange(fn)`, `onLayoutChange(fn)` | the scope's content changed; its layout may have moved without a DOM change (images or fonts loaded, resizes, `<details>` toggles). Both watch from the ctx's creation: a change before the lens subscribes reaches its first subscription |
+| `media(options)`, `mediaKit()` | the media helper's handle (below; `fixed: true` also redraws the photography lightbox); the helper's utilities alone |
 
 After `exit()` resolves the core removes the layers, the stylesheet, `lens-<id>` classes and
-the glyph class, disposes media handles, and restores the root attributes. A lens must not
-change the page's text or elements.
+the glyph class, disposes media handles, and restores the root attributes. After every exit,
+animated or instant, it also finishes the CSS transitions still running on `<html>`, `<body>`
+and in the scope, and the CSS animations named `lens-*`, since Chrome lets a running transition
+outlive the rule that declared it. A lens must not change the page's text or elements.
+
+What the core does for every lens, so a lens needs no workaround of its own:
+
+- **Hidden tabs.** `enter()` fails, and `exit()` is cut short, only after 20 s and 5 s of
+  *visible* time; a hidden tab (where `ctx.frame` pauses) stops that clock. A reset's grace
+  (1.5 s, or 0.8 s for an instant reset such as `pagehide`) counts wall-clock time.
+- **Root attributes.** A lens owns only its class tokens on `<html>` and `<body>` (`lens-*`,
+  `lenses-*`) and the custom properties (`--*`) it added to their style. The rest is the
+  page's, which may change it while a lens is on (the photography lightbox locks the body's
+  scroll while it is open). After the exit an attribute the page did not change is put back
+  byte for byte; one it changed keeps the page's value with only the lens's parts removed.
+  Lens parts the core had to remove (beyond the `lens-<id>` classes) are warned about once.
+- **Keys and page modals.** While a dialog, an `aria-modal` element or the photography
+  lightbox is open, Esc and the digit keys are the page's: Esc closes the lightbox and leaves
+  the lens on.
+- **The caption.** A `caption(ctx)` that returns `null` (not ready) is asked again every
+  150 ms while `enter()` runs and shows as soon as it answers. It sits by the trigger over no
+  text: beside it, above it (9 px clear of the trigger's glyphs, measured in its font, and of
+  what precedes it), beside its last line, in the page margin, or centred in the free band of
+  the viewport nearest the trigger (on a paper page, between the nav and the eyebrow); only
+  when none fits is it squeezed above the trigger, and as the last resort it is a subtitle at
+  the viewport's foot (on a phone, a caption of three lines, such as Tokens' with its count,
+  on a paper page or the publications page). While a view
+  transition runs (`document.startViewTransition`) the caption keeps its place and is placed
+  again when it has finished. Where it lies over text, a rounded halo of the ground behind its
+  glyphs (rings of small text-shadows, not a mitred stroke) keeps it legible: the page's
+  background under it or the lens's `ground`, whichever the caption's colour contrasts with; a
+  lens can name it with `--lenses-caption-ground`, as it names the caption's colour with
+  `--lenses-caption-color`, or set it at once with `ctx.captionGround(colour)` (a ground that
+  changes every frame).
+- **A ground that follows the theme.** `ground` may be a getter; the core stores it when the
+  lens has entered and again when `html[data-theme]` changes while the lens is active.
+- **Hidden glyphs.** `hideGlyphs(true)` also makes the text of `::before` and `::after`
+  transparent (it inherits `-webkit-text-fill-color`), and the text of `::marker` (list numbers
+  and letters), which Chrome does not let a lens restore. A lens that hides glyphs draws those
+  too (Stardust draws the markers) or accepts that they vanish; bullet shapes stay.
 
 ## Adding a lens
 
@@ -82,7 +121,8 @@ change the page's text or elements.
 2. Add the id to `LENSES` in `easter/lenses/core.js`. This is the only list of lenses on the
    site: the `<head>` snippet, the boot and the stylesheets do not change.
 3. Give it a `ground`: the `#rrggbb` colour a page is painted with while the lens arrives on it
-   (the colour the lens makes the page), or `null` when the page should show at once.
+   (the colour the lens makes the page), or `null` when the page should show at once. A getter
+   may give the colour for the current theme (the core stores it again on a theme change).
    Optionally give it `supported()` to decline a device or page.
 4. Add a browser suite `tests/browser_lens_<id>.js` if the lens has behaviour of its own;
    `tests/run_easter_suites.sh` picks it up. The core suites iterate every registered lens.
@@ -91,18 +131,39 @@ change the page's text or elements.
 ## The media helper
 
 `lenses/media.js` lets a lens redraw every image of the page without touching it.
-`const media = await ctx.media({ render, ground, select })` lays one canvas over each loaded
+`const media = await ctx.media({ render, ground, select, fixed })` lays one canvas over each loaded
 image near the viewport (class `lenses-media`, `data-kind` `photo` or `graphic`), in a page
 layer, clipped to scrolling ancestors. `render(source)` receives the image already drawn as
 displayed and returns the canvas to show (or `null`). The handle offers `overlays`, `ready`
 (resolved when the overlays near the viewport exist, or at once when exit begins, so `enter()`
 may await it), `refresh()`, `each(fn)` and `dispose()`; the core disposes it after the exit.
 After a resize or a zoom, overlays are drawn again at their new size as they come near.
-Renders are made one image per task, windowed with IntersectionObservers and cached (the
-renders off screen in a 64 MB LRU). The utilities `readable`, `draw`, `drawAsync`, `sample`
-and `classify` are also available to lenses that only need pixels, through
-`ctx.mediaKit()` (which loads the helper without making overlays). The header of `media.js`
-documents the details and the classification thresholds.
+Renders are made one image at a time, nearest first by where the images are when the next is
+picked (those in the viewport first), windowed with IntersectionObservers and cached (the
+renders off screen in a 64 MB LRU). Up to two file decodes run at once ahead of the renders,
+each photo's sample for classification beside its display-size decode, so one heavy file does
+not hold up the photos after it. After a jump (a fragment link) the cached renders of images
+now on screen are put back in the scroll event, before the paint. `media.overlays` and its
+records are live: when an image is drawn again, `record.canvas` is swapped in place, so keep
+your own reference to compare canvases. `media.kindOf(img)` gives the helper's classification
+of an image it has classified (`null` before), so a lens need not `sample()` it again. The
+utilities `readable`, `draw`, `drawAsync`, `plan`, `sample` and `classify` are also available
+to lenses that only need pixels, through
+`ctx.mediaKit()` (which loads the helper without making overlays); `plan` gives the crop and
+size the helper draws an image at, so a lens can decode the file again at exactly that crop.
+The header of `media.js` documents the details and the classification thresholds.
+
+Images inside a `position: fixed` container are skipped unless the lens passes `fixed: true`.
+Then they are redrawn too, also outside the scope (the photography lightbox, beside
+`#main-content`): their overlays go in a fixed layer (`lenses-media-layer lenses-media-fixed`,
+viewport coordinates) stacked just above the container, follow it as it opens, changes photo
+and closes, never take the pointer, and are cut out along the glyphs of the controls the
+container draws over the photo (the lightbox's arrows on a phone), so those stay visible. A
+lightbox already open when the handle is made is drawn at once. When its image asks for another
+file (next, previous) the old overlay is hidden before the next paint and the new render shows
+when it is ready (no old photo stretched over the new one's box); when it closes, its overlay
+goes before the next paint. These overlays are drawn at up to 3.2 MP (other images 1.6 MP), so
+the lightbox is sharp at a DPR of 2.
 
 Images with `visibility: hidden` are skipped like images that are not rendered. A lens that
 wants the original images hidden under its overlays must use `opacity: 0` (or pass `ground`,
@@ -133,4 +194,11 @@ tests/run_easter_suites.sh lenses_media                    # one suite
 `run_easter_suites.sh` runs `browser_lenses.js`, `browser_lenses_pages.js`,
 `browser_lenses_media.js`, `browser_tokens.js`, every `browser_lens_*.js` and
 `browser_easter_egg.js`, each in its own agent-browser session, and prints one line per suite.
-Its header lists the environment variables (server URL, session prefix, time limit).
+Its header lists the environment variables (server URL, session prefix, time limit, results
+directory). Two matter on a Mac. Headless Chrome renders no frames while the display sleeps
+(no `requestAnimationFrame`, no IntersectionObserver callbacks, view transitions never end), so
+a suite that starts while the display is asleep gets Chrome with
+`--disable-gpu-vsync,--disable-frame-rate-limit`, which keeps frames coming; with the display
+awake it gets no switches, since back-to-back frames stall Stardust's on the longest paper page
+(set `AGENT_BROWSER_ARGS` to choose the switches yourself). And `EASTER_DPR=2` runs every suite
+at a device pixel ratio of 2 (`EASTER_VIEWPORT`, default `1280 900`).

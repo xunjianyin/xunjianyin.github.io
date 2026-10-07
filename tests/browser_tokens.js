@@ -58,6 +58,10 @@
       if (now !== last) { last = now; since = performance.now(); }
       return performance.now() - since > 500;
     }, 'the page to settle', 10000);
+    // A star count comes from api.github.com and may take longer than that quiet half second;
+    // the token count would then change under the suite. Wait for every badge to show (a
+    // failed request leaves it hidden for good: give up after 5 s).
+    await until(() => !doc.querySelector('.project-stars[hidden]'), 'the star counts', 5000).catch(() => {});
     win.addEventListener('error', event => errors.push(event.message));
     win.addEventListener('unhandledrejection', event => errors.push(String(event.reason)));
     // Reduced motion is simulated through matchMedia, before the core reads it.

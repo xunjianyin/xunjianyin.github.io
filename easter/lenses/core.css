@@ -48,9 +48,32 @@ html.lenses-hide-glyphs :is(#site-nav, #main-content, #site-footer, body > heade
 }
 .lenses-layer * { pointer-events: none !important; }
 
-/* Caption: one serif italic line (and at most two quieter ones) beside or above the name. */
+/* Caption: one serif italic line (and at most two quieter ones) beside or above the name.
+   Where it lies over text (a subtitle at the viewport's foot, a tight band above a title) a
+   halo of the ground around its glyphs keeps it legible, with no band, border or box: three
+   rings of copies of the glyphs in the ground's colour, 1.5, 3 and 4.5 px out (8, 12 and 16
+   of them, blurred 1, 1.5 and 2 px), which add up to a rounded outline about 4.5 px wide with a
+   soft edge, then a short glow. (A -webkit-text-stroke is mitred: HTML text has no
+   stroke-linejoin, so a wide stroke spikes at the joins of the italic, and the spikes show
+   wherever the halo's colour differs from the ground under it. A blur alone is too faint
+   around thin serif strokes to hide the text beneath; the rings hide it a little better than
+   the 8 px stroke did.) The ground is a lens's --lenses-caption-ground, else
+   --lenses-caption-halo, which the core sets on the caption from the page under it (or the
+   lens's ground); over that ground the halo does not show. ctx.captionGround() sets
+   --lenses-caption-ground on the caption itself and adds is-grounded: no easing then. */
 .lenses-caption {
   --lenses-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --lenses-halo: var(--lenses-caption-ground, var(--lenses-caption-halo, transparent));
+  --lenses-halo-rings:
+    1.5px 0 1px var(--lenses-halo), 1.06px 1.06px 1px var(--lenses-halo), 0 1.5px 1px var(--lenses-halo), -1.06px 1.06px 1px var(--lenses-halo),
+    -1.5px 0 1px var(--lenses-halo), -1.06px -1.06px 1px var(--lenses-halo), 0 -1.5px 1px var(--lenses-halo), 1.06px -1.06px 1px var(--lenses-halo),
+    3px 0 1.5px var(--lenses-halo), 2.6px 1.5px 1.5px var(--lenses-halo), 1.5px 2.6px 1.5px var(--lenses-halo), 0 3px 1.5px var(--lenses-halo),
+    -1.5px 2.6px 1.5px var(--lenses-halo), -2.6px 1.5px 1.5px var(--lenses-halo), -3px 0 1.5px var(--lenses-halo), -2.6px -1.5px 1.5px var(--lenses-halo),
+    -1.5px -2.6px 1.5px var(--lenses-halo), 0 -3px 1.5px var(--lenses-halo), 1.5px -2.6px 1.5px var(--lenses-halo), 2.6px -1.5px 1.5px var(--lenses-halo),
+    4.5px 0 2px var(--lenses-halo), 4.16px 1.72px 2px var(--lenses-halo), 3.18px 3.18px 2px var(--lenses-halo), 1.72px 4.16px 2px var(--lenses-halo),
+    0 4.5px 2px var(--lenses-halo), -1.72px 4.16px 2px var(--lenses-halo), -3.18px 3.18px 2px var(--lenses-halo), -4.16px 1.72px 2px var(--lenses-halo),
+    -4.5px 0 2px var(--lenses-halo), -4.16px -1.72px 2px var(--lenses-halo), -3.18px -3.18px 2px var(--lenses-halo), -1.72px -4.16px 2px var(--lenses-halo),
+    0 -4.5px 2px var(--lenses-halo), 1.72px -4.16px 2px var(--lenses-halo), 3.18px -3.18px 2px var(--lenses-halo), 4.16px -1.72px 2px var(--lenses-halo);
   position: absolute;
   z-index: 2147483000;
   box-sizing: border-box;
@@ -66,10 +89,13 @@ html.lenses-hide-glyphs :is(#site-nav, #main-content, #site-footer, body > heade
   line-height: 17px;
   letter-spacing: 0.01em;
   text-align: left;
-  text-shadow: none;
+  text-shadow: var(--lenses-halo-rings), 0 0 5px var(--lenses-halo), 0 0 8px var(--lenses-halo), 0 0 11px var(--lenses-halo);
+  /* No stroke is drawn (width 0); its colour is the halo's, so code that reads the halo from
+     -webkit-text-stroke-color, as it was drawn before, still finds it. */
+  -webkit-text-stroke: 0 var(--lenses-halo);
   text-transform: none;
   opacity: 0;
-  transition: opacity 450ms ease;
+  transition: opacity 450ms ease, text-shadow 250ms linear, -webkit-text-stroke-color 250ms linear;
 }
 html[data-theme="dark"] .lenses-caption { color: var(--lenses-caption-color, #9ca3af); }
 .lenses-caption.is-shown { opacity: 1; }
@@ -83,6 +109,13 @@ html[data-theme="dark"] .lenses-caption { color: var(--lenses-caption-color, #9c
   letter-spacing: 0.02em;
   opacity: 0.78;
 }
+/* The note's letters are lighter, its halo is not (opacity would thin both). */
+@supports (color: color-mix(in srgb, red 50%, transparent)) {
+  .lenses-caption .lenses-caption-note {
+    opacity: 1;
+    color: color-mix(in srgb, currentColor 78%, transparent);
+  }
+}
 .lenses-caption.is-compact { font-size: 12px; line-height: 15px; }
 .lenses-caption.is-compact .lenses-caption-note { font-size: 11px; line-height: 14px; }
 /* A side note in the page margin; in the left margin it is set flush right, by the text. */
@@ -95,7 +128,9 @@ html[data-theme="dark"] .lenses-caption { color: var(--lenses-caption-color, #9c
   width: min(560px, calc(100vw - 24px));
   transform: translateX(-50%);
 }
+/* ctx.captionGround(): the lens drives the halo's ground itself, so it follows at once. */
+.lenses-caption.is-grounded { transition: opacity 450ms ease; }
 .lenses-caption.is-still { transition: none; }
 @media (prefers-reduced-motion: reduce) {
-  .lenses-caption { transition: none; }
+  .lenses-caption, .lenses-caption.is-grounded { transition: none; }
 }

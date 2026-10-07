@@ -6,7 +6,9 @@
  * over the lens's ground, or shows it at once for a lens without one, and #lenses-prepaint is
  * gone after the reveal), a back/forward return (pagehide and pageshow with persisted), an
  * unknown stored lens, Esc on a subpage, the triggers on every page kind, the first egg from a
- * subpage, ctx.onLayoutChange on a lazy photo and a padding change, every lens arriving on a
+ * subpage, ctx.onLayoutChange on a lazy photo and a padding change, the caption keeping its
+ * placement while a view transition runs (a stand-in and every lens, at 390 x 844 on
+ * publications), every lens arriving on a
  * sample of pages and leaving them byte for byte, and the frame budget on the longest paper
  * page. The lenses and their grounds are read from the core (lenses listed but not written
  * yet are skipped). Prints assertions, failures, first-frame samples, arrival times and frame
@@ -374,6 +376,217 @@
     await until(() => doc.querySelector('#main-content h1.post-title'), 'the blog post markdown');
     check(lenses().current === registered[registered.length - 1] && doc.querySelector('#main-content h1.post-title[data-lens-trigger]'), 'The lens stays through late blog markdown, whose title is a trigger');
     escape(); await idle();
+
+    /* 3d. The caption during a view transition, at 390 x 844 on publications (the title has no
+     * free band above it there). While a transition runs, hit tests see only its overlay, so
+     * the caption keeps the placement it had when the transition began and is placed again
+     * once it has finished. First a stand-in (the first lens's module with its enter replaced
+     * by a transition whose update widens the title and fires a resize, as Acta's does), then
+     * every registered lens that starts a transition while it enters. */
+    frame.style.width = '390px'; frame.style.height = '844px';
+    report.viewTransitions = {};
+    for (const who of ['stand-in', ...registered]) {
+      await load('/publications.html');
+      await settled();
+      // Every transition the page starts, seen from the test (installed before the core).
+      const started = [];
+      const native = doc.startViewTransition;
+      if (typeof native !== 'function') { report.viewTransitions[who] = 'unsupported'; break; }
+      doc.startViewTransition = function (...args) {
+        const vt = native.apply(this, args);
+        const record = { at: performance.now(), done: 0 };
+        started.push(record);
+        vt.finished.then(() => { record.done = performance.now(); }, () => { record.done = performance.now(); });
+        return vt;
+      };
+      const core = await win.SiteLensesBoot.loadCore();
+      await core._debug.loadAll();
+      const id = who === 'stand-in' ? registered[0] : who;
+      const lens = core._debug.lens(id);
+      const own = { enter: lens.enter, exit: lens.exit };
+      const sheet = doc.createElement('style');
+      if (who === 'stand-in') {
+        sheet.textContent = `html.lens-${id}-vt #main-content h1[data-lens-trigger] { letter-spacing: 0.06em; }`;
+        doc.head.append(sheet);
+        lens.enter = () => doc.startViewTransition(() => {
+          doc.documentElement.classList.add(`lens-${id}-vt`);
+          win.dispatchEvent(new win.Event('resize'));
+        }).finished.catch(() => {});
+        lens.exit = () => { doc.documentElement.classList.remove(`lens-${id}-vt`); return Promise.resolve(); };
+      }
+      // The caption's placements (its classes but the fade's, and its position), each time
+      // they are written, with whether a transition was running then.
+      const placements = [];
+      const placement = el => `${[...el.classList].filter(c => c !== 'is-shown' && c !== 'is-still').sort().join(' ')}|${el.style.left}|${el.style.top}|${el.style.width}`;
+      const running = () => started.some(r => !r.done);
+      const watch = new win.MutationObserver(() => {
+        const el = doc.querySelector('.lenses-caption');
+        if (el) placements.push({ at: performance.now(), running: running(), where: placement(el) });
+      });
+      watch.observe(doc.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
+      const title = doc.querySelector('#main-content h1[data-lens-trigger]');
+      try {
+        // The trigger anchors the caption to the title; the first lens enters by it, and any
+        // other lens is then reached with the title as the anchor still.
+        dblclick(title);
+        await until(() => win.SiteLenses && win.SiteLenses.current, 'the first lens by the title'); await idle();
+        if (id !== registered[0]) {
+          await lenses().reset();
+          await delay(100);
+          placements.length = 0; started.length = 0;
+          await lenses()._debug.goto(id);
+        }
+        await until(() => !running(), 'the transitions to finish', 8000).catch(() => {});
+        await delay(120);
+        const first = started[0];
+        if (!first) { report.viewTransitions[who] = 'no transition'; continue; }
+        const before = placements.filter(p => p.at <= first.at).pop() || placements[0];
+        const during = placements.filter(p => p.running && p.at > first.at);
+        const moved = [...new Set(during.map(p => p.where))].filter(where => !before || where !== before.where);
+        const last = started.reduce((t, r) => Math.max(t, r.done), 0);
+        const after = placements.filter(p => p.at >= last);
+        const caption = doc.querySelector('.lenses-caption');
+        report.viewTransitions[who] = { transitions: started.length, before: before && before.where, during: [...new Set(during.map(p => p.where))], after: after.length };
+        check(!!before && moved.length === 0, `${who} at 390 px: the caption keeps its placement while a view transition runs (${before && before.where}; moved to ${moved.join(' ; ') || 'nothing'})`);
+        check(!caption || after.length > 0, `${who} at 390 px: the caption is placed again once the transition has finished (${after.length} writes after it)`);
+        if (caption) {
+          const c = caption.getBoundingClientRect();
+          const nav = doc.querySelector('#site-nav').getBoundingClientRect();
+          check(c.top >= nav.bottom - 1 || c.bottom <= nav.top + 1, `${who} at 390 px: the caption does not lie over the nav after the transition (${Math.round(c.top)}..${Math.round(c.bottom)} vs nav ${Math.round(nav.top)}..${Math.round(nav.bottom)})`);
+        }
+      } finally {
+        watch.disconnect();
+        lens.enter = own.enter; lens.exit = own.exit;
+        if (lenses()) { await lenses().reset(); await idle(); }
+        sheet.remove();
+        delete doc.startViewTransition;      // the document's own method again
+      }
+    }
+    frame.style.width = '1280px'; frame.style.height = '900px';
+
+    /* 3e. The photography lightbox and the lenses (R1, R2). The lightbox locks the body's
+     * scroll (body.style.overflow = 'hidden') while it is open. A lens's exit keeps that lock
+     * when the lightbox stays open, and does not put it back when the lightbox was closed
+     * inside the lens; neither is warned about. While it is open, Esc closes it (the page's
+     * own key handler) and leaves the lens on, and the digit keys are the page's too. Every
+     * lens, both orders. */
+    {
+      report.lightbox = {};
+      const leftWarnings = id => warnings.filter(w => w.includes(`"${id}"`) && / left /.test(w)).length;
+      const key = k => doc.body.dispatchEvent(new win.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+      for (const id of registered) {
+        await load('/photography.html');
+        await settled();
+        const box = doc.getElementById('lightbox');
+        const openBox = async () => { doc.querySelectorAll('#main-content .photo-item')[1].click(); await until(() => box.classList.contains('active'), 'the lightbox to open'); };
+        const closeBox = () => doc.getElementById('close-lightbox').click();
+        const warned = leftWarnings(id);
+        // Opened inside the lens, still open when the lens leaves.
+        await (await win.SiteLensesBoot.loadCore())._debug.goto(id);
+        await openBox();
+        await lenses().reset(); await idle();
+        const keptLock = doc.body.style.overflow;
+        check(box.classList.contains('active') && keptLock === 'hidden', `R1 ${id}: leaving the lens with the lightbox open keeps its scroll lock (body overflow ${JSON.stringify(keptLock)})`);
+        closeBox();
+        check(doc.body.style.overflow === '', `${id}: the closed lightbox lifts its lock after the lens has left`);
+        // Opened before the lens, closed inside it.
+        await openBox();
+        await lenses()._debug.goto(id);
+        closeBox();
+        await lenses().reset(); await idle();
+        const lockAfter = doc.body.style.overflow;
+        check(!box.classList.contains('active') && lockAfter !== 'hidden', `R1 ${id}: a lightbox opened before the lens and closed inside it leaves the page scrollable after the exit (body overflow ${JSON.stringify(lockAfter)})`);
+        check(leftWarnings(id) === warned, `R1 ${id}: the page's own lock is not warned about as the lens's (${leftWarnings(id) - warned} warnings)`);
+        report.lightbox[id] = { keptLock, lockAfter };
+        // R2: Esc and the digits are the page's while the lightbox is open.
+        if (id === registered[0] || id === registered[registered.length - 1]) {
+          await lenses()._debug.goto(id);
+          await openBox();
+          key('Escape'); await delay(60); await idle();
+          check(!box.classList.contains('active') && lenses().current === id, `R2 ${id}: Esc with the lightbox open closes the lightbox and leaves the lens on (lens ${lenses().current})`);
+          await openBox();
+          const other = registered.find(x => x !== id);
+          key('0'); key(String(boot._debug.lenses.indexOf(other) + 1)); await delay(300); await idle();
+          check(lenses().current === id && box.classList.contains('active'), `R2 ${id}: the digit keys do nothing to the lens while the lightbox is open (lens ${lenses().current})`);
+          closeBox();
+          key('Escape'); await delay(60); await idle();
+          check(lenses().current === null, `R2 ${id}: with the lightbox closed, Esc leaves the lens`);
+        }
+      }
+    }
+
+    /* 3f. The caption never lies over text (R4): on the homepage and a paper page, at 1440 x 900
+     * and 390 x 844, for every lens entered through the page's trigger, no glyph of the caption
+     * overlaps a glyph of the page (ink boxes: each text box narrowed to the ascent and descent
+     * its glyphs reach, measured in its font). The publications page is reported, not checked:
+     * at 390 px a three-line caption (Tokens' with its count) finds no free band there and falls
+     * back to the subtitle over the text. */
+    {
+      report.captions = {};
+      const inks = (roots, region) => {
+        const out = [];
+        const g = doc.createElement('canvas').getContext('2d');
+        const range = doc.createRange();
+        const meets = r => r.right > region.left && r.left < region.right && r.bottom > region.top && r.top < region.bottom;
+        for (const root of roots) {
+          const walker = doc.createTreeWalker(root, win.NodeFilter.SHOW_TEXT);
+          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            const text = node.data.trim();
+            if (!text || !node.parentElement) continue;
+            const look = win.getComputedStyle(node.parentElement);
+            if (look.visibility !== 'visible') continue;
+            range.selectNodeContents(node);
+            const rects = [...range.getClientRects()].filter(r => r.width > 0.5 && r.height > 0.5 && meets(r));
+            if (!rects.length) continue;
+            const font = size => [look.fontStyle, look.fontWeight, size, look.fontFamily].join(' ');
+            g.font = font(look.fontSize);
+            const share = parseFloat(String(look.fontSizeAdjust).replace(/^[a-z-]+\s+/, ''));
+            if (share > 0) { const x = g.measureText('x').actualBoundingBoxAscent; if (x > 0) g.font = font(`${(parseFloat(look.fontSize) ** 2 * share) / x}px`); }
+            const m = g.measureText(look.textTransform === 'uppercase' ? text.toUpperCase() : text);
+            for (const r of rects) {
+              const baseline = r.top + (r.height - m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2 + m.fontBoundingBoxAscent;
+              out.push({ text: text.slice(0, 24), left: r.left, right: r.right, top: baseline - m.actualBoundingBoxAscent, bottom: baseline + m.actualBoundingBoxDescent });
+            }
+          }
+        }
+        return out;
+      };
+      const scopeRoots = () => [...new Set(['#site-nav, body > header.site-header', '#main-content', '#site-footer, body > footer.paper-footer'].map(x => doc.querySelector(x)).filter(Boolean))];
+      const overlaps = () => {
+        const el = doc.querySelector('.lenses-caption');
+        if (!el) return null;
+        const own = inks([el], { left: -1e6, right: 1e6, top: -1e6, bottom: 1e6 });
+        const hits = [];
+        for (const a of own) {
+          for (const b of inks(scopeRoots(), a)) {
+            const x = Math.min(a.right, b.right) - Math.max(a.left, b.left); const y = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+            if (x > 0.5 && y > 0.5) hits.push(`"${b.text}" by ${y.toFixed(1)} px`);
+          }
+        }
+        return hits;
+      };
+      for (const [width, height] of [[1440, 900], [390, 844]]) {
+        frame.style.width = `${width}px`; frame.style.height = `${height}px`;
+        for (const page of ['/', '/papers/godel-agent.html', '/publications.html']) {
+          await load(page);
+          await settled();
+          const trigger = doc.querySelector('.profile-text .name') || doc.querySelector('#main-content [data-lens-trigger]');
+          dblclick(trigger);
+          await until(() => win.SiteLenses && win.SiteLenses.current && !win.SiteLenses.busy, `${page}: the first lens`);
+          for (const id of registered) {
+            if (lenses().current !== id) await lenses()._debug.goto(id);
+            await idle(); await delay(50);
+            const hits = overlaps();
+            const label = `${id}@${page}@${width}`;
+            report.captions[label] = { step: state().captionStep, hits: hits ? hits.slice(0, 3) : 'no caption' };
+            if (page === '/publications.html') continue;
+            check(hits !== null && hits.length === 0, `R4 ${label}: the caption lies over no text (${state().captionStep}; ${hits ? hits.slice(0, 3).join(', ') || 'clear' : 'no caption'})`);
+          }
+          await lenses().reset(); await idle();
+        }
+      }
+      frame.style.width = '1280px'; frame.style.height = '900px';
+    }
 
     /* 4. Every lens arrives on a sample of pages, keeps links working, and Esc restores. */
     for (const [name, page] of Object.entries(SAMPLE)) {
