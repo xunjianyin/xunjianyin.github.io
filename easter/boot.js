@@ -23,7 +23,7 @@
   'use strict';
   if (window.SiteLensesBoot) return;
 
-  const VERSION = 'lenses-v3';        // the ?v= of the lenses core (easter/lenses/core.*)
+  const VERSION = 'lenses-v4';        // the ?v= of the lenses core (easter/lenses/core.*)
   const SPIRA_VERSION = 'spira-v10';  // the ?v= of easter/spira/spira.*
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
   const ROOT = new URL('../', SCRIPT_SRC).href;                 // easter/boot.js → the site root
