@@ -1,0 +1,252 @@
+/* Lens IX · Darkroom (easter/lenses/darkroom.js).
+   The page as a warm-toned fibre print. Colour only; no word, size or position changes.
+   html.lens-darkroom        the lens is on: the print layer's backdrop filter prints the page
+   html.lens-darkroom-print  the print is shown: its link styles, the images' overlays and the
+                             paper texture (switched on while the sheet is blank, so the
+                             switch cannot be seen)
+   html.lens-darkroom-mixing the print layer uses the mixing filters (the lights going out, and
+                             the exit without view transitions)
+   html.lens-darkroom-veil   the scope's own images are veiled under their silver prints (with
+                             the print; lifted by the script if an image would get no print)
+   lens-darkroom-shell / -paper  site-shell pages / paper pages
+   html.lens-darkroom-scoped the scoped mode, for engines without SVG filters in
+                             backdrop-filter (below)
+   The filters live in the print layer's 0 x 0 svg (#lens-darkroom-page, -page-dark, -mix,
+   -mix-dark, -media); their tables are written by the script.
+
+   Stacking, from the page up: in the scoped mode only, the underlay (-1, under every box of
+   the page); the back-to-top button (999, earlier in the document); the print
+   layer (999), whose backdrop filter prints everything under it; the paper texture (999, made
+   after the print layer, drawn as it is, so it is the same in both themes); the images' layer
+   (999, made last), toned by its own filter; the lightbox and the skip link (1000, unprinted);
+   the helper's fixed layer with the lightbox photograph's print (1001, toned like the images'
+   layer); the caption; the safelight. The page itself carries no filter: a reference filter on an
+   ancestor makes Chrome load every lazy image at once (the scoped mode, below, is only for
+   engines that cannot print through a backdrop filter). */
+
+/* The caption (above the print, under the safelight) is read on the sheet: its halo is the
+   paper, which the safelight multiplies exactly as it does the sheet, so the halo does not
+   show on it, from the blank sheet through the print. While the dark theme's page is still
+   going to the blank sheet (the lights going out, 0.5 s) the halo is off: paper there would
+   be a bright label on the darkening room; it comes in on the blank sheet (core.css fades
+   it over 0.25 s), where it matches. */
+html.lens-darkroom {
+  --lenses-caption-color: #5a4c44;   /* read under the safelight, where the caption shows */
+  --lenses-caption-ground: #f4f0e6;
+}
+
+html.lens-darkroom.lens-darkroom-mixing[data-theme="dark"] { --lenses-caption-ground: transparent; }
+
+/* ---- The print layer ---- */
+.lenses-layer.lens-darkroom-sheet {
+  z-index: 999;
+  display: none;
+}
+
+html.lens-darkroom .lenses-layer.lens-darkroom-sheet { display: block; }
+
+/* The backdrop filters, never in the scoped mode (below), whose engines would drop them or,
+   where they render them, print the page twice. */
+html.lens-darkroom:not(.lens-darkroom-scoped) .lenses-layer.lens-darkroom-sheet {
+  -webkit-backdrop-filter: url(#lens-darkroom-page);
+  backdrop-filter: url(#lens-darkroom-page);
+}
+
+html.lens-darkroom:not(.lens-darkroom-scoped)[data-theme="dark"] .lenses-layer.lens-darkroom-sheet {
+  -webkit-backdrop-filter: url(#lens-darkroom-page-dark);
+  backdrop-filter: url(#lens-darkroom-page-dark);
+}
+
+html.lens-darkroom.lens-darkroom-mixing:not(.lens-darkroom-scoped) .lenses-layer.lens-darkroom-sheet {
+  -webkit-backdrop-filter: url(#lens-darkroom-mix);
+  backdrop-filter: url(#lens-darkroom-mix);
+}
+
+html.lens-darkroom.lens-darkroom-mixing:not(.lens-darkroom-scoped)[data-theme="dark"] .lenses-layer.lens-darkroom-sheet {
+  -webkit-backdrop-filter: url(#lens-darkroom-mix-dark);
+  backdrop-filter: url(#lens-darkroom-mix-dark);
+}
+
+/* The scoped mode (engines without SVG filters in backdrop-filter, set by the script): the
+   filters on the scope's own elements, the footer's children rather than the footer (its
+   back-to-top button is position: fixed, and a filter on an ancestor would pin it there),
+   and the root, outside the scope, painted as paper once the sheet is blank. */
+
+html.lens-darkroom.lens-darkroom-scoped :is(#site-nav, #main-content, #site-footer > *, body > header.site-header, body > footer.paper-footer) {
+  filter: url(#lens-darkroom-page);
+}
+
+html.lens-darkroom.lens-darkroom-scoped[data-theme="dark"] :is(#site-nav, #main-content, #site-footer > *) {
+  filter: url(#lens-darkroom-page-dark);
+}
+
+html.lens-darkroom.lens-darkroom-scoped.lens-darkroom-mixing :is(#site-nav, #main-content, #site-footer > *, body > header.site-header, body > footer.paper-footer) {
+  filter: url(#lens-darkroom-mix);
+}
+
+html.lens-darkroom.lens-darkroom-scoped.lens-darkroom-mixing[data-theme="dark"] :is(#site-nav, #main-content, #site-footer > *) {
+  filter: url(#lens-darkroom-mix-dark);
+}
+
+html.lens-darkroom-print.lens-darkroom-scoped:not(.lens-darkroom-mixing) { background-color: #f4f0e6 !important; }
+html.lens-darkroom-print.lens-darkroom-scoped:not(.lens-darkroom-mixing) body { background-color: transparent !important; }
+
+/* While the scoped mode mixes (the lights going out, the fade back), the root keeps the page's
+   own background, which the filters do not reach: the underlay, a fixed layer under the page
+   (z-index -1, over the canvas and under every box), paints the paper over it at the mixing
+   weight (the script sets its opacity with the filters' weight), so the page's background
+   turns to paper with the filtered nav, main and footer, not after them. */
+.lenses-layer.lens-darkroom-underlay {
+  z-index: -1;
+  display: none;
+  opacity: 0;
+  background-color: #f4f0e6;
+}
+
+html.lens-darkroom.lens-darkroom-scoped.lens-darkroom-mixing .lenses-layer.lens-darkroom-underlay { display: block; }
+
+.lens-darkroom-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* The dark theme's projection is inverted: in the print, the scope's own images are inverted
+   back first, so an image without an overlay (a cross-origin badge, or a photo for the few
+   milliseconds before its print is made) still prints as a positive. Not while the lights go
+   out, when the page itself still shows. The inversion takes the image's border with it, so
+   the border is given as the inverse of the dark theme's image border (#374151, the portrait
+   and the project images): it then prints as faintly as the light theme's (#e5e7eb). */
+html.lens-darkroom-print:not(.lens-darkroom-mixing)[data-theme="dark"] :is(#site-nav, #main-content, #site-footer) :is(img, video) {
+  filter: invert(1);
+  border-color: #c8beae;
+}
+
+/* ---- The veil ----
+   While the print is shown, the scope's images with a same-origin source (the media helper
+   prints every one of them) are masked to their border and padding: the image itself shows
+   the bare paper until its silver print arrives (it then develops in, darkroom.js), never the
+   page filter's print of it, whose tone differs. A mask keeps the border, which prints as
+   before, and the image's hit-testing. The script lifts the veil for the whole page when an
+   image there would get no print (too small, unreadable, or broken). Cross-origin images are
+   left to the page filter. The photography lightbox's photograph (outside the scope) is
+   veiled too, showing the lightbox's dark ground until its print develops in; the page sets
+   its src as an absolute URL, so it cannot be told by its attribute, and the script lifts
+   the veil if it cannot be printed. */
+html.lens-darkroom-print.lens-darkroom-veil :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) img:not([src^="http:"], [src^="https:"], [src^="//"]),
+html.lens-darkroom-print.lens-darkroom-veil #lightbox img {
+  -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  -webkit-mask-clip: content-box, border-box;
+  -webkit-mask-composite: xor;
+  mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  mask-clip: content-box, border-box;
+  mask-composite: exclude;
+}
+
+/* ---- The images' silver prints (the media helper's layer) ----
+   Above the print layer, shown with the print only, toned by the images' table. */
+.lenses-layer.lenses-media-layer {
+  z-index: 999;
+  visibility: hidden;
+}
+
+html.lens-darkroom-print .lenses-layer.lenses-media-layer {
+  visibility: visible;
+  filter: url(#lens-darkroom-media);
+}
+
+/* The photography lightbox (above the print layer, so not printed by it) shows its photograph
+   as a silver print in the helper's fixed layer, veiled until then (above). Where the veil is
+   lifted, the photograph under its print is at least toned. The skip link, when focused, in
+   grey. */
+html.lens-darkroom-print:not(.lens-darkroom-veil) #lightbox img { filter: url(#lens-darkroom-media); }
+html.lens-darkroom-print a.skip-link { filter: grayscale(1); }
+
+/* ---- Links ----
+   Links print in the text's ink: blue and the paper pages' green are dark through the red
+   filter and the grade. In the dark theme the site's link colours are light blues, which the
+   inverted projection would print as a pale grey (the publications filters would read as
+   disabled), so in the scope they take the text's colour at their source: every element that
+   uses them (links, the filter buttons, focus rings, hover colours) prints in the ink, as the
+   light theme's dark blues do. Links with colours of their own take the text's colour too
+   (site-shell pages, whose links have no fills). */
+html.lens-darkroom-print.lens-darkroom-shell[data-theme="dark"] :is(#site-nav, #main-content, #site-footer) {
+  --primary-color: var(--text-color);
+  --secondary-color: var(--text-color);
+}
+
+html.lens-darkroom-print.lens-darkroom-shell[data-theme="dark"] :is(#site-nav, #main-content, #site-footer) :is(a[href], button.detail-toggle) {
+  color: var(--text-color);
+}
+
+/* The colour is gone, so a thin warm-grey underline carries a text link (and the abstract and
+   citation toggles, drawn as links). Its strength is a property, so the hover and focus rule
+   below, set on the link itself, wins over the root's value whatever the selectors weigh. The
+   dark theme's table thins faint tones (darkroom.js, DARK_EDGE), so there the underline is
+   mixed stronger, to print as the light theme's does. */
+html.lens-darkroom-print { --lens-darkroom-underline: 32%; }
+html.lens-darkroom-print.lens-darkroom-shell[data-theme="dark"] { --lens-darkroom-underline: 45%; }
+
+html.lens-darkroom-print.lens-darkroom-shell #main-content button.detail-toggle,
+html.lens-darkroom-print.lens-darkroom-shell :is(#main-content, #site-footer) a[href]:not(:has(img, svg, picture, canvas, video)),
+html.lens-darkroom-print.lens-darkroom-paper :is(#main-content, body > footer.paper-footer) a[href]:not(.resource-link, :has(img, svg, picture, canvas, video)) {
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in srgb, currentColor var(--lens-darkroom-underline, 32%), transparent);
+}
+
+html.lens-darkroom-print :is(#main-content, #site-footer, body > footer.paper-footer) :is(a[href], button.detail-toggle):is(:hover, :focus-visible) {
+  --lens-darkroom-underline: 100%;
+}
+
+/* ---- The paper's texture (the tile is set by the script), over the print layer ---- */
+.lenses-layer.lens-darkroom-texture {
+  z-index: 999;
+  display: none;
+  background-repeat: repeat;
+  background-position: 0 0;
+}
+
+html.lens-darkroom-print .lenses-layer.lens-darkroom-texture { display: block; }
+
+/* ---- The safelight ----
+   A deep amber-red room with a paler glow where the sheet lies, multiplied over everything
+   (the caption too). Shown by the script while the print develops. */
+.lenses-layer.lens-darkroom-safelight {
+  z-index: 2147483001;
+  display: none;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  background: radial-gradient(ellipse 72% 80% at 50% 44%, #eba08a 0%, #c95a3d 36%, #8a2a17 72%, #3a0d06 100%);
+}
+
+/* A band of reflected safelight on the developer, crossing the sheet once (the script moves it). */
+.lens-darkroom-band {
+  position: absolute;
+  top: -20%;
+  left: 0;
+  width: 46%;
+  height: 140%;
+  opacity: 0;
+  background: linear-gradient(90deg, rgba(255, 226, 212, 0) 0%, rgba(255, 226, 212, 0.26) 50%, rgba(255, 226, 212, 0) 100%);
+  will-change: transform, opacity;
+}
+
+/* ---- The exit's crossfade (a view transition of the root) ----
+   600 ms from the print to the page; in the dark theme 350 ms from the blank sheet, after the
+   ink has gone back into the paper (darkroom.js, UNDEVELOP_MS and BLANK_FADE_MS). */
+html.lens-darkroom-vt-out::view-transition-group(root),
+html.lens-darkroom-vt-out::view-transition-old(root),
+html.lens-darkroom-vt-out::view-transition-new(root) {
+  animation-duration: 600ms;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+html.lens-darkroom-vt-out.lens-darkroom-vt-blank::view-transition-group(root),
+html.lens-darkroom-vt-out.lens-darkroom-vt-blank::view-transition-old(root),
+html.lens-darkroom-vt-out.lens-darkroom-vt-blank::view-transition-new(root) {
+  animation-duration: 350ms;
+}

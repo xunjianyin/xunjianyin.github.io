@@ -4,15 +4,71 @@
  * Every glyph in the lens scope is redrawn as fine luminous particles on a night
  * ground. Each word is rendered offscreen in its exact computed font and sampled on
  * a grid of about 0.09 em; a particle sits at the ink centroid of every covered cell,
- * so letters keep their shape and stay readable. The homepage portrait becomes a
- * point cloud of its own luminance.
+ * so letters keep their shape and stay readable.
+ *
+ * Every image becomes particles too: each same-origin <img> in the scope that is
+ * loaded, rendered (not inside a closed <details>) and at least 24 x 24 CSS px. Its
+ * pixels come from the media helper's utilities (drawAsync decodes and resizes a photo
+ * off the main thread, as it is displayed, object-fit included; sample and classify tell
+ * a photo from a graphic).
+ *   - A photo becomes a point cloud of its own luminance: soft stars in the desaturated
+ *     original colour, lifted for the night, whose grains grow with the grid's step. The
+ *     step is set by the stars the photo will hold, max(1.6 px, sqrt(area x lit share /
+ *     14000)), where the lit share is the expected share of cells with a star, so a night
+ *     photo of thin lit windows gets a finer grid than a bright sky of the same size; one
+ *     image stays under about 14 k particles (should more cells light up, all thin out
+ *     alike). A cell's light leans toward its outlier: its brightest pixel where that
+ *     stands out of a darker neighbourhood (lit windows, a horizon), its darkest where that
+ *     cuts into a lighter one (bare branches, a gull against the sky), so thin structure
+ *     of either kind survives the gathering; a dark neighbourhood is lifted a little (at
+ *     most twice: rocks under a bright sky keep their shapes) and a little local contrast
+ *     keeps small subjects apart from broad gradients. Bright areas hold a star in nearly
+ *     every cell, dim ones thin out into a sparse sky, dark cells stay empty. A round
+ *     image keeps a round edge; the homepage portrait keeps its soft oval.
+ *   - A graphic (a figure, a diagram, a chart, an SVG panel) becomes particles where it
+ *     has ink: subsamples that differ from the ground colours around them (the light
+ *     panels and pills it is drawn on, as found in each small block of it; for a
+ *     transparent image, its alpha), sampled like glyphs on cells with an ink centroid,
+ *     coloured as text is (dark ink turns pale, colour into a pale tint of its hue, a pale
+ *     outline into a dim line), so a chart reads as its own lines in light; ink lighter
+ *     than its own ground (white letters on a blue tile) stays bright. A graphic carries
+ *     text, so it gets a finer step than a photo (1.25 px at the finest, as page text of
+ *     12-16 px is sampled) and a larger budget (about 56 k), spent on its lines and
+ *     letters: the inside of a solid fill holds a particle in three cells of ten, dimmer,
+ *     so outlines lead and the letters on a fill stay readable. Only the commonest ground
+ *     (and grounds as near it) is empty: every other ground (a tinted panel that groups a
+ *     column of boxes, a grey pill that marks a kind of box) is a sparse dim fill at its own
+ *     hue, as dense as it stands apart from the commonest, with a fainter line of dust where
+ *     it meets another ground. So grey reads apart from white and the panels keep their
+ *     shapes and hues (at most about 11 k grains a graphic, beside its ink).
+ *   - An image's own border (a project thumbnail's hairline) becomes a faint line of
+ *     dust, so the picture keeps its edge on the night.
+ * Decoding and sampling run as jobs (two at once, nearest first; three before an
+ * arrival's first frame) beside the text builder, so words never wait for pixels. An image
+ * whose particles come late crossfades from the page's own image while the lens enters (it
+ * was on the day page); arriving, and for a photo that loads while the lens is settled,
+ * it waits hidden under the night and its stars fade in, so no colour photo is shown in
+ * the lens. Cross-origin images (badges), canvases and video keep the CSS treatment:
+ * filtered back and dimmed. The photography lightbox's photo, outside the scope in a fixed
+ * container, is drawn as stars as well, on a still canvas the media helper lays over it
+ * (ctx.media with fixed: true): the photo itself stays under the lightbox's dark backdrop,
+ * its stars fade in when they are ready (a canvas whose photo has gone is hidden at once),
+ * and they fade out over the photo as the lens leaves. While the lightbox covers the
+ * viewport the night beneath it is not drawn.
+ * Text that CSS generates (::before and ::after content) has no text node to sample: it
+ * keeps its own glyphs (stardust.css), so no word is lost. A list's text markers (its
+ * numbers and letters, ::marker), hidden with the glyphs, are drawn as words of their own
+ * where the browser puts them.
  *
  * The page DOM is never edited. The core hides the glyphs (links, buttons and demo
  * controls stay usable under the particles); this lens adds classes on <html> for the
- * night ground and draws on two canvases in the core's fixed layer:
+ * night ground, writes one rule per image that became (or waits to become) particles
+ * into its own stylesheet (opacity 0, so the image still takes the pointer; a mask while
+ * it dissolves or condenses), and draws on two canvases in the core's fixed layer:
  *   - ink (Canvas2D), used in transitions only: crisp word sprites in device pixels,
  *     identical to the page's glyphs, dissolve into dust on enter and condense back
- *     on exit. It also draws the faint shockwave rings.
+ *     on exit (and, on a light page, the images' night patches under their dust). It
+ *     also draws the faint shockwave rings.
  *   - dust (WebGL2, else WebGL1; a Canvas2D pixel plotter without WebGL): points in
  *     groups, one draw call each. Home positions, colours and seeds are static buffers;
  *     the vertex shader computes the shimmer, the enter puff, the exit condensation,
@@ -20,17 +76,48 @@
  *     wind is simulated on the CPU, for the particles it has disturbed, and only that
  *     range of the offsets is uploaded.
  *
+ * Enter: the ground turns to night while a sweep runs down the viewport line by line;
+ * each line's ink sprites puff into dust, and each image dissolves in the same sweep
+ * (a gradient mask on the page's own image, so no photo is decoded for it) while its
+ * particles puff out; a figure on a white ground meanwhile turns to night with the page
+ * (inverted), so its lines dissolve into the same lines in dust. Exit: the sweep runs
+ * again, faster; the dust condenses into ink and the images return under the same mask.
+ * Arrival and reduced motion: the settled night at once. An exit cut short (an instant
+ * reset, a departing page) ends at once. On a light page every image keeps a counter-
+ * filter to the column's inversion that eases on the column's own curve, in and out, so
+ * the two hue rotations cancel at every moment and a photo never passes through another
+ * hue; since an interpolated inversion flattens every colour toward grey half way, the
+ * images still shown in a transition are only as opaque as the inversion leaves them
+ * distinct, so no grey slab stands on the grey page. And so that a photo goes out once:
+ * its rows the sweep has not reached when the inversion leaves it half its contrast
+ * dissolve then, all at once (it crossfades into its stars), and leaving, its stars stay
+ * until its contrast is back. Meanwhile a night patch in its box under its stars keeps the
+ * light page from showing through its dark parts (no tonal negative).
+ *
  * Long pages are windowed. Text in normal flow is cut into bands of the document,
  * built for the viewport and 1.5 screens either side in slices of a few milliseconds
  * and evicted far away. Text inside a container that clips and scrolls (a wide table
  * on a phone, a citation block) or that is fixed or sticky forms its own group, which
- * follows the container and is clipped to it. Late content (rendered markdown, demos,
- * toggled abstracts) is re-measured; only groups whose words changed are re-sampled.
+ * follows the container and is clipped to it. An image is a group of its own that
+ * belongs to the band or container that holds it: it is placed, clipped, windowed and
+ * capped with it. Late content (rendered markdown, the blog list, demos, toggled
+ * abstracts) and layout that moves without a DOM change (photos loading into the
+ * photography masonry, fonts, a <details> toggle; ctx.onLayoutChange) are re-measured,
+ * watched from the moment the lens starts measuring, so nothing that changes during the
+ * enter or the arrival is missed; only groups whose words or images moved are sampled
+ * again, and a moved image is only translated. A group whose words or image moved stops
+ * being drawn at once (a few words per group are measured again on each new model, and
+ * when an image in the scope loads), until its replacement is built: text is never drawn
+ * where it no longer is. Arriving, the images near the viewport that are still loading
+ * are waited for a moment (the page is still hidden over the night), so the first
+ * measure already sees the masonry the reader will see, and the images on screen are
+ * waited for until IMAGE_ARRIVE_MS, so the gallery is usually stars in the first frame. The content of a closed
+ * <details> is laid out by the browser but not painted: it is not drawn either, until it
+ * opens.
  *
  * On a light page the main column is inverted (hue kept): light panels sink into the
  * night, borders become faint, colour tints that carry data stay distinguishable, and
- * SVG figures turn into light ink. Images, canvases and video are filtered back and
- * dimmed, so they show as dimmed originals.
+ * inline SVG figures turn into light ink.
  */
 (() => {
   'use strict';
@@ -39,19 +126,22 @@
    * Constants. Lengths are CSS px, times are seconds unless marked ms.
    * ------------------------------------------------------------------------- */
   const NIGHT_RGB = [6, 8, 12];          // the ground, #06080c (stardust.css and the pre-paint rule use it)
-  const PHOTO_SELECTOR = '.profile-photo';
+  const PORTRAIT_SELECTOR = '.profile-photo';    // the homepage portrait keeps its soft oval
   const CLASS_NIGHT = 'lens-stardust';           // the night (ground, inversion, marks)
   const CLASS_BODY = 'lens-stardust-body';       // the body paints its own ground: turn it to night too
   const CLASS_INVERT = 'lens-stardust-invert';   // a light page: the main column is inverted
   const CLASS_GROUND = 'lens-stardust-ground';   // transitions for the ground; kept through the exit
   const CLASS_LEAVING = 'lens-stardust-leaving'; // the shorter exit duration
-  const CLASS_PHOTO = 'lens-stardust-photo';     // hides the portrait under its point cloud
   const CLASS_STILL = 'lens-stardust-still';     // no transitions at all (reduced motion, arrival, instant exit)
+  const SHEET_HREF = 'easter/lenses/stardust.css';   // the lens's own stylesheet takes the image rules
   const CLASS_CAPTION = 'lens-stardust-caption'; // the core's caption in a light tone, once the ground is dark
   // Never drawn as particles: SVG text (painted with fill), form controls and editable text.
   const EXCLUDE = 'script, style, noscript, template, svg, textarea, select, option, input, [contenteditable]:not([contenteditable="false"])';
   // Marks whose colours stardust.css changes (flushed without transitions on an instant exit).
   const MARKS = '.homepage-section h2, .project-link, #theme-toggle, .footer-social a, .back-to-top, .nav-button';
+  // Images outside the scope: the media helper redraws those in a position: fixed container
+  // (the photography lightbox) as stars, on a canvas over them.
+  const OUTSIDE_IMAGES = 'img:not(:is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) img)';
 
   // Sampling the glyphs
   const STEP_EM = 0.09;                  // grid step as a fraction of the font size ...
@@ -67,7 +157,9 @@
   const ALPHA_MIN = 0.42;                // alpha of the faintest particle
   const ATLAS_W = 2048;                  // sampling and sprite atlases
   const ATLAS_H = 2048;
-  const SAMPLE_PAGE_H = 64;              // one sampling pass renders this tall a strip of words (a taller word: its own)
+  const SAMPLE_PAGE_H = 40;              // one sampling pass renders this tall a strip of words (a taller word: its own) ...
+  const PASS_CELLS = [1500, 12000];      // ... and harvests between these many cells (a larger word: its own pass),
+  const PASS_MS = 2.5;                   // as many as take about this long (it adapts: cold code and a busy machine are slower)
   const LINE_SLACK = 3;                  // baselines within this many px form one line
   const THIN_ERODE = 0.28;               // css px shaved off ink sprites of antialiased (thinner) page text
 
@@ -76,25 +168,101 @@
   const BUILD_SCREENS = 1.5;             // build the viewport and this many screens either side ...
   const KEEP_SCREENS = 3.5;              // ... and evict groups farther than this
   const PARTICLE_CAP = 160000;           // live particles at most; the nearest groups win
-  const SLICE_MS = 5;                    // building yields to the page after this much work (a step past it stays under 8 ms)
+  const SLICE_MS = 4;                    // building yields to the page after this much work (a step past it stays under 8 ms)
   const GROUP_FADE = 0.25;               // a group built while live fades in (it may be on screen)
   const ARRIVE_REST_MS = 600;            // arriving: after the first frame, the page's first paint goes first
+  const ARRIVE_IMAGES_MS = 150;          // arriving: images near the viewport still loading are waited for until then
   const CONTENT_MS = 200;                // class and style changes in the scope settle this long
 
-  // The portrait as a point cloud
-  const PHOTO_STEP = 1.6;                // px between samples
+  // Images as particles
+  const IMAGE_MIN = 24;                  // px: a smaller image (content box) keeps the CSS dimming
+  const IMAGE_BUDGET = 14000;            // particles per image, about: the step grows with the area (a photo's lit area) ...
+  const IMAGE_STEP = 1.6;                // ... from this finest step (px between samples)
+  const IMAGE_JOBS = 2;                  // images decoded and sampled at once (decoding is off the main thread) ...
+  const IMAGE_JOBS_ARRIVING = 3;         // ... and before an arrival's first frame
+  const IMAGE_CACHE = 32;                // sampled images kept per activation (by source, size and fit)
+  const IMAGE_WAIT_MS = 320;             // entering waits this long for the images on screen (later ones crossfade in) ...
+  const IMAGE_ARRIVE_MS = 230;           // ... arriving, until this long after arrive() began (later ones wait
+                                         // under the night and fade in; the arrival settles within 350 ms)
+  const IMAGE_FADE = 0.25;               // s: the page's image fades out as late particles fade in
+  const WAIT_FADE = 0.4;                 // s: stars of an image hidden while they were made fade in this long
+  const LIGHTBOX_BUDGET = 30000;         // stars of the lightbox's photo (one still canvas: no particle cost)
+  const COVER_OPAQUE = 0.9;              // a fixed container this opaque over the whole viewport hides the night
+  const MASK_STOP = 16;                  // px between the stops of a dissolving image's mask
+  const INVERT = 0.94;                   // the light page's column inversion (stardust.css)
+  const SLAB_CONTRAST = [0.08, 0.75];    // an image in a transition shows from none to full over this contrast left by the inversions
+  const SLAB_IN = 0.28;                  // s: a light page's image rows the enter's sweep has not reached by then dissolve then
+                                         // (the inversions leave an image half its contrast then, none from 0.36 s to 0.44 s:
+                                         // it crossfades straight into its stars) ...
+  const SLAB_OUT = 0.17;                 // s: ... and leaving, an image's stars stay at least until then (they condense from
+                                         // 0.43 s, as its contrast comes back: half at 0.45 s, all at 0.5 s)
+  const PHOTO_SUPER = 2;                 // a photo is drawn at up to this many pixels per side of the finest cell ...
+  const PHOTO_FINE_PX = 2.5e5;           // ... and this many pixels at most
+  const PHOTO_CELLS_MAX = 1.2e5;         // cells of one photo at most (a dark photo gets a finer grid)
+  const PHOTO_PEAK = 0.6;                // a cell's light leans this far from its mean toward its outlier: its brightest
+                                         // or its darkest pixel, whichever stands further from the cells around it ...
+  const PHOTO_OUTLIER_R = 2;             // ... (a box of this many cells either side) ...
+  const PHOTO_OUTLIER_SOFT = 0.08;       // ... fully once the one stands this much further out than the other
   const PHOTO_MIN_LUMA = 0.07;           // darker cells stay empty: the night shows through
   const PHOTO_DESATURATE = 0.6;          // share of grey in the cloud's colour
   const PHOTO_LIFT = 1.18;               // brightening of the cloud on the night ground
-  const PHOTO_FONT = 9;                  // the "font size" that scales the portrait's puff
-  const PHOTO_STRIP = 3;                 // px: the portrait dissolves in strips this tall
+  const PHOTO_GROW = 0.5;                // grains grow as (step / IMAGE_STEP)^PHOTO_GROW ...
+  const PHOTO_SIZE = [1.0, 2.3];         // ... from these diameters (px) at the darkest and brightest
+  const PHOTO_GAMMA = 0.9;               // tone curve of the glow (above 1: brighter highlights stand out)
+  const PHOTO_LOCAL = 0.8;               // local contrast: a cell is pushed this far from its neighbourhood's mean ...
+  const PHOTO_LOCAL_R = 0.06;            // ... over a box this share of the image's shorter side (2 cells at least)
+  const PHOTO_KEY = 0.42;                // exposure: a dark neighbourhood is lifted toward this light ...
+  const PHOTO_EXPOSE = 0.5;              // ... as (key / its mean)^this ...
+  const PHOTO_EXPOSE_MAX = 2;            // ... at most this many times (a light one is never dimmed) ...
+  const PHOTO_EXPOSE_R = 0.2;            // ... the neighbourhood: a box this share of the shorter side
+  const PHOTO_DENSE = 0.4;               // from this glow every cell holds a star; a dimmer one with probability glow / PHOTO_DENSE ...
+  const PHOTO_SPARSE_LIFT = 0.5;         // ... and that star is brighter by this share of the light the empty cells gave up
+  const PHOTO_JITTER = 0.85;             // of a cell: grains wander this far (total), so no lattice shows
+  const PHOTO_MAGNITUDE = 0.35;          // stars differ in brightness and size by up to this share
+  const PHOTO_FONT = 9;                  // the "font size" that scales a photo's puff (at the finest step)
+  const STAR_WIDTH = 0.85;               // a photo grain is a soft star: gaussian width per radius ...
+  const STAR_MIN = 0.75;                 // ... and at least this (device px)
+  // A graphic carries text (its labels) and thin lines: it gets a finer step and a larger
+  // budget than a photo, spent on its lines and letters; the inside of a solid fill is drawn
+  // sparsely (FILL_KEEP), so a fill costs a fraction of its area.
+  const GRAPHIC_BUDGET = 56000;          // particles of one graphic, about (a fill's cells counted at FILL_KEEP)
+  const GRAPHIC_STEP = 1.25;             // its finest step: labels of 12-16 px are sampled about as page text is
+  const GRAPHIC_SUPER = 2;               // subsamples per cell side at the finest step
+  const GRAPHIC_MAX_PX = 1.1e6;          // subsamples of one graphic at most (the cells get fewer above it)
+  const GRAPHIC_FONT = 12;               // the "font size" that scales a graphic's puff
+  const BG_SHARE = 0.025;                // a colour on this share of a graphic, as light as its commonest, is ground
+  const BG_COLOURS = 6;                  // ... (at most this many ground colours: the panels and pills a figure is drawn on)
+  const BG_LUMA = 0.22;                  // ... (luma within this of the commonest colour's)
+  const INK_NEAR = 0.06;                 // colour distance (0..1) from the ground under which there is no ink ...
+  const INK_FAR = 0.3;                   // ... and above which the ink is full
+  const INK_SPREAD = 1.5;                // particles per unit of ink share and cell, about (rims of thin lines count)
+  const FILL_COVER = 0.85;               // a cell this covered, with its four neighbours of about its colour, lies inside a fill ...
+  const FILL_SIMILAR = 0.09;             // ... (colour distance 0..1 to each neighbour at most) ...
+  const FILL_KEEP = 0.3;                 // ... holds a particle with this chance ...
+  const FILL_ALPHA = 0.55;               // ... drawn this bright: outlines and the letters on a fill lead
+  // A ground other than the commonest (a tinted panel, a grey pill) that differs from it by
+  // INK_NEAR or more is not empty: a sparse dim fill at its own tint, so grey reads apart
+  // from white and the panels a figure groups its boxes in keep their shapes and hues.
+  const TINT_STEP = 2.6;                 // px: one chance of a grain per square this wide ...
+  const TINT_FROM = 0.05;                // ... taken with probability (d - this) x TINT_GAIN, d its colour distance (0..1)
+  const TINT_GAIN = 7;                   // from the main ground (a pale panel about 0.2, a grey pill about 0.65) ...
+  const TINT_KEEP = [0.16, 0.75];        // ... within these;
+  const TINT_EDGE = 0.7;                 // where it meets another ground, with this (a faint line along its edge)
+  const TINT_SHARE = 0.75;               // a square is that ground's when this share of it is
+  const TINT_ALPHA = [0.45, 0.8];        // drawn this bright, from a pale panel's distance (0.07) to a grey's (0.16),
+  const TINT_LIGHT = 0.62;               // in its hue at this lightness (a grey: a cool grey as light),
+  const TINT_BUDGET = 11000;             // and at most about this many grains per graphic (beside its ink)
+  const FRAME_GAP = 2.4;                 // px between the grains of an image's own border ...
+  const FRAME_ALPHA = 0.6;               // ... drawn this faint
 
   // Choreography (the ground's durations must match stardust.css)
   const GROUND_IN = 0.8;
   const GROUND_OUT = 0.7;
+  const GROUND_EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';   // the ground's and the column's curve
   const ENTER_START = 0.12;              // the first line starts once the ground is moving
   const ENTER_SWEEP = 0.85;              // top to bottom of the viewport, line by line
   const ENTER_DUR = 1.0;                 // a line puffs into dust and settles in this long
+  const LATE_JOIN = ENTER_START + ENTER_SWEEP + 0.3;   // an image ready later than this crossfades in
   const EXIT_SWEEP = 0.25;
   const EXIT_DUR = 0.45;                 // a line stirs, condenses and becomes ink
   const SETTLE_SLACK = 0.45;             // extra wait for the CSS ground before giving up
@@ -166,13 +334,14 @@
    * Night colours. Greys become pale cool greys that keep their emphasis (dark body
    * text bright, muted text dimmer, headings and bold brightest); saturated colours
    * (links) become a pale tint of their own hue. On a light page, near-white text sits on
-   * a dark fill that the inversion turns light, so it turns dark as well.
+   * a dark fill that the inversion turns light, so it turns dark as well; a graphic's pale
+   * ink (a light grey outline on white) has no such fill: it becomes a dim line (graphic).
    */
-  function nightColour([r, g, b], emphasis, darkPage) {
+  function nightColour([r, g, b], emphasis, darkPage, graphic = false) {
     const max = Math.max(r, g, b); const min = Math.min(r, g, b);
     if ((max - min) / 255 < 0.16) {
       const l = luma([r, g, b]);
-      if (!darkPage && l > 0.82) return [30, 33, 38];
+      if (!darkPage && l > 0.82 && !graphic) return [30, 33, 38];
       const strength = darkPage ? l : 1 - l;
       const level = emphasis ? 1.07 : 0.55 + 0.45 * strength;
       return [226, 233, 242].map(v => Math.min(255, v * level));
@@ -182,6 +351,17 @@
     else if (max === g) hue = (b - r) / (max - min) + 2;
     else hue = (r - g) / (max - min) + 4;
     return hsl((hue * 60 + 360) % 360, 0.82, emphasis ? 0.86 : 0.8);
+  }
+  // A graphic's tinted ground on the night: its own hue, half saturated at most, at
+  // TINT_LIGHT (a grey stays a cool grey).
+  function tintColour([r, g, b]) {
+    const max = Math.max(r, g, b); const min = Math.min(r, g, b); const chroma = (max - min) / 255;
+    if (chroma < 0.03) return [218, 225, 234].map(v => v * TINT_LIGHT / 0.88);
+    let hue;
+    if (max === r) hue = ((g - b) / (max - min)) % 6;
+    else if (max === g) hue = (b - r) / (max - min) + 2;
+    else hue = (r - g) / (max - min) + 4;
+    return hsl((hue * 60 + 360) % 360, clamp(chroma * 5, 0.25, 0.55), TINT_LIGHT);
   }
   // Draw a word with its letter-spacing; fall back to measured per-glyph advances.
   function fillSpaced(g, text, x, y, spacing, native, stroke = false) {
@@ -196,9 +376,35 @@
     if (!channel) { channel = new MessageChannel(); channel.port1.onmessage = () => { const go = waiting.shift(); if (go) go(); }; }
     return new Promise(resolve => { waiting.push(resolve); channel.port2.postMessage(0); });
   }
+  // Slice bookkeeping for the tests: the longest, and how many went over the 8 ms budget.
+  const SLICE_BUDGET_MS = 8;
+  const IMAGE_SLICES = new Set(['cells', 'cellsEnd', 'emit', 'tint', 'photo', 'read']);
+  function noteSlice(state, ms, tag) {
+    const p = state.perf;
+    p.slices = (p.slices || 0) + 1;
+    if (ms > SLICE_BUDGET_MS) p.slicesOver = (p.slicesOver || 0) + 1;
+    if (ms > (p.sliceMax || 0)) p.sliceMax = ms;
+    if (IMAGE_SLICES.has(tag) && ms > (p.imageSliceMax || 0)) p.imageSliceMax = ms;
+    const tags = p.sliceTags || (p.sliceTags = {});
+    if (ms > (tags[tag] || 0)) tags[tag] = +ms.toFixed(1);
+  }
   function hashString(text, h = 2166136261) {
     for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
     return h >>> 0;
+  }
+  const isSvg = src => /^data:image\/svg\+xml|\.svgz?(?:[?#]|$)/i.test(src);
+  // A selector for one element by position, from its nearest ancestor with an id (or the
+  // body): #photo-grid>div:nth-child(3)>img:nth-child(1). Rebuilt with every model.
+  function pathTo(el) {
+    const parts = [];
+    for (let node = el; node; node = node.parentElement) {
+      if (node !== el && node.id && document.getElementById(node.id) === node) { parts.unshift(`#${CSS.escape(node.id)}`); break; }
+      if (node === document.body) { parts.unshift('body'); break; }
+      const parent = node.parentElement;
+      if (!parent) return null;
+      parts.unshift(`${node.localName}:nth-child(${Array.prototype.indexOf.call(parent.children, node) + 1})`);
+    }
+    return parts.join('>');
   }
 
   /* ---------------------------------------------------------------------------
@@ -212,11 +418,130 @@
     return !colour || luma(colour) < 0.5;
   }
 
+  // Where the scope's images are and whether they have loaded, with the document's size: a
+  // model remembers it, and arrival compares it once its listeners are on (a photo that
+  // loaded in between moved the layout unseen).
+  function layoutPrint(scope) {
+    const html = document.documentElement;
+    let h = hashString(`${html.scrollWidth}x${html.scrollHeight}`);
+    for (const root of scope) {
+      for (const img of root.querySelectorAll('img')) {
+        const r = img.getBoundingClientRect();
+        h = hashString(`${img.complete ? 1 : 0}|${Math.round(r.left)},${Math.round(r.top + window.scrollY)}|${Math.round(r.width)}x${Math.round(r.height)}`, h);
+      }
+    }
+    return h;
+  }
+
+  // Resolves once the scope's images near the viewport that are still loading have loaded
+  // (or failed), or at the deadline (performance.now() time), whichever comes first.
+  function imagesLoading(scope, deadline) {
+    const H = window.innerHeight;
+    const pending = [];
+    for (const root of scope) {
+      for (const img of root.querySelectorAll('img')) {
+        if (img.complete || !(img.currentSrc || img.getAttribute('src'))) continue;
+        const r = img.getBoundingClientRect();
+        if (r.bottom >= -0.5 * H && r.top <= 1.5 * H) pending.push(img);
+      }
+    }
+    const left = deadline - performance.now();
+    if (!pending.length || left <= 0) return Promise.resolve();
+    return Promise.race([
+      Promise.all(pending.map(img => new Promise(resolve => {
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+        if (img.complete) resolve();
+      }))),
+      new Promise(resolve => setTimeout(resolve, left))
+    ]);
+  }
+
+  /*
+   * List markers. A marker that is text (a decimal, alphabetic or roman counter, or a string)
+   * is hidden with the glyphs (a ::marker inherits the transparent fill, and Chrome takes no
+   * other fill colour on it) but has no text node to sample: the lens draws it as a word of
+   * its own. Its text is the item's ordinal in the list's counter style with the style's
+   * suffix (". "); an outside marker ends where the item's first line begins (Chrome lays
+   * it out so: its margin is minus its own width), an inside one begins there, on the
+   * baseline of the item's first line. A shape (disc, circle, square, a <summary>'s
+   * triangle) is painted as a shape, which the hidden glyphs leave alone: it stays itself.
+   */
+  const alphabetic = letters => n => {
+    if (n < 1) return String(n);
+    let text = '';
+    for (let k = n; k > 0; k = Math.floor((k - 1) / letters.length)) text = letters[(k - 1) % letters.length] + text;
+    return text;
+  };
+  const ROMAN = [[1000, 'm'], [900, 'cm'], [500, 'd'], [400, 'cd'], [100, 'c'], [90, 'xc'], [50, 'l'], [40, 'xl'], [10, 'x'], [9, 'ix'], [5, 'v'], [4, 'iv'], [1, 'i']];
+  const roman = n => {
+    if (n < 1 || n > 3999) return String(n);
+    let text = '';
+    for (const [value, digits] of ROMAN) for (; n >= value; n -= value) text += digits;
+    return text;
+  };
+  const LATIN = 'abcdefghijklmnopqrstuvwxyz';
+  const COUNTER_STYLES = {
+    decimal: String,
+    'decimal-leading-zero': n => (Math.abs(n) < 10 ? `${n < 0 ? '-' : ''}0${Math.abs(n)}` : String(n)),
+    'lower-alpha': alphabetic(LATIN), 'lower-latin': alphabetic(LATIN),
+    'upper-alpha': n => alphabetic(LATIN)(n).toUpperCase(), 'upper-latin': n => alphabetic(LATIN)(n).toUpperCase(),
+    'lower-roman': roman, 'upper-roman': n => roman(n).toUpperCase(),
+    'lower-greek': alphabetic('αβγδεζηθικλμνξοπρστυφχψω')
+  };
+  // A computed CSS string ("→ ") as its text, or null for anything else.
+  const cssString = value => (/^"(?:[^"\\]|\\.)*"$/.test(value || '') ? value.slice(1, -1).replace(/\\(.)/g, '$1') : null);
+  // The ordinals of a list's items (HTML: start, reversed, value), memoised per list.
+  function ordinals(list, memo) {
+    let map = memo.get(list);
+    if (map) return map;
+    map = new Map(); memo.set(list, map);
+    const items = [...list.children].filter(el => el.localName === 'li' && getComputedStyle(el).display === 'list-item');
+    const ol = list.localName === 'ol'; const reversed = ol && list.reversed;
+    let value = ol && list.hasAttribute('start') ? list.start : reversed ? items.length : 1;
+    for (const item of items) {
+      const own = item.hasAttribute('value') ? parseInt(item.getAttribute('value'), 10) : NaN;
+      if (Number.isFinite(own)) value = own;
+      map.set(item, value);
+      value += reversed ? -1 : 1;
+    }
+    return map;
+  }
+  // The text a list item's marker draws, or null (no marker, an image, or a shape).
+  function markerText(li, memo) {
+    const cs = getComputedStyle(li);
+    if (cs.display !== 'list-item' || (cs.listStyleImage && cs.listStyleImage !== 'none')) return null;
+    const content = getComputedStyle(li, '::marker').content;
+    if (content && content !== 'normal') return cssString(content);
+    const own = cssString(cs.listStyleType);
+    if (own !== null) return own;
+    const format = COUNTER_STYLES[cs.listStyleType];
+    if (!format || !li.parentElement) return null;
+    const n = ordinals(li.parentElement, memo).get(li);
+    return n === undefined ? null : `${format(n)}. `;
+  }
+
+  // The content box's corner radii (px), as [[h, v] x 4] from the top left, or null.
+  function radiiOf(cs, width, height) {
+    const length = (value, of) => (String(value).endsWith('%') ? (parseFloat(value) / 100) * of : parseFloat(value) || 0);
+    const insets = [['Left', 'Top'], ['Right', 'Top'], ['Right', 'Bottom'], ['Left', 'Bottom']];
+    let any = false;
+    const radii = ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'].map((name, i) => {
+      const [hv, vv = hv] = String(cs[name] || '0px').trim().split(/\s+/);
+      const inset = side => (parseFloat(cs[`border${side}Width`]) || 0) + (parseFloat(cs[`padding${side}`]) || 0);
+      const r = [Math.max(0, length(hv, width) - inset(insets[i][0])), Math.max(0, length(vv, height) - inset(insets[i][1]))];
+      if (r[0] > 0.5 && r[1] > 0.5) any = true;
+      return r;
+    });
+    return any ? radii : null;
+  }
+
   async function buildModel(state) {
     const scope = state.ctx.scope;
     const model = {
       gen: ++state.gen, entries: [], boxes: new Map(), words: new Map(),
       styles: new Map(), opacities: new Map(), anchors: new Map(), excluded: new Map(), sizes: new Map(),
+      images: [], imageKeys: new Set(), print: layoutPrint(scope),
       darkPage: !state.light, docW: document.documentElement.scrollWidth, docH: document.documentElement.scrollHeight
     };
     const html = document.documentElement;
@@ -230,9 +555,8 @@
       model.opacities.set(el, value);
       return value;
     };
-    const styleOf = el => {
-      if (model.styles.has(el)) return model.styles.get(el);
-      const cs = getComputedStyle(el);
+    // How the text of el (or its marker: cs is then the ::marker's style) is drawn, or null.
+    const styleFrom = (el, cs) => {
       const rgba = parseColour(cs.color);
       const alpha = rgba ? rgba[3] * opacityOf(el) : 0;
       let info = null;
@@ -251,21 +575,41 @@
           transform: cs.textTransform,
           thin: cs.webkitFontSmoothing === 'antialiased',
           ascent: metrics.fontBoundingBoxAscent || size * 0.8,
+          descent: metrics.fontBoundingBoxDescent || size * 0.2,
           day, night: nightColour(day, emphasis, model.darkPage).concat(alpha),
           dayCss: `rgba(${day[0]},${day[1]},${day[2]},${alpha.toFixed(3)})`
         };
         info.nightCss = `rgba(${info.night.slice(0, 3).map(Math.round).join(',')},${alpha.toFixed(3)})`;
         info.key = `${font}|${info.dayCss}|${info.spacing}|${info.transform}`;
       }
+      return info;
+    };
+    const styleOf = el => {
+      if (model.styles.has(el)) return model.styles.get(el);
+      const info = styleFrom(el, getComputedStyle(el));
       model.styles.set(el, info);
       return info;
     };
     const excluded = el => {
       if (model.excluded.has(el)) return model.excluded.get(el);
-      const value = !!el.closest(EXCLUDE);
+      const value = !!el.closest(EXCLUDE) || !rendered(el);
       model.excluded.set(el, value);
       return value;
     };
+    // The content of a closed <details> (outside its <summary>) still has client rects (the
+    // browser lays it out when asked) but is not painted: it is no more drawn than shown.
+    function rendered(el) {
+      if (typeof el.checkVisibility === 'function') {
+        if (el.checkVisibility()) return true;
+        // (An element without a box of its own, display: contents, still shows its text.)
+        return getComputedStyle(el).display === 'contents' && !!el.parentElement && rendered(el.parentElement);
+      }
+      for (let d = el.closest('details:not([open])'); d; d = d.parentElement && d.parentElement.closest('details:not([open])')) {
+        const summary = el.closest('summary');
+        if (!summary || summary.parentElement !== d) return false;
+      }
+      return true;
+    }
     // Visually hidden text (a 1 px clip box) is not drawn by the page either.
     const tiny = el => {
       if (model.sizes.has(el)) return model.sizes.get(el);
@@ -303,7 +647,7 @@
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
       for (let node = walker.nextNode(); node; node = walker.nextNode()) {
         if (performance.now() - began > SLICE_MS) {
-          if (performance.now() - began > (state.perf.sliceMax || 0)) state.perf.sliceMax = performance.now() - began;
+          noteSlice(state, performance.now() - began, 'model');
           await nextTask();
           if (state.dead || state.gen !== model.gen) return null;
           began = performance.now();
@@ -322,6 +666,102 @@
           box.entries.push(entry);
         } else {
           model.entries.push(entry);
+        }
+      }
+    }
+    // List markers that are text: one word each, where Chrome draws it (see markerText()).
+    const lists = new Map();
+    for (const root of scope) {
+      for (const li of root.querySelectorAll('li')) {
+        if (performance.now() - began > SLICE_MS) {
+          noteSlice(state, performance.now() - began, 'modelMarkers');
+          await nextTask();
+          if (state.dead || state.gen !== model.gen) return null;
+          began = performance.now();
+        }
+        if (excluded(li)) continue;
+        const text = markerText(li, lists);
+        if (!text || !text.trim()) continue;
+        const style = styleFrom(li, getComputedStyle(li, '::marker'));
+        const span = style && tiny(li);
+        if (!span) continue;
+        const anchor = anchorOf(li, root);
+        const word = markerWord(li, text, style, anchor ? boxOrigin(anchor) : { x: -window.scrollX, y: -window.scrollY }, measure, styleOf);
+        if (!word) continue;
+        word.link = linkId(state, li);
+        const entry = { node: null, marker: li, words: [word], parent: li, style, link: word.link, anchor, top: span[0], bottom: span[1] };
+        if (anchor) {
+          let box = model.boxes.get(anchor);
+          if (!box) box = makeBox(anchor, root);
+          model.boxes.set(anchor, box);
+          box.entries.push(entry);
+        } else {
+          model.entries.push(entry);
+        }
+      }
+    }
+    // Images that can become particles: same origin (or allowed), loaded, rendered (not in a
+    // closed <details>), visible, at least IMAGE_MIN px, not inside a fixed ancestor. Each keeps its own placement: in
+    // the document, or in the container that clips it (its box, like text).
+    const imageOf = (img, root) => {
+      if (!state.kit.readable(img) || excluded(img) || !img.getClientRects().length) return null;
+      const cs = getComputedStyle(img);
+      if (cs.visibility !== 'visible' || cs.position === 'fixed') return null;
+      // The lens's own rule hides an image that became particles: its opacity is ours.
+      const own = state.imageRules.has(img) ? 1 : parseFloat(cs.opacity);
+      const opacity = (Number.isFinite(own) ? own : 1) * opacityOf(img.parentElement);
+      if (opacity < 0.02) return null;
+      const anchor = anchorOf(img.parentElement, root);
+      let box = null;
+      if (anchor) {
+        box = model.boxes.get(anchor) || makeBox(anchor, root);
+        if (box.fixed) return null;
+        model.boxes.set(anchor, box);
+      }
+      const r = img.getBoundingClientRect();
+      const px = name => parseFloat(cs[name]) || 0;
+      const left = r.left + px('borderLeftWidth') + px('paddingLeft'); const top = r.top + px('borderTopWidth') + px('paddingTop');
+      const w = r.width - px('borderLeftWidth') - px('borderRightWidth') - px('paddingLeft') - px('paddingRight');
+      const h = r.height - px('borderTopWidth') - px('borderBottomWidth') - px('paddingTop') - px('paddingBottom');
+      if (w < IMAGE_MIN || h < IMAGE_MIN) return null;
+      // (Fresh scroll offsets: the model is built in slices, and the reader may scroll.)
+      const origin = anchor ? boxOrigin(anchor) : { x: -window.scrollX, y: -window.scrollY };
+      const docY = top + window.scrollY;
+      const src = img.currentSrc || img.src;
+      const fit = { objectFit: cs.objectFit, objectPosition: cs.objectPosition };
+      const radii = radiiOf(cs, r.width, r.height);
+      // Its border, on the sides that show one (a square image only: a round one, and the
+      // portrait's soft oval, keep their own edge).
+      const sides = ['Top', 'Right', 'Bottom', 'Left'].map(side => {
+        const width = px(`border${side}Width`); const colour = parseColour(cs[`border${side}Color`]); const style = cs[`border${side}Style`];
+        return width >= 0.5 && colour && colour[3] > 0.05 && style !== 'none' && style !== 'hidden' ? { w: width, c: colour } : null;
+      });
+      const frame = !radii && !img.matches(PORTRAIT_SELECTOR) && sides.some(Boolean) ? { sides, pad: [px('paddingTop'), px('paddingRight'), px('paddingBottom'), px('paddingLeft')] } : null;
+      const oval = radii && radii.every(([rh, rv]) => rh >= 0.45 * w && rv >= 0.45 * h);
+      const shape = img.matches(PORTRAIT_SELECTOR) || oval ? 'oval' : radii ? radii.map(c => c.map(v => v.toFixed(1)).join(' ')).join(',') : '';
+      let id = state.imageIds.get(img);
+      if (!id) { id = ++state.imageCount; state.imageIds.set(img, id); }
+      return {
+        img, src, w, h, x: left - origin.x, y: top - origin.y, top: docY, bottom: docY + h, box, fit,
+        inset: [left - r.left, top - r.top], border: [r.width, r.height], frame,   // (inset, border: for a quick check that it moved)
+        radii: shape && shape !== 'oval' ? radii : null, oval: shape === 'oval', opacity, link: linkId(state, img),
+        gkey: `i${id}`,
+        // What the particles depend on (not where they are): equal keys share one sampling.
+        key: `${src}|${w.toFixed(1)}x${h.toFixed(1)}|${fit.objectFit} ${fit.objectPosition}|${shape}|${opacity.toFixed(2)}|${state.light ? 'light' : 'dark'}`
+      };
+    };
+    if (state.kit) {
+      for (const root of scope) {
+        for (const img of root.querySelectorAll('img')) {
+          if (performance.now() - began > SLICE_MS) {
+            noteSlice(state, performance.now() - began, 'modelImages');
+            await nextTask();
+            if (state.dead || state.gen !== model.gen) return null;
+            began = performance.now();
+          }
+          if (!img.isConnected) continue;
+          const item = imageOf(img, root);
+          if (item) { model.images.push(item); model.imageKeys.add(item.gkey); }
         }
       }
     }
@@ -374,6 +814,7 @@
    * otherwise. `mid` is the document y of the word's middle (it picks the band).
    */
   function wordsOf(state, model, entry) {
+    if (entry.words) return entry.words;    // a list marker, measured with the model
     const cached = model.words.get(entry.node);
     if (cached) return cached;
     const words = [];
@@ -396,7 +837,7 @@
       words.push({
         text: transform(node.data.slice(start, end), atStart),
         x: r.left - origin.x, y: r.top - origin.y, width: r.width, height: r.height,
-        mid: (r.top + r.bottom) / 2 + sy, style, link: entry.link, line: -1
+        mid: (r.top + r.bottom) / 2 + sy, style, link: entry.link, line: -1, node, from: start, to: end
       });
     };
     for (const match of node.data.matchAll(/\S+/gu)) {
@@ -418,6 +859,55 @@
     }
     model.words.set(entry.node, words);
     return words;
+  }
+
+  /*
+   * A list item's marker as a word (see markerText()): its text without the trailing space,
+   * in the group's coordinates (origin: where they start in the viewport now), on the
+   * baseline of the item's first line, which is the baseline of the first text drawn in it.
+   * An outside marker ends where that line begins, an inside one begins there (the content
+   * box's start plus text-indent). null when the item has no text to align it with, or is
+   * right to left (the site has none; its marker's order would need the bidi algorithm).
+   */
+  function markerWord(li, text, style, origin, measure, styleOf) {
+    const cs = getComputedStyle(li);
+    if (cs.direction === 'rtl') return null;
+    const walker = document.createTreeWalker(li, NodeFilter.SHOW_TEXT);
+    let node = walker.nextNode(); let at = -1;
+    for (; node; node = walker.nextNode()) {
+      at = node.data.search(/\S/);
+      if (at >= 0 && node.parentElement && !node.parentElement.closest(EXCLUDE)) break;
+    }
+    if (!node) return null;
+    const range = document.createRange();
+    range.setStart(node, at); range.setEnd(node, at + 1);
+    const first = range.getBoundingClientRect();
+    if (!first.height) return null;
+    const line = styleOf(node.parentElement);
+    let ascent = line && line.ascent;
+    if (!ascent) {
+      const own = getComputedStyle(node.parentElement);
+      measure.font = `${own.fontStyle} ${own.fontWeight} ${own.fontSize} ${own.fontFamily}`;
+      ascent = measure.measureText('Hg').fontBoundingBoxAscent || parseFloat(own.fontSize) * 0.8;
+    }
+    const baseline = first.top + ascent;
+    const r = li.getBoundingClientRect();
+    const px = name => parseFloat(cs[name]) || 0;
+    const indent = /px$/.test(cs.textIndent) ? parseFloat(cs.textIndent) : 0;
+    const start = r.left + px('borderLeftWidth') + px('paddingLeft') + indent;
+    measure.font = style.font;
+    const spaced = 'letterSpacing' in measure;
+    if (spaced) measure.letterSpacing = `${style.spacing}px`;
+    const shown = text.trimEnd();
+    const full = measure.measureText(text).width; const width = measure.measureText(shown).width;
+    if (spaced) measure.letterSpacing = '0px';
+    const left = cs.listStylePosition === 'inside' ? start : start - full;
+    const top = baseline - style.ascent;
+    return {
+      text: shown, x: left - origin.x, y: top - origin.y, width, height: style.ascent + style.descent,
+      mid: top + (style.ascent + style.descent) / 2 + window.scrollY, style, link: 0, line: -1,
+      node: null, marker: li, from: 0, to: 0, ref: [r.left - origin.x, r.top - origin.y]
+    };
   }
 
   // Visual lines of a group: words whose baselines agree, in reading order from the top.
@@ -476,14 +966,32 @@
    * centroid, where the particle goes. Returns the index of the next word.
    */
   let sampler = null;
-  function samplePass(words, from, list, random) {
+  let passCells = PASS_CELLS[0];
+  function samplerOf() {
     if (!sampler) {
       const canvas = makeCanvas(ATLAS_W, 1);
       const g = canvas.getContext('2d', { willReadFrequently: true });
-      sampler = { canvas, g, native: 'letterSpacing' in g };
+      sampler = { canvas, g, native: 'letterSpacing' in g, warm: false };
     }
-    const { canvas, g, native } = sampler;
-    let x = 0; let y = 0; let shelf = 0; let i = from; let pageH = SAMPLE_PAGE_H;
+    return sampler;
+  }
+  // The first text a page draws on a canvas sets up the browser's text rasteriser (about 30 ms
+  // on a 2020 Mac, once per page): it is done in a task of its own, before any word is
+  // measured or sampled, so it does not add to a building slice.
+  function warmSampler(state) {
+    const s = samplerOf();
+    if (s.warm) return;
+    const began = performance.now();
+    s.canvas.height = 24;                // (a pass sizes it again)
+    s.g.font = getComputedStyle(document.body).font || '16px serif';
+    s.g.fillText('a', 0, 16);
+    s.warm = true;
+    noteSlice(state, performance.now() - began, 'warm');
+  }
+  function samplePass(words, from, list, random) {
+    const began = performance.now();
+    const { canvas, g, native } = samplerOf();
+    let x = 0; let y = 0; let shelf = 0; let i = from; let pageH = SAMPLE_PAGE_H; let cells = 0;
     for (; i < words.length; i++) {
       const w = words[i]; const st = w.style;
       const padX = Math.ceil(0.4 * st.size + Math.abs(st.spacing)); const padY = Math.ceil(0.2 * st.size);
@@ -491,11 +999,13 @@
       const pw = cols * SUPER; const ph = rows * SUPER;
       w.slot = null;
       if (pw > ATLAS_W || ph > ATLAS_H) continue;
+      // A pass harvests at most passCells cells (one larger word alone), so it fits a slice.
+      if (i > from && cells + cols * rows > passCells) break;
       if (i === from && ph > pageH) pageH = ph;
       if (x + pw > ATLAS_W) { x = 0; y += shelf + 2; shelf = 0; }
       if (y + ph > pageH) break;
       w.slot = [x, y, cols, rows, padX, padY];
-      x += pw + 2; shelf = Math.max(shelf, ph);
+      x += pw + 2; shelf = Math.max(shelf, ph); cells += cols * rows;
     }
     const height = y + shelf;
     if (!height) return Math.max(i, from + 1);
@@ -546,62 +1056,642 @@
         }
       }
     }
+    // The next pass takes as many cells as fit PASS_MS at this pass's pace (smoothed).
+    const spent = performance.now() - began;
+    if (cells > 0 && spent > 0.05) passCells = clamp(0.5 * passCells + 0.5 * cells * PASS_MS / spent, PASS_CELLS[0], PASS_CELLS[1]);
     return i;
   }
 
-  // The homepage portrait: luminance sampled into a point cloud in desaturated original colour.
-  function samplePhoto(img, list, random) {
-    if (!img || !img.complete || !img.naturalWidth) return null;
-    const cs = getComputedStyle(img);
-    const r = img.getBoundingClientRect();
-    if (cs.visibility !== 'visible' || r.width < 8 || r.height < 8) return null;
-    const px = n => parseFloat(cs[n]) || 0;
-    const box = {
-      left: r.left + window.scrollX, top: r.top + window.scrollY, width: r.width, height: r.height,
-      border: [px('borderTopWidth'), px('borderRightWidth'), px('borderBottomWidth'), px('borderLeftWidth')],
-      pad: [px('paddingTop'), px('paddingRight'), px('paddingBottom'), px('paddingLeft')],
-      borderColour: cs.borderTopColor, opacity: parseFloat(cs.opacity) || 1, img
+  /*
+   * Images. A job decodes one image as it is displayed (off the main thread for a raster
+   * file) and samples it into particles relative to its content box. The result is cached
+   * by the image's key (source, size, fit, shape, opacity), so a moved image is only
+   * translated and an evicted one comes back without decoding again.
+   */
+  const kinds = new Map();               // src -> 'photo' | 'graphic', for the page's lifetime
+
+  // A test for the content box's rounded corners (CSS px from its top left), or null.
+  function cornerTest(item) {
+    const radii = item.radii;
+    if (!radii) return null;
+    const w = item.w; const h = item.h;
+    const [tl, tr, br, bl] = radii;
+    const corner = (x, y, cx, cy, [rh, rv]) => { const u = (x - cx) / rh; const v = (y - cy) / rv; return u * u + v * v <= 1; };
+    return (x, y) => {
+      if (x < tl[0] && y < tl[1]) return corner(x, y, tl[0], tl[1], tl);
+      if (x > w - tr[0] && y < tr[1]) return corner(x, y, w - tr[0], tr[1], tr);
+      if (x > w - br[0] && y > h - br[1]) return corner(x, y, w - br[0], h - br[1], br);
+      if (x < bl[0] && y > h - bl[1]) return corner(x, y, bl[0], h - bl[1], bl);
+      return true;
     };
-    const cx = box.left + box.border[3] + box.pad[3]; const cy = box.top + box.border[0] + box.pad[0];
-    const cw = box.width - box.border[1] - box.border[3] - box.pad[1] - box.pad[3];
-    const ch = box.height - box.border[0] - box.border[2] - box.pad[0] - box.pad[2];
-    const cols = Math.max(1, Math.round(cw / PHOTO_STEP)); const rows = Math.max(1, Math.round(ch / PHOTO_STEP));
-    const g = makeCanvas(cols, rows).getContext('2d', { willReadFrequently: true });
-    g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-    let data;
-    try { g.drawImage(img, 0, 0, cols, rows); data = g.getImageData(0, 0, cols, rows).data; } catch (error) { return null; }
-    const dx = cw / cols; const dy = ch / rows;
-    for (let j = 0; j < rows; j++) {
-      for (let i = 0; i < cols; i++) {
-        const k = (j * cols + i) * 4;
-        const cr = data[k]; const cg = data[k + 1]; const cb = data[k + 2];
-        const l = luma([cr, cg, cb]);
-        // Brightness by luminance with a little more contrast; the square's edges
-        // fade into the night, so the cloud is an oval with soft borders.
-        const vignette = 1 - smooth(0.68, 1.08, Math.hypot((i + 0.5) / cols * 2 - 1, (j + 0.5) / rows * 2 - 1));
-        const glow = Math.pow(smooth(PHOTO_MIN_LUMA, 0.82, l), 0.85) * vignette;
-        if (glow < 0.04) continue;
-        const grey = l * 255;
-        const night = [cr, cg, cb].map(v => Math.min(255, (grey + (v - grey) * (1 - PHOTO_DESATURATE)) * PHOTO_LIFT + 18));
-        const x = cx + (i + 0.5 + (random() - 0.5) * 0.6) * dx;
-        const y = cy + (j + 0.5 + (random() - 0.5) * 0.6) * dy;
-        // Full alpha on the day page (it dissolves out of the photo), luminance at night.
-        pushParticle(list, x, y, random(), 0.85 + 0.7 * glow, 0, PHOTO_FONT, -1 - y, [cr, cg, cb], night,
-          (0.12 + 0.88 * glow) * box.opacity, box.opacity);
+  }
+
+  // A box blur of a w x h field (window 2r + 1, edges repeated): two passes of running sums.
+  // (Synchronous, so every call shares one scratch field: photos are sampled side by side,
+  // and their large temporary arrays are what makes the collector pause.)
+  let blurScratch = new Float32Array(0);
+  function boxBlur(src, w, h, r) {
+    if (blurScratch.length < w * h) blurScratch = new Float32Array(w * h);
+    const tmp = blurScratch; const out = new Float32Array(w * h); const k = 1 / (2 * r + 1);
+    for (let y = 0; y < h; y++) {
+      const row = y * w; let sum = 0;
+      for (let x = -r; x <= r; x++) sum += src[row + clamp(x, 0, w - 1)];
+      for (let x = 0; x < w; x++) {
+        tmp[row + x] = sum * k;
+        sum += src[row + Math.min(w - 1, x + r + 1)] - src[row + Math.max(0, x - r)];
       }
     }
-    return box;
+    for (let x = 0; x < w; x++) {
+      let sum = 0;
+      for (let y = -r; y <= r; y++) sum += tmp[clamp(y, 0, h - 1) * w + x];
+      for (let y = 0; y < h; y++) {
+        out[y * w + x] = sum * k;
+        sum += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x];
+      }
+    }
+    return out;
+  }
+
+  // The tone curve of a photo's light (0..1) before local contrast, and the chance that a
+  // cell of that light holds a star.
+  const photoGlow = l => Math.pow(smooth(PHOTO_MIN_LUMA, 0.86, l), PHOTO_GAMMA);
+  const photoPresence = glow => (glow < 0.04 ? 0 : Math.min(1, glow / PHOTO_DENSE));
+  // Pixels per CSS px at which a photo is drawn for its cells (see photoParticles).
+  const photoRatio = item => Math.min(PHOTO_SUPER / IMAGE_STEP, Math.sqrt(PHOTO_FINE_PX / (item.w * item.h)));
+
+  /*
+   * A photo, drawn at up to PHOTO_SUPER pixels per side of the finest cell, then gathered
+   * into cells. The grid is set by the stars the photo will hold, not by its area alone:
+   * the expected number of stars per pixel (from the same tone curve) gives the step that
+   * spends IMAGE_BUDGET (or item.budget) on them, so a night photo of thin lit windows gets
+   * a finer grid than a bright sky of the same size. A cell's light leans from its mean
+   * toward its outlier (PHOTO_PEAK): its brightest pixel where that stands out of the cells
+   * around it more than its darkest does, else its darkest; its colour is the colour of its
+   * light (luminance-weighted). So thin bright lines (lit windows, a horizon, surf) and thin
+   * dark ones (bare branches, a bird against the sky) both survive the gathering. Then local
+   * contrast (a cell is pushed away from the mean of its neighbourhood, so a gull against
+   * the sky or a figure under trees stands out of a broad gradient) and the tone curve.
+   * Bright cells each hold a star; dimmer ones only now and then, a little brighter, so dim
+   * areas thin out into a sparse sky instead of a uniform grey haze. Should the stars still
+   * exceed the budget, every cell's chance is scaled down (and the survivors brightened the
+   * same way). Size and alpha follow the light. In slices; resolves { list, step }, or null
+   * if live() turns false.
+   */
+  async function photoParticles(state, item, data, W, H, random, live) {
+    let began = performance.now();
+    const breathe = async () => {
+      if (performance.now() - began < SLICE_MS) return true;
+      noteSlice(state, performance.now() - began, 'photo');
+      await nextTask();
+      began = performance.now();
+      return live();
+    };
+    // The expected stars per pixel on the tone curve (luminance is computed again below rather
+    // than kept: one array less per photo).
+    const lumAt = k => (0.2126 * data[k] + 0.7152 * data[k + 1] + 0.0722 * data[k + 2]) / 255;
+    let expected = 0;
+    for (let y = 0, p = 0; y < H; y++) {
+      if (!(await breathe())) return null;
+      for (let x = 0; x < W; x++, p++) {
+        const k = p * 4;
+        if (data[k + 3] >= 13) expected += photoPresence(photoGlow(lumAt(k)));
+      }
+    }
+    const area = item.w * item.h;
+    const share = Math.max(expected / (W * H), 1e-3);
+    const budget = item.budget || IMAGE_BUDGET;
+    const step = Math.max(IMAGE_STEP, Math.sqrt((area * share) / budget), Math.sqrt(area / PHOTO_CELLS_MAX), 1 / (W / item.w));
+    const cols = Math.max(1, Math.round(item.w / step)); const rows = Math.max(1, Math.round(item.h / step));
+    // Gather the pixels into cells: mean and brightest luminance, alpha, and the colour of
+    // the light (rgb weighted by luminance).
+    const n = cols * rows;
+    const colOf = new Int32Array(W);
+    for (let x = 0; x < W; x++) colOf[x] = Math.min(cols - 1, Math.floor((x * cols) / W));
+    const sumL = new Float32Array(n); const maxL = new Float32Array(n); const minL = new Float32Array(n).fill(1);
+    const sumA = new Float32Array(n); const rgb = new Float32Array(n * 3); const count = new Float32Array(n);
+    for (let y = 0, p = 0; y < H; y++) {
+      if (!(await breathe())) return null;
+      const row = Math.min(rows - 1, Math.floor((y * rows) / H)) * cols;
+      for (let x = 0; x < W; x++, p++) {
+        const c = row + colOf[x]; const k = p * 4; const l = lumAt(k);
+        sumL[c] += l; if (l > maxL[c]) maxL[c] = l; if (l < minL[c]) minL[c] = l;
+        sumA[c] += data[k + 3]; count[c]++;
+        const w = l + 0.004;
+        rgb[c * 3] += data[k] * w; rgb[c * 3 + 1] += data[k + 1] * w; rgb[c * 3 + 2] += data[k + 2] * w;
+      }
+    }
+    // Each cell leans toward its outlier: the brightest pixel where it stands out of a darker
+    // neighbourhood (a lit window, a horizon), the darkest where it cuts into a lighter one (a
+    // bare branch or a bird against the sky), and stays near its mean where neither does.
+    if (!(await breathe())) return null;
+    const means = new Float32Array(n);
+    for (let c = 0; c < n; c++) means[c] = count[c] ? sumL[c] / count[c] : 0;
+    const around = boxBlur(means, cols, rows, PHOTO_OUTLIER_R);
+    if (!(await breathe())) return null;
+    const cell = new Float32Array(n);
+    for (let c = 0; c < n; c++) {
+      const mean = means[c]; const up = maxL[c] - around[c]; const down = around[c] - minL[c];
+      const lean = PHOTO_PEAK * clamp(Math.abs(up - down) / PHOTO_OUTLIER_SOFT, 0, 1);
+      cell[c] = mean + lean * ((up >= down ? maxL[c] : minL[c]) - mean);
+    }
+    if (!(await breathe())) return null;
+    // Exposure: a cell in a dark neighbourhood (rocks under a bright sky, a facade at dusk)
+    // is lifted toward PHOTO_KEY, at most PHOTO_EXPOSE_MAX times; light areas keep their light.
+    const wide = boxBlur(cell, cols, rows, Math.max(2, Math.round(PHOTO_EXPOSE_R * Math.min(cols, rows))));
+    const gain = new Float32Array(n);
+    for (let j = 0; j < rows; j++) {
+      if (!(await breathe())) return null;
+      for (let c = j * cols, end = c + cols; c < end; c++) {
+        gain[c] = clamp(Math.pow(PHOTO_KEY / Math.max(wide[c], 1e-3), PHOTO_EXPOSE), 1, PHOTO_EXPOSE_MAX);
+        cell[c] = Math.min(1, cell[c] * gain[c]);
+      }
+    }
+    if (!(await breathe())) return null;
+    const near = boxBlur(cell, cols, rows, Math.max(2, Math.round(PHOTO_LOCAL_R * Math.min(cols, rows))));
+    // Each cell's glow, and the stars they would hold: over the budget, all thin out alike.
+    const glows = new Float32Array(n);
+    let stars = 0;
+    for (let j = 0; j < rows; j++) {
+      if (!(await breathe())) return null;
+      for (let i = 0; i < cols; i++) {
+        const c = j * cols + i;
+        const a = count[c] ? sumA[c] / count[c] / 255 : 0;
+        if (a < 0.05) continue;
+        const lit = clamp(cell[c] + PHOTO_LOCAL * (cell[c] - near[c]), 0, 1);
+        // A round image (and the portrait) fades into the night at an oval edge.
+        const vignette = item.oval ? 1 - smooth(0.68, 1.08, Math.hypot((i + 0.5) / cols * 2 - 1, (j + 0.5) / rows * 2 - 1)) : 1;
+        const glow = photoGlow(lit) * vignette * a;
+        glows[c] = glow; stars += photoPresence(glow);
+      }
+    }
+    const thin = Math.min(1, budget / Math.max(1, stars));
+    const list = particleList();
+    const dx = item.w / cols; const dy = item.h / rows;
+    const grain = Math.pow(step / IMAGE_STEP, PHOTO_GROW);
+    const font = -PHOTO_FONT * Math.sqrt(step / IMAGE_STEP);   // negative: drawn as soft stars
+    const inside = cornerTest(item);
+    for (let j = 0; j < rows; j++) {
+      if (!(await breathe())) return null;
+      for (let i = 0; i < cols; i++) {
+        const c = j * cols + i;
+        const glow = glows[c];
+        const presence = photoPresence(glow) * thin;
+        if (!presence || random() > presence) continue;
+        const light = Math.min(1, glow * (1 + PHOTO_SPARSE_LIFT * (1 / presence - 1)));
+        const x = (i + 0.5 + (random() - 0.5) * PHOTO_JITTER) * dx;
+        const y = (j + 0.5 + (random() - 0.5) * PHOTO_JITTER) * dy;
+        if (inside && !inside(x, y)) continue;
+        const a = sumA[c] / count[c] / 255;
+        const weight = sumL[c] + 0.004 * count[c];
+        const day = [rgb[c * 3] / weight, rgb[c * 3 + 1] / weight, rgb[c * 3 + 2] / weight];
+        const grey = luma(day) * 255; const lift = PHOTO_LIFT * gain[c];
+        const night = day.map(v => Math.min(255, (grey + (v - grey) * (1 - PHOTO_DESATURATE)) * lift + 18));
+        // Every star has its own magnitude: a little smaller and fainter, or not.
+        const magnitude = 1 - PHOTO_MAGNITUDE * random();
+        const size = grain * (PHOTO_SIZE[0] + (PHOTO_SIZE[1] - PHOTO_SIZE[0]) * light) * (0.75 + 0.25 * magnitude);
+        // Full alpha on the day page (it dissolves out of the photo), its light at night.
+        pushParticle(list, x, y, random(), size, 0, font, -1 - y, day, night,
+          (0.14 + 0.86 * light) * magnitude * item.opacity, a * item.opacity);
+      }
+    }
+    noteSlice(state, performance.now() - began, 'photo');
+    return { list, step };
+  }
+
+  // A graphic's ground: its commonest colour and the colours about as light that cover much
+  // of it (the panels a figure is drawn on), or null when it is mostly transparent. Read on
+  // about 4096 points; also returns the share of ink among them.
+  function groundOf(data, width, height) {
+    const stride = Math.max(1, Math.floor(Math.sqrt((width * height) / 4096)));
+    const counts = new Map(); let points = 0;
+    for (let y = stride >> 1; y < height; y += stride) {
+      for (let x = stride >> 1; x < width; x += stride) {
+        const i = (y * width + x) * 4; points++;
+        const key = data[i + 3] < 128 ? -1 : (data[i] >> 4) << 8 | (data[i + 1] >> 4) << 4 | (data[i + 2] >> 4);
+        let c = counts.get(key);
+        if (!c) { c = [0, 0, 0, 0]; counts.set(key, c); }
+        c[0]++; c[1] += data[i]; c[2] += data[i + 1]; c[3] += data[i + 2];
+      }
+    }
+    const ranked = [...counts.entries()].sort((a, b) => b[1][0] - a[1][0]);
+    if (!ranked.length || ranked[0][0] === -1) return { colours: null, stride };
+    const mean = c => [c[1] / c[0], c[2] / c[0], c[3] / c[0]];
+    const colours = [mean(ranked[0][1])]; const l0 = luma(colours[0]);
+    for (const [key, c] of ranked.slice(1, 12)) {
+      if (key === -1 || c[0] < BG_SHARE * points || colours.length >= BG_COLOURS) continue;
+      const m = mean(c);
+      if (Math.abs(luma(m) - l0) <= BG_LUMA) colours.push(m);
+    }
+    return { colours, stride };
+  }
+
+  /*
+   * A graphic, drawn at GRAPHIC_SUPER subsamples per cell side at the finest step. A
+   * subsample's ink is its distance from the nearest ground colour around it (after
+   * compositing its alpha over the commonest), or its alpha when the ground is transparent.
+   * The grounds around a subsample are those its block of BLOCK subsamples and the blocks
+   * next to it show, so a light box outline between a white box and a tinted panel is ink,
+   * and so are the letters on a pale pill. The step grows with the ink (so a sparse line
+   * drawing keeps the finest step and its labels); each cell's mean ink is its coverage, and
+   * the particle sits at the ink centroid, in the ink's own colour turned to the night as
+   * text is. The inside of a solid fill is drawn sparse and dimmer. Resolves the particles
+   * (CSS px from the content box's top left), or null if stopped.
+   */
+  async function graphicParticles(state, item, data, W, H, random, live) {
+    const ratio = W / item.w;                      // subsamples per CSS px
+    const { colours, stride } = groundOf(data, W, H);
+    const bg = colours; const base = bg ? bg[0] : null;
+    const dark = base ? luma(base) < 0.5 : !state.light;
+    const MAX_DIST = 441.673;                      // the distance from black to white
+    const BLOCK = 8;                               // subsamples per block side (local grounds)
+    const all = bg ? (1 << bg.length) - 1 : 0;
+    const bw = Math.ceil(W / BLOCK); const bh = Math.ceil(H / BLOCK);
+    let masks = null;                              // per block: the ground colours around it (bits)
+    let began = performance.now();
+    if (bg && bg.length > 1) {
+      // (A ground counts in a block where it covers a third of it or more: the antialiased
+      // rim of a grey line is not a grey panel.)
+      const K = bg.length; const counts = new Uint8Array(bw * bh * K); const limit = (1.5 * INK_NEAR * MAX_DIST) ** 2;
+      for (let y = 0; y < H; y += 2) {
+        if (performance.now() - began > SLICE_MS) {
+          noteSlice(state, performance.now() - began, 'cells');
+          await nextTask();
+          if (!live()) return null;
+          began = performance.now();
+        }
+        const row = (y >> 3) * bw;
+        for (let x = 0, i = y * W * 4; x < W; x += 2, i += 8) {
+          const a = data[i + 3] / 255;
+          const r = data[i] * a + base[0] * (1 - a); const g = data[i + 1] * a + base[1] * (1 - a); const b = data[i + 2] * a + base[2] * (1 - a);
+          // (Its nearest ground: a pale blue panel lies within reach of white as well.)
+          let near = -1; let least = limit;
+          for (let k = 0; k < bg.length; k++) {
+            const c = bg[k]; const dr = r - c[0]; const dg = g - c[1]; const db = b - c[2];
+            const dd = dr * dr + dg * dg + db * db;
+            if (dd < least) { least = dd; near = k; }
+          }
+          if (near >= 0) counts[(row + (x >> 3)) * K + near]++;
+        }
+      }
+      const own = new Uint8Array(bw * bh); const enough = (BLOCK / 2) ** 2 / 3;
+      for (let q = 0; q < bw * bh; q++) for (let k = 0; k < K; k++) if (counts[q * K + k] >= enough) own[q] |= 1 << k;
+      masks = new Uint8Array(bw * bh);
+      for (let by = 0; by < bh; by++) {
+        for (let bx = 0; bx < bw; bx++) {
+          let m = 0;
+          for (let j = Math.max(0, by - 1); j <= Math.min(bh - 1, by + 1); j++) for (let k = Math.max(0, bx - 1); k <= Math.min(bw - 1, bx + 1); k++) m |= own[j * bw + k];
+          masks[by * bw + bx] = m || all;          // (inside a large ink area: every ground)
+        }
+      }
+    }
+    const ink = new Float32Array(5);               // ink, r, g, b and nearest ground of the last subsample read
+    const read = (i, m) => {
+      const a = data[i + 3] / 255;
+      let r = data[i]; let g = data[i + 1]; let b = data[i + 2];
+      if (!base) { ink[0] = a; ink[1] = r; ink[2] = g; ink[3] = b; ink[4] = -1; return a; }
+      r = r * a + base[0] * (1 - a); g = g * a + base[1] * (1 - a); b = b * a + base[2] * (1 - a);
+      let d = Infinity; let near = -1;
+      for (let k = 0; k < bg.length; k++) {
+        if (!((m >> k) & 1)) continue;
+        const c = bg[k]; const dr = r - c[0]; const dg = g - c[1]; const db = b - c[2];
+        const dd = dr * dr + dg * dg + db * db;
+        if (dd < d) { d = dd; near = k; }
+      }
+      const v = smooth(INK_NEAR, INK_FAR, Math.sqrt(d) / MAX_DIST);
+      ink[0] = v; ink[1] = r; ink[2] = g; ink[3] = b; ink[4] = near;
+      return v;
+    };
+    // The tinted grounds (see TINT_STEP): every ground but the commonest that stands INK_NEAR
+    // or more from it. Their squares are counted in the first pass of cells (they do not
+    // depend on its step): per square, the subsamples of each ground (slot 0: the main ground
+    // and the grounds as near it).
+    const K = bg ? bg.length : 0;
+    const tintOf = new Float32Array(Math.max(1, K));   // per ground: its distance from the main one (0: not a tint)
+    for (let k = 1; k < K; k++) {
+      const c = bg[k]; const dist = Math.hypot(c[0] - base[0], c[1] - base[1], c[2] - base[2]) / MAX_DIST;
+      tintOf[k] = dist >= INK_NEAR ? dist : 0;
+    }
+    const tinted = tintOf.some(v => v > 0);
+    const tk = Math.max(1, TINT_STEP * ratio);     // subsamples per tint square side
+    const tcols = Math.max(1, Math.floor(W / tk)); const trows = Math.max(1, Math.floor(H / tk));
+    const tintCol = new Int32Array(W);
+    for (let x = 0; x < W; x++) tintCol[x] = Math.min(tcols - 1, Math.floor(x / tk));
+    let tintCounts = null;                         // per square and ground (K each), filled once ...
+    let tintRGB = null;                            // ... and per square the colour summed over its tinted subsamples
+    const maskAt = (x, y) => (masks ? masks[(y >> 3) * bw + (x >> 3)] : all);
+    // The share of ink, on the ground's sample points, sets the step.
+    let sum = 0; let points = 0;
+    for (let y = stride >> 1; y < H; y += stride) for (let x = stride >> 1; x < W; x += stride) { sum += read((y * W + x) * 4, maskAt(x, y)); points++; }
+    const share = Math.min(1, (INK_SPREAD * sum) / Math.max(1, points));
+    // One pass of cells at a step: per cell the ink summed, its centroid and colour
+    // (ink-weighted sums) and its coverage; count is the number of cells with a particle.
+    const pass = async step => {
+      const cols = Math.max(1, Math.floor((W / ratio) / step)); const rows = Math.max(1, Math.floor((H / ratio) / step));
+      const kx = W / cols; const ky = H / rows;    // subsamples per cell, across and down
+      const colOf = new Int32Array(W); const colArea = new Float32Array(cols); const rowArea = new Float32Array(rows);
+      for (let x = 0; x < W; x++) { const c = Math.min(cols - 1, Math.floor(x / kx)); colOf[x] = c; colArea[c]++; }
+      const sums = new Float32Array(cols * rows); const mx = new Float32Array(cols * rows); const my = new Float32Array(cols * rows);
+      const rgb = new Float32Array(cols * rows * 3); const cover = new Float32Array(cols * rows);
+      let count = 0; began = performance.now();
+      const counting = tinted && !tintCounts;
+      const tints = counting ? new Uint16Array(tcols * trows * K) : null;
+      const tintSum = counting ? new Float32Array(tcols * trows * 3) : null;
+      for (let cj = 0; cj < rows; cj++) {
+        const y0 = Math.round(cj * ky); const y1 = cj === rows - 1 ? H : Math.round((cj + 1) * ky);
+        rowArea[cj] = Math.max(1, y1 - y0);
+        for (let y = y0; y < y1; y++) {
+          let i = y * W * 4; const mrow = (y >> 3) * bw;
+          const trow = counting ? Math.min(trows - 1, Math.floor(y / tk)) * tcols : 0;
+          for (let x = 0; x < W; x++, i += 4) {
+            if (read(i, masks ? masks[mrow + (x >> 3)] : all) <= 0) {
+              if (counting && ink[4] >= 0) {
+                const q = trow + tintCol[x]; const slot = tintOf[ink[4]] > 0 ? ink[4] : 0;
+                tints[q * K + slot]++;
+                if (slot) { tintSum[q * 3] += ink[1]; tintSum[q * 3 + 1] += ink[2]; tintSum[q * 3 + 2] += ink[3]; }
+              }
+              continue;
+            }
+            const v = ink[0]; const c = cj * cols + colOf[x];
+            sums[c] += v; mx[c] += v * (x + 0.5); my[c] += v * (y + 0.5);
+            rgb[c * 3] += v * ink[1]; rgb[c * 3 + 1] += v * ink[2]; rgb[c * 3 + 2] += v * ink[3];
+          }
+        }
+        for (let ci = 0; ci < cols; ci++) {
+          const c = cj * cols + ci;
+          cover[c] = sums[c] / (colArea[ci] * rowArea[cj]);
+          if (cover[c] >= COVER_MIN) count++;
+        }
+        const spent = performance.now() - began;
+        if (spent > SLICE_MS) {
+          noteSlice(state, spent, 'cells');
+          await nextTask();
+          if (!live()) return null;
+          began = performance.now();
+        }
+      }
+      // The inside of a fill: a cell covered, as are its four neighbours, all of about one
+      // colour (a letter or a line on the fill breaks it). It costs FILL_KEEP of a particle.
+      const fills = new Uint8Array(cols * rows);
+      const near = (a, b) => {
+        const wa = sums[a]; const wb = sums[b];
+        const dr = rgb[a * 3] / wa - rgb[b * 3] / wb; const dg = rgb[a * 3 + 1] / wa - rgb[b * 3 + 1] / wb; const db = rgb[a * 3 + 2] / wa - rgb[b * 3 + 2] / wb;
+        return dr * dr + dg * dg + db * db <= (FILL_SIMILAR * MAX_DIST) ** 2;
+      };
+      let cost = 0;
+      for (let cj = 0; cj < rows; cj++) {
+        if (performance.now() - began > SLICE_MS) {
+          noteSlice(state, performance.now() - began, 'cells');
+          await nextTask();
+          if (!live()) return null;
+          began = performance.now();
+        }
+        for (let ci = 0; ci < cols; ci++) {
+          const c = cj * cols + ci;
+          if (cover[c] < COVER_MIN) continue;
+          const inside = cover[c] >= FILL_COVER && ci > 0 && cj > 0 && ci < cols - 1 && cj < rows - 1 &&
+            cover[c - 1] >= FILL_COVER && cover[c + 1] >= FILL_COVER && cover[c - cols] >= FILL_COVER && cover[c + cols] >= FILL_COVER &&
+            near(c, c - 1) && near(c, c + 1) && near(c, c - cols) && near(c, c + cols);
+          fills[c] = inside ? 1 : 0;
+          cost += inside ? FILL_KEEP : 1;
+        }
+      }
+      noteSlice(state, performance.now() - began, 'cellsEnd');
+      if (counting) { tintCounts = tints; tintRGB = tintSum; }
+      return { step, cols, rows, sums, mx, my, rgb, cover, count, fills, cost };
+    };
+    // The share is an estimate (the rims of thin lines count in full, a fill's inside costs
+    // less): far off the budget, the cells are made once more at a step changed by the
+    // difference (as lines would need it).
+    const budget = GRAPHIC_BUDGET;
+    let grid = await pass(Math.max(GRAPHIC_STEP, Math.sqrt((item.w * item.h * share) / budget), 1 / ratio));
+    if (grid && (grid.cost > budget * 1.15 || (grid.cost < budget * 0.6 && grid.step > Math.max(GRAPHIC_STEP, 1 / ratio) * 1.08))) {
+      await nextTask();
+      if (!live()) return null;
+      grid = await pass(Math.max(GRAPHIC_STEP, 1 / ratio, grid.step * Math.pow(Math.max(1, grid.cost) / budget, 0.75)));
+    }
+    if (!grid) return null;
+    const { step, cols, rows, sums, mx, my, rgb, cover, fills } = grid;
+    await nextTask();                              // the particles take a slice of their own
+    if (!live()) return null;
+    const emitted = performance.now();
+    const list = particleList();
+    const grain = clamp(step / (STEP_EM * 16), 1, 1.4);
+    const inside = cornerTest(item);
+    began = emitted;
+    for (let cj = 0; cj < rows; cj++) {
+      if (performance.now() - began > SLICE_MS) {
+        noteSlice(state, performance.now() - began, 'emit');
+        await nextTask();
+        if (!live()) return null;
+        began = performance.now();
+      }
+      for (let ci = 0; ci < cols; ci++) {
+        const c = cj * cols + ci; const cov = cover[c];
+        if (cov < COVER_MIN) continue;
+        const weight = sums[c];
+        const b = smooth(COVER_MIN, COVER_FULL, cov);
+        const fill = fills[c] === 1;
+        if (fill && random() > FILL_KEEP) continue;
+        const jitter = (JITTER[0] + (JITTER[1] - JITTER[0]) * b) * step;
+        const x = mx[c] / weight / ratio + (random() - 0.5) * 2 * jitter;
+        const y = my[c] / weight / ratio + (random() - 0.5) * 2 * jitter;
+        if (inside && !inside(x, y)) continue;
+        const day = [rgb[c * 3] / weight, rgb[c * 3 + 1] / weight, rgb[c * 3 + 2] / weight];
+        // Ink lighter than its own ground (white letters on a blue tile) is light ink, as on a
+        // dark page: the ground it stood out from is gone, so it must stay bright.
+        const night = nightColour(day, false, dark || (base && luma(day) > luma(base)), true);
+        const size = grain * (SIZE_MIN + (SIZE_MAX - SIZE_MIN) * clamp(b + (random() - 0.5) * 0.25, 0, 1));
+        const alpha = item.opacity * (ALPHA_MIN + (1 - ALPHA_MIN) * b) * (1 - GRAIN * random());
+        pushParticle(list, x, y, random(), size, 0, GRAPHIC_FONT, -1 - y, day, night, alpha * (fill ? FILL_ALPHA : 1), alpha);
+      }
+    }
+    if (tintCounts) {
+      // The tinted grounds: a square that is mostly one of them holds a grain with a chance
+      // that grows with its own colour's distance from the main ground (more where it meets
+      // another ground, so a panel keeps its edge), in its own colour turned to the night: a
+      // light grey box that lies nearer a pale lavender panel than white is a faint grey, not
+      // lavender. Over TINT_BUDGET, all thin out alike.
+      // (Owner of a square: a tint k, MAIN for the main ground, or -1 for ink or a mixture.)
+      // In slices of their own, row by row: a large figure has a hundred thousand squares.
+      const breathe = async () => {
+        if (performance.now() - began < SLICE_MS) return true;
+        noteSlice(state, performance.now() - began, 'tint');
+        await nextTask();
+        began = performance.now();
+        return live();
+      };
+      noteSlice(state, performance.now() - began, 'emit');
+      await nextTask();
+      if (!live()) return null;
+      began = performance.now();
+      const MAIN = -2; const area = tk * tk; const owner = new Int8Array(tcols * trows).fill(-1);
+      for (let q = 0; q < tcols * trows; q++) {
+        if (q % tcols === 0 && !(await breathe())) return null;
+        let best = 0; let most = 0;
+        for (let k = 1; k < K; k++) { const n = tintCounts[q * K + k]; if (n > most) { most = n; best = k; } }
+        if (most >= TINT_SHARE * area) owner[q] = best;
+        else if (tintCounts[q * K] >= TINT_SHARE * area) owner[q] = MAIN;
+      }
+      const chance = new Float32Array(tcols * trows); const distance = new Float32Array(tcols * trows); let expected = 0;
+      const colourOf = q => {
+        let n = 0; for (let k = 1; k < K; k++) n += tintCounts[q * K + k];
+        return [tintRGB[q * 3] / n, tintRGB[q * 3 + 1] / n, tintRGB[q * 3 + 2] / n];
+      };
+      for (let tj = 0; tj < trows; tj++) {
+        if (!(await breathe())) return null;
+        for (let ti = 0; ti < tcols; ti++) {
+          const q = tj * tcols + ti; const k = owner[q];
+          if (k < 0) continue;
+          const c = colourOf(q);
+          distance[q] = Math.hypot(c[0] - base[0], c[1] - base[1], c[2] - base[2]) / MAX_DIST;
+          // (An edge: next to another tint or to the main ground, not to ink, whose own line
+          // is drawn already.)
+          let edge = false;
+          for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const a = ti + di; const b = tj + dj;
+            if (a < 0 || b < 0 || a >= tcols || b >= trows) continue;
+            const other = owner[b * tcols + a];
+            if (other !== k && (other >= 0 || other === MAIN)) { edge = true; break; }
+          }
+          const p = Math.max(edge ? TINT_EDGE : 0, clamp((distance[q] - TINT_FROM) * TINT_GAIN, TINT_KEEP[0], TINT_KEEP[1]));
+          chance[q] = p; expected += p;
+        }
+      }
+      const thin = Math.min(1, TINT_BUDGET / Math.max(1, expected));
+      const cell = tk / ratio;                     // CSS px per square
+      for (let tj = 0; tj < trows; tj++) {
+        if (!(await breathe())) return null;
+        for (let ti = 0; ti < tcols; ti++) {
+          const q = tj * tcols + ti; const k = owner[q];
+          if (k < 0 || random() > chance[q] * thin) continue;
+          const x = (ti + 0.15 + 0.7 * random()) * cell; const y = (tj + 0.15 + 0.7 * random()) * cell;
+          if (inside && !inside(x, y)) continue;
+          const day = colourOf(q);
+          const alpha = item.opacity * (TINT_ALPHA[0] + (TINT_ALPHA[1] - TINT_ALPHA[0]) * smooth(0.07, 0.16, distance[q])) * (1 - GRAIN * random());
+          pushParticle(list, x, y, random(), grain * SIZE_MIN * (1 + 0.3 * random()), 0, GRAPHIC_FONT, -1 - y, day, tintColour(day), alpha, alpha);
+        }
+      }
+      state.perf.tintMax = Math.max(state.perf.tintMax || 0, Math.round(expected * thin));
+    }
+    noteSlice(state, performance.now() - began, 'emit');
+    return { list, step, lightGround: !dark };
+  }
+
+  // One image's particles: its kind (cached by source), then its pixels as displayed.
+  // Resolves { kind, step, list, lightGround }, or null when it could not be read or the lens
+  // moved on (lightGround: a graphic drawn on a light ground, or a transparent one on a light page).
+  async function sampleImage(state, item) {
+    const kit = state.kit; const img = item.img;
+    const live = () => !state.dead && state.phase !== 'exiting' && img.isConnected && img.complete;
+    let kind = kinds.get(item.src);
+    let photoDraw = null;
+    if (!kind) {
+      if (isSvg(item.src)) kind = 'graphic';
+      else {
+        // A raster image is most often a photo: its drawing starts while it is classified,
+        // so the two decodes (off the main thread) run side by side.
+        photoDraw = kit.drawAsync(img, item.w, item.h, photoRatio(item), item.fit).catch(() => null);
+        const sampled = await kit.sample(img);
+        if (!live()) return null;
+        kind = kit.classify(sampled, img);
+      }
+      kinds.set(item.src, kind);
+    }
+    const random = seeded(hashString(item.key));
+    if (kind === 'photo') {
+      const canvas = (photoDraw && await photoDraw) || await kit.drawAsync(img, item.w, item.h, photoRatio(item), item.fit);
+      if (!live()) return null;
+      await nextTask();
+      if (!live()) return null;
+      const began = performance.now();
+      const data = canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, canvas.width, canvas.height).data;
+      noteSlice(state, performance.now() - began, 'read');
+      const out = await photoParticles(state, item, data, canvas.width, canvas.height, random, live);
+      return out && { kind, step: out.step, list: out.list };
+    }
+    let ratio = GRAPHIC_SUPER / GRAPHIC_STEP;
+    if (item.w * item.h * ratio * ratio > GRAPHIC_MAX_PX) ratio = Math.sqrt(GRAPHIC_MAX_PX / (item.w * item.h));
+    const drawn = performance.now();
+    const canvas = await kit.drawAsync(img, item.w, item.h, ratio, item.fit);
+    if (!live()) return null;
+    // (An SVG is drawn synchronously by drawAsync; the first draw lays out its document.)
+    if (isSvg(item.src)) state.perf.svgDrawMs = Math.max(state.perf.svgDrawMs || 0, performance.now() - drawn);
+    await nextTask();
+    if (!live()) return null;
+    const began = performance.now();
+    const data = canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, canvas.width, canvas.height).data;
+    noteSlice(state, performance.now() - began, 'read');
+    await nextTask();
+    if (!live()) return null;
+    const out = await graphicParticles(state, item, data, canvas.width, canvas.height, random, live);
+    return out && { kind, step: out.step, list: out.list, lightGround: out.lightGround };
+  }
+
+  // Jobs: the images the window needs are decoded and sampled IMAGE_JOBS at once, nearest
+  // first; the builder picks each result up when it lands (it runs again then).
+  function requestImage(state, item, distance) {
+    if (state.imageCache.has(item.key) || state.imageFailed.has(item.key)) return null;
+    let job = state.jobs.get(item.key);
+    if (!job) {
+      job = { key: item.key, item, distance, running: false, wanted: true, resolve: null, promise: null };
+      job.promise = new Promise(resolve => { job.resolve = resolve; });
+      state.jobs.set(item.key, job);
+    }
+    job.item = item; job.distance = distance; job.wanted = true;
+    pumpJobs(state);
+    return job.promise;
+  }
+  function pumpJobs(state) {
+    const limit = state.phase === 'build' && state.ctx.arriving ? IMAGE_JOBS_ARRIVING : IMAGE_JOBS;
+    while (!state.dead && state.phase !== 'exiting' && state.jobsRunning < limit) {
+      let next = null;
+      for (const job of state.jobs.values()) if (!job.running && (!next || job.distance < next.distance)) next = job;
+      if (!next) return;
+      next.running = true; state.jobsRunning++;
+      runJob(state, next);
+    }
+  }
+  async function runJob(state, job) {
+    let result = null;
+    try { result = await sampleImage(state, job.item); } catch (error) { result = null; }
+    state.jobsRunning--;
+    state.jobs.delete(job.key);
+    if (!state.dead) {
+      const img = job.item.img;
+      if (result) {
+        state.imageCache.delete(job.key); state.imageCache.set(job.key, result);
+        while (state.imageCache.size > IMAGE_CACHE) state.imageCache.delete(state.imageCache.keys().next().value);
+        state.perf.images = (state.perf.images || 0) + 1;
+      } else if (state.phase !== 'exiting' && img.isConnected && img.complete) {
+        state.imageFailed.add(job.key);         // unreadable after all: it keeps the CSS treatment
+        if (state.waiting.has(img)) dropImageRule(state, img);
+      }
+    }
+    job.resolve(result);
+    if (state.dead) return;
+    pumpJobs(state);
+    schedule(state);
   }
 
   /*
    * Freeze a list into GPU-ready arrays, sorted by grid cell (row-major over the group's
    * bounding box) so that the wind's neighbourhood is a few contiguous index ranges.
    */
-  function freeze(list, lines) {
-    const n = list.n;
+  // (In slices: a band of a long page holds tens of thousands of particles, and the first
+  // freezes of a page run before the code is optimised. Resolves null if live() turns false.)
+  async function freeze(state, list, lines, live) {
+    const n = list.n; const f = list.f;
+    let began = performance.now();
+    const breathe = async () => {
+      if (performance.now() - began < SLICE_MS) return true;
+      noteSlice(state, performance.now() - began, 'freeze');
+      await nextTask();
+      began = performance.now();
+      return live();
+    };
     let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity;
     for (let i = 0; i < n; i++) {
-      const x = list.f[i * 8]; const y = list.f[i * 8 + 1];
+      const x = f[i * 8]; const y = f[i * 8 + 1];
       if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y;
     }
     if (!n) { minX = minY = 0; maxX = maxY = 1; }
@@ -609,8 +1699,9 @@
     const cols = Math.floor((maxX - gx0) / CELL) + 1; const rows = Math.floor((maxY - gy0) / CELL) + 1;
     const cellOf = new Int32Array(n); const counts = new Int32Array(cols * rows + 1);
     for (let i = 0; i < n; i++) {
-      const cx = clamp(Math.floor((list.f[i * 8] - gx0) / CELL), 0, cols - 1);
-      const cy = clamp(Math.floor((list.f[i * 8 + 1] - gy0) / CELL), 0, rows - 1);
+      if ((i & 4095) === 4095 && !(await breathe())) return null;
+      const cx = clamp(Math.floor((f[i * 8] - gx0) / CELL), 0, cols - 1);
+      const cy = clamp(Math.floor((f[i * 8 + 1] - gy0) / CELL), 0, rows - 1);
       cellOf[i] = cy * cols + cx; counts[cellOf[i] + 1]++;
     }
     for (let k = 1; k <= cols * rows; k++) counts[k] += counts[k - 1];
@@ -619,14 +1710,20 @@
     const statics = new Float32Array(n * 6);       // x, y, seed, size, link, font
     const colours = new Uint8ClampedArray(n * 8);  // day rgba, night rgba
     const rowY = new Float32Array(n);              // y that times the sweep (the line's middle, or own y)
+    // The colours move as two 32-bit words per particle.
+    const from32 = new Uint32Array(list.c.buffer, list.c.byteOffset, list.c.length >> 2);
+    const to32 = new Uint32Array(colours.buffer);
     for (let i = 0; i < n; i++) {
+      if ((i & 4095) === 4095 && !(await breathe())) return null;
       const to = fill[cellOf[i]]++;
-      const f = i * 8; const s6 = to * 6; const c8 = to * 8;
-      for (let k = 0; k < 6; k++) statics[s6 + k] = list.f[f + k];
-      for (let k = 0; k < 8; k++) colours[c8 + k] = list.c[f + k];
-      const tag = list.f[f + 6];
+      const k = i * 8; const s6 = to * 6;
+      statics[s6] = f[k]; statics[s6 + 1] = f[k + 1]; statics[s6 + 2] = f[k + 2];
+      statics[s6 + 3] = f[k + 3]; statics[s6 + 4] = f[k + 4]; statics[s6 + 5] = f[k + 5];
+      to32[to * 2] = from32[i * 2]; to32[to * 2 + 1] = from32[i * 2 + 1];
+      const tag = f[k + 6];
       rowY[to] = tag >= 0 ? lines[tag].mid : -1 - tag;
     }
+    noteSlice(state, performance.now() - began, 'freeze');
     return { n, statics, colours, rowY, cellStart, cols, rows, gx0, gy0, x0: minX, y0: minY, x1: maxX, y1: maxY };
   }
 
@@ -636,7 +1733,7 @@
   const VERTEX = `
 precision highp float;
 attribute vec2 aHome;
-attribute vec4 aMeta;   // seed, size (css px), link id (0: none), font size (css px)
+attribute vec4 aMeta;   // seed, size (css px), link id (0: none), font size (css px; negative: a soft star)
 attribute vec4 aDay;    // colour on the day page, premultiplied in the shader
 attribute vec4 aNight;  // colour on the night ground
 attribute vec2 aOff;    // wind displacement (CPU, sparse)
@@ -648,7 +1745,7 @@ uniform vec3 uPhase;    // time since the enter began, since the exit began (<0:
 uniform vec4 uHover;    // link id, amount; previous link id, amount
 uniform vec4 uRing[${RING_MAX}];  // x, y (viewport), age (s), strength
 varying vec4 vColour;
-varying vec2 vDot;      // radius and sprite size, device px
+varying vec3 vDot;      // radius (a soft star: its gaussian width), sprite size (device px), soft
 void main() {
   float seed = aMeta.x;
   float h1 = fract(seed * 7.13 + 0.17);
@@ -659,7 +1756,7 @@ void main() {
   float home = 1.0 - smoothstep(0.0, 0.7, x);         // the exit pulls every displacement home
   float angle = seed * 6.2831853;
   vec2 dir = vec2(cos(angle), sin(angle) - 0.5);       // dust lifts a little
-  float reach = aMeta.w * (0.15 + 0.5 * h1);
+  float reach = abs(aMeta.w) * (0.15 + 0.5 * h1);
   float puff = 6.75 * e * (1.0 - e) * (1.0 - e);        // out fast, settle slowly (peak at e = 1/3)
   float stir = 0.18 * sin(3.14159265 * min(x / 0.7, 1.0));
   vec2 base = aHome + uGroup.xy;
@@ -688,19 +1785,29 @@ void main() {
   float size = aMeta.y * (1.0 + 0.35 * (1.0 - smoothstep(0.0, 0.3, e)) + 0.35 * smoothstep(0.3, 0.85, x) + 0.15 * hover);
   // An antialiased disc at its sub-pixel position: the sprite has a pixel of margin.
   float radius = 0.5 * size * uPhase.z;
-  gl_PointSize = 2.0 * radius + 2.0;
-  vDot = vec2(radius, gl_PointSize);
+  if (aMeta.w < 0.0) {
+    // A photo's grain is a soft star: a gaussian with the light of the disc it replaces,
+    // never narrower than STAR_MIN device px (a smaller one gives up brightness instead).
+    float width = max(radius * ${STAR_WIDTH.toFixed(2)}, ${STAR_MIN.toFixed(2)});
+    a *= min(1.0, radius * radius / (width * width));
+    gl_PointSize = 2.0 * ceil(2.2 * width) + 1.0;
+    vDot = vec3(width, gl_PointSize, 1.0);
+  } else {
+    gl_PointSize = 2.0 * radius + 2.0;
+    vDot = vec3(radius, gl_PointSize, 0.0);
+  }
   vColour = vec4(c.rgb * a, a);
 }`;
   const FRAGMENT = `
 precision mediump float;
 varying vec4 vColour;
-varying vec2 vDot;
+varying vec3 vDot;
 void main() {
   // Coverage of a disc of radius vDot.x by this pixel (a one-pixel ramp at the rim);
   // discs smaller than a pixel give up brightness instead of size.
   float d = length(gl_PointCoord - 0.5) * vDot.y;
-  gl_FragColor = vColour * (clamp(vDot.x + 0.5 - d, 0.0, 1.0) * min(1.0, 2.0 * vDot.x));
+  float cover = vDot.z > 0.5 ? exp(-d * d / (vDot.x * vDot.x)) : clamp(vDot.x + 0.5 - d, 0.0, 1.0) * min(1.0, 2.0 * vDot.x);
+  gl_FragColor = vColour * cover;
 }`;
 
   function glRenderer(canvas) {
@@ -892,8 +1999,8 @@ void main() {
     let began = state.sliceAt = performance.now();
     const pause = async () => {
       const spent = performance.now() - began;
-      if (spent > (state.perf.sliceMax || 0)) state.perf.sliceMax = spent;
       if (spent < SLICE_MS) return false;
+      noteSlice(state, spent, 'words');
       await nextTask();
       began = state.sliceAt = performance.now();
       return state.dead || state.gen !== model.gen || state.phase === 'exiting';
@@ -901,16 +2008,10 @@ void main() {
     const words = await groupWords(state, model, spec, pause);
     if (!words) return null;
     const lines = groupLines(words);
-    // The homepage portrait belongs to the band that holds its middle.
-    let photoImg = null;
-    if (spec.kind === 'band' && state.photoImg) {
-      const r = state.photoImg.getBoundingClientRect(); const mid = (r.top + r.bottom) / 2 + window.scrollY;
-      if (mid >= spec.y0 && mid < spec.y1) photoImg = state.photoImg;
-    }
-    const sig = signature(words, photoImg ? `photo:${Math.round(photoImg.getBoundingClientRect().top + window.scrollY)}` : '');
+    const sig = signature(words);
     if (old && old.sig === sig && old.data) {
       // Nothing it draws has changed: keep the particles, take the fresh word records.
-      old.gen = model.gen; old.words = words; old.lines = lines; old.spec = spec;
+      old.gen = model.gen; old.words = words; old.lines = lines; old.spec = spec; old.stale = false;
       if (spec.kind === 'box') old.box = spec.box;
       return old;
     }
@@ -920,25 +2021,73 @@ void main() {
       i = samplePass(words, i, list, random);
       if (i < words.length && await pause()) return null;
     }
-    let photo = null;
-    if (photoImg) { if (await pause()) return null; photo = samplePhoto(photoImg, list, random); }
-    if (await pause()) return null;
-    const data = freeze(list, lines);
+    // The freeze starts a slice of its own (a band of a long page holds tens of thousands).
+    noteSlice(state, performance.now() - began, 'words');
+    await nextTask();
+    began = state.sliceAt = performance.now();
+    if (state.dead || state.gen !== model.gen || state.phase === 'exiting') return null;
+    const data = await freeze(state, list, lines, () => !(state.dead || state.gen !== model.gen || state.phase === 'exiting'));
+    if (!data) return null;
     // The upload that follows starts a slice of its own.
     await nextTask();
     state.sliceAt = performance.now();
     if (state.dead || state.gen !== model.gen || state.phase === 'exiting') return null;
-    const n = data.n;
+    return makeGroup(spec, model, data, { sig, words, lines });
+  }
+
+  // A group record: its particles, their motion state, and where it is drawn.
+  function makeGroup(spec, model, data, fields) {
+    const n = data.n; const box = spec.kind === 'image' ? spec.item.box : spec.box || null;
     const group = {
-      key: spec.key, kind: spec.kind, spec, k: spec.k, box: spec.box || null, gen: model.gen, sig,
-      words, lines, data, photo,
+      key: spec.key, kind: spec.kind, spec, k: spec.k, box, gen: model.gen, image: null, ...fields, data,
       off: new Float32Array(n * 2), vel: new Float32Array(n * 2), delays: new Float32Array(n * 2),
       awake: new Uint8Array(n), awakeList: new Int32Array(n), awakeCount: 0,
       buf: null, bornAt: performance.now(), fade: 0, alpha: 1,
-      origin: { x: 0, y: 0 }, clip: null, visible: false, lagShare: spec.kind === 'box' ? spec.box.lagShare : 1
+      origin: { x: 0, y: 0 }, clip: null, visible: false, lagShare: box ? box.lagShare : 1
     };
     for (let i = 0; i < n; i++) group.delays[i * 2] = -10;
     return group;
+  }
+
+  // An image's group: its sampled particles (from the cache) translated to where it is now.
+  // It belongs to the band or the box that holds it: placed, clipped and scrolled with it.
+  async function imageGroup(state, model, spec, result) {
+    const item = spec.item; const from = result.list;
+    const list = { n: from.n, f: from.f.slice(0, from.n * 8), c: from.c.slice(0, from.n * 8) };
+    for (let i = 0, k = 0; i < list.n; i++, k += 8) {
+      list.f[k] += item.x; list.f[k + 1] += item.y;
+      list.f[k + 4] = item.link; list.f[k + 6] = -1 - list.f[k + 1];   // its own row times its sweep
+    }
+    if (item.frame) frameParticles(state, item, list);
+    const data = await freeze(state, list, [], () => !(state.dead || state.gen !== model.gen || state.phase === 'exiting'));
+    state.sliceAt = performance.now();
+    return data && makeGroup(spec, model, data, { sig: spec.sig, words: [], lines: [], image: item, imageKind: result.kind, step: result.step, lightGround: !!result.lightGround });
+  }
+
+  // An image's own border (a project thumbnail's hairline frame) goes with the image when it
+  // is hidden: it is drawn as a faint line of dust along the middle of each side, so the
+  // picture keeps its edge on the night.
+  function frameParticles(state, item, list) {
+    const random = seeded(hashString(`${item.gkey}|frame`));
+    const { sides, pad } = item.frame;
+    const [t, r, b, l] = sides.map(side => (side ? side.w : 0));
+    // The border box around the content box, in the group's coordinates.
+    const x0 = item.x - pad[3] - l; const x1 = item.x + item.w + pad[1] + r;
+    const y0 = item.y - pad[0] - t; const y1 = item.y + item.h + pad[2] + b;
+    const lines = [[x0, y0 + t / 2, x1, y0 + t / 2], [x1 - r / 2, y0, x1 - r / 2, y1], [x0, y1 - b / 2, x1, y1 - b / 2], [x0 + l / 2, y0, x0 + l / 2, y1]];
+    sides.forEach((side, k) => {
+      if (!side) return;
+      const [ax, ay, bx, by] = lines[k];
+      const length = Math.hypot(bx - ax, by - ay); const n = Math.max(2, Math.round(length / FRAME_GAP));
+      const day = side.c.slice(0, 3); const night = nightColour(day, false, !state.light, true);
+      const alpha = side.c[3] * item.opacity;
+      for (let i = 0; i < n; i++) {
+        const u = (i + 0.5 + (random() - 0.5) * 0.6) / n; const across = (random() - 0.5) * 0.5;
+        const x = ax + (bx - ax) * u + (k % 2 ? across : 0); const y = ay + (by - ay) * u + (k % 2 ? 0 : across);
+        pushParticle(list, x, y, random(), SIZE_MIN * (1 + 0.2 * random()), item.link, GRAPHIC_FONT, -1 - y, day, night,
+          alpha * FRAME_ALPHA * (1 - GRAIN * random()), alpha);
+      }
+    });
   }
 
   // The groups the window needs, nearest first: bands in reach of the viewport, and boxes.
@@ -962,13 +2111,22 @@ void main() {
       const y0 = k * BAND_H; const y1 = y0 + BAND_H;
       specs.push({ kind: 'band', key: `b${k}`, k, y0, y1, distance: gap(y0, y1), order: near(y0, y1) });
     }
-    for (const box of model.boxes.values()) {
-      if (!box.el.isConnected) continue;
-      const fixedTop = box.fixed ? sy : box.top; const fixedBottom = box.fixed ? sy + H : box.bottom;
-      if (fixedBottom < top || fixedTop > bottom) continue;
+    const boxId = box => {
       let id = state.boxIds.get(box.el);
       if (!id) { id = ++state.boxCount; state.boxIds.set(box.el, id); }
-      specs.push({ kind: 'box', key: `x${id}`, box, distance: gap(fixedTop, fixedBottom), order: near(Math.max(fixedTop, top), Math.min(fixedBottom, bottom)) });
+      return id;
+    };
+    for (const box of model.boxes.values()) {
+      if (!box.el.isConnected || !box.entries.length) continue;
+      const fixedTop = box.fixed ? sy : box.top; const fixedBottom = box.fixed ? sy + H : box.bottom;
+      if (fixedBottom < top || fixedTop > bottom) continue;
+      specs.push({ kind: 'box', key: `x${boxId(box)}`, box, distance: gap(fixedTop, fixedBottom), order: near(Math.max(fixedTop, top), Math.min(fixedBottom, bottom)) });
+    }
+    // Images: a group each, in reach like the text around them.
+    for (const item of model.images) {
+      if (item.bottom < top || item.top > bottom) continue;
+      const sig = `${item.key}|${Math.round(item.x * 4)},${Math.round(item.y * 4)}|${item.link}|${item.box ? boxId(item.box) : 0}`;
+      specs.push({ kind: 'image', key: item.gkey, item, sig, distance: gap(item.top, item.bottom), order: near(item.top, item.bottom) });
     }
     specs.sort((a, b) => a.distance - b.distance || a.order - b.order);
     return specs;
@@ -978,13 +2136,26 @@ void main() {
   function addGroup(state, group, replaced, fade) {
     if (replaced) removeGroup(state, replaced);
     if (state.renderer) state.renderer.create(group);
-    group.fade = fade && !replaced && !state.ctx.motion.matches ? GROUP_FADE : 0;
+    // (No fade while an arrival rests: no frame would carry it, so it shows at once; except
+    // for the stars of an image that waited for them under the night, which end the rest:
+    // the page's first paint is light without its images.)
+    const waited = !!group.image && state.waiting.has(group.image.img);
+    group.fade = fade && !replaced && !state.ctx.motion.matches && (waited || !resting(state)) ? (waited ? WAIT_FADE : GROUP_FADE) : 0;
+    if (waited) { state.waiting.delete(group.image.img); if (group.fade && resting(state)) state.restBroken = true; }
     group.bornAt = performance.now();
     state.groups.set(group.key, group);
     state.particles += group.data.n;
     state.dirty = true;
+    if (group.image) {
+      // The filter its image's rule carries (an existing rule takes it at once).
+      const img = group.image.img; const base = imageBase(state, group);
+      if (base) state.imageBases.set(img, base); else state.imageBases.delete(img);
+      const entry = state.imageRules.get(img);
+      if (entry) setImageRule(state, img, entry.css);
+    }
   }
   function removeGroup(state, group) {
+    group.stale = true;                  // (its ink sprites, if any, are not drawn either)
     if (state.groups.get(group.key) === group) state.groups.delete(group.key);
     state.particles -= group.data ? group.data.n : 0;
     if (state.renderer) state.renderer.release(group);
@@ -997,7 +2168,8 @@ void main() {
    * far groups. Re-run whenever the window or the content changes.
    */
   function schedule(state) {
-    if (state.dead || state.phase === 'exiting') return;
+    // (Before the swap, prepare() builds what is on screen itself.)
+    if (state.dead || state.phase === 'exiting' || state.phase === 'build') return;
     state.buildWanted = true;
     if (!state.building) runBuilder(state);
   }
@@ -1013,6 +2185,8 @@ void main() {
           state.perf.models = (state.perf.models || 0) + 1; state.perf.modelMs = performance.now() - m0;
           if (!model) { state.buildWanted = true; continue; }
           state.model = model;
+          syncImageRules(state, model);
+          markStale(state, model);
         }
         await fillWindow(state, state.model, true);
       }
@@ -1023,7 +2197,7 @@ void main() {
   async function fillWindow(state, model, fade) {
     const specs = neededGroups(state, model);
     const needed = new Set(specs.map(spec => spec.key));
-    // Evict first what lies beyond reach (or whose container is gone) ...
+    // Evict first what lies beyond reach (or whose container or image is gone) ...
     const sy = window.scrollY; const H = state.H;
     const keepTop = sy - KEEP_SCREENS * H; const keepBottom = sy + H + KEEP_SCREENS * H;
     const evict = force => {
@@ -1031,11 +2205,20 @@ void main() {
         .map(group => { const [top, bottom] = groupSpan(group); return { group, top, bottom, d: Math.max(top - sy, sy - bottom) }; })
         .sort((a, b) => b.d - a.d);
       for (const { group, top, bottom } of far) {
-        const gone = group.kind === 'box' && !group.box.el.isConnected;
+        const gone = (group.kind === 'box' && !group.box.el.isConnected) || (group.kind === 'image' && !model.imageKeys.has(group.key));
         if (gone || bottom < keepTop || top > keepBottom || (force && state.particles > PARTICLE_CAP)) removeGroup(state, group);
       }
     };
     evict(false);
+    // ... start decoding the images the window needs that are not sampled yet (nearest
+    // first; jobs no longer needed are dropped before they run) ...
+    for (const job of state.jobs.values()) job.wanted = false;
+    for (const spec of specs) {
+      if (spec.kind !== 'image') continue;
+      const old = state.groups.get(spec.key);
+      if (!(old && old.sig === spec.sig)) requestImage(state, spec.item, spec.distance);
+    }
+    for (const [key, job] of state.jobs) if (!job.running && !job.wanted) { state.jobs.delete(key); job.resolve(null); }
     // ... then build the window, nearest first. Near the cap a farther group (behind the
     // scroll, usually) makes room for a nearer one, or the window stops growing.
     const distanceOf = new Map(specs.map(spec => [spec.key, spec.distance]));
@@ -1043,6 +2226,18 @@ void main() {
       if (state.dead || state.phase === 'exiting' || state.gen !== model.gen) return;
       const old = state.groups.get(spec.key) || null;
       if (old && old.gen === model.gen) continue;
+      let result = null;
+      if (spec.kind === 'image') {
+        // The same image in the same place: keep it. Otherwise it waits for its job (the old
+        // particles stay until then).
+        if (old && old.sig === spec.sig) {
+          if (old.stale) { old.stale = false; state.dirty = true; show(state); }
+          old.gen = model.gen; old.spec = spec; old.image = spec.item; old.box = spec.item.box;
+          continue;
+        }
+        result = state.imageCache.get(spec.item.key);
+        if (!result) continue;
+      }
       while (!old && spec.distance > 0 && state.particles > PARTICLE_CAP * 0.88) {
         let farthest = null; let far = spec.distance;
         for (const group of state.groups.values()) {
@@ -1054,20 +2249,75 @@ void main() {
       }
       if (!old && spec.distance > 0 && state.particles > PARTICLE_CAP * 0.88) break;
       const b0 = performance.now();
-      const group = await buildGroup(state, model, spec, old);
+      if (result) state.sliceAt = b0;
+      const group = result ? await imageGroup(state, model, spec, result) : await buildGroup(state, model, spec, old);
       if (!group || state.dead || state.gen !== model.gen) return;
       if (group !== old) {
         state.perf.builds = (state.perf.builds || 0) + 1; state.perf.buildWall = (state.perf.buildWall || 0) + performance.now() - b0;
         addGroup(state, group, state.groups.get(spec.key) || null, fade);
-        if (state.phase === 'entering') enterDelays(state, group, true);
+        // Built while the lens enters: text settles at once; an image joins the sweep (one
+        // the sweep has passed already dissolves in a sweep of its own, from its top, now).
+        const late = state.phase === 'entering' && group.image ? lateSweep(state, group) : false;
+        const joins = late !== false;
+        if (state.phase === 'entering') enterDelays(state, group, !joins, late);
+        if (joins) group.fade = 0;
+        if (group.image) imageShown(state, group, joins, late);
       }
       if (state.particles > PARTICLE_CAP) trimToCap(state);
       // The slice that finished this group (freeze and upload included).
-      state.perf.sliceMax = Math.max(state.perf.sliceMax || 0, performance.now() - state.sliceAt);
+      noteSlice(state, performance.now() - state.sliceAt, 'group');
       await nextTask();
-      wake(state);
+      show(state);
     }
   }
+  /*
+   * A new model: the groups whose words or image moved since they were sampled (photos that
+   * loaded into the masonry, a <details> that opened above) stop being drawn at once, until
+   * the builder brings their replacements, so no text is ever drawn where it no longer is. A
+   * few words per group are measured again (the first, the last and two between); a group
+   * whose words still sit where they were is kept as it is.
+   */
+  function markStale(state, model) {
+    const range = state.range || (state.range = document.createRange());
+    const sx = window.scrollX; const sy = window.scrollY;
+    const items = model ? new Map(model.images.map(item => [item.gkey, item])) : null;
+    let hidden = 0;
+    for (const group of state.groups.values()) {
+      if (group.stale || !group.data) continue;
+      let moved = false;
+      if (group.image && items) {
+        const item = items.get(group.key);
+        moved = !item || item.key !== group.image.key || Math.abs(item.x - group.image.x) > 1 || Math.abs(item.y - group.image.y) > 1;
+      } else if (group.image) {
+        // (Without a new model: where its image is now.)
+        const item = group.image; const img = item.img;
+        const origin = item.box ? (item.box.el.isConnected ? boxOrigin(item.box.el) : null) : { x: -sx, y: -sy };
+        const r = img.getBoundingClientRect();
+        moved = !origin || !img.isConnected || Math.abs(r.left + item.inset[0] - origin.x - item.x) > 1 || Math.abs(r.top + item.inset[1] - origin.y - item.y) > 1 ||
+          Math.abs(r.width - item.border[0]) > 1 || Math.abs(r.height - item.border[1]) > 1;
+      } else if (group.words.length) {
+        const words = group.words; const n = words.length;
+        const origin = group.box ? (group.box.el.isConnected ? boxOrigin(group.box.el) : null) : { x: -sx, y: -sy };
+        for (const i of new Set([0, n - 1, n >> 1, n >> 2])) {
+          const w = words[i];
+          if (w.marker) {
+            // (A list marker: where its item is.)
+            const r = w.marker.isConnected && origin ? w.marker.getBoundingClientRect() : null;
+            if (!r || Math.abs(r.left - origin.x - w.ref[0]) > 1 || Math.abs(r.top - origin.y - w.ref[1]) > 1) { moved = true; break; }
+            continue;
+          }
+          if (!origin || !w.node.isConnected || w.to > w.node.length) { moved = true; break; }
+          range.setStart(w.node, w.from); range.setEnd(w.node, w.to);
+          const r = range.getBoundingClientRect();
+          if (Math.abs(r.left - origin.x - w.x) > 1 || Math.abs(r.top - origin.y - w.y) > 1) { moved = true; break; }
+        }
+      }
+      if (moved) { group.stale = true; hidden++; }
+    }
+    if (hidden) { state.dirty = true; show(state); }
+    return hidden;
+  }
+
   // Over the cap: drop the groups farthest from the viewport, never one on screen.
   function trimToCap(state) {
     const sy = window.scrollY; const H = state.H;
@@ -1079,18 +2329,22 @@ void main() {
   // A group's extent in document y (for eviction).
   function groupSpan(group) {
     if (group.kind === 'band') return [group.spec.y0, group.spec.y1];
-    if (group.box.fixed) return [-Infinity, Infinity];
-    const r = group.box.el.getBoundingClientRect();
-    return [r.top + window.scrollY, r.bottom + window.scrollY];
+    if (group.box) {
+      if (group.box.fixed) return [-Infinity, Infinity];
+      const r = group.box.el.getBoundingClientRect();
+      return [r.top + window.scrollY, r.bottom + window.scrollY];
+    }
+    return [group.image.top, group.image.bottom];
   }
 
-  // Where each group is this frame: its origin in the viewport, clip and visibility.
+  // Where each group is this frame: its origin in the viewport, clip and visibility. A band
+  // and an image in the page's flow follow the page; a box, and an image in it, follow the box.
   function placeGroups(state) {
     const W = state.W; const H = state.H; const sx = window.scrollX; const sy = window.scrollY;
     const now = performance.now();
     for (const group of state.groups.values()) {
       const d = group.data; if (!d) continue;
-      if (group.kind === 'band') {
+      if (!group.box) {
         group.origin.x = -sx; group.origin.y = -sy; group.clip = null; group.cover = null;
         group.visible = d.y1 - sy > -LAG_MAX - 20 && d.y0 - sy < H + LAG_MAX + 20 && d.x1 - sx > -20 && d.x0 - sx < W + 20;
       } else {
@@ -1122,11 +2376,41 @@ void main() {
   }
 
   // Enter timing for a group: line by line from the top of the viewport (or settled).
-  function enterDelays(state, group, settled) {
+  // The moment the enter's sweep reaches a row at y (viewport px when the enter began); for
+  // an image that joined late, its own sweep from its top (late: { start, top }) if later.
+  function sweepDelay(state, y, late) {
+    const delay = ENTER_START + ENTER_SWEEP * clamp(y / state.H, 0, 1);
+    return late ? Math.max(delay, late.start + ENTER_SWEEP * clamp((y - late.top) / state.H, 0, 1)) : delay;
+  }
+  /*
+   * On a light page the column's inversion and an image's counter-filter leave the image no
+   * contrast half way (updateMasks()). So an image row the sweep has not reached by SLAB_IN
+   * dissolves then (or, for an image built later, as it joins), all rows at once: a photo
+   * goes out once instead of fading out at the flat moment and coming back to dissolve. And
+   * leaving, an image's stars stay until SLAB_OUT, when its contrast is back: it returns once.
+   * Meanwhile its night patch (drawPatches()) keeps the light page from showing through its
+   * dark parts. floor: the moment an image row dissolves at the latest (enterDelays()).
+   */
+  function imageDelayIn(state, y, late, floor) {
+    const delay = sweepDelay(state, y, late);
+    return state.light && !late ? Math.min(delay, floor) : delay;
+  }
+  function imageDelayOut(state, y) {
+    const delay = EXIT_SWEEP * clamp(y / state.H, 0, 1);
+    return state.light ? Math.max(delay, SLAB_OUT) : delay;
+  }
+  const floorOf = (state, img) => (state.floors.has(img) ? state.floors.get(img) : SLAB_IN);
+  function enterDelays(state, group, settled, late = null) {
     const d = group.data; if (!d) return;
-    const oy = group.kind === 'band' ? -window.scrollY : boxOrigin(group.box.el).y;
-    const H = state.H;
-    const delay = y => (settled ? -10 : ENTER_START + ENTER_SWEEP * clamp((y + oy) / H, 0, 1));
+    // (The sweep is timed by where things were when the enter began.)
+    const oy = group.box ? boxOrigin(group.box.el).y + window.scrollY - state.enterScroll : -state.enterScroll;
+    let delay = y => (settled ? -10 : sweepDelay(state, y + oy, late));
+    if (group.image && !settled) {
+      // (An image built while the lens enters joins no earlier than now.)
+      const floor = Math.max(SLAB_IN, (state.phase === 'entering' ? state.enterT : 0) + 0.05);
+      state.floors.set(group.image.img, floor);
+      delay = y => imageDelayIn(state, y + oy, late, floor);
+    }
     for (const line of group.lines) line.delayIn = delay(line.mid);
     for (let i = 0; i < d.n; i++) group.delays[i * 2] = delay(d.rowY[i]);
     state.renderer.uploadDelays(group);
@@ -1134,14 +2418,15 @@ void main() {
   function exitDelays(state, group) {
     const d = group.data; if (!d) return;
     const oy = group.origin.y; const H = state.H;
-    const delay = y => EXIT_SWEEP * clamp((y + oy) / H, 0, 1);
+    const delay = group.image ? y => imageDelayOut(state, y + oy) : y => EXIT_SWEEP * clamp((y + oy) / H, 0, 1);
     for (const line of group.lines) line.delayOut = delay(line.mid);
     for (let i = 0; i < d.n; i++) group.delays[i * 2 + 1] = delay(d.rowY[i]);
     state.renderer.uploadDelays(group);
   }
 
   /* ---------------------------------------------------------------------------
-   * Ink: crisp sprites of the visible words (and the portrait) for the transitions
+   * Ink: crisp sprites of the visible words for the transitions (images dissolve under a
+   * mask on the page's own image: see the image rules below)
    * ------------------------------------------------------------------------- */
   // Day and night sprites of every word on visible lines, in device pixels, so that at
   // full alpha each sprite is blitted 1:1 onto its glyphs. Per group, as placed now.
@@ -1178,7 +2463,7 @@ void main() {
         }
         set.lines.push(line);
       }
-      if (set.lines.length || group.photo) sets.push(set);
+      if (set.lines.length) sets.push(set);
     }
     sets.sort((a, b) => (a.group.cover ? 1 : 0) - (b.group.cover ? 1 : 0));
     const atlases = heights.map(h => makeCanvas(ATLAS_W, Math.max(1, h)));
@@ -1203,29 +2488,371 @@ void main() {
         g.restore();
       }
     }
-    // The portrait with its border, pre-scaled to device pixels and drawn in strips.
-    let photo = null;
-    for (const group of state.groups.values()) {
-      const box = group.photo;
-      if (!box || !group.visible) continue;
-      const sx = window.scrollX; const sy = window.scrollY;
-      const left = Math.round((box.left - sx) * dpr); const ptop = Math.round((box.top - sy) * dpr);
-      const w = Math.round(box.width * dpr); const h = Math.round(box.height * dpr);
-      const c = makeCanvas(w, h); const g = c.getContext('2d');
-      g.globalAlpha = box.opacity;
-      g.fillStyle = box.borderColour; g.fillRect(0, 0, w, h);
-      const [bt, br, bb, bl] = box.border.map(v => Math.round(v * dpr));
-      g.clearRect(bl, bt, w - bl - br, h - bt - bb);
-      const [pt, pr, pb, pl] = box.pad.map(v => v * dpr);
-      g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-      try { g.drawImage(box.img, bl + pl, bt + pt, w - bl - br - pl - pr, h - bt - bb - pt - pb); } catch (error) { /* drawn blank */ }
-      const strip = Math.max(1, Math.round(PHOTO_STRIP * dpr));
-      const strips = [];
-      for (let s = 0; s < h; s += strip) strips.push({ y: s, h: Math.min(strip, h - s), docY: box.top + (s + strip / 2) / dpr, delayIn: -10, delayOut: 0 });
-      photo = { canvas: c, left, top: ptop, w, h, strips, scrollX: sx, scrollY: sy };
-    }
-    return { sets, atlases, photo };
+    return { sets, atlases };
   }
+
+  /* ---------------------------------------------------------------------------
+   * Image rules: one rule per image that became particles, written into the lens's own
+   * stylesheet (which the core removes with the lens), so no element is touched. Settled:
+   * opacity 0 (the image keeps the pointer: a photo still opens the lightbox). While the
+   * lens enters or leaves: a gradient mask that follows the sweep, so the page's own image
+   * dissolves (or returns) row by row with the line timing of the text, and no photo has
+   * to be decoded for it. An image that becomes particles while the lens is live fades out
+   * as its particles fade in. A graphic on a light ground in the main column is meanwhile
+   * shown inverted, as its particles draw it (with the column on a light page, by its own
+   * filter on a dark one), so it dissolves from light lines on the night into the same lines
+   * in dust instead of from a dimmed white slab; a photo keeps the sheet's dimmed original.
+   * ------------------------------------------------------------------------- */
+  const RULE_HIDDEN = 'opacity:0!important;transition:none!important';
+  const RULE_FADING = `opacity:0!important;transition:opacity ${IMAGE_FADE}s ease-out!important`;
+  // While the lens leaves, every rule ends with this: the image's filter (its counter-filter
+  // on a light page, its dimming on a dark one) eases back on the column's own curve, so the
+  // two hue rotations keep cancelling and a photo never passes through a negative; opacity
+  // still changes at once (it is not listed).
+  const RULE_LEAVING = `transition:filter ${GROUND_OUT}s ${GROUND_EASE}!important;`;
+  // Every rule starts with this: an id inside :not() lifts it above every rule of the sheet
+  // (whose selectors hold one id at most), whatever the image's own path.
+  const RULE_PREFIX = 'html:not(#lens-stardust-rule) ';
+  const BASE_LIGHT = 'filter:none!important;';                                  // inverted with the column
+  const BASE_DARK = 'filter:invert(0.94) hue-rotate(180deg)!important;';      // inverted by its own filter
+
+  // The filter an image group's rule carries (see above), or ''.
+  function imageBase(state, group) {
+    if (!group.image || group.imageKind !== 'graphic' || !group.lightGround) return '';
+    if (!group.image.img.closest('#main-content')) return '';
+    return state.light ? BASE_LIGHT : BASE_DARK;
+  }
+
+  function lensSheet(state) {
+    if (state.sheet && state.sheet.ownerNode && state.sheet.ownerNode.isConnected) return state.sheet;
+    const link = [...document.querySelectorAll('link[rel="stylesheet"]')].find(el => (el.getAttribute('href') || '').includes(SHEET_HREF));
+    state.sheet = (link && link.sheet) || null;
+    return state.sheet;
+  }
+  // Sets an image's rule (null removes it): its base filter, if any, then css, then the
+  // phase's tail (RULE_LEAVING while the lens leaves).
+  function setImageRule(state, img, css) {
+    const entry = state.imageRules.get(img);
+    if (css === null) { if (entry) dropImageRule(state, img); return; }
+    const text = (state.imageBases.get(img) || '') + css + (css && !css.endsWith(';') ? ';' : '') + state.ruleTail;
+    if (entry) {
+      entry.css = css;
+      if (entry.text !== text) { entry.rule.style.cssText = text; entry.text = text; }
+      return;
+    }
+    const sheet = lensSheet(state); const selector = pathTo(img);
+    if (!sheet || !selector) return;
+    try {
+      const index = sheet.insertRule(`${RULE_PREFIX}${selector}{${text}}`, sheet.cssRules.length);
+      state.imageRules.set(img, { rule: sheet.cssRules[index], selector, css, text });
+    } catch (error) { /* an odd selector: the image keeps the CSS treatment */ }
+  }
+  function dropImageRule(state, img) {
+    state.masked.delete(img); state.waiting.delete(img);
+    const entry = state.imageRules.get(img);
+    if (!entry) return;
+    state.imageRules.delete(img);
+    const sheet = entry.rule.parentStyleSheet;
+    const index = sheet ? Array.prototype.indexOf.call(sheet.cssRules, entry.rule) : -1;
+    if (index >= 0) sheet.deleteRule(index);
+  }
+  // After a new model: the rules follow their images (a DOM change moves selectors), and an
+  // image that can no longer be particles (hidden, removed, unreadable) shows again.
+  function syncImageRules(state, model) {
+    const items = new Map(model.images.map(item => [item.img, item]));
+    for (const [img, entry] of [...state.imageRules]) {
+      const item = items.get(img);
+      // (An image hidden as it loaded, measured by the next model.)
+      if (!item && state.waiting.has(img) && img.isConnected && img.complete) continue;
+      if (!item || state.imageFailed.has(item.key)) { dropImageRule(state, img); continue; }
+      const selector = pathTo(img);
+      if (selector && selector !== entry.selector) { dropImageRule(state, img); setImageRule(state, img, entry.css); }
+    }
+  }
+  // An image group was added: its image gives way to it, with the sweep when it joins one,
+  // else with a short crossfade (the swap does this for the groups built before it; an exit
+  // leaves the images alone).
+  function imageShown(state, group, joins, late) {
+    const img = group.image.img;
+    if (state.phase === 'build' || state.phase === 'exiting' || state.imageRules.has(img)) return;
+    if (joins) {
+      state.masked.add(img);
+      if (late) state.late.set(img, late);
+      setImageRule(state, img, '');
+      return;
+    }
+    setImageRule(state, img, state.ctx.motion.matches || resting(state) ? RULE_HIDDEN : RULE_FADING);
+  }
+  /*
+   * Waiting under the night. On an arrival, and for a photo that loads while the lens is
+   * settled, an image that will become particles is hidden at once (the reader never saw it
+   * in this lens), and its stars fade in when they are made (WAIT_FADE). Only entering does
+   * an image crossfade from itself: it was on the day page. One that turns out unreadable
+   * shows again with the CSS treatment.
+   */
+  function hideWaiting(state, img) {
+    if (state.imageRules.has(img)) return;
+    setImageRule(state, img, RULE_HIDDEN);
+    if (state.imageRules.has(img)) state.waiting.add(img);
+  }
+  // Will this image become particles? (What buildModel's imageOf() asks, cheaply, for an image
+  // that has just loaded.)
+  function willBeParticles(state, img) {
+    if (!state.kit || !state.kit.readable(img) || !img.isConnected || !img.getClientRects().length || img.closest(EXCLUDE)) return false;
+    if (typeof img.checkVisibility === 'function' && !img.checkVisibility({ checkOpacity: false, checkVisibilityCSS: true })) return false;
+    const r = img.getBoundingClientRect();
+    return r.width >= IMAGE_MIN && r.height >= IMAGE_MIN && !fixedRootOf(img);
+  }
+  // How an image built during the enter joins its sweep: null when the sweep has not reached
+  // it yet; { start, top } when it has, so the image dissolves in a sweep of its own from its
+  // top, starting now (the enter lasts until that is done); false when the enter is nearly
+  // over (it crossfades instead).
+  function lateSweep(state, group) {
+    const img = group.image.img;
+    if (state.late.has(img)) return state.late.get(img);   // rebuilt: as before
+    if (state.masked.has(img)) return null;
+    const r = img.getBoundingClientRect();
+    const top = r.top + window.scrollY - state.enterScroll;
+    const start = state.enterT + 0.05;
+    if (start < sweepDelay(state, top, null)) return null;
+    if (state.enterT > LATE_JOIN) return false;
+    state.enterEnd = Math.max(state.enterEnd, start + ENTER_SWEEP * clamp(r.height / state.H, 0, 1) + ENTER_DUR);
+    return { start, top };
+  }
+  // The share of a row still drawn by the page (1) rather than by its dust (0), for a row at
+  // viewport y now: the ink timing of a text line there (drawInk's alphaOf), with the sweep
+  // timed by where the row was when the enter (or the exit) began.
+  function inkAt(state, y, late, img) {
+    const sy = window.scrollY;
+    const delayIn = imageDelayIn(state, y + sy - state.enterScroll, late, floorOf(state, img));
+    let a = inkEnter(clamp((state.enterT - delayIn) / ENTER_DUR, 0, 1));
+    if (state.phase === 'exiting') {
+      const delayOut = imageDelayOut(state, y + sy - state.exitScroll);
+      a = Math.max(a, inkExit(clamp((state.exitT - delayOut) / EXIT_DUR, 0, 1)));
+    }
+    return a;
+  }
+  // How present an image row's stars are now (0..1), as the shader times them: the row at
+  // viewport y, with the image's own timing.
+  function dustAt(state, y, late, img) {
+    const sy = window.scrollY;
+    const delayIn = imageDelayIn(state, y + sy - state.enterScroll, late, floorOf(state, img));
+    let a = smooth(0, 0.15, clamp((state.enterT - delayIn) / ENTER_DUR, 0, 1));
+    if (state.phase === 'exiting') {
+      const delayOut = imageDelayOut(state, y + sy - state.exitScroll);
+      a *= 1 - smooth(0.6, 1, clamp((state.exitT - delayOut) / EXIT_DUR, 0, 1));
+    }
+    return a;
+  }
+  // The masks of the images in a transition, this frame. On a light page the inverting
+  // column flattens every image toward grey while the ground changes (an inversion by a maps
+  // a colour v to a + (1 - 2a) v: at a = 0.5 everything is mid-grey), and so does an image's
+  // own counter-inversion, which eases with it: at progress q the two leave a photo
+  // |1 - 2q| |1 - 2 x 0.94 q| of its contrast. The images still shown are only as opaque as
+  // that contrast allows: they fade out as it goes and come back as it returns, and no grey
+  // slab stands on the grey page. The column eases on the ground's curve, so the ground's
+  // progress is the inversions'.
+  function updateMasks(state) {
+    const H = state.H; const leaving = state.phase === 'exiting';
+    if (state.light) {
+      const q = state.groundP;
+      const dip = smooth(SLAB_CONTRAST[0], SLAB_CONTRAST[1], Math.abs(1 - 2 * q) * Math.abs(1 - 2 * INVERT * q));
+      setDip(state, dip < 0.995 ? dip : 1);
+    }
+    for (const img of state.masked) {
+      if (!img.isConnected) continue;
+      const r = img.getBoundingClientRect();
+      // Far from the viewport nobody sees it: hidden while entering, shown while leaving.
+      if (r.bottom < -H || r.top > 2 * H) { setImageRule(state, img, leaving ? '' : RULE_HIDDEN); continue; }
+      const stops = clamp(Math.ceil(r.height / MASK_STOP) + 1, 2, 48);
+      let lo = 1; let hi = 0; const parts = [];
+      for (let k = 0; k < stops; k++) {
+        const t = k / (stops - 1); const a = inkAt(state, r.top + t * r.height, state.late.get(img), img);
+        if (a < lo) lo = a; if (a > hi) hi = a;
+        parts.push(`rgba(0,0,0,${a.toFixed(3)}) ${(t * 100).toFixed(2)}%`);
+      }
+      let css = '';
+      if (hi < 0.002) css = RULE_HIDDEN;
+      else if (lo < 0.998) { const mask = `linear-gradient(${parts.join(',')})`; css = `-webkit-mask-image:${mask}!important;mask-image:${mask}!important`; }
+      setImageRule(state, img, css);
+    }
+  }
+
+  // The column's media in a transition on a light page: one rule of the lens's sheet gives
+  // them the opacity the inversion's contrast allows (1: the rule is empty). An image that
+  // became particles has its own rule, which wins (hidden, or masked: the mask then shows
+  // through this opacity).
+  const DIP_SELECTOR = '#main-content :is(img, video, canvas, iframe, object, embed)';
+  function setDip(state, dip) {
+    const text = dip < 1 ? `opacity:${dip.toFixed(3)}!important` : '';
+    if (!state.dipRule) {
+      if (!text) return;
+      const sheet = lensSheet(state);
+      if (!sheet) return;
+      try { state.dipRule = sheet.cssRules[sheet.insertRule(`${RULE_PREFIX}${DIP_SELECTOR}{}`, sheet.cssRules.length)]; } catch (error) { return; }
+    }
+    if (state.dipRule.style.cssText !== text) state.dipRule.style.cssText = text;
+  }
+
+  /* ---------------------------------------------------------------------------
+   * The photography lightbox: its photo sits outside the scope, in a fixed container, so
+   * the media helper (fixed: true) lays a canvas over it, follows it as it opens, changes
+   * photo and closes, and keeps the arrows and the caption over it visible. The canvas holds
+   * the photo's stars, sampled as the gallery's are (with a larger budget: one still canvas
+   * costs no particles) and drawn as the shader draws a settled star, on the lightbox's own
+   * backdrop. It is still: no shimmer, no wind. The photo itself stays under the backdrop
+   * (stardust.css), so until its stars are ready the lightbox shows its dark, its caption
+   * and its arrows; the canvas then fades in. A canvas whose photo has gone (the next one was
+   * asked for, or the lightbox closed) is hidden in the same task, before the helper follows
+   * (it waits a moment for the container to settle), so no photo's stars ever stand under
+   * another's caption. While the lightbox covers the viewport the night beneath it is not
+   * drawn at all (watchCover).
+   * ------------------------------------------------------------------------- */
+  function lightbox(state) {
+    const ctx = state.ctx;
+    if (!state.kit || typeof ctx.media !== 'function' || !document.querySelector(OUTSIDE_IMAGES)) return;
+    ctx.media({ select: OUTSIDE_IMAGES, fixed: true, render: source => lightboxStars(state, source) })
+      .then(handle => {
+        if (state.dead) { handle.dispose(); return; }
+        state.media = handle;
+        // (The helper renders a fixed image when its container changes; one already open as
+        // the lens starts, as after a jump from another lens with the lightbox open, waits
+        // for a change that does not come. A refresh renders it now.)
+        handle.refresh();
+      }, () => { /* the photo stays under the backdrop */ });
+    // The photo changes or the lightbox closes: the stars of the photo that was are hidden now.
+    const containers = new Set();
+    for (const img of document.querySelectorAll(OUTSIDE_IMAGES)) { const root = fixedRootOf(img); if (root) containers.add(root); }
+    const stale = () => {
+      if (state.dead || !state.media) return;
+      for (const overlay of state.media.overlays) {
+        if (!overlay.fixed) continue;
+        const img = overlay.img; const drawn = state.lightboxSrc.get(overlay.canvas);
+        const gone = !img.isConnected || !img.getClientRects().length || (drawn !== undefined && drawn !== img.src);
+        const visibility = gone ? 'hidden' : '';
+        if (overlay.canvas.style.visibility !== visibility) overlay.canvas.style.visibility = visibility;
+      }
+    };
+    const observer = new MutationObserver(stale);
+    for (const root of containers) observer.observe(root, { subtree: true, attributes: true, attributeFilter: ['class', 'style', 'src', 'hidden'] });
+    ctx.signal.addEventListener('abort', () => observer.disconnect(), { once: true });
+  }
+  // The outermost position: fixed ancestor of an element below <body>, or null.
+  function fixedRootOf(el) {
+    let root = null;
+    for (let a = el; a && a !== document.body && a !== document.documentElement; a = a.parentElement) {
+      if (getComputedStyle(a).position === 'fixed') root = a;
+    }
+    return root;
+  }
+  async function lightboxStars(state, source) {
+    const { img, width: W, height: H } = source;
+    if (state.dead || !source.readable || !img.isConnected) return null;
+    const src = img.src;
+    const live = () => !state.dead && img.isConnected;
+    let began = performance.now();
+    const data = source.ctx2d.getImageData(0, 0, W, H).data;
+    noteSlice(state, performance.now() - began, 'read');
+    await nextTask();
+    if (!live()) return null;
+    const item = { w: source.cssWidth, h: source.cssHeight, oval: false, radii: null, opacity: 1, budget: LIGHTBOX_BUDGET };
+    const random = seeded(hashString(`${img.currentSrc || img.src}|${W}x${H}`));
+    const out = source.kind === 'graphic' ? await graphicParticles(state, item, data, W, H, random, live) : await photoParticles(state, item, data, W, H, random, live);
+    if (!out || !live()) return null;
+    // The backdrop the photo sits on (the lightbox's translucent black over the night).
+    let ground = NIGHT_RGB;
+    for (let el = img.parentElement; el && el !== document.body; el = el.parentElement) {
+      const bg = parseColour(getComputedStyle(el).backgroundColor);
+      if (bg && bg[3] > 0.05) { ground = NIGHT_RGB.map((v, k) => bg[k] * bg[3] + v * (1 - bg[3])); break; }
+    }
+    // Each particle as the shader draws it settled: a soft star (a gaussian of the disc's
+    // light, never narrower than STAR_MIN device px) or a disc, laid "over" the ground.
+    const dpr = W / source.cssWidth;
+    const acc = new Float32Array(W * H * 3);
+    const rows = async fn => {           // (row by row, in slices)
+      for (let y = 0; y < H; y++) {
+        if (performance.now() - began > SLICE_MS) {
+          noteSlice(state, performance.now() - began, 'lightbox');
+          await nextTask();
+          if (!live()) return false;
+          began = performance.now();
+        }
+        fn(y * W, (y + 1) * W);
+      }
+      return true;
+    };
+    began = performance.now();
+    if (!(await rows((p0, p1) => { for (let p = p0; p < p1; p++) { acc[p * 3] = ground[0]; acc[p * 3 + 1] = ground[1]; acc[p * 3 + 2] = ground[2]; } }))) return null;
+    const { n, f, c } = out.list;
+    for (let i = 0; i < n; i++) {
+      if ((i & 255) === 255 && performance.now() - began > SLICE_MS) {
+        noteSlice(state, performance.now() - began, 'lightbox');
+        await nextTask();
+        if (!live()) return null;
+        began = performance.now();
+      }
+      const k = i * 8; const x = f[k] * dpr; const y = f[k + 1] * dpr; const star = f[k + 5] < 0;
+      const radius = 0.5 * f[k + 3] * dpr; const alpha = c[k + 7] / 255;
+      const width = Math.max(radius * STAR_WIDTH, STAR_MIN);
+      const a = star ? alpha * Math.min(1, (radius * radius) / (width * width)) : alpha * Math.min(1, 2 * radius);
+      const reach = Math.ceil(star ? 2.2 * width : radius + 1);
+      const r = c[k + 4]; const g = c[k + 5]; const b = c[k + 6];
+      for (let py = Math.max(0, Math.floor(y - reach)); py <= Math.min(H - 1, Math.ceil(y + reach)); py++) {
+        for (let px = Math.max(0, Math.floor(x - reach)); px <= Math.min(W - 1, Math.ceil(x + reach)); px++) {
+          const dx = px + 0.5 - x; const dy = py + 0.5 - y; const d2 = dx * dx + dy * dy;
+          const cover = star ? Math.exp(-d2 / (width * width)) : clamp(radius + 0.5 - Math.sqrt(d2), 0, 1);
+          const t = a * cover; if (t < 0.004) continue;
+          const q = (py * W + px) * 3;
+          acc[q] += (r - acc[q]) * t; acc[q + 1] += (g - acc[q + 1]) * t; acc[q + 2] += (b - acc[q + 2]) * t;
+        }
+      }
+    }
+    const canvas = makeCanvas(W, H); const g2 = canvas.getContext('2d');
+    const image = g2.createImageData(W, H); const pixels = image.data;
+    if (!(await rows((p0, p1) => {
+      for (let p = p0, q = p0 * 4; p < p1; p++, q += 4) { pixels[q] = acc[p * 3]; pixels[q + 1] = acc[p * 3 + 1]; pixels[q + 2] = acc[p * 3 + 2]; pixels[q + 3] = 255; }
+    }))) return null;
+    g2.putImageData(image, 0, 0);
+    noteSlice(state, performance.now() - began, 'lightbox');
+    state.perf.lightbox = (state.perf.lightbox || 0) + 1;
+    state.lightboxSrc.set(canvas, src);  // which photo these stars are (see lightbox())
+    return state.dead ? null : canvas;
+  }
+
+  /*
+   * A fixed container outside the scope that covers the viewport with a ground that is
+   * (almost) opaque: the photography lightbox, open. The night beneath it cannot be seen, so
+   * while the lens is settled no frame is drawn (the shimmer sleeps; opening the lightbox
+   * and changing its photo upload large images to the GPU, and a WebGL frame then would wait
+   * for them). Watched on the containers' class and style, and on resizes; the frames resume
+   * when it goes. Entering and leaving draw on: their frames end the transition.
+   */
+  function watchCover(state) {
+    const roots = new Set();
+    for (const img of document.querySelectorAll(OUTSIDE_IMAGES)) { const root = fixedRootOf(img); if (root) roots.add(root); }
+    if (!roots.size) return;
+    const covers = el => {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility !== 'visible' || (parseFloat(cs.opacity) || 0) < COVER_OPAQUE) return false;
+      const bg = parseColour(cs.backgroundColor);
+      if (!bg || bg[3] < COVER_OPAQUE) return false;
+      const r = el.getBoundingClientRect();
+      return r.left <= 0.5 && r.top <= 0.5 && r.right >= window.innerWidth - 0.5 && r.bottom >= window.innerHeight - 0.5;
+    };
+    const check = () => {
+      if (state.dead) return;
+      const was = state.covered;
+      state.covered = [...roots].some(covers);
+      if (was && !state.covered) { state.dirty = true; wake(state); }
+    };
+    const observer = new MutationObserver(check);
+    for (const root of roots) observer.observe(root, { attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+    window.addEventListener('resize', check, { passive: true, signal: state.ctx.signal });
+    state.ctx.signal.addEventListener('abort', () => observer.disconnect(), { once: true });
+    check();
+  }
+  // Settled under a covering lightbox: no frame is drawn.
+  const underCover = state => state.covered && state.phase === 'live';
 
   /* ---------------------------------------------------------------------------
    * The lens
@@ -1238,16 +2865,22 @@ void main() {
       ctx, phase: 'build', dead: false, applied: new Set(), glyphs: false, hadClass: false,
       W: 0, H: 0, dpr: 1, layer: null, renderer: null, canvas: null, inkCanvas: null, ink: null, inkG: null,
       gen: 0, model: null, modelStale: false, groups: new Map(), particles: 0, building: false, buildWanted: false,
-      linkIds: new WeakMap(), linkCount: 0, boxIds: new WeakMap(), boxCount: 0, photoImg: null, light: true,
-      enterAt: 0, enterT: 0, enterEnd: 0, exitAt: 0, exitT: -1, exitEnd: 0, enterScroll: 0,
-      night: 0, dayGround: [255, 255, 255], groundBody: true, startedAt: performance.now(),
+      linkIds: new WeakMap(), linkCount: 0, boxIds: new WeakMap(), boxCount: 0, light: true,
+      // Images: the media helper's utilities, ids, sampled results (LRU), jobs, failures, rules
+      kit: null, imageIds: new WeakMap(), imageCount: 0, imageCache: new Map(), jobs: new Map(), jobsRunning: 0,
+      imageFailed: new Set(), imageRules: new Map(), imageBases: new Map(), masked: new Set(), late: new Map(), sheet: null, ruleTail: '', dipRule: null,
+      haloRule: null, haloText: '',
+      media: null, lightboxSrc: new WeakMap(), covered: false, waiting: new Set(), floors: new Map(),
+      enterAt: 0, enterT: 0, enterEnd: 0, exitAt: 0, exitT: -1, exitEnd: 0, enterScroll: 0, exitScroll: 0,
+      night: 0, groundP: 0, dayGround: [255, 255, 255], groundBody: true, startedAt: performance.now(),
       pointer: { in: false, x: 0, y: 0, vx: 0, vy: 0, at: 0 },
       rings: new Float32Array(RING_MAX * 4), ringAt: new Float64Array(RING_MAX), ringNext: 0,
       ringView: new Float32Array(RING_MAX * 4),
       hover: { id: -1, amount: 0, prevId: -1, prevAmount: 0, target: -1 },
       scrollSmooth: window.scrollY, lag: 0, lastScrollY: window.scrollY, scrollDir: 1, lastScrollX: window.scrollX, windowAt: window.scrollY,
       ticking: false, unframe: null, frameToken: 0, lastRender: 0, dirty: true, ringsDrawn: false,
-      shimmerTimer: 0, exitTimer: 0, contentTimer: 0, restTimer: 0,
+      shimmerTimer: 0, contentTimer: 0, restTimer: 0, restUntil: 0, restBroken: false, showTimer: 0,
+      listening: false, changedEarly: false, exitWatch: null,
       perf: { frames: 0, total: 0, max: 0, last: 0, uploads: 0, uploaded: 0, render: 0, byPhase: {} },
       uniforms: {
         w: 0, h: 0, time: 0, shimmer: 0, night: 0, lag: 0,
@@ -1260,26 +2893,58 @@ void main() {
   async function prepare(ctx) {
     if (st && !st.dead) finishExit(st);  // a previous activation that was never exited
     const state = st = createState(ctx);
+    // Watch the scope before measuring it: what changes while the model is built (the blog
+    // list rendered after its fetch, star counts, a photo loading) is measured again once the
+    // lens is on (listen()).
+    watchChanges(state);
+    // The media helper's utilities (readable, sample, classify, drawAsync); without them the
+    // images keep the CSS treatment.
+    const kit = typeof ctx.mediaKit === 'function' ? ctx.mediaKit().catch(() => null) : Promise.resolve(null);
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    state.kit = await kit;
+    if (state.dead || ctx.signal.aborted) return null;
+    // Arriving, the page is still hidden over the night: images near the viewport that are
+    // still loading (the photography masonry, whose photos have no size before they load) get
+    // a moment, so the first measure already sees the layout the reader will see.
+    if (ctx.arriving) await imagesLoading(ctx.scope, state.startedAt + ARRIVE_IMAGES_MS);
+    if (state.dead || ctx.signal.aborted) return null;
+    warmSampler(state);
+    await nextTask();
     if (state.dead || ctx.signal.aborted) return null;
     const t0 = performance.now();
     state.light = pageIsLight(ctx.scope);
-    state.photoImg = ctx.scope.map(root => root.querySelector(PHOTO_SELECTOR)).find(Boolean) || null;
     measureViewport(state);
     const model = await buildModel(state);
     if (!model || state.dead || ctx.signal.aborted) return null;
     state.model = model;
-    // Only what is on screen before the swap; the rest of the window follows.
+    // Only what is on screen before the swap; the rest of the window follows. The images on
+    // screen are decoded meanwhile (off the main thread) and waited for a moment; the ones
+    // that take longer crossfade in once the lens is on.
     const specs = neededGroups(state, model).filter(spec => spec.distance === 0);
+    const jobs = specs.filter(spec => spec.kind === 'image').map(spec => requestImage(state, spec.item, 0)).filter(Boolean);
     const groups = [];
     for (const spec of specs) {
+      if (spec.kind === 'image') continue;
       const group = await buildGroup(state, model, spec, null);
       if (!group || state.dead || ctx.signal.aborted) return null;
       groups.push(group);
     }
+    if (jobs.length) {
+      const wait = Math.max(0, ctx.arriving ? state.startedAt + IMAGE_ARRIVE_MS - performance.now() : IMAGE_WAIT_MS - (performance.now() - t0));
+      await Promise.race([Promise.all(jobs), new Promise(resolve => setTimeout(resolve, wait))]);
+      if (state.dead || ctx.signal.aborted) return null;
+    }
+    for (const spec of specs) {
+      const result = spec.kind === 'image' ? state.imageCache.get(spec.item.key) : null;
+      const group = result && await imageGroup(state, model, spec, result);
+      if (group) groups.push(group);
+      if (state.dead || ctx.signal.aborted) return null;
+    }
     mount(state);
     for (const group of groups) addGroup(state, group, null, false);
     listen(state);
+    lightbox(state);
+    watchCover(state);
     state.perf.prepareMs = performance.now() - t0;
     return state;
   }
@@ -1304,11 +2969,9 @@ void main() {
       state.enterScroll = window.scrollY;
       placeGroups(state);
       for (const group of state.groups.values()) enterDelays(state, group, false);
-      const inkAt = performance.now();
+      const inkBegan = performance.now();
       state.ink = buildInk(state);
-      state.perf.enterInk = performance.now() - inkAt;
-      const H = state.H;
-      if (state.ink.photo) for (const strip of state.ink.photo.strips) strip.delayIn = ENTER_START + ENTER_SWEEP * clamp((strip.docY - window.scrollY) / H, 0, 1);
+      state.perf.enterInk = performance.now() - inkBegan;
       state.enterEnd = Math.max(ENTER_START + ENTER_SWEEP + ENTER_DUR, GROUND_IN);
       state.enterAt = performance.now(); state.enterT = 0; state.night = 0;
       // The swap: the ink sprites are exactly the page's glyphs, drawn in the same task.
@@ -1330,6 +2993,7 @@ void main() {
 
   // Arriving with a page: the ground is already night; the particles fade in, no sweep.
   async function arrive(ctx) {
+    const called = performance.now();
     try {
       const state = await prepare(ctx);
       if (!state) return;
@@ -1338,14 +3002,19 @@ void main() {
       // The particles are there in the first frame; they appear as the core fades the page in.
       for (const group of state.groups.values()) group.fade = 0;
       swapIn(state, false);
+      // The images whose stars are not made yet wait for them under the night.
+      for (const item of state.model.images) if (!state.groups.has(item.gkey) && !state.imageFailed.has(item.key)) hideWaiting(state, item.img);
       captionTone(state, 1);
       placeGroups(state);
       render(state, performance.now());
       state.perf.arrivedAt = performance.now();
+      state.perf.arriveMs = state.perf.arrivedAt - called;
       // Then the page appears (the core fades the body in) and paints itself for the first
       // time, which can keep the GPU busy (the photography page's photos); a WebGL frame then
-      // would wait for it on the main thread. The next frame waits until that has passed,
-      // unless the reader moves first.
+      // would wait for it on the main thread. The frame loop (the shimmer) waits until that
+      // has passed, unless the reader moves first; the builder does not wait, and what it
+      // changes meanwhile (a photo's stars, a group re-measured after the masonry moved) is
+      // shown by a single render each time (show()).
       state.restUntil = performance.now() + ARRIVE_REST_MS;
       state.restTimer = setTimeout(() => { state.restUntil = 0; wake(state); schedule(state); }, ARRIVE_REST_MS);
     } catch (error) {
@@ -1405,7 +3074,12 @@ void main() {
     if (state.groundBody) add(CLASS_BODY);
     if (state.light) add(CLASS_INVERT);
     add(CLASS_NIGHT);
-    if (state.photoImg) add(CLASS_PHOTO);
+    // The images that became particles give way: masked with the sweep, or hidden at once.
+    for (const group of state.groups.values()) {
+      if (!group.image) continue;
+      if (animate) state.masked.add(group.image.img);
+      setImageRule(state, group.image.img, animate ? '' : RULE_HIDDEN);
+    }
     state.ctx.hideGlyphs(true); state.glyphs = true;
     if (!animate) {
       // Settle without transitions, then let the page's own transitions run again.
@@ -1452,9 +3126,29 @@ void main() {
     return den < 1 ? (state.phase === 'exiting' ? 0 : 1) : clamp(num / den, 0, 1);
   }
   // The caption turns light when the ground passes mid-grey (it fades in on the day page).
+  // While the ground changes, the halo behind its glyphs (core.css) is the ground as it is
+  // this frame (one rule of the lens's sheet, on the caption alone), so it never stands as a
+  // pale smudge on a darkening page; settled, the night of CLASS_CAPTION (stardust.css).
   function captionTone(state, p) {
+    if (state.phase === 'entering') {
+      const rgb = state.dayGround.map((v, k) => Math.round(v + (NIGHT_RGB[k] - v) * clamp(p, 0, 1)));
+      captionHalo(state, `rgb(${rgb.join(',')})`);
+    } else captionHalo(state, '');
     if (p < 0.5 || state.applied.has(CLASS_CAPTION)) return;
     document.documentElement.classList.add(CLASS_CAPTION); state.applied.add(CLASS_CAPTION);
+  }
+  function captionHalo(state, colour) {
+    if (state.haloText === colour) return;
+    if (!state.haloRule) {
+      if (!colour) return;
+      const sheet = lensSheet(state);
+      if (!sheet) return;
+      try { state.haloRule = sheet.cssRules[sheet.insertRule('.lenses-caption{}', sheet.cssRules.length)]; } catch (error) { return; }
+    }
+    // (The core eases the halo's colour over 250 ms; driven every frame it would trail the
+    // ground, so meanwhile only the caption's opacity keeps its transition.)
+    state.haloRule.style.cssText = colour ? `--lenses-caption-ground:${colour};transition:opacity 450ms ease` : '';
+    state.haloText = colour;
   }
   // Text colour follows the ground. On a light page it flips quickly as the ground passes
   // mid-grey, so the text is always on the far side of the ground and stays legible.
@@ -1478,6 +3172,7 @@ void main() {
         pointer.vy += ((event.clientY - pointer.y) / dt - pointer.vy) * 0.5;
       } else { pointer.vx = 0; pointer.vy = 0; }
       pointer.x = event.clientX; pointer.y = event.clientY; pointer.at = now; pointer.in = true;
+      state.restBroken = true;
       if (!ctx.motion.matches) wake(state);
     }, opts);
     const leave = () => { pointer.in = false; pointer.vx = 0; pointer.vy = 0; };
@@ -1493,7 +3188,10 @@ void main() {
       wake(state);
     }, opts);
     // The page and any container inside it (a wide table on a phone) scroll.
-    document.addEventListener('scroll', () => wake(state), { passive: true, capture: true, signal });
+    document.addEventListener('scroll', event => {
+      if (event.target !== document || window.scrollY !== state.lastScrollY || window.scrollX !== state.lastScrollX) state.restBroken = true;
+      wake(state);
+    }, { passive: true, capture: true, signal });
     window.addEventListener('resize', () => {
       // The canvases follow at once. Text reflows only with the width, so only then is the
       // page re-measured (a phone's URL bar changes the height alone).
@@ -1525,29 +3223,58 @@ void main() {
       wake(state);
     };
     if (ctx.motion.addEventListener) ctx.motion.addEventListener('change', onMotion, { signal });
-    // Late content (markdown, star counts, abstracts, demos) and layout changes.
-    if (typeof ctx.onContentChange === 'function') ctx.onContentChange(() => contentChanged(state, 0));
+    // The scope has been watched since prepare() began (watchChanges): what changed while the
+    // model was measured (the blog list rendered after its fetch, a photo that loaded and
+    // moved the masonry) is measured again now; later changes are measured as they come.
+    state.listening = true;
+    if (state.changedEarly || (state.model && layoutPrint(ctx.scope) !== state.model.print)) contentChanged(state, 0);
+    state.canvas.addEventListener('webglcontextlost', event => event.preventDefault(), { signal });
+    state.canvas.addEventListener('webglcontextrestored', () => restoreContext(state), { signal });
+  }
+
+  /*
+   * Late content (markdown, the blog list, star counts, abstracts, demos) and layout that
+   * moves without a DOM change (photos loading into the photography masonry, fonts, a
+   * <details> toggle, a resize; the core debounces both). Subscribed when prepare() begins,
+   * before anything is measured (the core starts watching with the first subscription);
+   * until listen() the changes are only noted, since the groups being built for the swap
+   * belong to the model being measured.
+   */
+  function watchChanges(state) {
+    const { ctx } = state; const signal = ctx.signal;
+    const changed = wait => { if (state.listening) contentChanged(state, wait); else state.changedEarly = true; };
+    if (typeof ctx.onContentChange === 'function') ctx.onContentChange(() => changed(0));
     const observer = new MutationObserver(records => {
       // Class and style changes in the scope (a demo's state, a toggled section); a theme
       // switch on <html>; and, without the core's watcher, any text change.
       for (const record of records) {
         if (record.target === document.documentElement && record.attributeName !== 'data-theme') continue;
-        contentChanged(state, CONTENT_MS);
+        changed(CONTENT_MS);
         return;
       }
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     const watchText = typeof ctx.onContentChange !== 'function';
     for (const root of ctx.scope) observer.observe(root, { subtree: true, attributes: true, attributeFilter: ['class', 'style'], childList: watchText, characterData: watchText });
-    let first = true;
-    const resized = typeof ResizeObserver === 'function' ? new ResizeObserver(() => {
-      if (first) { first = false; return; }
-      contentChanged(state, CONTENT_MS);
-    }) : null;
-    if (resized) resized.observe(document.body);
+    // An image that loads in the scope may move what follows it (the photography masonry, whose
+    // photos have no size before they load): the groups that moved stop being drawn at once,
+    // and a re-measure follows without waiting for the core's debounced layout report.
+    const onLoad = event => {
+      if (!state.listening || state.dead || state.phase === 'exiting' || !(event.target instanceof HTMLImageElement)) return;
+      // (Settled: it waits for its stars under the night; see hideWaiting().)
+      if (state.phase === 'live' && willBeParticles(state, event.target)) hideWaiting(state, event.target);
+      if (markStale(state, null)) contentChanged(state, 0);
+    };
+    for (const root of ctx.scope) root.addEventListener('load', onLoad, { capture: true, signal });
+    let resized = null;
+    if (typeof ctx.onLayoutChange === 'function') {
+      ctx.onLayoutChange(() => { state.perf.layouts = (state.perf.layouts || 0) + 1; changed(0); });
+    } else if (typeof ResizeObserver === 'function') {
+      let first = true;
+      resized = new ResizeObserver(() => { if (first) { first = false; return; } changed(CONTENT_MS); });
+      resized.observe(document.body);
+    }
     signal.addEventListener('abort', () => { observer.disconnect(); if (resized) resized.disconnect(); clearTimeout(state.contentTimer); }, { once: true });
-    state.canvas.addEventListener('webglcontextlost', event => event.preventDefault(), { signal });
-    state.canvas.addEventListener('webglcontextrestored', () => restoreContext(state), { signal });
   }
 
   // The content or the layout changed: re-measure (soon); unchanged groups are kept.
@@ -1596,11 +3323,31 @@ void main() {
   // The core's shared loop calls tick() while it is registered; when nothing moves the
   // lens unregisters. Each registration carries a token, so a stale callback does nothing.
   function wake(state) {
-    if (state.dead || state.ticking) return;
+    if (state.dead || state.ticking || underCover(state)) return;
+    // Arriving, the page paints itself first (its photos keep the GPU busy, and a WebGL frame
+    // would wait for that on the main thread): frames wait for the rest timer, unless the
+    // reader scrolls or moves first, or the lens leaves.
+    if (resting(state)) return;
     state.ticking = true;
     const token = ++state.frameToken;
     const off = state.ctx.frame(dt => (token === state.frameToken ? tick(state, dt) : false));
     state.unframe = typeof off === 'function' ? off : null;
+  }
+  // An arrival's rest: no frame runs yet (see arrive()).
+  const resting = state => state.restUntil > performance.now() && !state.restBroken && state.phase !== 'exiting';
+  // A change to what is drawn (a group built, replaced or hidden): the next frame shows it.
+  // During an arrival's rest no frame runs, so one render (and nothing else) shows it then.
+  function show(state) {
+    if (state.dead) return;
+    if (!resting(state)) { wake(state); return; }
+    if (state.showTimer || !state.renderer) return;
+    state.showTimer = setTimeout(() => {
+      state.showTimer = 0;
+      if (state.dead || state.ticking) return;
+      placeGroups(state);
+      render(state, performance.now());
+      state.perf.restRenders = (state.perf.restRenders || 0) + 1;
+    }, 0);
   }
   function sleep(state) {
     state.frameToken++;
@@ -1610,6 +3357,7 @@ void main() {
 
   function tick(state, dt) {
     if (state.dead) return false;
+    if (underCover(state)) { sleep(state); return false; }
     const began = performance.now();
     dt = clamp(dt > 0 ? dt : 1 / 60, 0, 0.05);
     const reduced = state.ctx.motion.matches;
@@ -1618,14 +3366,17 @@ void main() {
     // Transitions
     if (state.phase === 'entering') {
       state.enterT = (began - state.enterAt) / 1000;
-      const p = groundProgress(state);
+      const p = state.groundP = groundProgress(state);
       state.night = nightMix(state, p);
       captionTone(state, p);
       busy = true;
       if (state.enterT >= state.enterEnd && (p > 0.995 || state.enterT > state.enterEnd + SETTLE_SLACK)) finishEnter(state);
     } else if (state.phase === 'exiting') {
+      // An instant reset (the first egg, pagehide) or reduced motion switched on meanwhile:
+      // the exit finishes at once.
+      if (state.ctx.instant || state.ctx.motion.matches) { finishExit(state); return false; }
       state.exitT = (began - state.exitAt) / 1000;
-      const p = groundProgress(state);
+      const p = state.groundP = groundProgress(state);
       state.night = nightMix(state, p);
       busy = true;
       if (state.exitT >= state.exitEnd && (p < 0.005 || state.exitT > state.exitEnd + SETTLE_SLACK)) {
@@ -1651,6 +3402,8 @@ void main() {
       if (Math.abs(scrollY - state.windowAt) > BAND_H / 2) { state.windowAt = scrollY; schedule(state); }
     }
     placeGroups(state);
+    // The images dissolve (or return) with the sweep.
+    if (state.phase === 'entering' || state.phase === 'exiting') updateMasks(state);
     // Wind (while leaving, disturbed particles only spring home)
     if (stepWind(state, dt, reduced)) busy = true;
     // Rings, in viewport coordinates for the shader
@@ -1710,15 +3463,24 @@ void main() {
     const renderer = state.renderer;
     renderer.begin(u);
     let drawn = 0;
-    // Groups that hide what scrolls beneath them go last, over a cleared box.
-    for (const group of state.groups.values()) if (group.visible && group.data && !group.cover) { renderer.draw(group, u); drawn++; }
-    for (const group of state.groups.values()) {
-      if (!group.visible || !group.data || !group.cover) continue;
-      renderer.occlude(group.cover, u); renderer.draw(group, u); drawn++;
+    // Images first, then text. The groups of a box that hides what scrolls beneath it (a
+    // sticky column with its own background) go last, over their cleared box.
+    const covered = new Map();
+    for (const images of [true, false]) {
+      for (const group of state.groups.values()) {
+        if (!group.visible || !group.data || group.stale || !!group.image !== images) continue;
+        if (group.cover) { const list = covered.get(group.box.el) || []; list.push(group); covered.set(group.box.el, list); continue; }
+        renderer.draw(group, u); drawn++;
+      }
+    }
+    for (const list of covered.values()) {
+      renderer.occlude(list[0].cover, u);
+      for (const group of list) { renderer.draw(group, u); drawn++; }
     }
     renderer.end();
-    state.lastRender = now; state.dirty = false;
+    state.lastRender = now; state.dirty = false; state.perf.renders = (state.perf.renders || 0) + 1;
     state.perf.render = performance.now() - r0; state.perf.drawn = drawn;
+    if (state.perf.render > (state.perf.renderMax || 0)) { state.perf.renderMax = state.perf.render; state.perf.renderMaxAt = r0; }
   }
 
   /*
@@ -1799,7 +3561,7 @@ void main() {
     return moving;
   }
 
-  // The ink canvas: word sprites and portrait strips in transitions, rings while live.
+  // The ink canvas: word sprites in transitions, rings while live.
   function drawInk(state) {
     const g = state.inkG; const ink = state.ink;
     const cw = state.inkCanvas.width; const ch = state.inkCanvas.height;
@@ -1807,6 +3569,7 @@ void main() {
     g.globalAlpha = 1;
     g.clearRect(0, 0, cw, ch);
     state.ringsDrawn = false;
+    if (state.light && (state.phase === 'entering' || state.phase === 'exiting')) drawPatches(state, g);
     if (ink && (state.phase === 'entering' || state.phase === 'exiting')) {
       const n = state.night; const dpr = state.dpr;
       const eT = state.enterT;            // frozen once the exit begins
@@ -1818,6 +3581,7 @@ void main() {
       };
       for (const set of ink.sets) {
         const group = set.group;
+        if (group.stale) continue;
         if (group.cover) g.clearRect(group.cover.x0 * dpr, group.cover.y0 * dpr, (group.cover.x1 - group.cover.x0) * dpr, (group.cover.y1 - group.cover.y0) * dpr);
         // A band follows the scroll even if it was re-sampled meanwhile; a box its container.
         const now = group.kind === 'band' ? { x: -window.scrollX, y: -window.scrollY } : group.origin;
@@ -1837,16 +3601,6 @@ void main() {
           }
         }
         if (clip) g.restore();
-      }
-      const photo = ink.photo;
-      if (photo) {
-        const dx = Math.round((photo.scrollX - window.scrollX) * dpr); const dy = Math.round((photo.scrollY - window.scrollY) * dpr);
-        for (const strip of photo.strips) {
-          const a = alphaOf(strip.delayIn, strip.delayOut);
-          if (a < 0.004) continue;
-          g.globalAlpha = a;
-          g.drawImage(photo.canvas, 0, strip.y, photo.w, strip.h, photo.left + dx, photo.top + dy + strip.y, photo.w, strip.h);
-        }
       }
       g.globalAlpha = 1;
     }
@@ -1870,9 +3624,48 @@ void main() {
     }
   }
 
+  /*
+   * A light page, in a transition: a night patch in each image's box (its own shape) under
+   * its stars, as present as they are row by row (dustAt()). Where a photo is dark its stars
+   * leave cells empty; without the patch the ground, light or passing mid-grey, would show
+   * there: a tonal negative of the photo. On the ink canvas, below the dust.
+   */
+  function drawPatches(state, g) {
+    const dpr = state.dpr; const H = state.H;
+    for (const group of state.groups.values()) {
+      // (By its box: the dark top of a night photo holds no star, yet must stay dark.)
+      if (!group.image || group.stale || !group.data || (group.box && !group.box.el.isConnected)) continue;
+      const item = group.image;
+      const x0 = item.x + group.origin.x; const y0 = item.y + group.origin.y;   // viewport px
+      if (y0 > H || y0 + item.h < 0 || x0 > state.W || x0 + item.w < 0) continue;
+      const stops = clamp(Math.ceil(item.h / MASK_STOP) + 1, 2, 48);
+      const gradient = g.createLinearGradient(0, y0 * dpr, 0, (y0 + item.h) * dpr);
+      let shown = false;
+      for (let k = 0; k < stops; k++) {
+        const t = k / (stops - 1); const a = dustAt(state, y0 + t * item.h, state.late.get(item.img), item.img);
+        if (a > 0.004) shown = true;
+        gradient.addColorStop(t, `rgba(${NIGHT_RGB.join(',')},${a.toFixed(3)})`);
+      }
+      if (!shown) continue;
+      g.save();
+      const c = group.clip;
+      if (c) { g.beginPath(); g.rect(c.x0 * dpr, c.y0 * dpr, (c.x1 - c.x0) * dpr, (c.y1 - c.y0) * dpr); g.clip(); }
+      g.fillStyle = gradient; g.beginPath();
+      if (item.oval) g.ellipse((x0 + item.w / 2) * dpr, (y0 + item.h / 2) * dpr, (item.w / 2) * dpr, (item.h / 2) * dpr, 0, 0, TAU);
+      else if (item.radii && typeof g.roundRect === 'function') g.roundRect(x0 * dpr, y0 * dpr, item.w * dpr, item.h * dpr, item.radii.map(([h, v]) => ({ x: h * dpr, y: v * dpr })));
+      else g.rect(x0 * dpr, y0 * dpr, item.w * dpr, item.h * dpr);
+      g.fill();
+      g.restore();
+      state.perf.patches = (state.perf.patches || 0) + 1;
+    }
+  }
+
   function finishEnter(state) {
-    state.phase = 'live'; state.enterT = 1e4; state.night = 1;
+    state.phase = 'live'; state.enterT = 1e4; state.night = 1; state.groundP = 1;
+    setDip(state, 1);
     captionTone(state, 1);
+    for (const img of state.masked) setImageRule(state, img, RULE_HIDDEN);
+    state.masked.clear();
     state.ink = null;                    // the sprites are no longer needed
     drawInk(state);
     state.dirty = true;
@@ -1884,42 +3677,95 @@ void main() {
     const state = st;
     if (!state || state.dead) return;
     if (state.entered) { state.entered(); state.entered = null; }   // an enter in progress gives way
-    const instant = ctx.instant === true || ctx.motion.matches || !state.renderer || state.phase === 'build' || !state.groups.size;
+    const instant = ctx.instant === true || ctx.motion.matches || document.hidden || !state.renderer || state.phase === 'build' || !state.groups.size;
     if (instant) { finishExit(state); return; }
     if (state.phase === 'exiting') return state.exited;
+    // An arrival's rest (the page's first paint goes first) gives way: the exit runs now.
+    clearTimeout(state.restTimer); state.restUntil = 0;
     // Freeze the enter where it stands; a line still in ink stays ink.
     const wasEntering = state.phase === 'entering';
     if (!wasEntering) state.enterT = 1e4;
     state.phase = 'exiting';
+    // The lightbox's stars fade out on the ground's curve over its photo, which is back at
+    // once. From the opacity they have now, before anything lifts the night (readDay() does
+    // for a moment, which would restart the class's fade-in; and a CSS transition would not
+    // start from an animation that goes in the same change).
+    if (state.media) {
+      for (const overlay of state.media.overlays) {
+        if (!overlay.fixed || typeof overlay.canvas.animate !== 'function') continue;
+        const from = getComputedStyle(overlay.canvas).opacity;
+        overlay.canvas.animate([{ opacity: from }, { opacity: 0 }], { duration: GROUND_OUT * 1000, easing: GROUND_EASE, fill: 'forwards' });
+      }
+    }
     readDay(state, true);
     placeGroups(state);
     for (const group of state.groups.values()) if (group.visible) exitDelays(state, group);
-    // Fresh ink for the current viewport (the night classes leave the text colours alone).
-    const inkAt = performance.now();
-    state.ink = buildInk(state);
-    state.perf.exitBuild = performance.now() - inkAt;
-    if (state.ink.photo) {
-      const H = state.H;
-      const delayIn = y => (wasEntering ? ENTER_START + ENTER_SWEEP * clamp((y - state.enterScroll) / H, 0, 1) : -10);
-      for (const strip of state.ink.photo.strips) { strip.delayIn = delayIn(strip.docY); strip.delayOut = EXIT_SWEEP * clamp((strip.docY - window.scrollY) / H, 0, 1); }
+    // The images return under the sweep: masked where they can be seen, shown at once
+    // elsewhere (and nothing new is sampled from now on).
+    state.exitScroll = window.scrollY;
+    // On a dark page a graphic loses its own inversion and eases back with the ground (on a
+    // light page it keeps following the column, which eases back itself).
+    if (!state.light) state.imageBases.clear();
+    state.masked.clear();
+    // Every rule now carries the column's filter transition, written before the night's
+    // classes go (the next style update starts the transitions with it).
+    state.ruleTail = RULE_LEAVING;
+    for (const img of [...state.imageRules.keys()]) {
+      const r = img.getBoundingClientRect();
+      if (img.isConnected && r.bottom > -0.25 * state.H && r.top < 1.25 * state.H) {
+        state.masked.add(img);
+        setImageRule(state, img, state.imageRules.get(img).css);
+      } else dropImageRule(state, img);
     }
+    for (const job of state.jobs.values()) job.resolve(null);
+    state.jobs.clear();
+    // Fresh ink for the current viewport (the night classes leave the text colours alone).
+    const inkBegan = performance.now();
+    state.ink = buildInk(state);
+    state.perf.exitBuild = performance.now() - inkBegan;
     state.exitEnd = Math.max(EXIT_SWEEP + EXIT_DUR, GROUND_OUT);
     state.exitAt = performance.now(); state.exitT = 0;
     const html = document.documentElement;
     html.classList.add(CLASS_GROUND, CLASS_LEAVING); state.applied.add(CLASS_GROUND); state.applied.add(CLASS_LEAVING);
     html.classList.remove(CLASS_NIGHT, CLASS_INVERT);
     state.exited = new Promise(resolve => { state.resolveExit = resolve; });
+    state.groundP = 1;                   // (the ground is still night: it starts to lift now)
+    updateMasks(state);
     wake(state);
-    // If frames stop (a hidden tab), finish on a timer.
-    state.exitTimer = setTimeout(() => finishExit(state), (state.exitEnd + SETTLE_SLACK + 0.6) * 1000);
+    // (In a hidden tab the frames pause, and the core pauses the exit's limit with them: the
+    // exit resumes when the tab shows again. A page that is left ends it at once: pagehide
+    // makes the core reset instantly, which the next frame or the listener below honours.)
+    state.exitWatch = new AbortController();
+    window.addEventListener('pagehide', () => finishExit(state), { signal: state.exitWatch.signal });
     return state.exited;
+  }
+
+  // The transitions the lens's classes started (the ground, the column and its media, the
+  // marks) end now. The core finishes those of an instant exit; an animated exit ends when
+  // the ground has (nearly) arrived, and a transition still running then would run on after
+  // its rule is gone (Chrome does), leaving the page a hair off its own colours (the back-to-
+  // top control's border eases over 0.8 s, longer than the exit). A CSSTransition names a
+  // longhand: border-color is four of them.
+  const LENS_TRANSITIONS = /^(background-color|filter|color|text-decoration-color|border-(top|right|bottom|left)-color)$/;
+  function endTransitions() {
+    if (typeof document.getAnimations !== 'function') return;
+    const html = document.documentElement; const main = document.getElementById('main-content');
+    for (const animation of document.getAnimations()) {
+      const el = animation.effect && animation.effect.target;
+      if (!el || !LENS_TRANSITIONS.test(animation.transitionProperty || '')) continue;
+      if (el === html || el === document.body || el === main || el.matches(MARKS) ||
+          (main && main.contains(el) && el.matches('img, video, canvas, iframe, object, embed'))) {
+        try { animation.finish(); } catch (error) { /* already gone */ }
+      }
+    }
   }
 
   // Complete restoration: glyphs back, classes off, canvases gone, GPU released.
   function finishExit(state) {
     if (state.dead) return;
     state.dead = true;
-    clearTimeout(state.exitTimer); clearTimeout(state.contentTimer); clearTimeout(state.shimmerTimer); clearTimeout(state.restTimer);
+    clearTimeout(state.contentTimer); clearTimeout(state.shimmerTimer); clearTimeout(state.restTimer); clearTimeout(state.showTimer);
+    if (state.exitWatch) { state.exitWatch.abort(); state.exitWatch = null; }
     if (state.glyphs) { state.ctx.hideGlyphs(false); state.glyphs = false; }
     const html = document.documentElement;
     if (html.classList.contains(CLASS_NIGHT)) {
@@ -1936,7 +3782,23 @@ void main() {
       for (const name of state.applied) html.classList.remove(name);
     }
     state.applied.clear();
+    endTransitions();
     if (!state.hadClass && html.hasAttribute('class') && !html.classList.length) html.removeAttribute('class');
+    // The images return (their rules go; the core then removes the stylesheet itself), and
+    // nothing sampled is kept.
+    for (const img of [...state.imageRules.keys()]) dropImageRule(state, img);
+    for (const key of ['dipRule', 'haloRule']) {
+      const rule = state[key]; if (!rule) continue;
+      const sheet = rule.parentStyleSheet;
+      const index = sheet ? Array.prototype.indexOf.call(sheet.cssRules, rule) : -1;
+      if (index >= 0) sheet.deleteRule(index);
+      state[key] = null;
+    }
+    for (const job of state.jobs.values()) job.resolve(null);
+    state.jobs.clear(); state.imageCache.clear(); state.sheet = null;
+    // The lightbox's stars go with the lens (they have faded out by now), not a frame later
+    // when the core disposes the handle after exit().
+    if (state.media) { try { state.media.dispose(); } catch (error) { /* gone */ } state.media = null; }
     // The canvases vanish at once; the GPU and backing stores are released just after.
     const renderer = state.renderer; const groups = [...state.groups.values()];
     const canvases = [state.canvas, state.inkCanvas].filter(Boolean);
@@ -1974,21 +3836,81 @@ void main() {
           const y0 = k * BAND_H; const y1 = y0 + BAND_H;
           const hasText = st.model.entries.some(e => e.top < y1 && e.bottom > y0);
           const g = st.groups.get(`b${k}`);
-          if (hasText && (!g || g.alpha < 0.5)) missing++;
+          if (hasText && (!g || g.stale || g.alpha < 0.5)) missing++;
         }
       }
       return {
-        phase: st.phase, renderer: p.renderer, particles: st.particles, groups: st.groups.size, visibleGroups: visible, missing,
+        phase: st.phase, enterT: +st.enterT.toFixed(3), exitT: +st.exitT.toFixed(3), renderer: p.renderer, particles: st.particles, groups: st.groups.size, visibleGroups: visible, missing,
         boxes: [...st.groups.values()].filter(g => g.kind === 'box').length, building: st.building, gen: st.gen,
         prepareMs: +(p.prepareMs || 0).toFixed(1), arrivedAt: p.arrivedAt ? Math.round(p.arrivedAt) : null, frames: p.frames, avgMs: p.frames ? +(p.total / p.frames).toFixed(3) : 0,
         maxMs: +p.max.toFixed(2), lastMs: +p.last.toFixed(3), awake,
         uploads: p.uploads, avgUploaded: p.uploads ? Math.round(p.uploaded / p.uploads) : 0, renderMs: +p.render.toFixed(3),
         exitBuildMs: +(p.exitBuild || 0).toFixed(1), enterInkMs: +(p.enterInk || 0).toFixed(1),
         sliceMaxMs: +(p.sliceMax || 0).toFixed(1), changes: p.changes || 0, models: p.models || 0, modelMs: +(p.modelMs || 0).toFixed(1), builds: p.builds || 0, buildWallMs: p.builds ? +(p.buildWall / p.builds).toFixed(1) : 0,
+        arriveMs: p.arriveMs ? +p.arriveMs.toFixed(1) : null, sliceTags: { ...(p.sliceTags || {}) }, renderMaxMs: +(p.renderMax || 0).toFixed(1), renderMaxAt: Math.round(p.renderMaxAt || 0), slices: p.slices || 0, slicesOver: p.slicesOver || 0,
+        layouts: p.layouts || 0, renders: p.renders || 0, restRenders: p.restRenders || 0, stale: [...st.groups.values()].filter(g => g.stale).length,
+        lightboxRenders: p.lightbox || 0, fixedOverlays: st.media ? st.media.overlays.filter(o => o.fixed).length : 0, images: [...st.groups.values()].filter(g => g.image).length, imageSamples: p.images || 0,
+        imageSliceMaxMs: +(p.imageSliceMax || 0).toFixed(1), svgDrawMs: +(p.svgDrawMs || 0).toFixed(1), jobs: st.jobs.size, rules: st.imageRules.size,
+        tintMax: p.tintMax || 0, covered: st.covered, patches: p.patches || 0, waiting: st.waiting.size,
         byPhase: Object.fromEntries(Object.entries(p.byPhase).map(([k, v]) => [k, { frames: v.frames, avgMs: +(v.total / v.frames).toFixed(3), maxMs: +v.max.toFixed(2) }]))
       };
     },
-    _reset() { if (st) { Object.assign(st.perf, { frames: 0, total: 0, max: 0, uploads: 0, uploaded: 0, byPhase: {}, sliceMax: 0 }); } },
+    _reset() { if (st) { Object.assign(st.perf, { frames: 0, total: 0, max: 0, uploads: 0, uploaded: 0, byPhase: {}, sliceMax: 0, imageSliceMax: 0, slices: 0, slicesOver: 0, sliceTags: {} }); } },
+    // Test hook: every image the model holds, and what became of it.
+    get _images() {
+      if (!st || !st.model) return [];
+      return st.model.images.map(item => {
+        const group = st.groups.get(item.gkey); const rule = st.imageRules.get(item.img);
+        return {
+          img: item.img, src: item.img.getAttribute('src'), built: !!(group && group.data), visible: !!(group && group.visible),
+          kind: group ? group.imageKind : kinds.get(item.src) || null, step: group ? +group.step.toFixed(2) : null,
+          particles: group && group.data ? group.data.n : 0, rule: rule ? rule.css : null, selector: rule ? rule.selector : null, base: st.imageBases.get(item.img) || '',
+          failed: st.imageFailed.has(item.key), queued: st.jobs.has(item.key), boxed: !!(group && group.box), clipped: !!(group && group.clip)
+        };
+      });
+    },
+    // Test hook: the words the live groups hold for the text inside el, in viewport px.
+    _wordsIn(el) {
+      const out = [];
+      if (!st) return out;
+      placeGroups(st);
+      for (const group of st.groups.values()) {
+        if (!group.data || group.stale) continue;
+        for (const w of group.words) {
+          if ((w.node && el.contains(w.node)) || (w.marker && el.contains(w.marker))) out.push({ text: w.text, left: w.x + group.origin.x, top: w.y + group.origin.y, width: w.width, height: w.height, marker: !!w.marker });
+        }
+      }
+      return out;
+    },
+    // Test hook: the particles at home inside a viewport rectangle (all groups placed now).
+    _particlesIn(rect) {
+      const out = { n: 0, x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+      if (!st) return out;
+      placeGroups(st);
+      for (const group of st.groups.values()) {
+        const d = group.data; if (!d || group.stale) continue;
+        for (let i = 0; i < d.n; i++) {
+          const x = d.statics[i * 6] + group.origin.x; const y = d.statics[i * 6 + 1] + group.origin.y;
+          if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) continue;
+          out.n++; out.x0 = Math.min(out.x0, x); out.y0 = Math.min(out.y0, y); out.x1 = Math.max(out.x1, x); out.y1 = Math.max(out.y1, y);
+        }
+      }
+      return out;
+    },
+    // Test hook: an image's particles as built, in CSS px from its content box's top left
+    // (x, y pairs), with the box's size and each particle's night colour (r, g, b, alpha);
+    // null when it has none.
+    _pointsOf(img) {
+      if (!st || !st.model) return null;
+      const item = st.model.images.find(i => i.img === img);
+      const group = item && st.groups.get(item.gkey);
+      if (!group || !group.data || group.stale) return null;
+      const d = group.data; const out = new Float32Array(d.n * 2); const at = group.image;
+      for (let i = 0; i < d.n; i++) { out[i * 2] = d.statics[i * 6] - at.x; out[i * 2 + 1] = d.statics[i * 6 + 1] - at.y; }
+      const night = new Uint8Array(d.n * 4);
+      for (let i = 0; i < d.n; i++) for (let k = 0; k < 4; k++) night[i * 4 + k] = d.colours[i * 8 + 4 + k];
+      return { w: at.w, h: at.h, points: out, night };
+    },
     // Test hook: the timing of the last activation, kept after its exit.
     get _lastPerf() { return lastPerf; }
   };

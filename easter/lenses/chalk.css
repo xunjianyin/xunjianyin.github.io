@@ -1,0 +1,279 @@
+/* Lens VII · Chalkboard (easter/lenses/chalk.js).
+   Paint only: colour, background, text shadow, masks, filters and the core's layers. No rule
+   here may change size, spacing, font or position, so the layout is exactly the normal one
+   (the script's writing and erasing are measured on it).
+
+   Classes on <html>:
+     lens-chalk           the activation: by itself it only sets the caption's colours
+     lens-chalk-shell     site-shell pages (home, site pages, blog posts): explicit colours
+     lens-chalk-paper     paper pages: one colour matrix (#lens-chalk-matrix) on the scope
+     lens-chalk-home      the homepage
+     lens-chalk-on        the board itself
+   The script adds one <style> (.lens-chalk-tiles, in its own layer) with what only it knows,
+   under selectors that outrank these:
+     background-image     of <html>: the slate tile (1024 css px, seamless), a data URL
+     mask-image           of the text blocks: the chalk grain, an alpha tile (160 css px)
+     --lens-chalk-link    paper pages: the link colour that the matrix turns into yellow chalk
+   The scope is the page's nav, main and footer: #site-nav / header.site-header,
+   #main-content, #site-footer / footer.paper-footer. The selectors carry an id (through
+   :is()) so they outrank the site's own colour rules, including the dark-theme ones; the
+   lens shows the same board in both site themes. */
+
+/* The caption is chalk on the slate from its first frame. The core shows it as the lens starts
+   (html.lens-chalk is on from then), while the sheet of slate fades in over the normal page:
+   chalk letters in a full slate halo read over the page, the sheet and the board alike, where
+   the normal page's grey caption would sit in a white halo on the slate. */
+html.lens-chalk {
+  --lenses-caption-color: rgba(228, 223, 210, 0.76);
+  --lenses-caption-ground: #1f2b26;
+}
+
+html.lens-chalk-on {
+  --lens-chalk-text: #e4dfd2;
+  --lens-chalk-bright: #f6f2e7;
+  --lens-chalk-soft: rgba(228, 223, 210, 0.74);
+  --lens-chalk-faint: rgba(228, 223, 210, 0.58);
+  --lens-chalk-line: rgba(228, 223, 210, 0.3);
+  --lens-chalk-yellow: #eed89c;
+  --lens-chalk-yellow-bright: #faecbd;
+  --lens-chalk-blue: #a9cde3;
+  /* A hand-drawn chalk line: two strokes of uneven pressure, slightly off level. */
+  --lens-chalk-rule: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 7' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='p'%3E%3Cstop offset='0' stop-color='%23efe9da' stop-opacity='.2'/%3E%3Cstop offset='.05' stop-color='%23efe9da' stop-opacity='.72'/%3E%3Cstop offset='.36' stop-color='%23efe9da' stop-opacity='.5'/%3E%3Cstop offset='.62' stop-color='%23efe9da' stop-opacity='.78'/%3E%3Cstop offset='.94' stop-color='%23efe9da' stop-opacity='.52'/%3E%3Cstop offset='1' stop-color='%23efe9da' stop-opacity='.08'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M3 3.9C150 3.2 320 4.5 500 3.6S820 2.8 997 4.1' fill='none' stroke='url(%23p)' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M42 4.7C260 4.2 520 5.1 760 4.3S930 3.8 978 4.6' fill='none' stroke='url(%23p)' stroke-width='.8' stroke-opacity='.4' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  /* Settled, the caption lies on the board itself, whose half-erased clouds are a little
+     lighter than the bare slate: a flat slate halo would draw a dark silhouette of the words
+     there, so the halo is the slate at half strength (the chalk caption needs no more; this
+     rule comes after html.lens-chalk's, which it overrides). */
+  --lenses-caption-ground: rgba(31, 43, 38, 0.5);
+  background: #1f2b26 repeat 0 0 / 1024px 1024px !important;   /* the image: the script's tile */
+}
+
+html.lens-chalk-on body,
+html.lens-chalk-on #main-content {
+  background: transparent !important;
+}
+
+/* The chalk grain: one mask on each text block (its image: the script's tile; the same list as
+   MASKED in chalk.js). Never on #site-nav or #site-footer themselves, whose skip link and
+   back-to-top button are fixed (a mask would clip them to the block). */
+html.lens-chalk-on :is(#site-nav > nav, #main-content, #site-footer > :not(.back-to-top), body > header.site-header, body > footer.paper-footer) {
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
+  -webkit-mask-size: 160px 160px;
+  mask-size: 160px 160px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  /* The grain must not clip what overflows the block (a wide figure's focus ring, a scroller
+     wider than main): the mask paints without a clip where the browser allows it. */
+  -webkit-mask-clip: no-clip;
+  mask-clip: no-clip;
+}
+
+html.lens-chalk-on ::selection { background: rgba(238, 216, 156, 0.28); }
+
+/* The images are drawn again in chalk (the script's overlays): the originals give way. A
+   cross-origin image cannot be read, so it is not drawn and stays, a little quieter. */
+html.lens-chalk-on :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) img:not([src^="http:"], [src^="https:"], [src^="//"]) {
+  opacity: 0 !important;
+}
+
+html.lens-chalk-on :is(#main-content, #site-footer) img:is([src^="http:"], [src^="https:"], [src^="//"]) {
+  filter: saturate(0.5) brightness(0.9);
+}
+
+/* ===================== Shell pages: explicit colours ===================== */
+
+html.lens-chalk-on.lens-chalk-shell {
+  --text-color: #e4dfd2;
+  --primary-color: #eed89c;
+  --secondary-color: #faecbd;
+  --bg-color: #1f2b26;
+  --border-color: rgba(228, 223, 210, 0.3);
+  --section-bg: transparent;
+  --hover-bg: rgba(238, 216, 156, 0.07);
+  color-scheme: dark;
+}
+
+/* Panels, cards and tables lose their fills: everything is written on the board. */
+html.lens-chalk-on.lens-chalk-shell :is(#main-content, #site-footer) :is(pre, code, kbd, samp, mark, table, thead, tbody, tfoot, tr, th, td, blockquote, details, summary, fieldset, .article-note, .article-toc, .tag, .highlight, .detail-content, input, select, textarea) {
+  background: transparent !important;
+}
+
+/* Every line in the scope is chalk (a blanket first; specific lines below). */
+html.lens-chalk-on.lens-chalk-shell :is(#site-nav, #main-content, #site-footer) :where(*) {
+  border-color: var(--lens-chalk-line);
+}
+
+/* Text: warm white chalk, then three weights: pressed hard, normal, and lighter. */
+html.lens-chalk-on.lens-chalk-shell :is(#site-nav, #main-content, #site-footer),
+html.lens-chalk-on.lens-chalk-shell :is(#site-nav, #main-content, #site-footer) * {
+  color: var(--lens-chalk-text);
+}
+
+html.lens-chalk-on.lens-chalk-shell :is(#site-nav, #main-content, #site-footer) :is(h1, h2, h3, h4, h5, .name, .page-title, .papertitle, .news-date, strong, b, th, dt, .photo-title, .article-title, .post-title) {
+  color: var(--lens-chalk-bright);
+  text-shadow: 0 0 0.6px rgba(250, 246, 236, 0.5), 0 0 6px rgba(250, 246, 236, 0.07);
+}
+
+html.lens-chalk-on.lens-chalk-shell :is(#main-content, #site-footer) :is(.pronunciation, .paper_rest, .footer-copyright, .gallery-intro, .photo-meta, .pub-status, .filter-label, .article-kicker, .article-dek, .article-meta, .post-meta, figcaption, small, time) {
+  color: var(--lens-chalk-soft);
+}
+
+html.lens-chalk-on.lens-chalk-shell :is(#main-content, #site-footer) :is(.paper-venue, .venue, .new-badge, .project-stars, .filter-count, .sep) {
+  color: var(--lens-chalk-faint);
+}
+
+/* Links: yellow chalk; the current page and the chosen filter: the one other chalk, pale blue. */
+html.lens-chalk-on.lens-chalk-shell :is(#site-nav, #main-content, #site-footer) :is(a, .abstract-toggle, .citation-toggle, .detail-toggle) {
+  color: var(--lens-chalk-yellow);
+  text-decoration-color: rgba(238, 216, 156, 0.45);
+}
+
+html.lens-chalk-on.lens-chalk-shell :is(#site-nav, #main-content, #site-footer) :is(a, button, .abstract-toggle, .citation-toggle, .detail-toggle):is(:hover, :focus-visible) {
+  color: var(--lens-chalk-yellow-bright);
+  text-decoration-color: currentColor;
+}
+
+html.lens-chalk-on.lens-chalk-shell :is(#site-nav, #main-content) :is(.nav-button[aria-current="page"], .filter-option[aria-pressed="true"]) {
+  color: var(--lens-chalk-blue);
+  text-shadow: none;
+}
+
+html.lens-chalk-on.lens-chalk-shell #main-content a.project-link { color: var(--lens-chalk-bright); }
+html.lens-chalk-on.lens-chalk-shell #main-content a.project-link:is(:hover, :focus-visible) { color: var(--lens-chalk-yellow-bright); }
+
+html.lens-chalk-on.lens-chalk-shell :is(#site-nav, #site-footer) :is(.theme-toggle, .back-to-top, .footer-social a, .easter-egg-footnote) {
+  color: var(--lens-chalk-text);
+}
+
+html.lens-chalk-on.lens-chalk-shell #site-footer .back-to-top {
+  background-color: #1f2b26;
+}
+
+/* Section rules: hand-drawn chalk lines in place of the 1 px borders. */
+html.lens-chalk-on.lens-chalk-shell #main-content :is(.homepage-section h2, .pub-year-heading, .project-group-heading, .about-section h2, .post-content h1) {
+  border-bottom-color: transparent !important;
+  background: var(--lens-chalk-rule) left bottom / 100% 7px no-repeat !important;
+}
+
+/* The photography lightbox (outside the scope, fixed): the script draws its photo in chalk as it
+   draws the gallery (the media helper's fixed layer, above the lightbox), on a slate backdrop;
+   the original gives way under the drawing. */
+html.lens-chalk-on.lens-chalk-shell #lightbox { background-color: rgba(31, 43, 38, 0.98); }
+html.lens-chalk-on.lens-chalk-shell #lightbox-img { opacity: 0 !important; }
+html.lens-chalk-on.lens-chalk-shell #lightbox :is(.photo-title, .lightbox-close, .lightbox-nav) { color: var(--lens-chalk-bright); }
+html.lens-chalk-on.lens-chalk-shell #lightbox .photo-meta { color: var(--lens-chalk-soft); }
+
+/* Canvases and videos of a shell page (none today) are inverted onto the slate. */
+html.lens-chalk-on.lens-chalk-shell #main-content :is(canvas, video) {
+  filter: invert(0.88) hue-rotate(180deg) saturate(0.72);
+}
+
+/* ===================== Paper pages: one colour matrix ===================== */
+
+html.lens-chalk-on.lens-chalk-paper :is(body > header.site-header, #main-content, body > footer.paper-footer) {
+  filter: url(#lens-chalk-matrix);
+}
+
+/* Text links (before the matrix: this colour comes out as the yellow chalk). */
+html.lens-chalk-on.lens-chalk-paper :is(#main-content :is(p, li, dd, td, figcaption, .paper-authors), body > header.site-header nav, body > footer.paper-footer) a {
+  color: var(--lens-chalk-link);
+  text-decoration-color: currentColor;
+}
+
+/* A filled control (the primary button, a demo's submit button, a pressed chip or toggle) would
+   come out of the matrix as a slab of chalk speckled by the grain: on the board it is drawn
+   like its neighbours, an outline, in the ink (the brightest chalk). The chips and toggles of
+   the demos' control rows are buttons without a class (every paper page, October 2026); the
+   buttons that carry data (a heatmap's cells .se-cell and .jd-cell, a citation matrix's
+   .au-cite, a ranking's .at-row, words marked in a text .eval-word) all have a class and keep
+   their own colours, pressed or not: their fill is what they say. */
+html.lens-chalk-on.lens-chalk-paper #main-content :is(.resource-link.primary, button[type="submit"], .godel-form button, button[aria-pressed="true"]:not([class])) {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+html.lens-chalk-on.lens-chalk-paper #main-content :is(.resource-link.primary, button[type="submit"], .godel-form button, button[aria-pressed="true"]:not([class])) :where(*) {
+  color: inherit;
+}
+
+html.lens-chalk-on.lens-chalk-paper #main-content button[aria-pressed="true"] .coral-swatch use {
+  fill: transparent;
+  stroke: var(--ink);
+}
+
+html.lens-chalk-on.lens-chalk-paper #main-content :is(.resource-link.primary, button[type="submit"], .godel-form button):hover {
+  background: var(--wash);
+}
+
+/* The caption, when the core sets it as a subtitle at the viewport's foot (no room by the
+   trigger): written on a patch of the board wiped clean for it, so it never lies over a line of
+   text. The patch is the bare slate, shrunk to the caption and feathered at its edges, where
+   the text it covers fades out: no box, no rule. Centred by margins, as the core's transform
+   is replaced. */
+html.lens-chalk-on .lenses-caption.is-fixed {
+  left: 12px;
+  right: 12px;
+  transform: none;
+  width: fit-content;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 8px 22px 9px;
+  background: rgba(31, 43, 38, 0.97);
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent),
+    linear-gradient(transparent, #000 7px, #000 calc(100% - 7px), transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent),
+    linear-gradient(transparent, #000 7px, #000 calc(100% - 7px), transparent);
+  mask-composite: intersect;
+  text-wrap: balance;
+}
+
+/* ===================== The script's sheets (in the core's page layer) ===================== */
+
+/* The drawings of the images (and the first rubs under them) are made while the slate comes in;
+   they show from the switch on. */
+html.lens-chalk:not(.lens-chalk-on) :is(.lenses-media-layer, .lenses-layer.lens-chalk-rubs) { visibility: hidden; }
+
+/* Above the image overlays (the media helper's layer), below the caption. */
+.lenses-layer.lens-chalk-sheets { z-index: 950; }
+
+/* The first rubs: just under the drawings (the media helper's layer, z-index 900), which fade in
+   over them; a small canvas stretched over its photo, smoothly, under the chalk grain (the
+   script's tile, as on the text). */
+.lenses-layer.lens-chalk-rubs { z-index: 899; }
+
+.lens-chalk-rub {
+  position: absolute;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  image-rendering: auto;
+  -webkit-mask-size: 160px 160px;
+  mask-size: 160px 160px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+}
+
+.lens-chalk-sheet,
+.lens-chalk-dust {
+  position: absolute;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lens-chalk-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lens-chalk-sheet { transition: none !important; }
+}

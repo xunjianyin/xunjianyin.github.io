@@ -14,7 +14,9 @@
  *
  * Links are lifted above the night by html.lens-lamplight (position and z-index) and coloured
  * by two inline custom properties: --ll-link (their own colour, read on entry) and --ll-near
- * (0 in the dark, 1 under the lamp). Exit restores every link's style attribute exactly.
+ * (0 in the dark, 1 under the lamp). Their boxes are measured again whenever the layout may
+ * have moved (resizes, late content, ctx.onLayoutChange). Exit restores every link's style
+ * attribute exactly.
  */
 (() => {
   'use strict';
@@ -281,6 +283,9 @@
       signal.addEventListener('abort', () => observer.disconnect());
     }
     ctx.onContentChange(() => { refreshLinks(s, ctx.scope); s.wake(); });
+    // Layout that moves without a DOM change or a content-box resize of the scope (lazy photos,
+    // fonts, a padding change, a toggled <details>): the links are measured again.
+    if (typeof ctx.onLayoutChange === 'function') ctx.onLayoutChange(() => { s.measured = false; s.dirtyLinks = true; s.wake(); });
     // A theme switch changes the links' own colours.
     const themes = new MutationObserver(() => { readLinkColours(s); s.dirtyLinks = true; s.wake(); });
     themes.observe(html, { attributes: true, attributeFilter: ['data-theme'] });

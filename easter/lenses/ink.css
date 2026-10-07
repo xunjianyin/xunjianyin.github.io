@@ -1,0 +1,308 @@
+/* Lens VI · Ink (easter/lenses/ink.js).
+   The page as ink on xuan paper: one black ink in five dilutions, and cinnabar for links.
+     焦 scorched  headings, names, titles           --lens-ink-jiao
+     浓 thick     running text                       --lens-ink-nong
+     重 heavy     secondary text: authors, captions  --lens-ink-zhong
+     淡 light     muted text: venues, notes, counts  --lens-ink-dan
+     清 clear     rules, borders, faint washes       --lens-ink-qing
+   Colours only: no size, spacing or font changes, so the layout is exactly the page's own.
+   Page rules are scoped to html.lens-ink (the switched-on state); the rest style the
+   script's own elements in the core's layers, so this sheet is inert until the switch.
+
+   Two ways of colouring:
+     lens-ink-shell  site-shell pages (home, site pages, blog posts; light or dark theme):
+                     every element in the scope inherits its colour, so the site's own
+                     colours give way, and role rules set the five tones where the roles are
+                     (the selectors carry an id through :is(), so they outrank the site);
+     lens-ink-paper  paper pages: their palette variables in ink, a few explicit rules, and
+                     the SVG filter #lens-ink-wash (made by the script) on demos, figures and
+                     charts: every colour becomes ink of its darkness, white becomes clear
+                     paper, so the panels lie on the same sheet. */
+
+/* The caption takes the light ink from the first moment (before the switch). While the page
+   whitens in the dark theme the ground under it turns from dark to paper: no halo until the
+   switch (either colour would show around the letters as a ragged cut-out). */
+html.lens-ink-caption { --lenses-caption-color: #6d685f; }
+html.lens-ink-caption.lens-ink-pending[data-theme="dark"] { --lenses-caption-ground: transparent; }
+
+html.lens-ink {
+  --lens-ink-jiao: #121212;
+  --lens-ink-nong: #2e2c29;
+  --lens-ink-zhong: #4a4640;
+  --lens-ink-dan: #6d685f;
+  --lens-ink-qing: rgba(42, 40, 37, 0.17);
+  --lens-ink-qing-strong: rgba(42, 40, 37, 0.3);
+  --lens-ink-wash: rgba(42, 40, 37, 0.045);
+  --lens-ink-wash-deep: rgba(42, 40, 37, 0.085);
+  --lens-ink-cinnabar: #a3382a;
+  --lens-ink-cinnabar-deep: #8a2b20;
+  --lenses-caption-color: #6d685f;
+  color-scheme: light;
+  background: #f3efe4 var(--lens-ink-paper, none) repeat 0 0 / 600px 600px !important;
+}
+
+html.lens-ink body,
+html.lens-ink #main-content {
+  background: transparent !important;
+}
+
+html.lens-ink ::selection { background: rgba(42, 40, 37, 0.14); }
+
+/* The ink feathers a hair into the paper at glyph edges: a tight halo of the text's own
+   colour and a fainter, wider one. Never a blur of the glyph itself. */
+html.lens-ink :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) {
+  text-shadow:
+    0 0 0.45px color-mix(in srgb, currentColor 26%, transparent),
+    0 0 1.7px color-mix(in srgb, currentColor 7%, transparent);
+}
+
+/* Headings are scorched ink: the deepest black, with a slightly fuller halo (a glossy edge). */
+html.lens-ink :is(#site-nav, #main-content, #site-footer, body > header.site-header) :is(h1, h2, .name, .page-title, .article-title, .post-title) {
+  text-shadow:
+    0 0 0.5px color-mix(in srgb, currentColor 40%, transparent),
+    0 0 2.2px color-mix(in srgb, currentColor 9%, transparent);
+}
+
+/* Links: cinnabar; a hover deepens it slowly, as ink soaking in. The back-to-top button and
+   the footer's icons keep the site's own transitions (they fade in and out, and on hover). */
+html.lens-ink :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) :is(a, button):not(.back-to-top, .footer-social a) {
+  transition: color 320ms ease, background-color 320ms ease, border-color 320ms ease;
+}
+
+/* The switch itself is never eased: the new colours are there in one frame. */
+html.lens-ink-instant :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer),
+html.lens-ink-instant :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) * {
+  transition: none !important;
+}
+
+/* ===================== Site-shell pages ===================== */
+
+html.lens-ink.lens-ink-shell {
+  --text-color: #2e2c29;
+  --primary-color: #a3382a;
+  --secondary-color: #8a2b20;
+  --bg-color: #f3efe4;
+  --border-color: rgba(42, 40, 37, 0.17);
+  --sidebar-bg: transparent;
+  --section-bg: transparent;
+  --hover-bg: rgba(42, 40, 37, 0.04);
+  --shadow-color: transparent;
+  --placeholder-bg: rgba(42, 40, 37, 0.045);
+  --placeholder-text: #6d685f;
+}
+
+/* 浓 by default, inherited by everything; rules and borders in 清. */
+html.lens-ink.lens-ink-shell :is(#site-nav, #main-content, #site-footer) { color: var(--lens-ink-nong); }
+html.lens-ink.lens-ink-shell :is(#site-nav, #main-content, #site-footer) :where(*) {
+  color: inherit;
+  border-color: var(--lens-ink-qing);
+}
+
+/* 焦: names, titles, headings. */
+html.lens-ink.lens-ink-shell :is(#site-nav, #main-content, #site-footer) :is(h1, h2, h3, h4, h5, th, dt, .name, .page-title, .papertitle, .news-date, .pub-year-heading, .project-group-heading, .photo-title, .article-title, .article-toc-title, .post-title, .blog-title, .coming-soon h2, .nav-button[aria-current="page"], .filter-option[aria-pressed="true"]) {
+  color: var(--lens-ink-jiao);
+}
+
+/* 重: authors, captions, intros and other secondary text. */
+html.lens-ink.lens-ink-shell :is(#site-nav, #main-content, #site-footer) :is(.paper_rest, .paper-links, .new-badge, .gallery-intro, .photo-meta, .post-meta, .blog-meta, .blog-tags, .blog-date, .blog-author, .blog-read-time, .article-kicker, .article-dek, .article-meta, .figure-label, .tag, figcaption, .filter-label, .pub-status, .pub-empty, .coming-soon, .horizontal-scroll-hint, .footer-copyright, .footer-social a, .back-link, .theme-toggle) {
+  color: var(--lens-ink-zhong);
+}
+
+/* 淡: venues, notes, counts, separators. */
+html.lens-ink.lens-ink-shell :is(#site-nav, #main-content, #site-footer) :is(.pronunciation, .paper-venue, .venue, .paper_rest i, .filter-count, .filter-note, .sep, .project-stars, .article-toc li, small, time) {
+  color: var(--lens-ink-dan);
+}
+html.lens-ink.lens-ink-shell #main-content .paper_rest b { color: var(--lens-ink-nong); }
+
+/* Links in cinnabar (those the site draws as text, its project names and back links, keep
+   their ink). */
+html.lens-ink.lens-ink-shell :is(#site-nav, #main-content, #site-footer) :is(a, .nav-button, .detail-toggle, .abstract-toggle, .citation-toggle, .filter-option, .read-more):not(.skip-link, .project-link, .project-stars, .back-link, .footer-social a, .nav-button[aria-current="page"], .filter-option[aria-pressed="true"]) {
+  color: var(--lens-ink-cinnabar);
+}
+html.lens-ink.lens-ink-shell :is(#site-nav, #main-content, #site-footer) :is(a, .nav-button, .detail-toggle, .abstract-toggle, .citation-toggle, .filter-option, .read-more):not(.skip-link, .project-link, .project-stars, .back-link, .footer-social a, .nav-button[aria-current="page"], .filter-option[aria-pressed="true"]):is(:hover, :focus-visible) {
+  color: var(--lens-ink-cinnabar-deep);
+}
+html.lens-ink.lens-ink-shell :is(#main-content, #site-footer) :is(.project-link, .back-link, .project-stars, .footer-social a):is(:hover, :focus-visible) {
+  color: var(--lens-ink-cinnabar);
+}
+html.lens-ink.lens-ink-shell #main-content .project-link {
+  color: var(--lens-ink-jiao);
+  text-decoration-color: var(--lens-ink-qing-strong);
+}
+html.lens-ink.lens-ink-shell #main-content .article-note a { text-decoration-color: rgba(163, 56, 42, 0.35); }
+/* The skip link (shown on focus) is a cinnabar block with paper letters (the link rules above
+   leave it out, so nothing outranks this). */
+html.lens-ink.lens-ink-shell #site-nav .skip-link { background: var(--lens-ink-cinnabar); color: #f6f1e6; text-shadow: none; }
+html.lens-ink.lens-ink-shell #site-nav .skip-link:is(:hover, :focus, :focus-visible) { background: var(--lens-ink-cinnabar-deep); color: #f6f1e6; }
+
+/* Panels lose their fills; code and tags keep a faint wash of 清. The back-to-top button keeps
+   its own fill (the paper, through --bg-color), so it stays a clean square over anything. */
+html.lens-ink.lens-ink-shell :is(#main-content, #site-footer) :is(table, thead, tbody, tr, th, td, blockquote, details, summary, .detail-content, .article-toc, input, select, textarea, button):not(.back-to-top) {
+  background-color: transparent !important;
+}
+html.lens-ink.lens-ink-shell :is(#main-content, #site-footer) :is(pre, code, kbd, samp, .tag, .article-note, mark, span.highlight) {
+  background: var(--lens-ink-wash) !important;
+}
+html.lens-ink.lens-ink-shell :is(#main-content, #site-footer) :is(pre code, pre kbd, pre samp) { background: transparent !important; }
+html.lens-ink.lens-ink-shell #main-content .article-note { border-left-color: var(--lens-ink-qing-strong); }
+html.lens-ink.lens-ink-shell #main-content .article-note-status { border-left-color: var(--lens-ink-cinnabar); }
+
+/* Images: printed in ink until their painting covers them (and for good, when the image's
+   pixels may not be read). Photos are printed through the wash's own tone curve, so their
+   painting soaks in as a small step, not as a lightening. */
+html.lens-ink.lens-ink-shell :is(#main-content, #site-footer) :is(img, video, canvas) {
+  filter: url(#lens-ink-print);
+}
+html.lens-ink.lens-ink-shell #main-content :is(.profile-photo, .photo-item img) {
+  filter: url(#lens-ink-print-wash);
+}
+html.lens-ink.lens-ink-shell #main-content .profile-photo { border-color: var(--lens-ink-qing); background: transparent !important; }
+
+/* The photography lightbox (outside the scope): a sheet of the same paper, its tile at the
+   viewport's origin. Its photo is painted by the media helper (fixed: true), in a layer above
+   the lightbox, over the photo itself, which is hidden: the lightbox's paper shows until the
+   painting is there. While the painting of the photo now shown is awaited (it opens, or shows
+   the next photo) the script sets html.lens-ink-awaiting, which hides the last painting too,
+   and the new one soaks in from paper. A photo that will not be painted is printed
+   (html.lens-ink-lightbox-print). */
+html.lens-ink.lens-ink-shell #lightbox { background: #f3efe4 var(--lens-ink-paper, none) repeat 0 0 / 600px 600px; }
+html.lens-ink.lens-ink-shell #lightbox :is(.lightbox-close, .lightbox-nav, .lightbox-caption, .photo-title) { color: var(--lens-ink-nong); text-shadow: none; }
+html.lens-ink.lens-ink-shell #lightbox .photo-meta { color: var(--lens-ink-zhong); }
+html.lens-ink.lens-ink-shell #lightbox :is(.lightbox-close, .lightbox-nav):hover { color: var(--lens-ink-cinnabar); }
+html.lens-ink.lens-ink-shell #lightbox img { opacity: 0; filter: url(#lens-ink-print-wash); }
+html.lens-ink-lightbox-print.lens-ink-shell #lightbox img { opacity: 1; }
+html.lens-ink-awaiting .lenses-media-fixed .lenses-media { opacity: 0 !important; }
+/* The filter makes the photo a stacking context that would paint over the arrows before it
+   (on a phone they lie over the photo): they are lifted back above it. */
+html.lens-ink.lens-ink-shell #lightbox :is(.lightbox-nav, .lightbox-caption) { z-index: 1; }
+
+/* The back-to-top button follows the variables: a square of paper, a 清 border, its arrow in ink. */
+html.lens-ink.lens-ink-shell .back-to-top { box-shadow: none; background-color: #f3efe4; }
+
+/* ===================== Paper pages ===================== */
+
+/* Their palette, in ink: labels and accents scorched, text thick, notes heavy, rules clear. */
+html.lens-ink.lens-ink-paper {
+  --paper: transparent;
+  --ink: #2e2c29;
+  --muted: #4a4640;
+  --accent: #121212;
+  --line: rgba(42, 40, 37, 0.17);
+  --wash: rgba(42, 40, 37, 0.045);
+}
+
+html.lens-ink.lens-ink-paper :is(body > header.site-header, #main-content, body > footer.paper-footer) :is(h1, h2, h3, .site-name, .title-name, .finding-value) {
+  color: var(--lens-ink-jiao);
+}
+html.lens-ink.lens-ink-paper :is(body > header.site-header, #main-content) :is(.site-name span, .paper-eyebrow, .paper-authors, .author-legend, .section-intro, figcaption, caption, .table-caption, .related-venue, .related-thread) {
+  color: var(--lens-ink-zhong);
+}
+html.lens-ink.lens-ink-paper #main-content :is(.paper-takeaway, .narrative, .related-title, .paper-glance dd) {
+  color: var(--lens-ink-nong);
+}
+html.lens-ink.lens-ink-paper :is(body > header.site-header, body > footer.paper-footer) { border-color: var(--lens-ink-qing); }
+
+/* Links in cinnabar: the header's sections, the authors, the resources, related work. */
+html.lens-ink.lens-ink-paper :is(body > header.site-header nav, #main-content, body > footer.paper-footer) a {
+  color: var(--lens-ink-cinnabar);
+}
+html.lens-ink.lens-ink-paper :is(body > header.site-header nav, #main-content, body > footer.paper-footer) a:is(:hover, :focus-visible) {
+  color: var(--lens-ink-cinnabar-deep);
+}
+html.lens-ink.lens-ink-paper body > header.site-header a.site-name { color: var(--lens-ink-jiao); }
+html.lens-ink.lens-ink-paper #main-content .paper-authors a { text-decoration-color: rgba(163, 56, 42, 0.38); }
+html.lens-ink.lens-ink-paper #main-content .related-research a .related-name { color: var(--lens-ink-cinnabar); }
+html.lens-ink.lens-ink-paper #main-content .related-research a :is(.related-title) { color: var(--lens-ink-nong); }
+
+/* The resource links: clear frames, and the first a block of cinnabar with paper letters,
+   as a seal in intaglio (白文). */
+html.lens-ink.lens-ink-paper #main-content .resource-link {
+  border-color: var(--lens-ink-qing-strong);
+  background: transparent;
+}
+html.lens-ink.lens-ink-paper #main-content .resource-link:is(:hover, :focus-visible) {
+  border-color: var(--lens-ink-cinnabar);
+  background: var(--lens-ink-wash);
+}
+html.lens-ink.lens-ink-paper #main-content .resource-link.primary {
+  background: var(--lens-ink-cinnabar);
+  border-color: var(--lens-ink-cinnabar);
+  color: #f6f1e6;
+  text-shadow: none;
+}
+html.lens-ink.lens-ink-paper #main-content .resource-link.primary:is(:hover, :focus-visible) {
+  background: var(--lens-ink-cinnabar-deep);
+  border-color: var(--lens-ink-cinnabar-deep);
+}
+html.lens-ink.lens-ink-paper #main-content .copy-citation-btn { border-color: var(--lens-ink-qing-strong); color: var(--lens-ink-cinnabar); background: transparent; }
+
+/* Panels: white fills become the paper; green washes become washes of 清. */
+html.lens-ink.lens-ink-paper :is(#main-content, body > footer.paper-footer) :is(.concept-diagram, .source-figure img, .primary-figure, .paper-citation) {
+  background-color: transparent;
+}
+html.lens-ink.lens-ink-paper .skip-link { background: #f3efe4; color: var(--lens-ink-cinnabar); }
+html.lens-ink.lens-ink-paper #main-content :is(thead th, .paper-citation, .token.known, .key-known) { background: var(--lens-ink-wash); }
+html.lens-ink.lens-ink-paper #main-content :is(.results-table tr.is-highlight, .token.predicted, .key-predicted, .table-key i, .diagram-flow li:last-child) {
+  background: var(--lens-ink-wash-deep);
+  border-color: var(--lens-ink-qing-strong);
+}
+html.lens-ink.lens-ink-paper #main-content :is(.results-table .is-emphasis, .token.predicted) { color: var(--lens-ink-jiao); }
+html.lens-ink.lens-ink-paper #main-content :is(.diagram-flow li + li)::before { color: var(--lens-ink-dan); }
+html.lens-ink.lens-ink-paper #main-content :is(.paper-authors a) { color: var(--lens-ink-cinnabar); }
+
+/* Demos, figures and charts: every colour becomes ink of its darkness on the paper (the
+   outermost such element only, so no ink is filtered twice). */
+html.lens-ink.lens-ink-paper #main-content :is([data-paper-demo], .paper-demo, [class*="-demo"], .concept-diagram, figure, .figure-scroll, svg, canvas, video, img):not(:is([data-paper-demo], .paper-demo, [class*="-demo"], .concept-diagram, figure, .figure-scroll, svg) *) {
+  filter: url(#lens-ink-wash);
+}
+/* Small icons drawn in the text's colour stay text. */
+html.lens-ink.lens-ink-paper :is(body > header.site-header, #main-content) :is(a, button) > svg {
+  filter: none;
+}
+
+/* ===================== The script's own elements ===================== */
+
+/* The veil of paper, above the paintings and the site's fixed chrome (the back-to-top button
+   at 999, the progress bar, skip link and photography lightbox at 1000, the lightbox's
+   paintings just above it at 1001), under the caption. */
+.lenses-layer.lens-ink-veil-layer { z-index: 1002; }
+.lens-ink-veil {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* While the page whitens the paintings wait under it; while it returns they are gone. */
+html:is(.lens-ink-pending, .lens-ink-leaving) .lenses-media-layer,
+html:is(.lens-ink-pending, .lens-ink-leaving) .lens-ink-seal { visibility: hidden; }
+
+/* A painting made after the lens settled (scrolled to, loaded late) soaks in. */
+.lenses-media.lens-ink-fresh { animation: lens-ink-soak 420ms ease-out both; }
+@keyframes lens-ink-soak { from { opacity: 0; } to { opacity: 1; } }
+
+.lens-ink-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* The seal: pressed once, a quick settle into the paper. */
+.lens-ink-seal {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  transform: scale(1.14);
+  transition: opacity 150ms ease-out, transform 190ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.lens-ink-seal.is-stamped { opacity: 1; transform: none; }
+.lens-ink-seal.is-still { transition: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lens-ink-seal { transition: none; }
+  .lenses-media.lens-ink-fresh { animation: none; }
+  html.lens-ink :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) :is(a, button):not(.back-to-top, .footer-social a) { transition: none; }
+}

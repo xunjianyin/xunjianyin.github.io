@@ -1,0 +1,134 @@
+/* Lens VIII · Shannon, 1951. The letters' ink lives in ::highlight(lens-shannon-<pair>-<level>)
+   rules that shannon.js writes into this sheet (their colours depend on the page's own colours),
+   with the page's own ground as --lens-shannon-ground; here the original images under the
+   drawings (and their blank sheets), the theme toggle's one still style pass, the caption at the
+   viewport's foot, and the hover tooltip. The image overlays (easter/lenses/media.js) fade by
+   inline opacity; a photo's overlay is coloured by its inline ink filter (shannon.js). */
+
+/* The originals under their drawings: while the lens is on (html.lens-shannon-covered) and while
+   it arrives with a page (until arrive() has run; the page is hidden over its ground before this
+   sheet loads), an image of the page's own (a relative URL) is never shown in colour; so is the
+   photography lightbox's photograph (always one of the gallery's, under an absolute URL). Once
+   the lens's filters exist (html.lens-shannon-sheets) such an image is painted as its blank
+   sheet: a hairline round its box in the tone of a photo's frame, on nothing (shannon.js, the
+   SVG filter #lens-shannon-sheet), so an image whose drawing is pending reads as a framed blank
+   sheet that fills in; under a drawing it is not seen. Until then, opacity 0. Opacity and a
+   filter, not visibility (the media helper skips hidden images) and not a clip (a figure in a
+   link keeps its whole box for the pointer). Cross-origin images keep their own look. */
+html[data-lens-arriving="shannon"] :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) img:not([src*="//"]),
+html.lens-shannon-covered :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) img:not([src*="//"]),
+html.lens-shannon-covered #lightbox-img {
+  opacity: 0 !important;
+}
+html.lens-shannon-sheets[data-lens-arriving="shannon"] :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) img:not([src*="//"]),
+html.lens-shannon-sheets.lens-shannon-covered :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) img:not([src*="//"]) {
+  opacity: 1 !important;
+  filter: url(#lens-shannon-sheet) !important;
+}
+html.lens-shannon-sheets.lens-shannon-covered #lightbox-img {
+  opacity: 1 !important;
+  filter: url(#lens-shannon-sheet-fixed) !important;
+}
+/* At opacity 0 the lightbox's photograph is painted with the positioned boxes, in document
+   order: after the arrows, which it would cover (and take their clicks) where they lie over it,
+   as on a phone. The arrows keep their place above it (a filter makes the same stacking). */
+html.lens-shannon-covered #lightbox .lightbox-nav { z-index: 1; }
+
+/* The theme toggle: for one style pass the site's colour transitions are suspended, so the lens
+   reads the new theme's colours at once (shannon.js adds and removes this class in one task). */
+html.lens-shannon-still,
+html.lens-shannon-still *,
+html.lens-shannon-still *::before,
+html.lens-shannon-still *::after {
+  transition: none !important;
+}
+
+/* The caption, when the core sets it as a subtitle at the viewport's foot (no room by the name
+   or the title: a phone, a paper page entered from far down). Where it lies over text its band
+   (::before) covers whole lines of it on that text's own ground: shannon.js grows the band from
+   the caption's box to the glyph boxes it touches and the rest of their lines, so no line is cut
+   and none shows between the caption's lines; its edges fall in the gaps between lines, where
+   the page's ground is, so the band has no visible edge. Over no text (a photograph) there is
+   no band, only the core's halo. No border and no box. */
+html.lens-shannon .lenses-caption.is-fixed {
+  --lenses-caption-ground: var(--lens-shannon-band-ground, var(--lens-shannon-ground));
+  width: max-content;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 5px 12px 6px;
+  text-wrap: balance;
+}
+/* On the narrowest screens shannon.js joins the line's words with no-break spaces; filled
+   greedily (not balanced), the first line then breaks after its dash:
+   "VIII · Shannon, 1951 —" / "Each letter is as dark as it was surprising." */
+@media (max-width: 399.98px) {
+  html.lens-shannon .lenses-caption .lenses-caption-line { text-wrap: wrap; }
+}
+html.lens-shannon .lenses-caption.is-fixed::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: var(--lens-shannon-band-top, 0px);
+  right: var(--lens-shannon-band-right, 0px);
+  bottom: var(--lens-shannon-band-bottom, 0px);
+  left: var(--lens-shannon-band-left, 0px);
+  background: var(--lens-shannon-band-ground, var(--lens-shannon-ground, transparent));
+  opacity: var(--lens-shannon-band-on, 0);
+  pointer-events: none;
+}
+
+/* Hover: each letter of the word over its bits, and the word's total, in a small square note. */
+.lens-shannon-tip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto;
+  column-gap: 5px;
+  align-items: baseline;
+  padding: 3px 7px 4px;
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: pre;
+  color: #24292f;
+  -webkit-text-fill-color: currentColor;
+  background: #fbfbf9;
+  border: 1px solid #d3d7dd;
+  border-radius: 0;
+  visibility: hidden;
+}
+
+.lens-shannon-tip.is-on { visibility: visible; }
+
+.lens-shannon-tip-letter {
+  justify-self: center;
+}
+
+.lens-shannon-tip-bits,
+.lens-shannon-tip-total {
+  justify-self: center;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: #6b7280;
+}
+
+.lens-shannon-tip-total {
+  justify-self: start;
+  padding-left: 4px;
+  font-style: italic;
+  color: #24292f;
+}
+
+html.lens-shannon-dark .lens-shannon-tip {
+  color: #e2e5e9;
+  background: #26282c;
+  border-color: #474b52;
+}
+
+html.lens-shannon-dark .lens-shannon-tip-bits { color: #9ca3af; }
+html.lens-shannon-dark .lens-shannon-tip-total { color: #e2e5e9; }

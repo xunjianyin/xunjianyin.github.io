@@ -1,8 +1,12 @@
-/* Lens I · Stardust (see stardust.js). The core hides the glyphs and the lens draws them
-   as particles; these rules turn the ground to night and make the rest of the page sit in
-   it: on a light page the main column is inverted (hue kept), so light panels sink into
-   the night, borders become faint and data tints stay distinguishable, while images,
-   canvases and video are filtered back and dimmed. Durations match GROUND_IN and
+/* Lens I · Stardust (see stardust.js). The core hides the glyphs and the lens draws them,
+   and every readable image, as particles; these rules turn the ground to night and make the
+   rest of the page sit in it: on a light page the main column is inverted (hue kept), so
+   light panels sink into the night, borders become faint and data tints stay
+   distinguishable, while the media that stay themselves (cross-origin images such as
+   badges, canvases, video) are filtered back and dimmed. The images that became particles
+   are hidden by rules the lens writes into this sheet at run time (one per image, removed
+   with the sheet); while the lens leaves, those rules carry the column's filter transition,
+   so an image's counter-filter eases back with the column. Durations match GROUND_IN and
    GROUND_OUT in stardust.js. */
 
 /* The ground: the root always (as the pre-paint rule paints it), and the body when it
@@ -13,22 +17,65 @@ html.lens-stardust {
 html.lens-stardust.lens-stardust-body body {
   background-color: #06080c !important;
 }
-/* In the dark site theme the main column paints its own background; let the ground show. */
-html.lens-stardust #main-content {
+/* In the dark site theme the main column paints its own background: it turns to night with
+   the ground (the same colour on the same curve, so it never shows as a lighter box while the
+   ground changes). Inverted on a light page, it lets the ground show through. */
+html.lens-stardust:not(.lens-stardust-invert) #main-content {
+  background-color: #06080c !important;
+}
+html.lens-stardust.lens-stardust-invert #main-content {
   background-color: transparent !important;
 }
 
-/* A light page: the main column inverted, its media turned back and dimmed. */
+/* A light page: the main column inverted, its media turned back and dimmed. The media turn
+   their hue the other way (-180deg is the same end state as 180deg): while both filters
+   ease (in, and out again), the two rotations cancel at every moment, so a photo never
+   passes through violet or a negative. */
 html.lens-stardust.lens-stardust-invert #main-content {
   filter: invert(0.94) hue-rotate(180deg);
 }
 html.lens-stardust.lens-stardust-invert #main-content :is(img, video, canvas, iframe, object, embed) {
-  filter: brightness(0.66) saturate(0.7) hue-rotate(180deg) invert(1);
+  filter: brightness(0.66) saturate(0.7) hue-rotate(-180deg) invert(1);
 }
-/* A dark page (or the nav, header and footer): media simply dimmed. */
+/* A dark page (or the nav, header and footer, which sit outside the column): media simply
+   dimmed. */
 html.lens-stardust:not(.lens-stardust-invert) #main-content :is(img, video, canvas, iframe, object, embed),
 html.lens-stardust :is(#site-nav, body > header.site-header, #site-footer, body > footer.paper-footer) :is(img, video, canvas) {
   filter: brightness(0.62) saturate(0.7);
+}
+
+/* The photography lightbox: the lens draws its photo as stars on a canvas the media helper
+   lays over it (stardust.js, lightbox()). The photo itself stays under the lightbox's dark
+   backdrop (opacity 0: it still takes the pointer), so no colour photo shows before its
+   stars, which fade in over the dark when they are ready. A photo with an opacity below 1
+   is a stacking context and paints (and hit-tests) over the arrows before it in the tree:
+   the arrows are lifted above it, as the close control already is. Leaving, the stars fade
+   out on the ground's curve over the photo, which is back at once (stardust.js, exit()). */
+html.lens-stardust #lightbox img {
+  opacity: 0 !important;
+}
+html.lens-stardust #lightbox :is(.lightbox-nav, .lightbox-close) {
+  z-index: 1001;
+}
+html.lens-stardust .lenses-media-fixed canvas.lenses-media {
+  animation: lens-stardust-appear 0.45s ease-out both;
+}
+@keyframes lens-stardust-appear {
+  from { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.lens-stardust .lenses-media-fixed canvas.lenses-media { animation: none; }
+}
+
+/* Text that CSS generates (::before and ::after content: a demo table's column labels on a
+   phone, a "·" between two notes, a placeholder in an empty slot) has no text node, so the
+   lens cannot draw it as dust; it keeps its own glyphs (inverted with the column on a light
+   page) instead of vanishing with the hidden ones. This sheet is only attached while the lens
+   is on. (A list's numbers, ::marker, cannot keep theirs: Chrome ignores the fill colour on
+   a marker, which inherits the hidden one. The lens draws them as dust instead.) */
+html.lenses-hide-glyphs :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) *::before,
+html.lenses-hide-glyphs :is(#site-nav, #main-content, #site-footer, body > header.site-header, body > footer.paper-footer) *::after {
+  -webkit-text-fill-color: currentColor !important;
 }
 
 /* Faint rules in the nav, header and footer. */
@@ -63,14 +110,12 @@ html.lens-stardust:not(.lens-stardust-invert) .project-link {
 }
 
 /* The core's caption, in a light tone once the ground has passed mid-grey (the lens adds
-   this class then; before it the caption keeps the core's grey on the day page). */
+   this class then; before it the caption keeps the core's grey on the day page), with a halo
+   of the night behind its glyphs. While the ground changes, the lens sets the halo to the
+   ground of each frame (stardust.js, captionTone()). */
 html.lens-stardust-caption {
   --lenses-caption-color: #b3bfce;
-}
-
-/* The portrait is drawn as a point cloud in its place. */
-html.lens-stardust-photo .profile-photo {
-  visibility: hidden;
+  --lenses-caption-ground: #06080c;
 }
 
 /* Transitions for the ground and the inversion; kept through the exit so they ease back. */
@@ -78,9 +123,13 @@ html.lens-stardust-ground,
 html.lens-stardust-ground body {
   transition: background-color 0.8s cubic-bezier(0.65, 0, 0.35, 1) !important;
 }
-html.lens-stardust-ground #main-content,
 html.lens-stardust-ground #main-content :is(img, video, canvas, iframe, object, embed) {
   transition: filter 0.8s cubic-bezier(0.65, 0, 0.35, 1) !important;
+}
+/* The main column's own background (the dark site theme paints one) eases with the ground,
+   so it does not stand out as a box while the night lifts. */
+html.lens-stardust-ground #main-content {
+  transition: filter 0.8s cubic-bezier(0.65, 0, 0.35, 1), background-color 0.8s cubic-bezier(0.65, 0, 0.35, 1) !important;
 }
 html.lens-stardust-ground.lens-stardust-leaving,
 html.lens-stardust-ground.lens-stardust-leaving body,

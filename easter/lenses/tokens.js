@@ -16,7 +16,9 @@
  * only for blocks within a screen of the viewport (an IntersectionObserver, a first pass at
  * build time and a re-measure when scrolling settles). Long work (parsing the ranks, reading and
  * encoding a long paper) runs in slices of a few milliseconds. Late content (rendered markdown,
- * star counts, opened abstracts, live demos) rebuilds the page model through ctx.onContentChange.
+ * star counts, opened abstracts, live demos) rebuilds the page model through ctx.onContentChange;
+ * layout that moves without a DOM change (lazy photos, fonts, a padding change) re-measures the
+ * placed tiles through ctx.onLayoutChange.
  */
 (function () {
   'use strict';
@@ -975,6 +977,10 @@
         resizeObserver = new ResizeObserver(() => { if (skipFirstResize) { skipFirstResize = false; return; } requestRelayout(null); });
         ctx.scope.forEach(el => resizeObserver.observe(el));
       }
+      // Layout that moves without a DOM change and without a scope element resizing its
+      // content box (a padding change, lazy images in reserved boxes, a toggled <details>):
+      // the core's debounced report re-measures the placed tiles.
+      if (typeof ctx.onLayoutChange === 'function') ctx.onLayoutChange(() => requestRelayout(null));
       // Late content: the core's debounced observer when it offers one, otherwise our own.
       if (typeof ctx.onContentChange === 'function') {
         ctx.onContentChange(requestRebuild);

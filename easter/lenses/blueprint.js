@@ -632,15 +632,18 @@
     return node instanceof Element && node !== html && node !== document.body && st.ctx.scope.some(s => s.contains(node));
   }
 
+  // The grid's offsets, so a major line runs along the column's left edge and top.
+  const gridVars = mm => ({
+    '--lens-bp-gx': `${((Math.round(mm.col.l + mm.origin.x + scrollX) - 1) % GRID_MAJOR + GRID_MAJOR) % GRID_MAJOR}px`,
+    '--lens-bp-gy': `${((Math.round(mm.col.t + mm.origin.y + scrollY) - 1) % GRID_MAJOR + GRID_MAJOR) % GRID_MAJOR}px`
+  });
+
   // (Re)measures and redraws the annotations, the grid alignment and the cyanotype position.
   function layout(st) {
     const mm = measure(st);
     if (!mm) return;
     st.signature = signature();
-    rootVars.set({
-      '--lens-bp-gx': `${((Math.round(mm.col.l + mm.origin.x + scrollX) - 1) % GRID_MAJOR + GRID_MAJOR) % GRID_MAJOR}px`,
-      '--lens-bp-gy': `${((Math.round(mm.col.t + mm.origin.y + scrollY) - 1) % GRID_MAJOR + GRID_MAJOR) % GRID_MAJOR}px`
-    });
+    rootVars.set(gridVars(mm));
     const drawing = draw(st, mm);
     if (st.drawing) st.drawing.replaceWith(drawing); else st.root.prepend(drawing);
     st.drawing = drawing;
@@ -704,6 +707,9 @@
     // Late content (blog markdown, star counts, toggled abstracts, demos): measure again.
     // Panels can change without changing any size, so this relayout is forced.
     if (typeof st.ctx.onContentChange === 'function') st.ctx.onContentChange(() => { st.relayout = true; st.force = true; schedule(); });
+    // Layout that moves without a DOM change (lazy images, fonts, a padding change, a toggled
+    // <details>): the core reports it, debounced; the drawing is measured again.
+    if (typeof st.ctx.onLayoutChange === 'function') st.ctx.onLayoutChange(() => { st.relayout = true; st.force = true; schedule(); });
     if ('ResizeObserver' in window) {
       const observer = new ResizeObserver(() => { st.relayout = true; schedule(); });
       st.ctx.scope.forEach(node => observer.observe(node));
@@ -831,6 +837,17 @@
     css: true,
     enter,
     arrive,
-    exit
+    exit,
+    // Test hook (not part of the lens contract): whether the drawing and the grid offsets
+    // equal what a measurement of the layout now gives (labels deferred under the caption
+    // aside), or null when the lens is not on.
+    _current() {
+      const st = state;
+      const mm = st && st.drawing ? measure(st) : null;
+      if (!mm) return null;
+      const plain = node => node.outerHTML.replace(/ bp-deferred/g, '');
+      const grid = Object.entries(gridVars(mm)).every(([name, value]) => html.style.getPropertyValue(name) === value);
+      return { drawing: plain(st.drawing) === plain(draw(st, mm)), grid };
+    }
   });
 })();
