@@ -18,6 +18,11 @@
  * - The footer's "*" (.easter-egg-footnote) or typing the password outside a text field opens
  *   it; easter/spira/spira.{js,css} load on the first opening, and an active lens is reset at
  *   once (and forgotten) first. Its AudioContext is primed inside the gesture.
+ *
+ * Either egg: a click (or a tap) on any [data-egg-trigger] (the homepage photo) opens one of
+ * the two at random: Spira, or the next lens, as a double-click on the page's own name would
+ * (the caption sits by that name). Where Spira is not bound, it is always the next lens. The
+ * second click of a double-click is not counted.
  */
 (() => {
   'use strict';
@@ -46,6 +51,9 @@
   const PASSWORD = 'yxjgogogo';
   const PASSWORD_GAP_MS = 1800;       // a longer pause between keys starts the password over
   const TYPING = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], dialog[open]';
+  // Either egg, at random
+  const EGG_TRIGGER = '[data-egg-trigger]';
+  const SPIRA_SHARE = 0.5;            // the chance that a click opens Spira rather than the next lens
 
   const html = document.documentElement;
   const storage = (fn, fallback = null) => { try { return fn(sessionStorage); } catch (error) { return fallback; } };
@@ -225,9 +233,24 @@
     });
   }
 
+  /* Either egg, at random ---------------------------------------------------------- */
+  // A lens chosen from the photo behaves as a double-click on the page's name: the core places
+  // its caption by its trigger, and the photo holds no text to sit beside.
+  let spiraBound = false;
+  document.addEventListener('click', event => {
+    const target = event.target instanceof Element ? event.target : null;
+    const trigger = target && target.closest(EGG_TRIGGER);
+    if (!trigger || event.detail > 1) return;          // a double-click counts once
+    if (spiraBound && Math.random() < SPIRA_SHARE) { openSpira(); return; }
+    const scope = trigger.closest('main') || document;
+    const name = scope.querySelector(TRIGGER) || document.querySelector(TRIGGER) || trigger;
+    triggerLens(name, event.pointerType || (event.detail === 0 ? 'keyboard' : 'mouse'));
+  });
+
   // The footer is injected by the site shell, possibly after this runs: one delegated click
   // listener, and the password listener, once the page shows it has the site shell's footer.
   function bindSpira() {
+    spiraBound = true;
     document.addEventListener('click', event => {
       const target = event.target instanceof Element ? event.target : null;
       if (target && target.closest(FOOTNOTE)) openSpira();
