@@ -57,7 +57,7 @@ LENSES_PREPAINT = ("<script>/* Lenses: the reader's lens follows them across pag
                    "html[data-lens-arriving] body{opacity:0;animation:lenses-failsafe 0s linear 3s forwards}"
                    "@keyframes lenses-failsafe{to{opacity:1}}';d.head.appendChild(t)}}}catch(e){}})()</script>")
 # A boot that fails to load shows the page as it is (the mark and the ground go).
-LENSES_BOOT = ('<script src="../easter/boot.js?v=lenses-v4" defer '
+LENSES_BOOT = ('<script src="../easter/boot.js?v=lenses-v5" defer '
                "onerror=\"document.documentElement.removeAttribute('data-lens-arriving');"
                "var p=document.getElementById('lenses-prepaint');p&&p.remove()\"></script>")
 # Numbers, optionally signed, with a unit, a ± interval, or a significance mark.
