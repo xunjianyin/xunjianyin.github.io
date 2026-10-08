@@ -346,6 +346,35 @@ ul, ol {
   }
 }
 
+/* Below this width the six links and the toggle no longer fit on one line (about 330 px of
+   labels and icon). They are set as a deliberate two-row table instead: three columns of
+   links sized to their longest label, spread to the edges of the text column, and the toggle
+   in a fourth column at the right, centred across both rows. */
+@media screen and (max-width: 480px) {
+  .nav-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, auto) auto;
+    grid-auto-flow: row;
+    justify-content: space-between;
+    justify-items: start;
+    align-items: center;
+    gap: 0 12px;
+    padding: 10px 24px 0;   /* the text column's edges on a phone (.page-shell) */
+  }
+
+  .nav-buttons-wide {
+    padding-left: 16px;     /* ... and the photography grid's */
+    padding-right: 16px;
+  }
+
+  .theme-toggle {
+    grid-column: 4;
+    grid-row: 1 / span 2;
+    justify-self: end;
+    margin-right: -7px;   /* the icon, not the button box, lines up with the text column */
+  }
+}
+
 @media screen and (max-width: 768px) {
   .page-shell {
     padding: 24px 16px 40px;

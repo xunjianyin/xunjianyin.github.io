@@ -183,6 +183,21 @@ a:focus, a:hover {
   color: var(--text-color);
 }
 
+/* A title that links to the paper's own page keeps the title's colour; it is underlined on
+   hover and focus, so the blue stays with the links below it. */
+.papertitle-link,
+.papertitle-link:hover,
+.papertitle-link:focus {
+  color: inherit;
+}
+
+.papertitle-link:hover,
+.papertitle-link:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
 .venue {
   color: #9ca3af;
 }

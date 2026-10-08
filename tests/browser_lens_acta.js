@@ -640,7 +640,9 @@
       const nav = [...doc.querySelectorAll('#site-nav a, #site-nav button')].map(a => a.getBoundingClientRect()).filter(r => r.width > 0 && r.bottom > 0);
       const range = doc.createRange(); range.selectNodeContents(doc.querySelector('#main-content h1'));
       const title = [...range.getClientRects()];
-      check(cap.classList.contains('is-above') && !nav.some(r => overlaps(r, c)) && !title.some(r => overlaps(r, c)),
+      // Above the title: aligned with it (is-above) or centred in the free band between the nav
+      // and the title (is-band), whichever the core finds room for under the phone's two-row nav.
+      check((cap.classList.contains('is-above') || cap.classList.contains('is-band')) && c.bottom <= Math.min(...title.map(r => r.top)) + 0.5 && !nav.some(r => overlaps(r, c)) && !title.some(r => overlaps(r, c)),
         `phone, photography: the caption sits above the title, clear of the nav (${cap.className}, ${Math.round(c.top)}–${Math.round(c.bottom)} px)`);
     } else check(false, 'phone, photography: the caption shows after the enter');
     // The lightbox on a phone: its arrows cross the photograph, and stay visible over the

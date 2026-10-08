@@ -64,9 +64,13 @@ function populatePublications(publications, listId) {
     li.dataset.type = publicationType(pub);
     li.dataset.lead = String(isLeadAuthor(pub));
 
+    // A paper with its own page on this site (a papers/<slug>.html link) has its title link to
+    // that page; the "Paper" link stays for the PDF.
+    const localPage = (pub.links || []).find(link => /^papers\/[a-z0-9-]+\.html$/.test(link.url));
     const titleDiv = document.createElement('div');
     titleDiv.className = 'papertitle';
-    titleDiv.innerHTML = (pub.isNew ? '<span class="new-badge">New</span>' : '') + pub.title;
+    titleDiv.innerHTML = (pub.isNew ? '<span class="new-badge">New</span>' : '')
+      + (localPage ? `<a class="papertitle-link" href="${localPage.url}">${pub.title}</a>` : pub.title);
 
     const restDiv = document.createElement('div');
     restDiv.className = 'paper_rest';
@@ -81,7 +85,9 @@ function populatePublications(publications, listId) {
     linksWrapper.className = 'paper-links';
     linksWrapper.appendChild(document.createTextNode('[ '));
 
-    const linkElements = pub.links.map(link => {
+    // The local page is the title's link; the row keeps the others (an external project page
+    // keeps its "Page" link).
+    const linkElements = pub.links.filter(link => link !== localPage).map(link => {
       const anchor = document.createElement('a');
       anchor.href = link.url;
       anchor.textContent = link.text;
