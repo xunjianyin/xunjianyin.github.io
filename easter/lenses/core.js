@@ -128,7 +128,7 @@
   /* ---------------------------------------------------------------------------
    * Constants
    * ------------------------------------------------------------------------- */
-  const VERSION = 'lenses-v5';        // the ?v= of every lens asset; bump it when any lens file changes
+  const VERSION = 'lenses-v6';        // the ?v= of every lens asset; bump it when any lens file changes
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
   const ROOT = new URL('../../', SCRIPT_SRC).href;            // easter/lenses/core.js → the site root
   const LENS_DIR = 'easter/lenses/';  // <id>.js, <id>.css and media.js, from the site root
