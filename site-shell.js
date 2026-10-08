@@ -182,7 +182,7 @@
   function loadEasterBoot(then) {
     if (window.SiteLensesBoot) { if (then) then(window.SiteLensesBoot); return; }
     const script = document.createElement('script');
-    script.src = toRootHref('easter/boot.js?v=lenses-v6');
+    script.src = toRootHref('easter/boot.js?v=lenses-v7');
     script.onload = () => {
       const boot = window.SiteLensesBoot;
       if (boot && then) then(boot);
