@@ -224,6 +224,29 @@
     await nextPaint();
     const afterKey = egg().spira.projectStar('godel-agent');
     check(chartCanvas.toDataURL() !== image && Math.hypot(afterKey.x - beforeKey.x, afterKey.y - beforeKey.y) > 5, 'Arrow keys turn the rendered spiral');
+    // The galaxy is held by its near side (the lower half of the tilted disk): a drag or an
+    // arrow moves that side the same way. Measured on every paper star, split at the median
+    // screen y; the drag is held still before the release, so no spin is left after it.
+    const stars = () => new Map(slugs.map(slug => [slug, egg().spira.projectStar(slug)]).filter(([, p]) => p && Number.isFinite(p.x)));
+    const nearShift = (from, to, axis) => {
+      const ys = [...from.values()].map(p => p.y).sort((a, b) => a - b); const middle = ys[Math.floor(ys.length / 2)];
+      const shifts = [...from].filter(([slug, p]) => p.y > middle && to.has(slug)).map(([slug, p]) => to.get(slug)[axis] - p[axis]);
+      return shifts.reduce((a, b) => a + b, 0) / Math.max(1, shifts.length);
+    };
+    const dragBy = async (dx, dy) => {
+      const x0 = win.innerWidth * 0.62; const y0 = win.innerHeight * 0.9;
+      pointer('pointerdown', x0, y0);
+      for (let k = 1; k <= 8; k++) { stage.dispatchEvent(new win.PointerEvent('pointermove', { pointerId: 7, pointerType: 'mouse', buttons: 1, clientX: x0 + dx * k / 8, clientY: y0 + dy * k / 8, bubbles: true })); await delay(16); }
+      await delay(120);
+      pointer('pointerup', x0 + dx, y0 + dy);
+      await nextPaint();
+    };
+    let from = stars(); await dragBy(120, 0); let to = stars();
+    check(nearShift(from, to, 'x') > 20, `Dragging right carries the galaxy's near side right (${nearShift(from, to, 'x').toFixed(1)} px)`);
+    from = stars(); await dragBy(0, 80); to = stars();
+    check(nearShift(from, to, 'y') > 3, `Dragging down tips the near side down, toward the reader (${nearShift(from, to, 'y').toFixed(1)} px)`);
+    from = stars(); stage.dispatchEvent(new win.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true })); await nextPaint(); to = stars();
+    check(nearShift(from, to, 'x') > 5, `ArrowRight carries the near side right as a drag would (${nearShift(from, to, 'x').toFixed(1)} px)`);
 
     /* Chrome: revealed by intent only (pointer in its corner, keyboard focus, a tap on empty sky). */
     const actionsRect = chartActions.getBoundingClientRect();

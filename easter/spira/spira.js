@@ -4817,9 +4817,12 @@
         const dx = event.clientX - drag.x; const dy = event.clientY - drag.y;
         if (!drag.moved && Math.hypot(event.clientX - drag.x0, event.clientY - drag.y0) > 4) { drag.moved = true; stage.classList.add('is-dragging'); }
         if (drag.moved) {
-          yaw += dx * DRAG_YAW; pitch = clamp(pitch + dy * DRAG_PITCH, PITCH_RANGE[0], PITCH_RANGE[1]);
+          // The galaxy is held by its near side (the lower, larger half of the tilted disk): it
+          // follows the pointer. A larger yaw carries the near side left and a larger pitch lifts
+          // it (more edge-on), so both turn against the pointer's motion.
+          yaw -= dx * DRAG_YAW; pitch = clamp(pitch - dy * DRAG_PITCH, PITCH_RANGE[0], PITCH_RANGE[1]);
           const seconds = Math.max(0.008, (event.timeStamp - drag.at) / 1000);
-          if (!motion.matches) { vYaw = lerp(vYaw, dx * DRAG_YAW / seconds, 0.5); vPitch = lerp(vPitch, dy * DRAG_PITCH / seconds, 0.5); }
+          if (!motion.matches) { vYaw = lerp(vYaw, -dx * DRAG_YAW / seconds, 0.5); vPitch = lerp(vPitch, -dy * DRAG_PITCH / seconds, 0.5); }
           if (hoverPaper >= 0) setHover(-1);
           if (hoverWish >= 0) setHoverWish(-1);
         }
@@ -4878,10 +4881,11 @@
       if (mode === 'chart' && coreTarget === 1 && !dive && event.target === stage && (event.key === '+' || event.key === '=')) { event.preventDefault(); startDive(); return; }
       if (mode !== 'chart' || coreTarget || coreU > 0 || dive || event.target !== stage || event.altKey || event.ctrlKey || event.metaKey) return;
       switch (event.key) {
-        case 'ArrowLeft': yaw -= 0.15; break;
-        case 'ArrowRight': yaw += 0.15; break;
-        case 'ArrowUp': pitch = clamp(pitch - 0.08, PITCH_RANGE[0], PITCH_RANGE[1]); break;
-        case 'ArrowDown': pitch = clamp(pitch + 0.08, PITCH_RANGE[0], PITCH_RANGE[1]); break;
+        // As a drag would: the near side of the galaxy moves the way the arrow points.
+        case 'ArrowLeft': yaw += 0.15; break;
+        case 'ArrowRight': yaw -= 0.15; break;
+        case 'ArrowUp': pitch = clamp(pitch + 0.08, PITCH_RANGE[0], PITCH_RANGE[1]); break;
+        case 'ArrowDown': pitch = clamp(pitch - 0.08, PITCH_RANGE[0], PITCH_RANGE[1]); break;
         case '+': case '=': zoomTarget = clamp(zoomTarget * 1.2, ZOOM_RANGE[0], ZOOM_RANGE[1]); break;
         case '-': case '_': zoomTarget = clamp(zoomTarget / 1.2, ZOOM_RANGE[0], ZOOM_RANGE[1]); break;
         default: return;
