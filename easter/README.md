@@ -31,12 +31,57 @@ The rest of the site knows only three things.
    (then opens Spira, and the password works again). A click on `*` before the boot has
    loaded opens Spira once it is there.
 3. **Markup.** `[data-lens-trigger]` on the names and titles (`site-shell.js`, `index.html`,
-   the page `h1`s, the paper template), and the footer's `.easter-egg-footnote` button
-   (`site-shell.js`). Spira is bound only on pages with the site shell's footer
-   (`#site-footer`), so paper pages have no Spira.
+   the page `h1`s, the paper template), the footer's `.easter-egg-footnote` button
+   (`site-shell.js`), and the bio's key sentence, an unstyled `<span data-spira-key>` in
+   `index.html`. Spira is bound only on pages with the site shell's footer (`#site-footer`), so
+   paper pages have no Spira.
 
 `shared-styles.css` and `papers/paper-page.css` keep one rule:
 `[data-lens-trigger] { touch-action: manipulation; }`.
+
+Spira also reads the site's content as it opens (below).
+
+## Where Spira's content comes from
+
+Live, read when Spira opens:
+
+- **The page's words.** The visible text of `#main-content` and the footer becomes the text
+  spiral, and the page at its centre.
+- **The key sentence.** The words inside `[data-spira-key]` (the homepage bio) glint warm in the
+  hero frame. A page without the marker has no glint.
+- **The papers.** `publications` in `data.js`. A publication is drawn when one of its `topics` is
+  a theme id (`evaluation`, `knowledge`, `grounding`, `reasoning`, `improvement`; the first such
+  topic is its theme) and it has a year: the last `20xx` in `venue`, else `year={...}` in
+  `citation`. Others (CEER, with no topics) are not drawn. The years set the span: one turn per
+  year from the earliest paper's year to the latest's, the end of the latest at radius 1, then
+  the unwritten `next` turn. Title and venue come from `data.js`. A paper with a link to
+  `papers/<slug>.html` is local: its plate links to that page. Any other paper links to its
+  `Paper` link (else its first link) in a new tab. On a page without `data.js` (photography,
+  the blogs), Spira loads it once from the site root before it opens; if that fails, the footer's
+  `*` says "Could not load. Click to try again." and the next click tries again.
+- **The takeaways.** A local paper's plate shows the `.paper-takeaway` sentence of its page,
+  fetched when the plate opens (or when its star or index link is hovered) and kept while the
+  page is open. Until it arrives the plate keeps its room.
+- **The label on the spiral.** A curated short name (below), else an optional `short` field on
+  the publication in `data.js` (for example `short: "X-Tree"`), else the title before its `:`
+  when that has at most 30 characters, else a phrase cut from the title: a leading `-ing` word
+  dropped, ending before the first preposition (`by`, `for`, `with`, `via`, `in`, `on`, ...),
+  then shortened to whole words that fit.
+
+Curated in `spira/spira.js`:
+
+- `THEMES`: the five themes, their colours and their questions.
+- `QUESTIONS`: the ten open questions the shooting stars carry.
+- `GHOST_WORDS`: the four phrases on the unwritten turn. Each must occur on the homepage (the
+  suite checks it, so a bio edit that drops one is caught).
+- `SHORT_NAMES`: the short names the owner chose, keyed by slug (a paper without a page here is
+  keyed by its title, the part before any `:`, in lowercase with hyphens). Their order is also
+  the order of those papers within a (year, theme) cell; any other paper follows them, oldest
+  first (the reverse of `data.js`, which lists the newest first).
+- The score's timing: `SCORE_YEAR_BASE` plus `SCORE_PER_PAPER` for each paper of the year.
+
+Caught open questions last for one visit (`sessionStorage`, `spira-wishes`); the sound
+preference stays (`localStorage`, `spira-sound`).
 
 ## Files
 

@@ -21,12 +21,6 @@ def data_js_publications() -> list[dict[str, object]]:
     return entries
 
 
-def egg_themes() -> dict[str, str]:
-    """Slug -> theme id from the easter egg's PAPERS table."""
-    source = (ROOT / "easter" / "spira" / "spira.js").read_text()
-    return dict((slug, theme) for theme, slug in re.findall(r"\[\d{4}, '(\w+)', '([a-z0-9-]+)'", source))
-
-
 def topic_ids() -> list[str]:
     source = (ROOT / "data.js").read_text()
     block = source[source.index("const PUBLICATION_TOPICS = ["):source.index("];", source.index("const PUBLICATION_TOPICS = ["))]
@@ -46,24 +40,15 @@ class PublicationTopicsTest(unittest.TestCase):
                 self.assertTrue(set(entry["topics"]) <= known)
                 self.assertEqual(len(entry["topics"]), len(set(entry["topics"])))
 
-    def test_primary_topic_is_the_egg_theme(self) -> None:
-        themes = egg_themes()
+    def test_every_paper_page_has_a_theme(self) -> None:
+        # Spira draws a publication under its first topic that is a theme (spira.js, papersFrom):
+        # a paper with a page here must have one, or its star would be missing.
+        known = set(topic_ids())
         for entry in data_js_publications():
             if entry["slug"]:
                 with self.subTest(slug=entry["slug"]):
-                    self.assertIn(entry["slug"], themes)
                     self.assertTrue(entry["topics"], "papers with a page have a primary topic")
-                    self.assertEqual(entry["topics"][0], themes[entry["slug"]])
-
-    def test_egg_rows_are_separate_array_entries(self) -> None:
-        # A row without its trailing comma still parses ([a][b] is an index expression) but merges two stars.
-        source = (ROOT / "easter" / "spira" / "spira.js").read_text()
-        block = source[source.index("const PAPERS = ["):source.index("].map(", source.index("const PAPERS = ["))]
-        rows = [line.strip() for line in block.splitlines()[1:] if line.strip()]
-        self.assertEqual(len(rows), len(egg_themes()))
-        for row in rows[:-1]:
-            self.assertTrue(row.endswith("],"), row[:60])
-        self.assertTrue(rows[-1].endswith("]"), rows[-1][:60])
+                    self.assertIn(entry["topics"][0], known)
 
 
 if __name__ == "__main__":

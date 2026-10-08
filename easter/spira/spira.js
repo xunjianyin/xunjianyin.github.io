@@ -15,7 +15,7 @@
   /* ---------------------------------------------------------------------------
    * Tunable constants. Times are active seconds from the start of the opening;
    * lengths are CSS px unless marked "world" (research spiral units, in which
-   * the end of 2026 lies at radius 1).
+   * the end of the last year with a paper, LAST_YEAR, lies at radius 1).
    * ------------------------------------------------------------------------- */
   // Choreography
   const T_DUSK = 1.6;                  // the aperture of night covers the viewport
@@ -29,7 +29,7 @@
   const T_WIND = T_LAND + HOLD;        // 6.5: the text spiral winds in
   const T_COLLAPSED = 8.3;             // the text spiral is a point; the core inhales
   const T_IGNITE = 8.6;                // ignition
-  const T_HEAD = [8.65, 11.9];         // research head: inner start -> end of 2026
+  const T_HEAD = [8.65, 11.9];         // research head: inner start -> end of LAST_YEAR (for any span)
   const T_HEAD_RAMP = 0.3;             // head accelerates for this long
   const T_STOP = 12.6;                 // head fades out on the unwritten turn
   const T_PITCH = [9.1, 12.2];
@@ -108,9 +108,9 @@
   const RADIAL_SHARE = 0.6;            // a flight's radius settles by this fraction of it
   const WAIT_ALPHA = 0.55;             // words still on the page (in night colour) recede ...
   const FLIGHT_ALPHA = 0.9;            // ... words in flight are clearer, landed words full
-  // The key sentence of the bio, found among the captured words by token matching.
-  const KEY_SENTENCE = 'My research asks how AI systems can keep improving themselves over long horizons: agents that rewrite their own logic, learn from experience, and stay reliable when their environment changes. I focus on self-referential agents and world models.';
-  const KEY_MIN_TOKENS = 5;            // shorter matches are ignored (other pages)
+  // The key sentence of the bio: the page marks it (index.html, a span with data-spira-key);
+  // the captured words inside the marker glint. A page without the marker has no glint.
+  const KEY_MARKER = '[data-spira-key]';
   const WARM = '#ffe9c7';              // the glint and its lingering tint
   const GLINT_WIDTH = 0.14;            // s; how long the light dwells on a word
   const GLINT_TINT = 0.35;             // share of warm tint a word keeps after the light has passed
@@ -144,12 +144,11 @@
   const SPARK_TRAIL = 0.12;            // s; a trail spans the last 0.12 s, so it shortens as the spark slows
   const SPARK_GLITTER = 0.15;          // share of sparks that twinkle near the end of life
 
-  // Research spiral (world units): r(theta) = g^((theta - theta0) / 2 pi - 5)
+  // Research spiral (world units): r(theta) = g^((theta - theta0) / 2 pi - TURNS), one turn per
+  // year from FIRST_YEAR to LAST_YEAR (the earliest and the latest paper's year; see buildModel).
   const GROWTH = 1.68;
   const THETA0 = -Math.PI / 2;
-  const FIRST_YEAR = 2022;
-  const LAST_YEAR = 2026;
-  const INNER_TURNS = 0.6;             // faint tail before 2022
+  const INNER_TURNS = 0.6;             // faint tail before FIRST_YEAR
   const HEAD_TURN_EXP = 0.6;           // each turn lasts in proportion to r^0.6
   const FUTURE_EASE = 1.15;            // power of the head's ease-out onto the unwritten turn (it fades out as it stops)
   const SECTOR_PAD = 0.06;
@@ -261,7 +260,7 @@
   const ATLAS_SIZE = 2048;
   const ATLAS_PAD = 2;
 
-  // The next turn: beyond 2026 the radius grows by only FUTURE_GROWTH of the log spiral's
+  // The next turn: beyond LAST_YEAR the radius grows by only FUTURE_GROWTH of the log spiral's
   // rate, r = 1 + c (g^(phi / 2 pi) - 1), so the whole next turn (where the caught open
   // questions are pinned) stays within the chart's fit radius (about 1.2 after a full turn).
   const FUTURE_GROWTH = 0.3;
@@ -342,8 +341,12 @@
   const CORE_MUFFLE = 700;             // Hz: the music bus in core view ("inside the page")
 
   // "Listen to the spiral": a comet traces the written spiral, one turn per year.
-  const SCORE_INNER = 0.6;             // s along the faint inner tail before 2022
-  const SCORE_YEARS = [2.4, 3.0, 3.6, 4.4, 3.2]; // s per year 2022-2026, constant angular speed within each
+  const SCORE_INNER = 0.6;             // s along the faint inner tail before FIRST_YEAR
+  // s per year, constant angular speed within each: a base plus a share per paper, the least-
+  // squares fit (rounded) to the hand-set [2.4, 3.0, 3.6, 4.4, 3.2] for 2022-2026 at their
+  // 1, 3, 7, 8 and 10 papers. It keeps the years' total (16.6 s then) and gives a busy year room.
+  const SCORE_YEAR_BASE = 2.5;
+  const SCORE_PER_PAPER = 0.14;
   const SCORE_NEXT = 1.8;              // s along the dashed next turn (caught wishes chime), fading out
   const SCORE_OUTRO = 3;               // s the closing words hold before the default plate returns
   const SCORE_DUCK = 0.3;              // the ambient music's share during the score
@@ -371,74 +374,55 @@
     { id: 'reasoning', label: 'Reasoning', colour: '#9dc4f5', question: 'How can reasoning go beyond familiar cases?' },
     { id: 'improvement', label: 'Self-improvement', colour: '#f1a98e', question: 'Can experience change the learner?' }
   ];
-  // Year = venue year on the paper page. Within a (year, theme) cell this order is kept.
-  const PAPERS = [
-    [2022, 'evaluation', 'seq2seq-data2text', 'Evaluating Data-to-Text', 'How Do Seq2Seq Models Perform on End-to-End Data-to-Text Generation?', 'ACL 2022'],
-    [2023, 'evaluation', 'chatgpt-summarization-evaluation', 'ChatGPT as Summary Evaluator', 'Human-like Summarization Evaluation with ChatGPT', 'arXiv preprint 2023'],
-    [2023, 'evaluation', 'context-aware-evaluation', 'Cont-COMET', 'Exploring Context-Aware Evaluation Metrics for Machine Translation', 'EMNLP 2023 Findings'],
-    [2023, 'knowledge', 'alcuna', 'ALCUNA', 'ALCUNA: Large Language Models Meet New Knowledge', 'EMNLP 2023'],
-    [2024, 'evaluation', 'themis', 'Themis', 'Themis: A Reference-free NLG Evaluation Language Model with Flexibility and Interpretability', 'EMNLP 2024'],
-    [2024, 'knowledge', 'history-matters', 'History Matters', 'History Matters: Temporal Knowledge Editing in Large Language Model', 'AAAI 2024'],
-    [2024, 'knowledge', 'knowledge-boundary', 'Knowledge Boundary', 'Benchmarking Knowledge Boundary for Large Language Models: A Different Perspective on Model Evaluation', 'ACL 2024 · Main Conference'],
-    [2024, 'grounding', 'contextual-asr', 'Contextual ASR', 'Contextual Modeling for Document-level ASR Error Correction', 'LREC-COLING 2024'],
-    [2024, 'grounding', 'error-robust-retrieval', 'RERIC', 'Error-Robust Retrieval for Chinese Spelling Check', 'LREC-COLING 2024'],
-    [2024, 'reasoning', 'coral', 'COrAL', 'COrAL: Order-Agnostic Language Modeling for Efficient Iterative Refinement', 'AFM Workshop, NeurIPS 2024'],
-    [2024, 'improvement', 'contrasolver', 'ContraSolver', 'ContraSolver: Self-Alignment of Language Models by Resolving Internal Preference Contradictions', 'arXiv preprint 2024'],
-    [2025, 'evaluation', 'dsgram', 'DSGram', 'DSGram: Dynamic Weighting Sub-Metrics for Grammatical Error Correction in the Era of Large Language Models', 'AAAI 2025'],
-    [2025, 'evaluation', 'nlg-evaluation-survey', 'LLMs as Evaluators', 'LLM-based NLG Evaluation: Current Status and Challenges', 'Computational Linguistics 2025'],
-    [2025, 'evaluation', 'damon', 'DAMON', 'DAMON: A Dialogue-Aware MCTS Framework for Jailbreaking Large Language Models', 'EMNLP 2025'],
-    [2025, 'knowledge', 'mc-mke', 'MC-MKE', 'MC-MKE: A Fine-Grained Multimodal Knowledge Editing Benchmark Emphasizing Modality Consistency', 'ACL 2025 Findings'],
-    [2025, 'grounding', 'self-generated-documents', 'Self-Generated Documents', 'Evaluating Self-Generated Documents for Enhancing Retrieval-Augmented Generation with Large Language Models', 'NAACL 2025 Findings'],
-    [2025, 'grounding', 'knowledge-interplay', 'EchoQA', 'Understanding the Interplay between Parametric and Contextual Knowledge for Large Language Models', 'KnowLM Workshop @ ACL 2025'],
-    [2025, 'improvement', 'chemagent', 'ChemAgent', 'ChemAgent: Self-updating Library in Large Language Models Improves Chemical Reasoning', 'ICLR 2025'],
-    [2025, 'improvement', 'godel-agent', 'Gödel Agent', 'Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement', 'ACL 2025 · Main Conference'],
-    [2026, 'evaluation', 'auditing-health-llms', 'Challenges of Auditing', 'Challenges of Auditing: Variability in Outputs of Large Language Models for Health', 'arXiv preprint 2026'],
-    [2026, 'evaluation', 'agent-x', 'AGENT-X', 'AGENT-X: Adaptive Guideline-based Expert Network for Threshold-free AI-generated teXt detection', 'EMNLP 2026'],
-    [2026, 'grounding', 'eama', 'EAMA', 'EAMA: Entity-Aware Multimodal Alignment Based Approach for News Image Captioning', 'TOMM 2026'],
-    [2026, 'grounding', 'epistemic-context-learning', 'Epistemic Context Learning', 'Epistemic Context Learning: Building Trust the Right Way in LLM-Based Multi-Agent Systems', 'Agentic AI in the Wild Workshop, ICLR 2026'],
-    [2026, 'grounding', 'coding-agents-long-context', 'Coding Agents for Long Context', 'Coding Agents are Effective Long-Context Processors', 'arXiv preprint 2026'],
-    [2026, 'grounding', 'lazy-grounding', 'Lazy Grounding', 'Lazy Grounding: Attacking Search Agents with Factual Evidence', 'EMNLP 2026'],
-    [2026, 'reasoning', 'geometry-of-reasoning', 'The Geometry of Reasoning', 'The Geometry of Reasoning: Flowing Logics in Representation Space', 'ICLR 2026'],
-    [2026, 'reasoning', 'atomic-to-composite', 'Atomic to Composite', 'From Atomic to Composite: Reinforcement Learning Enables Generalization in Complementary Reasoning', 'SPOT Workshop, ICLR 2026'],
-    [2026, 'reasoning', 'reverse-lm', 'LEDOM', 'LEDOM: Reverse Language Model', 'ACL 2026'],
-    [2026, 'improvement', 'derl', 'DERL', 'Differentiable Evolutionary Reinforcement Learning', 'Recursive Self-Improvement Workshop, ICLR 2026']
-  ].map(([year, theme, slug, name, title, venue]) => ({
-    year, slug, name, title, venue, theme: THEMES.findIndex(t => t.id === theme)
-  }));
-
-  // One-sentence takeaways, a verbatim snapshot of the `takeaway` fields in
-  // papers/content/*.json (the paper pages show the same text).
-  const TAKEAWAYS = Object.freeze({
-    "agent-x": "LLM agents judge a text against routed stylistic guidelines, and a meta agent merges their calibrated verdicts, so no detection threshold is tuned. AGENT-X has the highest average accuracy for all four source models tested; Fast-DetectGPT keeps the higher average AUROC.",
-    "alcuna": "ALCUNA creates fictional organisms to test knowledge that models have not memorized, exposing a gap between reading new facts and connecting them to existing knowledge.",
-    "atomic-to-composite": "In a controlled reasoning setting, RL helps models combine internal knowledge with new context when supervised training has first established both component skills.",
-    "auditing-health-llms": "API-based health evaluations may not describe what chatbot users see. With the model version fixed, GPT answers to the same 50 consumer health questions differed between the API and ChatGPT, and several differences reversed between GPT-5.3 and GPT-5.4.",
-    "chatgpt-summarization-evaluation": "Given the instructions that human annotators follow, ChatGPT completed four summarization evaluation protocols. In this early-2023 study it agreed with human judgments better than common automatic metrics on SummEval but not on Newsroom, and its system-level agreement shifted sharply with the prompt.",
-    "chemagent": "ChemAgent turns solved chemistry subproblems into reusable memory, helping an LLM plan, calculate, and refine new solutions with experience retained outside its model weights.",
-    "coding-agents-long-context": "Off-the-shelf coding agents can process long contexts as files. With only a path and a question, Codex and Claude Code search, slice and script through the text, and exceed the best published scores on four of five long-context benchmarks.",
-    "context-aware-evaluation": "Adding document context to a translation metric only at inference trades sentence-level accuracy for system-level gains. Cont-COMET trains COMET with selected context, as human annotators see it, and largely removes that trade-off.",
-    "contextual-asr": "A transcript can contain clues to its own recognition errors. Retrieving context from the document and related documents helps a correction model use those clues.",
-    "contrasolver": "A model's preferences can contradict each other; ContraSolver finds cycles in those judgments and selects reliable comparisons to improve alignment through DPO.",
-    "coral": "COrAL lets a language model predict and revise several token positions within a local window, making the trade-off between reasoning accuracy and decoding speed explicit.",
-    "damon": "Safety failures can emerge over an evolving conversation; DAMON evaluates this risk with dialogue-aware search, showing why model defenses need testing beyond isolated prompts.",
-    "derl": "DERL learns how to combine simple reward signals: a meta-optimizer proposes rewards, trains a policy with them, and improves from that policy's validation performance.",
-    "dsgram": "Good grammatical correction must preserve meaning, avoid unnecessary edits, and read fluently. DSGram scores these dimensions separately and adapts their importance to each sentence.",
-    "eama": "News captions need names and events that an image alone cannot reveal. EAMA teaches a multimodal LLM, InstructBLIP, to find the relevant sentences and entities in the article before writing the caption.",
-    "epistemic-context-learning": "An agent that cannot verify a peer's answer can still judge the peer's track record. ECL estimates from earlier rounds which peer is reliable before it answers, and is misled less by persuasive wrong peers than aggregation that ignores history.",
-    "error-robust-retrieval": "A misspelled character is a poor retrieval query. RERIC combines pronunciation, shape, and surrounding context to find useful training examples without retraining the correction model.",
-    "geometry-of-reasoning": "When the same logical argument is expressed across topics and languages, changes along its representation trajectory reveal more shared logical structure than embedding positions alone.",
-    "godel-agent": "Gödel Agent can inspect and rewrite its own running code, using task feedback to revise both its problem-solving policy and the procedure that improves it.",
-    "history-matters": "Updating a model with today's facts can erase yesterday's answers; METO edits current and historical knowledge together so that facts remain associated with their time periods.",
-    "knowledge-boundary": "A wrong answer may reflect the prompt rather than missing knowledge; searching for alternative wording reveals facts a model can answer but a fixed benchmark misses.",
-    "knowledge-interplay": "Providing relevant context can make a model less willing to use facts it already knows; EchoQA tests when internal knowledge and external information work together or interfere.",
-    "lazy-grounding": "A search agent can be misled by evidence that is entirely true. Records that correctly answer a nearby variant of the question pull agents toward the variant’s answer: across 12 agent–benchmark settings, accuracy falls by 5.9 pp on average.",
-    "mc-mke": "Correcting one multimodal answer does not ensure related answers change consistently; MC-MKE checks whether edits agree across image recognition, textual facts, and questions about images.",
-    "nlg-evaluation-survey": "LLMs can evaluate generated text in several distinct ways. This survey organizes the methods and explains the reliability, cost, and control trade-offs behind each choice.",
-    "reverse-lm": "Train a language model to predict the past. Then use its backward probabilities to help forward models choose better answers.",
-    "self-generated-documents": "Documents generated by a model can help retrieval-augmented answers, but their usefulness depends on document style, model capacity, and how they are combined with retrieved evidence.",
-    "seq2seq-data2text": "A high generation score does not explain what a model gets wrong. Fine-grained human annotation reveals how copying, pre-training, and dataset structure affect data-to-text errors.",
-    "themis": "An evaluator should explain its scores and accept the criteria a task needs. Themis trains an open model to provide both, without requiring a reference answer."
+  /*
+   * The papers come from the site's publication list (data.js, the global `publications`) when
+   * the egg opens; see papersFrom. What stays curated here: the short names the owner chose for
+   * the labels on the spiral, keyed by paper slug (a paper without one is named by shortName).
+   * Their order is also the order of these papers within a (year, theme) cell.
+   */
+  const SHORT_NAMES = Object.freeze({
+    'seq2seq-data2text': 'Evaluating Data-to-Text',
+    'chatgpt-summarization-evaluation': 'ChatGPT as Summary Evaluator',
+    'context-aware-evaluation': 'Cont-COMET',
+    'alcuna': 'ALCUNA',
+    'themis': 'Themis',
+    'history-matters': 'History Matters',
+    'knowledge-boundary': 'Knowledge Boundary',
+    'contextual-asr': 'Contextual ASR',
+    'error-robust-retrieval': 'RERIC',
+    'coral': 'COrAL',
+    'contrasolver': 'ContraSolver',
+    'dsgram': 'DSGram',
+    'nlg-evaluation-survey': 'LLMs as Evaluators',
+    'damon': 'DAMON',
+    'mc-mke': 'MC-MKE',
+    'self-generated-documents': 'Self-Generated Documents',
+    'knowledge-interplay': 'EchoQA',
+    'chemagent': 'ChemAgent',
+    'godel-agent': 'Gödel Agent',
+    'auditing-health-llms': 'Challenges of Auditing',
+    'agent-x': 'AGENT-X',
+    'eama': 'EAMA',
+    'epistemic-context-learning': 'Epistemic Context Learning',
+    'coding-agents-long-context': 'Coding Agents for Long Context',
+    'lazy-grounding': 'Lazy Grounding',
+    'geometry-of-reasoning': 'The Geometry of Reasoning',
+    'atomic-to-composite': 'Atomic to Composite',
+    'reverse-lm': 'LEDOM',
+    'derl': 'DERL',
+    // Papers without a page here (the key is made from the title: see papersFrom)
+    'constructing-challenging-browser-use-tasks-by-controlled-environment-interventions': 'Browser-Use Tasks'
   });
+  const CURATED_ORDER = Object.keys(SHORT_NAMES);
+  const SHORT_MAX = 30;                // characters: the longest label the layout takes ('Coding Agents for Long Context')
+  // A generated short name ends before one of these words (or after , ; ? !).
+  const SHORT_BOUNDARY = new Set(['by', 'for', 'with', 'via', 'in', 'on', 'from', 'to', 'through', 'using', 'between',
+    'beyond', 'under', 'toward', 'towards', 'against', 'without', 'as', 'at']);
+  // ... and never ends on one of these.
+  const SHORT_DANGLING = new Set(['a', 'an', 'the', 'and', 'or', 'of', 'is', 'are', 'can', ...SHORT_BOUNDARY]);
+  const LOCAL_PAGE = /^papers\/([a-z0-9-]+)\.html$/i;   // a link to the paper's page on this site
+  const DATA_TIMEOUT_MS = 10000;       // a page without data.js waits this long for it before the opening fails
+  const TAKEAWAY_IN_MS = 240;          // a takeaway that arrives after its plate opened fades in (and settles) this long
   // Open questions, each bridging two themes. A shooting star carries one; caught, it is
   // pinned on the next turn, midway (the shorter way) between its two themes' sectors.
   const QUESTIONS = [
@@ -454,8 +438,8 @@
     ['improvement', 'grounding', 'Can experience become lasting capability?', 'A long-running agent sees more than fits in context. How does experience become part of its machinery?']
   ].map(([a, b, text, note]) => ({ a: THEMES.findIndex(t => t.id === a), b: THEMES.findIndex(t => t.id === b), text, note }));
   const NQ = QUESTIONS.length;
-  const WISH_KEY = 'spira-wishes';
-  const SOUND_KEY = 'spira-sound';
+  const WISH_KEY = 'spira-wishes';     // sessionStorage: caught questions last for one visit (a legacy localStorage copy is removed)
+  const SOUND_KEY = 'spira-sound';     // localStorage: the sound preference stays
 
   const COPY = {
     stage: 'The research spiral. Drag or use arrow keys to turn it; plus and minus to zoom. Keys 1 to 5 choose a theme; L listens to the spiral; Space catches a shooting star; M switches the sound. At the centre, plus goes deeper.',
@@ -782,38 +766,21 @@
   }
 
   /**
-   * Find the bio's key sentence among the captured words: the longest run of tokens
-   * (case-insensitive, punctuation-trimmed; pieces of a word wrapped across lines are
-   * joined) that also occurs, contiguously, in KEY_SENTENCE. Marks each word of the run
-   * with its order in the run and returns the run's length in tokens (0 when absent).
+   * Find the bio's key sentence among the captured words: the words whose text lies inside the
+   * page's marker (KEY_MARKER). Marks each with its order along the sentence (reading order)
+   * and returns the sentence's length in tokens (pieces of a word wrapped across lines count
+   * once); 0 when the page has no marker or none of its words is in view.
    */
-  const normaliseToken = text => text.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
-  const KEY_TOKENS = KEY_SENTENCE.split(/\s+/).map(normaliseToken);
   function markKeySentence(words) {
-    const tokens = []; const firstWord = []; const lastWord = [];
-    for (let i = 0; i < words.length; i++) {
-      if (words[i].cont && tokens.length) { tokens[tokens.length - 1] += words[i].text; lastWord[lastWord.length - 1] = i; continue; }
-      tokens.push(words[i].text); firstWord.push(i); lastWord.push(i);
+    const marker = document.querySelector(KEY_MARKER);
+    if (!marker) return 0;
+    let order = 0; let tokens = 0; let previous = false;
+    for (const word of words) {
+      const inside = marker.contains(word.node);
+      if (inside) { word.key = order++; if (!word.cont || !previous) tokens++; }
+      previous = inside;
     }
-    for (let i = 0; i < tokens.length; i++) tokens[i] = normaliseToken(tokens[i]);
-    // Longest common contiguous run: run[j] is the length of the match ending at token i, key j.
-    let best = 0; let bestEnd = -1; let previous = new Uint16Array(KEY_TOKENS.length + 1);
-    for (let i = 0; i < tokens.length; i++) {
-      const current = new Uint16Array(KEY_TOKENS.length + 1);
-      for (let j = 0; j < KEY_TOKENS.length; j++) {
-        if (tokens[i] && tokens[i] === KEY_TOKENS[j]) {
-          current[j + 1] = previous[j] + 1;
-          if (current[j + 1] > best) { best = current[j + 1]; bestEnd = i; }
-        }
-      }
-      previous = current;
-    }
-    if (best < KEY_MIN_TOKENS) return 0;
-    let order = 0;
-    for (let k = bestEnd - best + 1; k <= bestEnd; k++) {
-      for (let i = firstWord[k]; i <= lastWord[k]; i++) words[i].key = order++;
-    }
-    return best;
+    return tokens;
   }
 
   /**
@@ -873,31 +840,159 @@
   }
 
   /* ---------------------------------------------------------------------------
-   * Research spiral geometry (layout independent)
+   * Papers: the site's publication list (data.js)
    * ------------------------------------------------------------------------- */
-  const TURNS = LAST_YEAR - FIRST_YEAR + 1;
+  // data.js is a classic script with a top-level const, so `publications` is a global binding
+  // (not a window property) that this script reads by name; null on a page without data.js.
+  const sitePublications = () => (typeof publications !== 'undefined' && Array.isArray(publications) ? publications : null); // eslint-disable-line no-undef
+  /**
+   * A page without data.js (the photography page, the blogs) loads it once, from the site root,
+   * before the egg opens. Never a second script while the first may still run (a second const
+   * declaration would throw): a network error removes it, so a later opening tries again; a load
+   * that takes longer than DATA_TIMEOUT_MS fails this opening and still serves the next one.
+   */
+  let dataLoad = null;
+  function loadPublications() {
+    const ready = sitePublications();
+    if (ready) return Promise.resolve(ready);
+    if (!dataLoad) {
+      dataLoad = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = new URL('data.js', ROOT).href;
+        script.onload = () => { const list = sitePublications(); if (list) resolve(list); else reject(new Error('data.js defines no publications.')); };
+        script.onerror = () => { script.remove(); dataLoad = null; reject(new Error('data.js could not be loaded.')); };
+        document.head.append(script);
+      });
+    }
+    let timer = 0;
+    const late = new Promise((resolve, reject) => { timer = setTimeout(() => reject(new Error('data.js took too long.')), DATA_TIMEOUT_MS); });
+    return Promise.race([dataLoad, late]).finally(() => clearTimeout(timer));
+  }
+  const cleanText = text => String(text == null ? '' : text).replace(/\s+/g, ' ').trim();
+  const slugify = text => cleanText(text).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  // A paper's year: the last 20xx in its venue, else year={...} in its citation, else 0 (not drawn).
+  function yearOf(pub) {
+    const venue = cleanText(pub.venue).match(/\b20\d\d\b/g);
+    if (venue) return Number(venue[venue.length - 1]);
+    const cited = /\byear\s*=\s*[{"]?\s*(20\d\d)\b/i.exec(String(pub.citation || ''));
+    return cited ? Number(cited[1]) : 0;
+  }
+  /**
+   * The label on the spiral: the curated name (SHORT_NAMES), else the publication's own `short`
+   * field, else its title before ':' when that has at most SHORT_MAX characters, else a phrase
+   * cut from that title at a natural boundary: a leading gerund ("Constructing ...") dropped,
+   * ending before the first preposition (SHORT_BOUNDARY) or after , ; ? !, then shortened to
+   * whole words that fit, never ending on a function word.
+   */
+  function shortName(pub, slug) {
+    if (Object.prototype.hasOwnProperty.call(SHORT_NAMES, slug)) return SHORT_NAMES[slug];
+    const own = cleanText(pub.short);
+    if (own) return own;
+    const title = cleanText(pub.title);
+    const colon = title.indexOf(':');
+    const head = colon > 0 ? title.slice(0, colon).trim() : title;
+    if (head.length <= SHORT_MAX) return head;
+    let words = head.split(' ');
+    if (words.length > 2 && /^\p{Lu}\p{Ll}{3,}ing$/u.test(words[0]) && !SHORT_DANGLING.has(words[1].toLowerCase())) words = words.slice(1);
+    const phrase = [];
+    for (const word of words) {
+      if (phrase.length && SHORT_BOUNDARY.has(word.toLowerCase())) break;
+      phrase.push(word.replace(/[,;?!]+$/, ''));
+      if (/[,;?!]$/.test(word)) break;
+    }
+    while (phrase.length > 1 && phrase.join(' ').length > SHORT_MAX) phrase.pop();
+    while (phrase.length > 1 && SHORT_DANGLING.has(phrase[phrase.length - 1].toLowerCase())) phrase.pop();
+    let name = phrase.join(' ');
+    if (name.length > SHORT_MAX) name = `${name.slice(0, SHORT_MAX - 1)}…`;
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }
+  /**
+   * The drawable papers of a publication list: those with a topic among the five themes (the
+   * first such topic is the theme) and a year (yearOf). A link to papers/<slug>.html makes a
+   * paper local: it links to that page and its plate shows the page's takeaway. Any other
+   * paper links to its "Paper" link (else its first link) in a new tab, with no takeaway; its
+   * slug is made from its title (the part before ':'). Sorted by year, then theme; within a
+   * (year, theme) cell the curated papers keep the order they have had (CURATED_ORDER), and
+   * any other paper follows them, oldest first (data.js lists the newest first).
+   */
+  function papersFrom(list) {
+    const papers = []; const slugs = new Set();
+    for (const pub of Array.isArray(list) ? list : []) {
+      if (!pub || typeof pub !== 'object') continue;
+      const theme = (Array.isArray(pub.topics) ? pub.topics : []).map(id => THEMES.findIndex(t => t.id === id)).find(j => j >= 0);
+      const year = yearOf(pub);
+      if (theme === undefined || !year) continue;
+      const links = (Array.isArray(pub.links) ? pub.links : []).filter(link => link && typeof link.url === 'string' && link.url);
+      const page = links.map(link => LOCAL_PAGE.exec(link.url.trim())).find(Boolean);
+      const title = cleanText(pub.title);
+      let slug = page ? page[1].toLowerCase() : slugify(title.split(':')[0]) || 'paper';
+      if (slugs.has(slug)) { let k = 2; while (slugs.has(`${slug}-${k}`)) k++; slug = `${slug}-${k}`; }
+      slugs.add(slug);
+      let href = '';
+      if (page) href = paperURL(slug);
+      else {
+        const link = links.find(l => cleanText(l.text).toLowerCase() === 'paper') || links[0];
+        try { if (link) href = new URL(link.url.trim(), ROOT).href; } catch (error) { href = ''; }
+      }
+      papers.push({ year, theme, slug, local: !!page, href, title, venue: cleanText(pub.venue), name: shortName(pub, slug), order: papers.length });
+    }
+    const curated = p => CURATED_ORDER.indexOf(p.slug);
+    return papers.sort((a, b) => a.year - b.year || a.theme - b.theme ||
+      (curated(a) < 0) - (curated(b) < 0) || curated(a) - curated(b) || b.order - a.order);
+  }
+  /**
+   * A local paper's takeaway, the .paper-takeaway text of its page, read when its plate opens
+   * (or earlier, when its star or link is hovered) and cached per slug while the page is open: the
+   * text ('' for a page without one), or the load in flight. A failed load is forgotten, so
+   * the next plate tries again. Resolves with the text, or '' when there is none to show.
+   */
+  const takeawayCache = new Map();
+  function loadTakeaway(slug) {
+    const known = takeawayCache.get(slug);
+    if (known !== undefined) return Promise.resolve(known);
+    const load = fetch(paperURL(slug)).then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.text();
+    }).then(html => {
+      const found = new DOMParser().parseFromString(html, 'text/html').querySelector('.paper-takeaway');
+      const text = cleanText(found && found.textContent);
+      takeawayCache.set(slug, text);
+      return text;
+    }).catch(() => { takeawayCache.delete(slug); return ''; });
+    takeawayCache.set(slug, load);
+    return load;
+  }
+
+  /* ---------------------------------------------------------------------------
+   * Research spiral geometry (layout independent). The span of years and everything derived
+   * from it are rebuilt from the papers before each opening (buildModel).
+   * ------------------------------------------------------------------------- */
   const THETA_IN = THETA0 - TAU * INNER_TURNS;
-  const THETA_END = THETA0 + TAU * TURNS;
+  const D_THETA = TAU / SAMPLES_PER_TURN;
+  const INDEX_FIRST = Math.round((THETA0 - THETA_IN) / D_THETA);   // the sample at the start of FIRST_YEAR
+  const SECTOR = TAU / THEMES.length;
+  const sectorCentre = j => THETA0 + (j + 0.5) * SECTOR;
+  let PAPERS = [];
+  let FIRST_YEAR = 0; let LAST_YEAR = 0; let TURNS = 1;
+  let THETA_END = THETA0 + TAU;        // the end of LAST_YEAR (radius 1)
+  let THETA_NEXT = THETA_END + TAU;    // the end of the next turn
   // Written turns follow the log spiral; the next turn grows at FUTURE_GROWTH of its rate
   // (the same radius and direction at THETA_END, so the curve stays continuous).
   const radiusAt = theta => (theta <= THETA_END ? Math.pow(GROWTH, (theta - THETA0) / TAU - TURNS)
     : 1 + FUTURE_GROWTH * (Math.pow(GROWTH, (theta - THETA_END) / TAU) - 1));
-  const THETA_NEXT = THETA_END + TAU;   // the end of the next turn
-  const HEAD_SWEEP = THETA_END - THETA_IN;
   /*
    * Head angle. Each turn lasts in proportion to r^0.6, so the angular speed is
    * k r(theta)^-0.6 and the elapsed sweep time tau' grows like e^(a (theta - theta_in)) - 1
    * with a = 0.6 ln g / 2 pi. Inverting: theta = theta_in + ln(1 + tau' / K) / a, where K
-   * makes 2022-2026 last the sweep time. A quadratic ramp (tau' = tau^2 / 2R for tau < R)
-   * starts the head from rest; after 2026 a power ease-out (velocity continuous) brings
-   * it to rest on the unwritten turn by T_STOP.
+   * makes FIRST_YEAR-LAST_YEAR last the sweep time, whatever the span. A quadratic ramp
+   * (tau' = tau^2 / 2R for tau < R) starts the head from rest; after LAST_YEAR a power ease-out
+   * (velocity continuous) brings it to rest on the unwritten turn by T_STOP.
    */
   const HEAD_A = HEAD_TURN_EXP * Math.log(GROWTH) / TAU;
   const SWEEP_TIME = T_HEAD[1] - T_HEAD[0] - T_HEAD_RAMP / 2;
-  const HEAD_K = SWEEP_TIME / (Math.exp(HEAD_A * HEAD_SWEEP) - 1);
   const FUTURE_TIME = T_STOP - T_HEAD[1];
-  const END_SPEED = 1 / (HEAD_A * (HEAD_K + SWEEP_TIME));
-  const THETA_STOP = THETA_END + END_SPEED * FUTURE_TIME / FUTURE_EASE;
+  let HEAD_K = 1; let END_SPEED = 0; let THETA_STOP = THETA_END;
   function headTheta(t) {
     const tau = t - T_HEAD[0];
     if (tau <= 0) return THETA_IN;
@@ -918,53 +1013,16 @@
     for (let i = 0; i < 40; i++) { const m = (a + b) / 2; if (headTheta(m) < theta) a = m; else b = m; }
     return (a + b) / 2;
   }
-  const D_THETA = TAU / SAMPLES_PER_TURN;
   // Samples run to the end of the next turn (the written chart stops at THETA_STOP; the rest
   // is drawn only where caught questions are pinned).
-  const SAMPLE_COUNT = Math.ceil((THETA_NEXT - THETA_IN) / D_THETA) + 2;
-  const SAMPLE_X = new Float64Array(SAMPLE_COUNT);
-  const SAMPLE_Y = new Float64Array(SAMPLE_COUNT);
-  for (let i = 0; i < SAMPLE_COUNT; i++) {
-    const theta = THETA_IN + i * D_THETA; const r = radiusAt(theta);
-    SAMPLE_X[i] = r * Math.cos(theta); SAMPLE_Y[i] = r * Math.sin(theta);
-  }
-  const INDEX_2022 = Math.round((THETA0 - THETA_IN) / D_THETA);
-  const INDEX_END = Math.round((THETA_END - THETA_IN) / D_THETA);
-  const INDEX_NEXT = Math.min(SAMPLE_COUNT - 1, Math.round((THETA_NEXT - THETA_IN) / D_THETA));
-  const SECTOR = TAU / THEMES.length;
-  const sectorCentre = j => THETA0 + (j + 0.5) * SECTOR;
-  // Paper angle: k of m papers in a (year, theme) cell sit at (k + 0.5) / m across the padded sector.
-  (() => {
-    const cells = new Map();
-    PAPERS.forEach(p => { const key = `${p.year}:${p.theme}`; cells.set(key, (cells.get(key) || 0) + 1); });
-    const seen = new Map();
-    PAPERS.forEach(p => {
-      const key = `${p.year}:${p.theme}`; const k = seen.get(key) || 0; seen.set(key, k + 1);
-      const start = THETA0 + TAU * (p.year - FIRST_YEAR) + p.theme * SECTOR + SECTOR_PAD;
-      p.theta = start + (k + 0.5) / cells.get(key) * (SECTOR - 2 * SECTOR_PAD);
-      p.r = radiusAt(p.theta); p.x = p.r * Math.cos(p.theta); p.y = p.r * Math.sin(p.theta);
-      p.at = timeAtTheta(p.theta);
-    });
-  })();
+  let SAMPLE_COUNT = 0; let SAMPLE_X = new Float64Array(0); let SAMPLE_Y = new Float64Array(0);
+  let INDEX_END = 0; let INDEX_NEXT = 0;
   // Theme labels sit at THEME_LABEL_R, or just outside the next turn where it passes farther out.
-  const THEME_LABEL_RADII = THEMES.map((_, j) => Math.max(THEME_LABEL_R, radiusAt(THETA_END + (j + 0.5) * SECTOR) + 0.09));
-  // A question's place on the next turn: midway, the shorter way, between its two themes'
-  // sector centres (the ten midpoints fall every 36 degrees).
-  QUESTIONS.forEach(q => {
-    const ca = (q.a + 0.5) * SECTOR; const cb = (q.b + 0.5) * SECTOR;
-    let d = cb - ca; if (d > Math.PI) d -= TAU; else if (d < -Math.PI) d += TAU;
-    // A midpoint at 0 sits at the end of the next turn (2 pi), not on the end of 2026.
-    let phi = (((ca + d / 2) % TAU) + TAU) % TAU; if (phi < 1e-6 || TAU - phi < 1e-6) phi = TAU;
-    q.phi = phi; q.theta = THETA_END + phi; q.r = radiusAt(q.theta);
-    q.x = q.r * Math.cos(q.theta); q.y = q.r * Math.sin(q.theta);
-  });
+  let THEME_LABEL_RADII = [];
   // The score's timeline: segment k runs from SCORE_AT[k] to SCORE_AT[k + 1] (s) while the comet
-  // sweeps SCORE_THETA[k] .. SCORE_THETA[k + 1] at constant angular speed: the inner tail,
-  // the five years 2022-2026, then the next turn.
-  const SCORE_DUR = [SCORE_INNER, ...SCORE_YEARS, SCORE_NEXT];
-  const SCORE_THETA = [THETA_IN, ...SCORE_YEARS.map((_, k) => THETA0 + TAU * k), THETA_END, THETA_NEXT];
-  const SCORE_AT = SCORE_DUR.reduce((at, d) => { at.push(at[at.length - 1] + d); return at; }, [0]);
-  const SCORE_TOTAL = SCORE_AT[SCORE_AT.length - 1];
+  // sweeps SCORE_THETA[k] .. SCORE_THETA[k + 1] at constant angular speed: the inner tail, one
+  // segment per year FIRST_YEAR-LAST_YEAR (SCORE_YEARS), then the next turn.
+  let SCORE_YEARS = []; let SCORE_DUR = []; let SCORE_THETA = []; let SCORE_AT = [0]; let SCORE_TOTAL = 0;
   function scoreTheta(time) {
     for (let k = 0; k < SCORE_DUR.length; k++) {
       if (time <= SCORE_AT[k + 1]) return lerp(SCORE_THETA[k], SCORE_THETA[k + 1], clamp01((time - SCORE_AT[k]) / SCORE_DUR[k]));
@@ -977,10 +1035,72 @@
     }
     return SCORE_TOTAL;
   }
-  // Which part of the score a time falls in: 0-4 the years 2022-2026, -1 before them, 5 after.
-  const scoreYearAt = time => (time < SCORE_AT[1] ? -1 : time >= SCORE_AT[6] ? 5 : Math.min(4, SCORE_AT.findIndex(at => at > time) - 2));
-  PAPERS.forEach(p => { p.scoreAt = scoreTimeAt(p.theta); });
-  QUESTIONS.forEach(q => { q.scoreAt = scoreTimeAt(q.theta); });
+  // Which part of the score a time falls in: 0 .. TURNS - 1 the years, -1 before them, TURNS after.
+  const scoreYearAt = time => (time < SCORE_AT[1] ? -1 : time >= SCORE_AT[TURNS + 1] ? TURNS : Math.min(TURNS - 1, SCORE_AT.findIndex(at => at > time) - 2));
+  // Year marks at the start of each year, and 'next' at the end of LAST_YEAR.
+  let YEAR_MARKS = [];
+  /**
+   * Build the chart's model from a publication list: the papers, the span FIRST_YEAR-LAST_YEAR
+   * (one turn per year, the end of LAST_YEAR at radius 1), the head's sweep, the curve's
+   * samples, each paper's angle, the open questions' places on the next turn, the score's
+   * timeline and the year marks. For 2022-2026 the geometry and the opening's timing are those
+   * of the fixed span the egg had before; the score's seconds per year follow the papers.
+   */
+  function buildModel(list) {
+    PAPERS = papersFrom(list);
+    const years = PAPERS.map(p => p.year);
+    FIRST_YEAR = years.length ? Math.min(...years) : new Date().getFullYear();
+    LAST_YEAR = years.length ? Math.max(...years) : FIRST_YEAR;
+    TURNS = LAST_YEAR - FIRST_YEAR + 1;
+    THETA_END = THETA0 + TAU * TURNS;
+    THETA_NEXT = THETA_END + TAU;
+    HEAD_K = SWEEP_TIME / (Math.exp(HEAD_A * (THETA_END - THETA_IN)) - 1);
+    END_SPEED = 1 / (HEAD_A * (HEAD_K + SWEEP_TIME));
+    THETA_STOP = THETA_END + END_SPEED * FUTURE_TIME / FUTURE_EASE;
+    SAMPLE_COUNT = Math.ceil((THETA_NEXT - THETA_IN) / D_THETA) + 2;
+    SAMPLE_X = new Float64Array(SAMPLE_COUNT); SAMPLE_Y = new Float64Array(SAMPLE_COUNT);
+    for (let i = 0; i < SAMPLE_COUNT; i++) {
+      const theta = THETA_IN + i * D_THETA; const r = radiusAt(theta);
+      SAMPLE_X[i] = r * Math.cos(theta); SAMPLE_Y[i] = r * Math.sin(theta);
+    }
+    INDEX_END = Math.round((THETA_END - THETA_IN) / D_THETA);
+    INDEX_NEXT = Math.min(SAMPLE_COUNT - 1, Math.round((THETA_NEXT - THETA_IN) / D_THETA));
+    // Paper angle: k of m papers in a (year, theme) cell sit at (k + 0.5) / m across the padded sector.
+    const cells = new Map();
+    PAPERS.forEach(p => { const key = `${p.year}:${p.theme}`; cells.set(key, (cells.get(key) || 0) + 1); });
+    const seen = new Map();
+    PAPERS.forEach(p => {
+      const key = `${p.year}:${p.theme}`; const k = seen.get(key) || 0; seen.set(key, k + 1);
+      const start = THETA0 + TAU * (p.year - FIRST_YEAR) + p.theme * SECTOR + SECTOR_PAD;
+      p.theta = start + (k + 0.5) / cells.get(key) * (SECTOR - 2 * SECTOR_PAD);
+      p.r = radiusAt(p.theta); p.x = p.r * Math.cos(p.theta); p.y = p.r * Math.sin(p.theta);
+      p.at = timeAtTheta(p.theta);
+    });
+    THEME_LABEL_RADII = THEMES.map((_, j) => Math.max(THEME_LABEL_R, radiusAt(THETA_END + (j + 0.5) * SECTOR) + 0.09));
+    // A question's place on the next turn: midway, the shorter way, between its two themes'
+    // sector centres (the ten midpoints fall every 36 degrees).
+    QUESTIONS.forEach(q => {
+      const ca = (q.a + 0.5) * SECTOR; const cb = (q.b + 0.5) * SECTOR;
+      let d = cb - ca; if (d > Math.PI) d -= TAU; else if (d < -Math.PI) d += TAU;
+      // A midpoint at 0 sits at the end of the next turn (2 pi), not on the end of LAST_YEAR.
+      let phi = (((ca + d / 2) % TAU) + TAU) % TAU; if (phi < 1e-6 || TAU - phi < 1e-6) phi = TAU;
+      q.phi = phi; q.theta = THETA_END + phi; q.r = radiusAt(q.theta);
+      q.x = q.r * Math.cos(q.theta); q.y = q.r * Math.sin(q.theta);
+    });
+    SCORE_YEARS = Array.from({ length: TURNS }, (_, k) => SCORE_YEAR_BASE + SCORE_PER_PAPER * years.filter(y => y === FIRST_YEAR + k).length);
+    SCORE_DUR = [SCORE_INNER, ...SCORE_YEARS, SCORE_NEXT];
+    SCORE_THETA = [THETA_IN, ...SCORE_YEARS.map((_, k) => THETA0 + TAU * k), THETA_END, THETA_NEXT];
+    SCORE_AT = SCORE_DUR.reduce((at, d) => { at.push(at[at.length - 1] + d); return at; }, [0]);
+    SCORE_TOTAL = SCORE_AT[SCORE_AT.length - 1];
+    PAPERS.forEach(p => { p.scoreAt = scoreTimeAt(p.theta); });
+    QUESTIONS.forEach(q => { q.scoreAt = scoreTimeAt(q.theta); });
+    YEAR_MARKS = Array.from({ length: TURNS + 1 }, (_, i) => {
+      const theta = THETA0 + TAU * i;
+      return { label: i === TURNS ? 'next' : String(FIRST_YEAR + i), theta, r: radiusAt(theta), at: timeAtTheta(theta) };
+    });
+  }
+  // A model is there from the start (the synthesizer's octaves read the span); each opening rebuilds it.
+  buildModel(sitePublications() || []);
   // Rest footprint of the chart in units of S: a world circle of FIT_RADIUS seen at the
   // rest pitch. At rest the camera distance is exactly CAM_D, whatever S is.
   const FOOT_N = 72;
@@ -993,10 +1113,6 @@
       FOOT_X[k] = FIT_RADIUS * Math.cos(a) * f; FOOT_Y[k] = y1 * Math.cos(pitch) * f;
     }
   }
-  const YEAR_MARKS = Array.from({ length: TURNS + 1 }, (_, i) => {
-    const theta = THETA0 + TAU * i;
-    return { label: i === TURNS ? 'next' : String(FIRST_YEAR + i), theta, r: radiusAt(theta), at: timeAtTheta(theta) };
-  });
 
   /* ---------------------------------------------------------------------------
    * Sound. A small synthesizer on any BaseAudioContext, so an OfflineAudioContext
@@ -1005,7 +1121,9 @@
    *                         \-> reverb send (0.35, or 0.6) -> convolver -/
    *   master -> tone (the music bus lowpass; 700 Hz in core view) -> compressor -> out
    * Pitch: D major pentatonic. A theme is a degree (evaluation D, knowledge E, grounding
-   * F#, reasoning A, improvement B); a year is an octave (2022-23: 4, 2024-25: 5, 2026: 6).
+   * F#, reasoning A, improvement B); a year is an octave, the span spread evenly across
+   * octaves 4-6: the year's place k in FIRST_YEAR-LAST_YEAR gives 4 + floor(3 k / TURNS)
+   * (2022-2026: 4, 4, 5, 5, 6).
    * When sound is off, or a live context is not running, nothing is scheduled at all.
    * ------------------------------------------------------------------------- */
   const PENTATONIC = [0, 2, 4, 7, 9];                     // semitones above D
@@ -1019,7 +1137,7 @@
   const BELL_DECAYS = [2.4, 1.4, 1.1, 0.7];               // s to near silence
   const AUDIO_VOICES = 72;                                // one-shot voices beyond this are dropped
   const midiHz = m => 440 * Math.pow(2, (m - 69) / 12);
-  const yearOctave = year => (year <= 2023 ? 4 : year <= 2025 ? 5 : 6);
+  const yearOctave = year => 4 + Math.floor(3 * clamp(year - FIRST_YEAR, 0, TURNS - 1) / TURNS);
   const themeMidi = (theme, year) => 62 + 12 * (yearOctave(year) - 4) + PENTATONIC[theme];
   const octaveGain = year => Math.pow(0.8, yearOctave(year) - 4);   // each octave above 4 is 20 % quieter
   const themeNote = (theme, octave) => 62 + 12 * (octave - 4) + PENTATONIC[theme];
@@ -1390,8 +1508,12 @@
       },
       // The closing harp walks up the ladder (the mirror of the gather); dawn is a soft pad.
       home(t, step, pan) { harp(midiHz(LADDER[clamp(step, 0, LADDER.length - 1)]), t, GATHER_NOTE, pan); },
-      // The score: a year's chord (2026 voiced an octave higher), the final D add9 resolving.
-      year(t, k, dur) { return pad(k === 4 ? CHORDS[0].map(m => m + 12) : CHORDS[k], t, dur, SCORE_CHORD, 0.6, 1.2); },
+      // The score: a year's chord (the four chords in turn; the last year's voiced an octave
+      // higher), the final D add9 resolving.
+      year(t, k, dur, last = k === TURNS - 1) {
+        const chord = CHORDS[k % CHORDS.length];
+        return pad(last ? chord.map(m => m + 12) : chord, t, dur, SCORE_CHORD, 0.6, 1.2);
+      },
       resolve(t) { return pad(RESOLVE_CHORD, t, 4.5, SCORE_CHORD * 1.15, 0.25, 3); },
       // The dive: a descending whoosh, then a soft ignition-style bell cluster on arrival.
       dive(t, dur) { noise(t, dur, 5000, 600, 0.9, 0.07, 0, 0, 'arc', 'bandpass'); },
@@ -1474,11 +1596,42 @@
    * The egg
    * ------------------------------------------------------------------------- */
   let active = false;
+  const FOOTNOTE = '.easter-egg-footnote';
+  const FAILED_TITLE = 'Could not load. Click to try again.';   // the boot's words for a failed asset load
+  let footnoteTitle = null;            // the "*"'s own title while it carries FAILED_TITLE from the egg
 
+  /**
+   * Open the egg. options.timeScale speeds the opening up; options.publications (a list shaped
+   * like data.js's) stands in for the site's publications (a test hook). On a page without
+   * data.js the egg loads it first; if that fails, the egg does not open, as with a failed
+   * asset load: no primed audio is kept, the footer's "*" says so, and its next click tries again.
+   */
   function open(options) {
     if (active) return;
     active = true;
-    try { start(options || {}); } catch (error) { active = false; console.warn('The spiral could not open.', error); }
+    options = options || {};
+    const given = Array.isArray(options.publications) ? options.publications : sitePublications();
+    if (given) { begin(given, options); return; }
+    loadPublications().then(list => begin(list, options), error => {
+      active = false;
+      console.warn('The spiral could not load its papers.', error);
+      try { if (window.__spiraAudioContext) window.__spiraAudioContext.close().catch(() => {}); } catch (closing) { /* already closed */ }
+      try { delete window.__spiraAudioContext; } catch (deleting) { window.__spiraAudioContext = undefined; }
+      const footnote = document.querySelector(FOOTNOTE);
+      if (footnote) {
+        if (footnoteTitle === null && footnote.title !== FAILED_TITLE) footnoteTitle = footnote.title;
+        footnote.title = FAILED_TITLE;
+      }
+    });
+  }
+  function begin(list, options) {
+    try {
+      buildModel(list);
+      const footnote = document.querySelector(FOOTNOTE);
+      if (footnote && footnoteTitle !== null) footnote.title = footnoteTitle;
+      footnoteTitle = null;
+      start(options);
+    } catch (error) { active = false; console.warn('The spiral could not open.', error); }
   }
 
   function start(options) {
@@ -1508,7 +1661,7 @@
     dialog.setAttribute('data-quiet', '');
     dialog.style.setProperty('--spira-grain', grainTile());
     const years = [];
-    for (let y = LAST_YEAR; y >= FIRST_YEAR; y--) years.push(y);
+    for (let y = LAST_YEAR; y >= FIRST_YEAR; y--) if (PAPERS.some(p => p.year === y)) years.push(y);
     dialog.innerHTML = `
       <canvas class="spira-canvas" aria-hidden="true"></canvas>
       <div class="spira-stage" tabindex="0" role="group" aria-label="${escapeHTML(COPY.stage)}"></div>
@@ -1539,7 +1692,7 @@
       </div>
       <div class="spira-index" id="spira-index" hidden>${years.map(year => `
         <div class="spira-index-year"><p class="spira-index-label">${year}</p>${PAPERS.map((p, i) => p.year !== year ? '' :
-          `<a class="spira-index-link" href="${escapeHTML(paperURL(p.slug))}" title="${escapeHTML(p.title)}" data-paper="${i}">${escapeHTML(p.name)} <span>— ${escapeHTML(p.venue)}</span></a>`).join('')}</div>`).join('')}
+          `<a class="spira-index-link"${p.href ? ` href="${escapeHTML(p.href)}"` : ''}${p.local ? '' : ' target="_blank" rel="noopener"'} title="${escapeHTML(p.title)}" data-paper="${i}">${escapeHTML(p.name)} <span>— ${escapeHTML(p.venue)}</span></a>`).join('')}</div>`).join('')}
       </div>
       <p class="spira-toast" aria-hidden="true"></p>
       <div class="spira-opening">
@@ -1639,6 +1792,7 @@
     const wishLabelWidth = new Float32Array(NQ);
     let caughtCount = 0; let drawn = false; let drawnFade = 0; let nextDrawnWidth = 0;
     let hoverWish = -1; let selectedWish = -1; let plateView = '';
+    let plateTakeaway = null;          // what the plate shows of a paper's takeaway (a test hook reads it)
     let bridgeQ = -1; let bridgeFade = 0;   // the wish whose two themes are bridged (kept while fading out)   // plateView: '' | 'wishes' | 'drawn'
     // The catch in progress: the meteor decelerates, its letters re-lay into a line, the line
     // folds into a point that arcs to the next turn.
@@ -1660,7 +1814,9 @@
     let stillQ = -1; let stillX = 0; let stillY = 0; let stillTimer = 0;
     const uiOpacity = new Map();
     const ui = new Float32Array(4 * 8); let uiCount = 0;
-    const MAX_PLACED = 48;
+    // Every label and wish star the collision pass may place: focus (2), the score's rung papers
+    // and the paper labels (NP each), wish labels (2), themes, years, wish stars and ghost words.
+    const MAX_PLACED = 4 + 2 * PAPERS.length + THEMES.length + YEAR_MARKS.length + NQ + GHOST_WORDS.length;
     const placed = new Float32Array(4 * MAX_PLACED); let placedCount = 0;
     const yearWidth = new Float32Array(YEAR_MARKS.length); const themeWidth = new Float32Array(THEMES.length);
 
@@ -2646,16 +2802,16 @@
       const solidHead = head <= THETA_END;
       ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.strokeStyle = CURVE_COLOUR;
       ctx.lineWidth = 3; ctx.globalAlpha = 0.06 * research;
-      if (last >= INDEX_2022 && research > 0.004) {
-        ctx.beginPath(); ctx.moveTo(sampleSX[INDEX_2022], sampleSY[INDEX_2022]);
-        for (let i = INDEX_2022 + 1; i <= solidLast; i++) ctx.lineTo(sampleSX[i], sampleSY[i]);
+      if (last >= INDEX_FIRST && research > 0.004) {
+        ctx.beginPath(); ctx.moveTo(sampleSX[INDEX_FIRST], sampleSY[INDEX_FIRST]);
+        for (let i = INDEX_FIRST + 1; i <= solidLast; i++) ctx.lineTo(sampleSX[i], sampleSY[i]);
         if (solidHead) ctx.lineTo(headX, headY);
         ctx.stroke();
       }
       for (let c = 0; c <= solidLast && research > 0.004; c += CURVE_CHUNK) {
         const end = Math.min(c + CURVE_CHUNK, solidLast); const mid = (c + end) >> 1;
         const weight = clamp01(mid / INDEX_END);
-        const tail = mid < INDEX_2022 ? 0.6 : 1;
+        const tail = mid < INDEX_FIRST ? 0.6 : 1;
         ctx.lineWidth = lerp(0.55, 1.15, weight);
         ctx.globalAlpha = lerp(0.24, 0.66, Math.pow(weight, 1.4)) * sampleDepth[mid] * tail * research;
         ctx.beginPath(); ctx.moveTo(sampleSX[c], sampleSY[c]);
@@ -3836,9 +3992,12 @@
     }
 
     /* ---- Wishes: caught open questions on the next turn ------------------- */
+    // They last for one visit: sessionStorage keeps them through re-openings in this tab. A copy
+    // left in localStorage by an earlier version is removed, so everyone starts at 0 / 10.
     function loadWishes() {
+      try { localStorage.removeItem(WISH_KEY); } catch (error) { /* storage unavailable */ }
       try {
-        const list = JSON.parse(localStorage.getItem(WISH_KEY) || '[]');
+        const list = JSON.parse(sessionStorage.getItem(WISH_KEY) || '[]');
         if (Array.isArray(list)) {
           for (const q of list) {
             if (!Number.isInteger(q) || q < 0 || q >= NQ || caught[q]) continue;
@@ -3853,7 +4012,7 @@
       try {
         const list = [];
         for (let q = 0; q < NQ; q++) if (caught[q]) list.push(q);
-        if (list.length) localStorage.setItem(WISH_KEY, JSON.stringify(list)); else localStorage.removeItem(WISH_KEY);
+        if (list.length) sessionStorage.setItem(WISH_KEY, JSON.stringify(list)); else sessionStorage.removeItem(WISH_KEY);
       } catch (error) { /* storage unavailable */ }
     }
     function updateHint() {
@@ -4440,8 +4599,8 @@
     }
 
     /* ---- The score: "Listen to the spiral" -------------------------------- */
-    // About 19 s: a comet traces the spiral from its inner start through 2022-2026 (one year
-    // per turn, at constant angular speed within each year). Each paper it passes rings and
+    // About 19 s: a comet traces the spiral from its inner start through FIRST_YEAR-LAST_YEAR
+    // (one year per turn, at constant angular speed within each year). Each paper it passes rings and
     // sparkles, each year plays its chord and glows, and the plate shows the year with its
     // papers appearing as they ring. Then the comet runs on along the next turn, caught wishes
     // chime, and a final chord resolves.
@@ -4501,7 +4660,7 @@
       for (let p = 0; p < NP; p++) if (paperRing[p] > -99 && scoreRows[p]) scoreRows[p].classList.add('is-on');
     }
     function showScoreBlock(y) {
-      const shown = y < 0 ? 0 : y > 4 ? 5 : y;
+      const shown = y < 0 ? 0 : y >= TURNS ? TURNS : y;   // the years' blocks, then the closing words
       scoreBlocks.forEach((block, k) => block.classList.toggle('is-on', k === shown));
     }
     function scoreCues() {
@@ -4510,7 +4669,7 @@
       for (let k = 0; k < SCORE_YEARS.length; k++) {
         const c = SCORE_AT[k + 1]; if (!crosses(c)) continue;
         const dur = (SCORE_YEARS[k] + 1.2) * scale;
-        cue('year', c, a => { scorePads.push(...a.cue.year(audioAt(a, c, now), k, dur)); });
+        cue('year', c, a => { scorePads.push(...a.cue.year(audioAt(a, c, now), k, dur, k === TURNS - 1)); });
       }
       for (let p = 0; p < NP; p++) {
         const paper = PAPERS[p]; const c = paper.scoreAt; if (!crosses(c)) continue;
@@ -4557,8 +4716,44 @@
       if (text !== undefined) el.textContent = text;
       return el;
     }
+    // A link to a paper: its page on this site, or (another paper) the paper itself in a new tab.
+    function paperLink(p, className, text) {
+      const link = element('a', className, text);
+      if (p.href) link.href = p.href;
+      if (!p.local) { link.target = '_blank'; link.rel = 'noopener'; }
+      return link;
+    }
+    /**
+     * A local paper's takeaway, read from its page (the .paper-takeaway text) and cached per
+     * slug. A cached one shows at once. Otherwise the element keeps the room of the longest
+     * takeaway the plate shows (CSS: .is-pending) while the page loads, so the plate does not
+     * jump; the text then fades in as the element settles to its own height (at once under
+     * reduced motion). A page without a takeaway, or one that cannot be read, leaves none.
+     */
+    function takeawayElement(p) {
+      const known = takeawayCache.get(p.slug);
+      if (known === '') return null;
+      const el = element('p', 'spira-takeaway');
+      if (typeof known === 'string') { el.textContent = known; plateTakeaway = { slug: p.slug, state: 'shown', text: known }; return el; }
+      el.classList.add('is-pending'); el.setAttribute('aria-busy', 'true');
+      plateTakeaway = { slug: p.slug, state: 'loading', text: '' };
+      loadTakeaway(p.slug).then(text => {
+        if (closed || !el.isConnected) return;
+        if (!text) { el.remove(); plateTakeaway = { slug: p.slug, state: 'none', text: '' }; measureUI(); redraw(); return; }
+        const from = el.getBoundingClientRect().height;
+        el.textContent = text; el.classList.remove('is-pending'); el.removeAttribute('aria-busy');
+        plateTakeaway = { slug: p.slug, state: 'shown', text };
+        const to = el.getBoundingClientRect().height;
+        if (!motion.matches && typeof el.animate === 'function') {
+          const settle = el.animate([{ opacity: 0, height: `${from}px` }, { opacity: 1, height: `${to}px` }], { duration: TAKEAWAY_IN_MS, easing: 'ease-out' });
+          settle.finished.then(() => { if (!closed) { measureUI(); redraw(); } }, () => {});
+        }
+        measureUI(); redraw();
+      });
+      return el;
+    }
     function updatePlate() {
-      plateDetail.replaceChildren();
+      plateDetail.replaceChildren(); plateTakeaway = null;
       const detail = coreTarget === 1 || selectedPaper >= 0 || selectedWish >= 0 || selectedTheme >= 0 || plateView !== '';
       plateDefault.hidden = detail; plateDetail.hidden = !detail;
       if (coreTarget === 1) {
@@ -4568,11 +4763,13 @@
           element('p', 'spira-core-text', COPY.coreText), element('p', 'spira-hint', coarse || narrow ? COPY.deeperTouch : COPY.deeperPointer), back);
         announce(`${COPY.coreKicker}. ${COPY.coreTitle}`);
       } else if (selectedPaper >= 0) {
+        // A local paper links to its page and shows its takeaway; another links to the paper itself.
         const p = PAPERS[selectedPaper];
-        const link = element('a', 'spira-link', 'Read the paper page →'); link.href = paperURL(p.slug);
         plateDetail.append(element('p', 'spira-plate-kicker', `${p.year} · ${THEMES[p.theme].label}`), element('h3', 'spira-plate-title', p.title));
-        if (TAKEAWAYS[p.slug]) plateDetail.append(element('p', 'spira-takeaway', TAKEAWAYS[p.slug]));
-        plateDetail.append(element('p', 'spira-venue', p.venue), link);
+        const takeaway = p.local ? takeawayElement(p) : null;
+        if (takeaway) plateDetail.append(takeaway);
+        plateDetail.append(element('p', 'spira-venue', p.venue));
+        if (p.href) plateDetail.append(paperLink(p, 'spira-link', p.local ? 'Read the paper page →' : 'Read the paper →'));
         announce(`${p.name}, ${p.year}, ${THEMES[p.theme].label}.`);
       } else if (selectedWish >= 0) {
         const q = QUESTIONS[selectedWish];
@@ -4588,7 +4785,7 @@
           const list = element('span', 'spira-row-links');
           papers.forEach((p, i) => {
             if (i) list.append(document.createTextNode(', '));
-            const link = element('a', '', p.name); link.href = paperURL(p.slug); link.dataset.paper = String(PAPERS.indexOf(p));
+            const link = paperLink(p, '', p.name); link.dataset.paper = String(PAPERS.indexOf(p));
             list.append(link);
           });
           row.append(list); plateDetail.append(row);
@@ -4640,6 +4837,7 @@
     function setHover(p, sound) {
       if (hoverPaper === p) return;
       hoverPaper = p; updateCursor();
+      if (p >= 0 && PAPERS[p].local) loadTakeaway(PAPERS[p].slug);   // ready before a click opens its plate
       if (p >= 0 && sound) playPaper(p, false);   // brushing across the spiral strums it
       redraw();
     }
@@ -5044,6 +5242,13 @@
         const p = PAPERS.findIndex(paper => paper.slug === slug);
         return p < 0 ? null : { x: paperSX[p], y: paperSY[p] };
       },
+      // The papers drawn (from data.js or the open() hook), the year labels ('next' last), the
+      // score's seconds per year, and what the plate shows of a takeaway: null when it shows
+      // none (no paper, or a paper with no page), else { slug, state: 'loading' | 'shown' | 'none', text }.
+      get papers() { return PAPERS.map(p => ({ slug: p.slug, name: p.name, year: p.year, theme: THEMES[p.theme].id, local: p.local, href: p.href, title: p.title, venue: p.venue })); },
+      get years() { return YEAR_MARKS.map(mark => mark.label); },
+      get scoreYears() { return SCORE_YEARS.slice(); },
+      get takeaway() { return plateTakeaway ? Object.assign({}, plateTakeaway) : null; },
       // Sound: the cue log, the preference, and the voices the synthesizer has scheduled.
       audioCues,
       get sound() { return soundOn; },
@@ -5056,8 +5261,9 @@
       get bridge() { return { q: bridgeQ, fade: bridgeFade }; },
       get chrome() { return dialog.classList.contains('is-chrome'); },
       get catching() { return catchQ; },
-      // The score: null when off, else its state, clock and current year (2022-2026; 0 before, 1 after).
-      get score() { return score ? { state: ['', 'playing', 'outro', 'stopping'][score], t: scoreT, year: scoreYear < 0 ? 0 : scoreYear > 4 ? 1 : FIRST_YEAR + scoreYear } : null; },
+      // The score: null when off, else its state, clock and current year (FIRST_YEAR-LAST_YEAR;
+      // 0 before, 1 after).
+      get score() { return score ? { state: ['', 'playing', 'outro', 'stopping'][score], t: scoreT, year: scoreYear < 0 ? 0 : scoreYear >= TURNS ? 1 : FIRST_YEAR + scoreYear } : null; },
       // Spawn a question meteor now, already inside the viewport (a still wish under reduced
       // motion); returns its question or -1.
       spawnMeteor(q) {
@@ -5121,6 +5327,7 @@
     }
   }
 
-  // createAudio builds the egg's synthesizer on any BaseAudioContext (tests render it offline).
-  window.SiteEasterEgg = { open, createAudio: (context, options) => createSpiraAudio(context, options), takeaways: TAKEAWAYS };
+  // createAudio builds the egg's synthesizer on any BaseAudioContext (tests render it offline);
+  // ghostWords are the curated phrases of the next turn (the suite finds each on the homepage).
+  window.SiteEasterEgg = { open, createAudio: (context, options) => createSpiraAudio(context, options), ghostWords: Object.freeze(GHOST_WORDS.slice()) };
 })();

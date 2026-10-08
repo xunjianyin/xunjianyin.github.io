@@ -131,6 +131,9 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
   margin: 0 0 6px; color: #b4bdc8; font-size: 14px; line-height: 1.6;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden;
 }
+/* It is read from the paper's page: until it arrives it keeps the room of the longest takeaway
+   (the clamp's lines), so the plate does not jump; spira.js then fades it in as it settles. */
+#spira .spira-takeaway.is-pending { height: calc(4 * 1.6em); visibility: hidden; }
 #spira .spira-core-text { color: #d7dde5; }
 #spira .spira-back { margin-top: 6px; padding: 0; color: var(--spira-text); font-size: 13px; border-bottom: 1px solid rgba(207, 217, 230, 0.38); min-height: 44px; }
 #spira .spira-link { display: inline-block; margin-top: 10px; font-size: 13px; border-bottom: 1px solid rgba(207, 217, 230, 0.38); padding-bottom: 1px; }
@@ -265,6 +268,7 @@ html.spira-hide-text body:not(:has(#main-content)) main * {
   #spira .spira-hint { min-height: 3.3em; }
   #spira .spira-note { max-width: none; margin-top: 6px; padding-top: 6px; }
   #spira .spira-takeaway { font-size: 13px; -webkit-line-clamp: 3; line-clamp: 3; }
+  #spira .spira-takeaway.is-pending { height: calc(3 * 1.6em); }
   #spira .spira-index { top: 48px; left: 0; right: 0; bottom: 0; width: auto; max-height: none; padding: 4px 16px 16px; background: var(--spira-night); border-left: 0; border-top: 1px solid var(--spira-line); }
   #spira .spira-opening { right: 16px; bottom: 10px; gap: 20px; }
   #spira .spira-toast { right: 16px; top: 48px; }
