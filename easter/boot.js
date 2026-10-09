@@ -19,10 +19,10 @@
  *   it; easter/spira/spira.{js,css} load on the first opening, and an active lens is reset at
  *   once (and forgotten) first. Its AudioContext is primed inside the gesture.
  *
- * Either egg: a click (or a tap) on any [data-egg-trigger] (the homepage photo) opens one of
- * the two at random: Spira, or the next lens, as a double-click on the page's own name would
- * (the caption sits by that name). Where Spira is not bound, it is always the next lens. The
- * second click of a double-click is not counted.
+ * Either egg: a double-click or a double-tap on any [data-egg-trigger] (the homepage photo)
+ * opens one of the two at random: Spira, or the next lens, as a double-click on the page's own
+ * name would (the caption sits by that name). Where Spira is not bound, it is always the next
+ * lens. A single click does nothing: the photo gives nothing away.
  */
 (() => {
   'use strict';
@@ -53,7 +53,7 @@
   const TYPING = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], dialog[open]';
   // Either egg, at random
   const EGG_TRIGGER = '[data-egg-trigger]';
-  const SPIRA_SHARE = 0.5;            // the chance that a click opens Spira rather than the next lens
+  const SPIRA_SHARE = 0.5;            // the chance that the photo opens Spira rather than the next lens
 
   const html = document.documentElement;
   const storage = (fn, fallback = null) => { try { return fn(sessionStorage); } catch (error) { return fallback; } };
@@ -114,9 +114,10 @@
     loadCore().then(lenses => lenses.next({ pointerType, trigger: element }), () => dropAudio('__lensesAudioContext'));
   }
 
+  // The trigger under a double-click or double-tap: a lens trigger, or the photo (either egg).
   const triggerOf = target => {
     const el = target instanceof Element ? target : target && target.parentElement;
-    const trigger = el && el.closest(TRIGGER);
+    const trigger = el && el.closest(`${TRIGGER}, ${EGG_TRIGGER}`);
     if (!trigger) return null;
     const control = el.closest(INTERACTIVE);
     return control && trigger.contains(control) ? null : trigger;
@@ -133,7 +134,7 @@
     if (!trigger) return;
     event.preventDefault();
     if (performance.now() - tappedAt < TAP_DBLCLICK_GUARD_MS) return;
-    triggerLens(trigger, 'mouse');
+    activate(trigger, 'mouse');
   });
   // Touch and pen: two taps on the same trigger within 320 ms and 24 px.
   document.addEventListener('pointerup', event => {
@@ -146,13 +147,13 @@
       lastTap = null;
       tappedAt = now;
       event.preventDefault();
-      triggerLens(trigger, event.pointerType);
+      activate(trigger, event.pointerType);
     } else {
       lastTap = { trigger, at: now, x: event.clientX, y: event.clientY };
     }
   });
   // Cancelling the second tap's touchend stops its synthesized click and dblclick; the
-  // double-tap zoom is stopped by touch-action: manipulation on [data-lens-trigger].
+  // double-tap zoom is stopped by touch-action: manipulation on both kinds of trigger.
   document.addEventListener('touchend', event => {
     if (performance.now() - tappedAt < 60 && event.cancelable && triggerOf(event.target)) event.preventDefault();
   }, { passive: false });
@@ -234,18 +235,16 @@
   }
 
   /* Either egg, at random ---------------------------------------------------------- */
-  // A lens chosen from the photo behaves as a double-click on the page's name: the core places
-  // its caption by its trigger, and the photo holds no text to sit beside.
+  // A double-click or double-tap: on the photo, Spira or the next lens at random; elsewhere the
+  // next lens. A lens chosen from the photo behaves as a double-click on the page's name: the
+  // core places its caption by its trigger, and the photo holds no text to sit beside.
   let spiraBound = false;
-  document.addEventListener('click', event => {
-    const target = event.target instanceof Element ? event.target : null;
-    const trigger = target && target.closest(EGG_TRIGGER);
-    if (!trigger || event.detail > 1) return;          // a double-click counts once
+  function activate(trigger, pointerType) {
+    if (!trigger.matches(EGG_TRIGGER)) { triggerLens(trigger, pointerType); return; }
     if (spiraBound && Math.random() < SPIRA_SHARE) { openSpira(); return; }
     const scope = trigger.closest('main') || document;
-    const name = scope.querySelector(TRIGGER) || document.querySelector(TRIGGER) || trigger;
-    triggerLens(name, event.pointerType || (event.detail === 0 ? 'keyboard' : 'mouse'));
-  });
+    triggerLens(scope.querySelector(TRIGGER) || document.querySelector(TRIGGER) || trigger, pointerType);
+  }
 
   // The footer is injected by the site shell, possibly after this runs: one delegated click
   // listener, and the password listener, once the page shows it has the site shell's footer.

@@ -7,7 +7,7 @@ for them, and leave the page exactly as it was when they end.
 | --- | --- | --- |
 | Spira (first) | the footer's `*`, or typing `yxjgogogo` outside a text field | A full-screen canvas: the page's words wind into a logarithmic spiral, then a spiral of the research unwinds. |
 | Lenses (second) | double-click or double-tap a name or a page title | The page is redrawn in place through one lens after another; Esc returns to normal. The active lens follows the reader to every page. |
-| Either, at random | a click or a tap on the homepage photo | Spira, or the next lens (as a double-click on the name would), with even odds. |
+| Either, at random | double-click or double-tap the homepage photo | Spira, or the next lens (as a double-click on the name would), with even odds. A single click does nothing. |
 
 While a lens is active, the keys `1` to `9` jump to that place in the cycle and `0` returns to
 normal (not in text fields, not inside a paper's demo, not with a modifier). The last key
@@ -32,7 +32,7 @@ The rest of the site knows only three things.
    (then opens Spira, and the password works again). A click on `*` before the boot has
    loaded opens Spira once it is there.
 3. **Markup.** `[data-lens-trigger]` on the names and titles (`site-shell.js`, `index.html`,
-   the page `h1`s, the paper template), `[data-egg-trigger]` on the homepage photo (a click
+   the page `h1`s, the paper template), `[data-egg-trigger]` on the homepage photo (a double-click
    opens Spira or the next lens at random; where Spira is not bound, the next lens), the footer's `.easter-egg-footnote` button
    (`site-shell.js`), and the bio's key sentence, an unstyled `<span data-spira-key>` in
    `index.html`. Spira is bound only on pages with the site shell's footer (`#site-footer`), so

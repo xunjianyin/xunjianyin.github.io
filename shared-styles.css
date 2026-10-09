@@ -648,7 +648,7 @@ ul, ol {
 
 [data-theme="dark"] .project-link { text-decoration-color: #4b5563; }
 
-/* The eggs (easter/README.md): double-clicking a [data-lens-trigger] changes the lens, so a
-   double-tap must not zoom; a tap on a [data-egg-trigger] (the homepage photo) opens one of
-   the two eggs, so it must not wait for one. The arrival's ground and fade live with the lenses. */
+/* The eggs (easter/README.md): double-clicking a [data-lens-trigger] changes the lens, and
+   double-clicking a [data-egg-trigger] (the homepage photo) opens one of the two eggs, so a
+   double-tap must not zoom. The arrival's ground and fade live with the lenses. */
 [data-lens-trigger], [data-egg-trigger] { touch-action: manipulation; }

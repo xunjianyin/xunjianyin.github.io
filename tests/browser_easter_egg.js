@@ -779,34 +779,44 @@
     await until(() => !egg(), 'the opening close button');
     check(!doc.body.style.overflow && !doc.documentElement.classList.contains('spira-hide-text'), 'The opening Close restores an absent overflow style and the glyphs');
 
-    /* 10b. The homepage photo opens one of the two eggs at random (Math.random stubbed): Spira,
-       or the next lens as a double-click on the name would (its caption by the name); the
-       second click of a double-click is not counted. */
+    /* 10b. A double-click (or double-tap) on the homepage photo opens one of the two eggs at
+       random (Math.random stubbed): Spira, or the next lens as a double-click on the name
+       would (its caption by the name). A single click does nothing; a real double-click (two
+       clicks, then dblclick) counts once. */
     await load('/');
     const photo = doc.querySelector('.profile-photo[data-egg-trigger]');
-    check(!!photo && win.getComputedStyle(photo).touchAction === 'manipulation', 'The homepage photo is an egg trigger that does not wait for a double-tap');
+    check(!!photo && win.getComputedStyle(photo).touchAction === 'manipulation', 'The homepage photo is an egg trigger, and a double-tap on it does not zoom');
     const random = win.Math.random;
-    const click = detail => photo.dispatchEvent(new win.MouseEvent('click', { bubbles: true, cancelable: true, detail }));
+    const mouse = (type, detail) => photo.dispatchEvent(new win.MouseEvent(type, { bubbles: true, cancelable: true, detail }));
+    const doubleClick = () => { mouse('mousedown', 1); mouse('mouseup', 1); mouse('click', 1); mouse('mousedown', 2); mouse('mouseup', 2); mouse('click', 2); mouse('dblclick', 2); };
+    const photoTap = (x, y) => { for (const type of ['pointerdown', 'pointerup']) photo.dispatchEvent(new win.PointerEvent(type, { pointerId: 21, pointerType: 'touch', isPrimary: true, bubbles: true, cancelable: true, clientX: x, clientY: y })); };
     const photoMain = doc.querySelector('#main-content').innerHTML;
     win.Math.random = () => 0.2;
-    click(1);
+    mouse('click', 1);
+    await delay(400);
+    check(!egg() && !(win.SiteLenses && win.SiteLenses.current) && assets().length === 0, 'A single click on the photo opens nothing (and loads nothing)');
+    doubleClick();
     await until(() => egg()?.open, 'the photo to open Spira');
-    check(egg().open && !(win.SiteLenses && win.SiteLenses.current), 'A click on the photo can open Spira');
+    check(egg().open && !(win.SiteLenses && win.SiteLenses.current), 'A double-click on the photo can open Spira');
     keepStats();
     await dismiss();
     win.Math.random = () => 0.8;
-    click(1);
+    doubleClick();
     await until(() => win.SiteLenses && win.SiteLenses.current && !win.SiteLenses.busy, 'the photo to enter a lens', 15000);
     const firstLens = win.SiteLenses.current;
     const caption = doc.querySelector('.lenses-caption'); const name = doc.querySelector('.profile-text .name');
     const captionBox = caption && caption.getBoundingClientRect(); const nameBox = name.getBoundingClientRect();
     check(!egg() && !!firstLens && !!caption && !caption.classList.contains('is-fixed') && Math.abs((captionBox.top + captionBox.bottom) / 2 - (nameBox.top + nameBox.bottom) / 2) < nameBox.height,
-      `A click on the photo can move to the next lens, its caption by the name (${firstLens}, ${caption && caption.className})`);
-    click(1); click(2);                          // a double-click: two clicks, the second with detail 2
+      `A double-click on the photo can move to the next lens, its caption by the name (${firstLens}, ${caption && caption.className})`);
     await delay(100);
     await until(() => !win.SiteLenses.busy, 'the photo double-click to settle', 15000);
+    check(win.SiteLenses.current === firstLens, `A double-click counts once (still ${win.SiteLenses.current})`);
+    const box = photo.getBoundingClientRect(); const px = box.left + box.width / 2; const py = box.top + box.height / 2;
+    photoTap(px, py); await delay(120); photoTap(px + 3, py + 2);
+    await delay(100);
+    await until(() => !win.SiteLenses.busy, 'the photo double-tap to settle', 15000);
     const lensOrder = await win.SiteLenses._debug.loadAll();
-    check(win.SiteLenses.current === lensOrder[lensOrder.indexOf(firstLens) + 1], `A double-click on the photo moves one lens on (${firstLens} → ${win.SiteLenses.current})`);
+    check(win.SiteLenses.current === lensOrder[lensOrder.indexOf(firstLens) + 1], `A double-tap on the photo moves one lens on (${firstLens} → ${win.SiteLenses.current})`);
     await win.SiteLenses.reset({ instant: true });
     check(doc.querySelector('#main-content').innerHTML === photoMain, 'After the photo\'s lens the homepage markup is restored');
     win.Math.random = random;
