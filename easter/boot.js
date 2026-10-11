@@ -34,9 +34,9 @@
   'use strict';
   if (window.SiteLensesBoot) return;
 
-  const VERSION = 'lenses-v10';       // the ?v= of the lenses core (easter/lenses/core.*)
+  const VERSION = 'lenses-v11';       // the ?v= of the lenses core (easter/lenses/core.*)
   const SPIRA_VERSION = 'spira-v12';  // the ?v= of easter/spira/spira.*
-  const MURMUR_VERSION = 'murmur-v1'; // the ?v= of easter/murmur/murmur.*
+  const MURMUR_VERSION = 'murmur-v2'; // the ?v= of easter/murmur/murmur.*
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
   const ROOT = new URL('../', SCRIPT_SRC).href;                 // easter/boot.js → the site root
   const STORE_KEY = 'lenses-active';

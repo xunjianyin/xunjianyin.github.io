@@ -102,12 +102,16 @@ preference stays (`localStorage`, `spira-sound`).
 then cuts each word sprite at its letters' advance boxes, so the slices tile the word exactly
 and at rest the canvas is the page. Each slice is one agent; above 2600 letters (1500 on a
 touch device) the agents are whole words instead, and words beyond 900 stay printed in place.
-The model is continuous-time boids with Vicsek noise (the header of `murmur.js` has the
-equations): alignment, cohesion and separation within 36 px, a soft wall, a weak pull toward
-the viewport centre, and an angular noise `0.4 pi eta^2` per 1/15 s step, where `eta` is the
-noise the readout shows. `eta` cools from 1 to 0.04 over 3 to 30 s unless the reader sets it;
-the order `phi` is the mean local polarization of the letters that have neighbours (about 0.3
-in the gas, above 0.9 when ordered; the crossover lies near `eta` 0.5). The flight home is a
+The model is topological boids with Vicsek noise (the header of `murmur.js` has the
+equations): each letter flies with its seven nearest neighbours whatever their distance, as
+starlings do (Ballerini et al., PNAS 2008), so a thinned flock holds together and a scattered
+one regathers. Alignment with the seven, cohesion toward their centroid (growing with its
+distance), separation from any closer than 14 px, a soft wall, a weak pull toward the viewport
+centre, and an angular noise `0.4 pi eta^2` per 1/15 s step, where `eta` is the noise the
+readout shows. `eta` cools from 1 to 0.04 over 3 to 30 s unless the reader sets it; the order
+`phi` is the mean local polarization over each letter and its seven (about 0.35 in the gas,
+above 0.95 when ordered; the crossover lies between `eta` 0.6 and 0.4). The seven are found
+on a 24 px grid searched ring by ring, up to 144 px out. The flight home is a
 damped spring toward the letter before this one in the text at the rest offset (so words
 gather first, then lines), blending into the place itself, with an exact ease onto the glyphs
 in the last 0.7 s; the swap (glyphs back, dialog gone) is one paint. A hidden tab pauses the

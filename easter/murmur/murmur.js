@@ -10,18 +10,20 @@
  * mutated: one class on <html> hides its glyphs while sprites stand in their exact
  * places; links, the photo and the nav stay where they are.
  *
- * Model (continuous-time boids with Vicsek noise). For letter i with heading h_i (a unit
- * vector) and neighbours j within R:
- *   target  = wA * mean(h_j) + wC * unit(centroid_j - p_i) + wS * sum((p_i - p_j) / |p_i - p_j|^2)
- *             + walls + pointer
+ * Model (continuous-time topological boids with Vicsek noise). Each letter interacts with
+ * its k = 7 nearest neighbours whatever their distance, as starlings do (Ballerini et al.,
+ * PNAS 2008: six to seven), so a thinned flock still holds together and a scattered one
+ * regathers. For letter i with heading h_i (a unit vector) and its k nearest j:
+ *   target  = wA * unit(sum h_j) + wC * min(1, |c - p_i| / L) * unit(c - p_i)   (c the centroid)
+ *             + wS * sum over the j closer than s of (p_i - p_j) / |p_i - p_j|^2
+ *             + walls + roost + pointer
  *   h_i    <- unit(h_i + k dt (unit(target) - h_i)), then rotated by a eta^2 pi g sqrt(dt / tau)
  *             (g standard normal: the Vicsek angular noise; eta in [0, 1] is the readout's
  *             noise, squared so that the ordering falls near the middle of its range)
  *   p_i    <- p_i + v h_i dt
- *   phi     = mean over i with neighbours of |h_i + sum h_j| / (1 + n_i)   (the local
- *             polarization: 1 when every letter flies with its neighbours, low in the
- *             disordered gas; a flock that wheels as one is ordered locally while its global
- *             sum cancels)
+ *   phi     = mean over i of |h_i + sum h_j| / (1 + k)   (the local polarization: 1 when every
+ *             letter flies with its seven, about 0.35 in the disordered gas; a flock that
+ *             wheels as one is ordered locally while its global sum cancels)
  */
 (() => {
   'use strict';
@@ -40,10 +42,13 @@
   const HOME_FINAL = [2.7, 3.4];       // the last stretch eases exactly onto the page
   const HOME_UNWIND = [1.6, 2.6];      // letters turn upright over this span
   // The flock
-  const RADIUS = 36;                   // neighbourhood R
+  const K = 7;                         // the topological neighbourhood: the k nearest letters
+  const CELL = 24;                     // px: the grid cell of the nearest-neighbour search ...
+  const MAX_RING = 6;                  // ... searched up to this many rings out (144 px)
   const SEPARATION = 14;               // letters closer than this push apart
   const W_ALIGN = 1.0;
-  const W_COHESION = 0.4;
+  const W_COHESION = 0.55;             // cohesion grows with the distance to the seven's centroid ...
+  const COHESION_SCALE = 48;           // ... up to full weight at this distance
   const W_SEPARATION = 3.5;
   const W_CENTRE = 0.35;               // a weak pull toward the viewport centre (the roost), growing with distance
   const TURN_RATE = 6.0;               // 1/s: how fast a heading follows its target
@@ -346,10 +351,11 @@
       if (pred[i] >= 0) { offX[i] = homeX[i] - homeX[pred[i]]; offY[i] = homeY[i] - homeY[pred[i]]; }
     }
     // The grid for neighbour queries (cell = R).
-    const cols = Math.max(1, Math.ceil(vw / RADIUS) + 2); const rows = Math.max(1, Math.ceil(vh / RADIUS) + 2);
+    const cols = Math.max(1, Math.ceil(vw / CELL) + 2); const rows = Math.max(1, Math.ceil(vh / CELL) + 2);
     const head = new Int32Array(cols * rows); const next = new Int32Array(N);
+    const bestD = new Float32Array(K); const bestJ = new Int32Array(K);   // the k nearest of one letter
     const roost = Math.min(vw, vh) / 2;
-    const cellOf = (x, y) => clamp(Math.floor(x / RADIUS) + 1, 0, cols - 1) + cols * clamp(Math.floor(y / RADIUS) + 1, 0, rows - 1);
+    const cellOf = (x, y) => clamp(Math.floor(x / CELL) + 1, 0, cols - 1) + cols * clamp(Math.floor(y / CELL) + 1, 0, rows - 1);
 
     let phase = 'loosen';              // loosen -> flock -> home -> (closed)
     let time = 0;                      // active seconds since the opening (scaled)
@@ -406,33 +412,48 @@
       // Grid
       head.fill(-1);
       for (let i = 0; i < M; i++) { const c = cellOf(px[i], py[i]); next[i] = head[c]; head[c] = i; }
-      const R2 = RADIUS * RADIUS; const S2 = SEPARATION * SEPARATION;
-      let polar = 0; let polarN = 0;
+      const S2 = SEPARATION * SEPARATION;
+      let polar = 0;
       const pointerOn = pointer.in && phase !== 'home';
       const pMag = pointerOn ? W_POINTER * (0.55 + 0.45 * clamp(Math.hypot(pointer.vx, pointer.vy) / 600, 0, 1)) : 0;
       for (let i = 0; i < M; i++) {
         const x = px[i]; const y = py[i];
         let ax = 0; let ay = 0; let cx = 0; let cy = 0; let sx = 0; let sy = 0; let n = 0;
         if (social > 0) {
-          const col = clamp(Math.floor(x / RADIUS) + 1, 0, cols - 1); const row = clamp(Math.floor(y / RADIUS) + 1, 0, rows - 1);
-          for (let r = Math.max(0, row - 1); r <= Math.min(rows - 1, row + 1); r++) {
-            for (let c = Math.max(0, col - 1); c <= Math.min(cols - 1, col + 1); c++) {
-              for (let j = head[c + cols * r]; j >= 0; j = next[j]) {
-                if (j === i) continue;
-                const dx = px[j] - x; const dy = py[j] - y; const d2 = dx * dx + dy * dy;
-                if (d2 >= R2) continue;
-                n++; ax += hx[j]; ay += hy[j]; cx += dx; cy += dy;
-                if (d2 < S2 && d2 > 1e-4) { sx -= dx / d2; sy -= dy / d2; }
-              }
+          // The k nearest: rings of cells outward, until the k-th found is nearer than any cell
+          // of the next ring can be (a cell on ring r + 1 lies at least r cells away).
+          const col = clamp(Math.floor(x / CELL) + 1, 0, cols - 1); const row = clamp(Math.floor(y / CELL) + 1, 0, rows - 1);
+          const visit = (c, r) => {
+            if (c < 0 || c >= cols || r < 0 || r >= rows) return;
+            for (let j = head[c + cols * r]; j >= 0; j = next[j]) {
+              if (j === i) continue;
+              const dx = px[j] - x; const dy = py[j] - y; const d2 = dx * dx + dy * dy;
+              if (n === K && d2 >= bestD[K - 1]) continue;
+              // Insert, keeping bestD ascending.
+              let q = n < K ? n++ : K - 1;
+              while (q > 0 && bestD[q - 1] > d2) { bestD[q] = bestD[q - 1]; bestJ[q] = bestJ[q - 1]; q--; }
+              bestD[q] = d2; bestJ[q] = j;
             }
+          };
+          visit(col, row);
+          for (let ring = 1; ring <= MAX_RING; ring++) {
+            // The k-th found is nearer than any cell of this ring can be: done.
+            if (n === K && bestD[K - 1] <= (ring - 1) * CELL * (ring - 1) * CELL) break;
+            for (let c = col - ring; c <= col + ring; c++) { visit(c, row - ring); visit(c, row + ring); }
+            for (let r = row - ring + 1; r <= row + ring - 1; r++) { visit(col - ring, r); visit(col + ring, r); }
+          }
+          for (let q = 0; q < n; q++) {
+            const j = bestJ[q]; const d2 = bestD[q];
+            ax += hx[j]; ay += hy[j]; cx += px[j] - x; cy += py[j] - y;
+            if (d2 < S2 && d2 > 1e-4) { sx -= (px[j] - x) / d2; sy -= (py[j] - y) / d2; }
           }
         }
         let tx = 0; let ty = 0;
         if (n) {
           const al = Math.hypot(ax, ay) || 1;
           tx += W_ALIGN * social * ax / al; ty += W_ALIGN * social * ay / al;
-          const cl = Math.hypot(cx, cy) || 1;
-          tx += W_COHESION * social * cx / cl; ty += W_COHESION * social * cy / cl;
+          const cl = Math.hypot(cx, cy) / n;   // the distance to the centroid of the seven
+          if (cl > 1e-3) { const w = W_COHESION * social * Math.min(1, cl / COHESION_SCALE) / (cl * n); tx += w * cx; ty += w * cy; }
           const sl = Math.hypot(sx, sy);
           if (sl > 0) { const s = W_SEPARATION * Math.min(1, sl * SEPARATION) / sl; tx += s * sx; ty += s * sy; }
         }
@@ -463,9 +484,9 @@
         }
         const nl = Math.hypot(nx, ny) || 1;
         hx[i] = nx / nl; hy[i] = ny / nl;
-        if (n) { polar += Math.hypot(ax + hx[i], ay + hy[i]) / (n + 1); polarN++; }
+        polar += Math.hypot(ax + hx[i], ay + hy[i]) / (n + 1);
       }
-      order = polarN ? polar / polarN : 0;
+      order = M ? polar / M : 0;
       // Move
       if (phase === 'home') {
         // A damped spring toward the goal: the letter before this one in the text, at the rest
