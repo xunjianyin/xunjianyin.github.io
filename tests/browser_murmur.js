@@ -54,7 +54,7 @@
     win.cancelAnimationFrame = id => { pending.delete(id); cancel(id); };
   };
   const setReduced = value => { reduced = value; queries.forEach(query => query.dispatchEvent(new win.Event('change'))); };
-  const type = (text = 'flock', target = doc.body, extra = {}) => {
+  const type = (text = 'aiai', target = doc.body, extra = {}) => {
     for (const key of text) target.dispatchEvent(new win.KeyboardEvent('keydown', {
       key, code: `Key${key.toUpperCase()}`, bubbles: true, cancelable: true, ...extra
     }));
@@ -130,10 +130,10 @@
     const pristine = { main: main.innerHTML, attributes: htmlAttributes() };
     check(assets().length === 0 && !win.SiteMurmuration, 'No Murmuration asset loads before the password');
     const input = doc.createElement('input');
-    doc.body.append(input); input.focus(); type('flock', input); input.remove();
+    doc.body.append(input); input.focus(); type('aiai', input); input.remove();
     await delay(400);
     check(assets().length === 0 && !egg(), 'The password typed in an input opens and loads nothing');
-    for (const extra of [{ ctrlKey: true }, { metaKey: true }, { repeat: true }]) type('flock', doc.body, extra);
+    for (const extra of [{ ctrlKey: true }, { metaKey: true }, { repeat: true }]) type('aiai', doc.body, extra);
     await delay(200);
     check(assets().length === 0 && !egg(), 'Modifier shortcuts and repeated keys do not count');
 

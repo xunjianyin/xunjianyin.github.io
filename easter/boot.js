@@ -34,7 +34,7 @@
   'use strict';
   if (window.SiteLensesBoot) return;
 
-  const VERSION = 'lenses-v11';       // the ?v= of the lenses core (easter/lenses/core.*)
+  const VERSION = 'lenses-v12';       // the ?v= of the lenses core (easter/lenses/core.*)
   const SPIRA_VERSION = 'spira-v12';  // the ?v= of easter/spira/spira.*
   const MURMUR_VERSION = 'murmur-v2'; // the ?v= of easter/murmur/murmur.*
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
@@ -55,7 +55,7 @@
   // Spira
   const SITE_FOOTER = '#site-footer';
   const FOOTNOTE = '.easter-egg-footnote';
-  const PASSWORDS = { yxjgogogo: () => openSpira(), flock: () => openMurmur() };
+  const PASSWORDS = { yxjgogogo: () => openSpira(), aiai: () => openMurmur() };
   const PASSWORD_GAP_MS = 1800;       // a longer pause between keys starts the password over
   const TYPING = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], dialog[open]';
   // Any egg, at random
