@@ -3,7 +3,8 @@
 # line per suite: its assertions and failures. Exits non-zero when any suite fails or hangs.
 #
 # Usage: tests/run_easter_suites.sh [name ...]
-#   name         a suite to run (lenses, lenses_pages, lenses_media, tokens, easter_egg, lens_<id>);
+#   name         a suite to run (lenses, lenses_pages, lenses_media, tokens, murmur, easter_egg,
+#                lens_<id>);
 #                default: every suite listed below plus every tests/browser_lens_*.js
 # Environment:
 #   EASTER_BASE     the site's local static server (default http://localhost:8781); start one
@@ -54,7 +55,7 @@ if [ "$#" -gt 0 ]; then
   SUITES=$(for name in "$@"; do printf '%s\n' "$HERE/browser_${name#browser_}"; done | sed 's/\.js$//; s/$/.js/')
 else
   SUITES=$(
-    for name in lenses lenses_pages lenses_media tokens; do printf '%s\n' "$HERE/browser_$name.js"; done
+    for name in lenses lenses_pages lenses_media tokens murmur; do printf '%s\n' "$HERE/browser_$name.js"; done
     for file in "$HERE"/browser_lens_*.js; do [ -f "$file" ] && printf '%s\n' "$file"; done
     printf '%s\n' "$HERE/browser_easter_egg.js"
   )

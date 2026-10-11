@@ -1,17 +1,24 @@
 # Easter eggs
 
-The site has two hidden features. Both live in this directory, load only when a visitor asks
+The site has three hidden features. All live in this directory, load only when a visitor asks
 for them, and leave the page exactly as it was when they end.
 
 | Egg | Trigger | What it does |
 | --- | --- | --- |
 | Spira (first) | the footer's `*`, or typing `yxjgogogo` outside a text field | A full-screen canvas: the page's words wind into a logarithmic spiral, then a spiral of the research unwinds. |
 | Lenses (second) | double-click or double-tap a name or a page title | The page is redrawn in place through one lens after another; Esc returns to normal. The active lens follows the reader to every page. |
-| Either, at random | double-click or double-tap the homepage photo | Spira, or the next lens (as a double-click on the name would), with even odds. A single click does nothing. |
+| Murmuration (third) | typing `flock` outside a text field | The page's letters loosen from their lines and fly as a flock on the page's own paper; as the noise cools the flock orders; Esc (or Return) sends the letters home, where words, lines and the page grow back. |
+| Any, at random | double-click or double-tap the homepage photo | Spira, Murmuration, or the next lens (as a double-click on the name would), with even odds. A single click does nothing. |
 
 While a lens is active, the keys `1` to `9` jump to that place in the cycle and `0` returns to
 normal (not in text fields, not inside a paper's demo, not with a modifier). The last key
 wins, also while a lens module is still loading. There is no visible hint for this.
+
+While the flock is out, the wheel and the arrow keys cool (down) or warm (up) the noise, `End`
+and `Home` set it to 0 and 1, and Esc or the Return button starts the flight home. A readout
+of the noise and the order (bottom right, with Return) shows only on intent: the pointer in
+that corner, a tap on the flock, or a key. The pointer scatters the letters near it. Under
+reduced motion the flock never opens (the password does nothing, the photo never picks it).
 
 ## Where the site touches the eggs
 
@@ -24,9 +31,11 @@ The rest of the site knows only three things.
    `lenses-ground`), marks `html[data-lens-arriving]`, and, when the lens has a ground colour,
    hides the body over that colour (`<style id="lenses-prepaint">`). It names no lens.
 2. **`easter/boot.js`.** `site-shell.js` loads it on the hand-written pages; a paper page loads
-   it from its `<head>` (`LENSES_BOOT` in the same script). It binds both eggs' triggers and
+   it from its `<head>` (`LENSES_BOOT` in the same script). It binds every egg's triggers and
    brings the reader's lens to the page. Both Spira triggers (the footer's `*` and the typed
-   password) live in it. If it fails to load, the page shows as it is (the arrival mark and
+   password) and Murmuration's password live in it; Murmuration is bound where Spira is (pages
+   with the site shell's footer), loads `easter/murmur/murmur.{js,css}` on its first opening,
+   and a failed load is retried by the next trigger. If it fails to load, the page shows as it is (the arrival mark and
    the ground are removed), the password does nothing, and only the footer's `*` retries: it
    says "Could not load. Click to try again." and loads the boot again on the next click
    (then opens Spira, and the password works again). A click on `*` before the boot has
@@ -42,7 +51,7 @@ The rest of the site knows only three things.
 `[data-lens-trigger] { touch-action: manipulation; }` (`shared-styles.css` also names
 `[data-egg-trigger]` in it).
 
-Spira also reads the site's content as it opens (below).
+Spira and Murmuration also read the page's content as they open (below).
 
 ## Where Spira's content comes from
 
@@ -86,6 +95,24 @@ Curated in `spira/spira.js`:
 Caught open questions last for one visit (`sessionStorage`, `spira-wishes`); the sound
 preference stays (`localStorage`, `spira-sound`).
 
+## How Murmuration works
+
+`murmur/murmur.js` captures the visible words of `#main-content` and the footer as Spira does
+(exact computed font, colour and letter-spacing; one sprite per word in a device-pixel atlas),
+then cuts each word sprite at its letters' advance boxes, so the slices tile the word exactly
+and at rest the canvas is the page. Each slice is one agent; above 2600 letters (1500 on a
+touch device) the agents are whole words instead, and words beyond 900 stay printed in place.
+The model is continuous-time boids with Vicsek noise (the header of `murmur.js` has the
+equations): alignment, cohesion and separation within 36 px, a soft wall, a weak pull toward
+the viewport centre, and an angular noise `0.4 pi eta^2` per 1/15 s step, where `eta` is the
+noise the readout shows. `eta` cools from 1 to 0.04 over 3 to 30 s unless the reader sets it;
+the order `phi` is the mean local polarization of the letters that have neighbours (about 0.3
+in the gas, above 0.9 when ordered; the crossover lies near `eta` 0.5). The flight home is a
+damped spring toward the letter before this one in the text at the rest offset (so words
+gather first, then lines), blending into the place itself, with an exact ease onto the glyphs
+in the last 0.7 s; the swap (glyphs back, dialog gone) is one paint. A hidden tab pauses the
+loop; a resize, `pagehide` or a change to reduced motion finishes at once. Stored: nothing.
+
 ## Files
 
 ```
@@ -94,6 +121,8 @@ easter/
   boot.js              entry point on every page: both eggs' triggers, the lens arrival
   spira/spira.js       Spira (window.SiteEasterEgg), loaded on the first opening
   spira/spira.css
+  murmur/murmur.js     Murmuration (window.SiteMurmuration), loaded on the first opening
+  murmur/murmur.css
   lenses/core.js       the lenses core (window.SiteLenses): cycle, contract, caption, bell,
                        one animation loop, exact restoration; its header is the lens contract
   lenses/core.css      hidden glyphs, layers, caption, the arrival's fade
@@ -223,11 +252,12 @@ Asset URLs carry a cache key. When any file under `lenses/` changes, or `boot.js
 bump `lenses-vN` in `lenses/core.js`, `boot.js`, the `site-shell.js?v=` query of every
 hand-written page, the boot URL in `site-shell.js` and `LENSES_BOOT` in
 `scripts/build_papers.py`, then run `python3 scripts/build_papers.py`. When Spira changes, bump
-`SPIRA_VERSION` (`spira-vN`) in `boot.js`; that is a change to `boot.js`, so bump `lenses-vN`
-as well, or returning visitors keep a cached `boot.js` that asks for the old Spira (GitHub
+`SPIRA_VERSION` (`spira-vN`) in `boot.js`, and when Murmuration changes, `MURMUR_VERSION`
+(`murmur-vN`); either is a change to `boot.js`, so bump `lenses-vN`
+as well, or returning visitors keep a cached `boot.js` that asks for the old egg (GitHub
 Pages lets browsers cache files for 10 minutes). `tests/test_lenses_prepaint.py` checks that
-the lenses versions agree; the browser suites read both versions from `window.SiteLensesBoot`
-(`version`, `spiraVersion`), so no test names a version.
+the lenses versions agree; the browser suites read the versions from `window.SiteLensesBoot`
+(`version`, `spiraVersion`, `murmurVersion`), so no test names a version.
 
 ## Tests
 
@@ -240,8 +270,9 @@ tests/run_easter_suites.sh lenses_media                    # one suite
 ```
 
 `run_easter_suites.sh` runs `browser_lenses.js`, `browser_lenses_pages.js`,
-`browser_lenses_media.js`, `browser_tokens.js`, every `browser_lens_*.js` and
-`browser_easter_egg.js`, each in its own agent-browser session, and prints one line per suite.
+`browser_lenses_media.js`, `browser_tokens.js`, `browser_murmur.js`, every `browser_lens_*.js`
+and `browser_easter_egg.js`, each in its own agent-browser session, and prints one line per
+suite.
 Its header lists the environment variables (server URL, session prefix, time limit, results
 directory). Two matter on a Mac. Headless Chrome renders no frames while the display sleeps
 (no `requestAnimationFrame`, no IntersectionObserver callbacks, view transitions never end), so

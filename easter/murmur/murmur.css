@@ -1,0 +1,52 @@
+/* Murmuration (the third egg): the page's letters as a flock. easter/README.md is the map. */
+
+/* While the flock is out, the page's own glyphs are transparent; the canvas stands in. The
+   page is otherwise untouched (links, the photo and the nav stay where they are). */
+html.murmur-hide-text #main-content, html.murmur-hide-text #main-content *,
+html.murmur-hide-text #site-footer, html.murmur-hide-text #site-footer *,
+html.murmur-hide-text body:not(:has(#main-content)) main,
+html.murmur-hide-text body:not(:has(#main-content)) main * {
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+}
+
+#murmur {
+  position: fixed; inset: 0; box-sizing: border-box;
+  width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0; border-radius: 0; outline: none;
+  overflow: hidden; overscroll-behavior: contain;
+  background: transparent; color: var(--text-color, #000);
+  font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.5;
+  -webkit-text-fill-color: currentColor;
+  cursor: default;
+}
+#murmur[open] { display: block; }
+#murmur::backdrop { background: transparent; }
+#murmur *, #murmur *::before, #murmur *::after { box-sizing: border-box; }
+#murmur .murmur-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+
+/* The readout and the way back, hidden until the reader shows intent (the pointer in the
+   bottom-right corner, a tap on the flock, or a key). Flat, square, one hairline. */
+#murmur .murmur-chrome {
+  position: absolute; right: 20px; bottom: 18px; z-index: 1;
+  display: flex; align-items: center; gap: 14px;
+  opacity: 0; visibility: hidden; transition: opacity 180ms linear, visibility 0s linear 180ms;
+}
+#murmur .murmur-chrome.is-shown { opacity: 1; visibility: visible; transition: opacity 180ms linear; }
+#murmur .murmur-readout {
+  margin: 0; font-variant-numeric: tabular-nums; white-space: nowrap;
+  color: var(--secondary-color, #004A8C); letter-spacing: 0.02em;
+}
+#murmur .murmur-readout i { font-style: italic; }
+#murmur .murmur-return {
+  appearance: none; margin: 0; padding: 4px 10px; border: 1px solid currentColor; border-radius: 0;
+  background: var(--bg-color, #fff); color: var(--text-color, #000); font: inherit; letter-spacing: 0.02em;
+  cursor: pointer;
+}
+#murmur .murmur-return:hover { color: var(--secondary-color, #004A8C); }
+#murmur .murmur-return:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+#murmur .murmur-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 600px) {
+  #murmur .murmur-chrome { right: 14px; bottom: 14px; gap: 10px; }
+}

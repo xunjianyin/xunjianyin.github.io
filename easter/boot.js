@@ -19,17 +19,24 @@
  *   it; easter/spira/spira.{js,css} load on the first opening, and an active lens is reset at
  *   once (and forgotten) first. Its AudioContext is primed inside the gesture.
  *
- * Either egg: a double-click or a double-tap on any [data-egg-trigger] (the homepage photo)
- * opens one of the two at random: Spira, or the next lens, as a double-click on the page's own
- * name would (the caption sits by that name). Where Spira is not bound, it is always the next
- * lens. A single click does nothing: the photo gives nothing away.
+ * Murmuration (the third egg, easter/murmur/), on the same pages as Spira:
+ * - Typing its password outside a text field opens it; easter/murmur/murmur.{js,css} load on
+ *   the first opening, and an active lens is reset at once (and forgotten) first. Under
+ *   reduced motion it does not open (the password does nothing, the photo never picks it).
+ *
+ * Any egg: a double-click or a double-tap on any [data-egg-trigger] (the homepage photo)
+ * opens one of the three at random with even odds: Spira, Murmuration, or the next lens, as a
+ * double-click on the page's own name would (the caption sits by that name). Where Spira and
+ * Murmuration are not bound, it is always the next lens. A single click does nothing: the
+ * photo gives nothing away.
  */
 (() => {
   'use strict';
   if (window.SiteLensesBoot) return;
 
-  const VERSION = 'lenses-v9';        // the ?v= of the lenses core (easter/lenses/core.*)
+  const VERSION = 'lenses-v10';       // the ?v= of the lenses core (easter/lenses/core.*)
   const SPIRA_VERSION = 'spira-v12';  // the ?v= of easter/spira/spira.*
+  const MURMUR_VERSION = 'murmur-v1'; // the ?v= of easter/murmur/murmur.*
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
   const ROOT = new URL('../', SCRIPT_SRC).href;                 // easter/boot.js → the site root
   const STORE_KEY = 'lenses-active';
@@ -48,12 +55,14 @@
   // Spira
   const SITE_FOOTER = '#site-footer';
   const FOOTNOTE = '.easter-egg-footnote';
-  const PASSWORD = 'yxjgogogo';
+  const PASSWORDS = { yxjgogogo: () => openSpira(), flock: () => openMurmur() };
   const PASSWORD_GAP_MS = 1800;       // a longer pause between keys starts the password over
   const TYPING = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], dialog[open]';
-  // Either egg, at random
+  // Any egg, at random
   const EGG_TRIGGER = '[data-egg-trigger]';
-  const SPIRA_SHARE = 0.5;            // the chance that the photo opens Spira rather than the next lens
+  const SPIRA_SHARE = 1 / 3;          // the chance that the photo opens Spira ...
+  const MURMUR_SHARE = 1 / 3;         // ... or Murmuration; otherwise the next lens
+  const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
   const html = document.documentElement;
   const storage = (fn, fallback = null) => { try { return fn(sessionStorage); } catch (error) { return fallback; } };
@@ -234,20 +243,59 @@
     });
   }
 
-  /* Either egg, at random ---------------------------------------------------------- */
-  // A double-click or double-tap: on the photo, Spira or the next lens at random; elsewhere the
-  // next lens. A lens chosen from the photo behaves as a double-click on the page's name: the
-  // core places its caption by its trigger, and the photo holds no text to sit beside.
+  /* Murmuration (the third egg) ------------------------------------------------- */
+  let murmurLoading = null;
+  const murmurSupported = () => !matchMedia(REDUCED_MOTION).matches;
+  function openMurmur() {
+    if (!murmurSupported()) return;
+    // As for Spira: an active lens returns to normal first, without animation, and is forgotten.
+    const lenses = window.SiteLenses;
+    const lensesSettled = lenses && (lenses.current || lenses.busy) ? lenses.reset({ instant: true }) : null;
+    if (!lensesSettled) {
+      storage(store => { store.removeItem(STORE_KEY); store.removeItem(GROUND_KEY); });
+      unmark();
+    }
+    if (window.SiteMurmuration) {
+      if (lensesSettled) lensesSettled.then(() => window.SiteMurmuration.open());
+      else window.SiteMurmuration.open();
+      return;
+    }
+    if (murmurLoading) return;
+    const assets = [script(new URL(`easter/murmur/murmur.js?v=${MURMUR_VERSION}`, ROOT).href),
+      stylesheet(new URL(`easter/murmur/murmur.css?v=${MURMUR_VERSION}`, ROOT).href)];
+    murmurLoading = Promise.all([loadAll(assets)].concat(lensesSettled || [])).then(() => {
+      if (!window.SiteMurmuration) throw new Error('Murmuration did not initialize.');
+      window.SiteMurmuration.open();
+    }).catch(error => {
+      // Leave nothing behind, so the next trigger tries again.
+      assets.forEach(asset => asset.remove());
+      console.warn('The flock could not load.', error);
+    }).finally(() => { murmurLoading = null; });
+  }
+
+  /* Any egg, at random ----------------------------------------------------------- */
+  // A double-click or double-tap: on the photo, Spira, Murmuration or the next lens at random;
+  // elsewhere the next lens. A lens chosen from the photo behaves as a double-click on the
+  // page's name: the core places its caption by its trigger, and the photo holds no text to
+  // sit beside. Under reduced motion the photo never picks Murmuration (the odds stay even
+  // between the other two).
   let spiraBound = false;
   function activate(trigger, pointerType) {
     if (!trigger.matches(EGG_TRIGGER)) { triggerLens(trigger, pointerType); return; }
-    if (spiraBound && Math.random() < SPIRA_SHARE) { openSpira(); return; }
+    if (spiraBound) {
+      const roll = Math.random();
+      const murmur = murmurSupported();
+      const spiraShare = murmur ? SPIRA_SHARE : SPIRA_SHARE / (1 - MURMUR_SHARE);
+      if (roll < spiraShare) { openSpira(); return; }
+      if (murmur && roll < SPIRA_SHARE + MURMUR_SHARE) { openMurmur(); return; }
+    }
     const scope = trigger.closest('main') || document;
     triggerLens(scope.querySelector(TRIGGER) || document.querySelector(TRIGGER) || trigger, pointerType);
   }
 
   // The footer is injected by the site shell, possibly after this runs: one delegated click
-  // listener, and the password listener, once the page shows it has the site shell's footer.
+  // listener, and the passwords' listener (both eggs'), once the page shows it has the site
+  // shell's footer.
   function bindSpira() {
     spiraBound = true;
     document.addEventListener('click', event => {
@@ -268,11 +316,12 @@
       lastKeyAt = now;
       const key = event.key?.toLowerCase();
       sequence += key?.length === 1 ? key : '\0';
-      while (sequence && !PASSWORD.startsWith(sequence)) sequence = sequence.slice(1);
-      if (sequence === PASSWORD) { sequence = ''; openSpira(); }
+      const passwords = Object.keys(PASSWORDS);
+      while (sequence && !passwords.some(password => password.startsWith(sequence))) sequence = sequence.slice(1);
+      if (PASSWORDS[sequence]) { const open = PASSWORDS[sequence]; sequence = ''; open(); }
     });
   }
   whenReady().then(() => { if (document.querySelector(SITE_FOOTER)) bindSpira(); });
 
-  window.SiteLensesBoot = { version: VERSION, spiraVersion: SPIRA_VERSION, root: ROOT, loadCore, openSpira };
+  window.SiteLensesBoot = { version: VERSION, spiraVersion: SPIRA_VERSION, murmurVersion: MURMUR_VERSION, root: ROOT, loadCore, openSpira, openMurmur };
 })();
