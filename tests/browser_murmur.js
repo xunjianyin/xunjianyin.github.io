@@ -3,7 +3,7 @@
  * mutation while it is open and exact restoration after it, the model (letters per unit, order
  * at low noise, disorder at high noise, the cooling schedule), every close path (Escape, a
  * second close, pagehide, resize, Return), the last frame of the flight home on the glyphs,
- * the homepage photo, reduced motion, an active lens reset first, other pages (the
+ * the homepage photo (it opens Self-portrait, not the flock), reduced motion, an active lens reset first, other pages (the
  * publications, the blogs, a paper page without the egg), frame timing and errors.
  * Resolves with assertions, failures, notes and frame timing.
  */
@@ -248,19 +248,13 @@
     await until(() => !egg(), 'Return to finish', 5000);
     restored('Return', before);
 
-    /* 6. The photo: a double-click with Math.random at 0.5 opens Murmuration. */
+    /* 6. The photo opens Self-portrait, never the flock. */
     check(!!doc.querySelector('.profile-photo[data-egg-trigger]'), 'The homepage photo is an egg trigger');
-    const random = win.Math.random;
-    before = snapshot();
-    win.Math.random = () => 0.5;
-    try {
-      doubleClick();
-      await opened('the photo to open the flock');
-      check(!doc.querySelector('#spira') && !(win.SiteLenses && win.SiteLenses.current), 'The photo at 0.5 opens Murmuration, not Spira or a lens');
-      await delay(300);
-      closeNow();
-    } finally { win.Math.random = random; }
-    restored('Photo', before);
+    doubleClick();
+    await until(() => doc.querySelector('#portrait')?.open, 'the photo to open Self-portrait');
+    check(!egg(), 'The photo opens Self-portrait, not the flock');
+    doc.querySelector('#portrait').portrait.close(); doc.querySelector('#portrait')?.portrait.close();
+    await until(() => !doc.querySelector('#portrait'), 'Self-portrait to close');
 
     /* 8. An active lens is reset (and forgotten) before the flock opens. */
     const lenses = await win.SiteLensesBoot.loadCore();
@@ -275,29 +269,12 @@
     closeNow();
     check(!egg() && main.innerHTML === pristine.main, 'After the lens and the flock the homepage markup is restored');
 
-    /* 7. Reduced motion: no password, never from the photo, and a change closes the flock. */
+    /* 7. Reduced motion: no password, and a change closes the flock. */
     await load('/');
     setReduced(true);
     type();
     await delay(600);
     check(assets().length === 0 && !egg(), 'Reduced motion: the password opens and loads nothing');
-    const pageRandom = win.Math.random;
-    win.Math.random = () => 0.5;
-    try {
-      doubleClick();
-      await until(() => doc.querySelector('#spira')?.open || (win.SiteLenses && win.SiteLenses.current), 'Spira or a lens from the photo under reduced motion', 15000);
-    } finally { win.Math.random = pageRandom; }
-    check(!egg() && assets().length === 0, 'Reduced motion: the photo never opens Murmuration');
-    const spira = doc.querySelector('#spira');
-    if (spira) {
-      notes.push('reduced motion: the photo at 0.5 opened Spira');
-      spira.dispatchEvent(new win.Event('cancel', { cancelable: true }));
-      await until(() => !doc.querySelector('#spira'), 'Spira to close', 15000);
-    } else {
-      notes.push(`reduced motion: the photo at 0.5 opened the lens ${win.SiteLenses.current}`);
-      await until(() => !win.SiteLenses.busy, 'the lens to settle', 15000);
-      await win.SiteLenses.reset({ instant: true });
-    }
     setReduced(false);
     type();
     await opened('the password to open the flock after reduced motion');

@@ -1,6 +1,6 @@
 /**
  * The easter eggs' boot, on every page (loaded by site-shell.js, or by a paper page's <head>).
- * It binds both eggs' triggers and loads nothing else until a visitor asks for an egg.
+ * It binds every egg's triggers and loads nothing else until a visitor asks for an egg.
  * easter/README.md is the map.
  *
  * Lenses (the second egg, easter/lenses/):
@@ -22,21 +22,23 @@
  * Murmuration (the third egg, easter/murmur/), on the same pages as Spira:
  * - Typing its password outside a text field opens it; easter/murmur/murmur.{js,css} load on
  *   the first opening, and an active lens is reset at once (and forgotten) first. Under
- *   reduced motion it does not open (the password does nothing, the photo never picks it).
+ *   reduced motion it does not open (the password does nothing).
  *
- * Any egg: a double-click or a double-tap on any [data-egg-trigger] (the homepage photo)
- * opens one of the three at random with even odds: Spira, Murmuration, or the next lens, as a
- * double-click on the page's own name would (the caption sits by that name). Where Spira and
- * Murmuration are not bound, it is always the next lens. A single click does nothing: the
- * photo gives nothing away.
+ * Self-portrait (the fourth egg, easter/portrait/), wherever a [data-egg-trigger] is (the
+ * homepage photo):
+ * - A double-click or a double-tap on the photo opens it; easter/portrait/portrait.{js,css}
+ *   load on the first opening, and an active lens is reset at once (and forgotten) first. A
+ *   single click does nothing: the photo gives nothing away. Under reduced motion it opens
+ *   still, one test at a time.
  */
 (() => {
   'use strict';
   if (window.SiteLensesBoot) return;
 
-  const VERSION = 'lenses-v12';       // the ?v= of the lenses core (easter/lenses/core.*)
+  const VERSION = 'lenses-v13';       // the ?v= of the lenses core (easter/lenses/core.*)
   const SPIRA_VERSION = 'spira-v12';  // the ?v= of easter/spira/spira.*
   const MURMUR_VERSION = 'murmur-v2'; // the ?v= of easter/murmur/murmur.*
+  const PORTRAIT_VERSION = 'portrait-v1'; // the ?v= of easter/portrait/portrait.*
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
   const ROOT = new URL('../', SCRIPT_SRC).href;                 // easter/boot.js → the site root
   const STORE_KEY = 'lenses-active';
@@ -58,10 +60,8 @@
   const PASSWORDS = { yxjgogogo: () => openSpira(), aiai: () => openMurmur() };
   const PASSWORD_GAP_MS = 1800;       // a longer pause between keys starts the password over
   const TYPING = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], dialog[open]';
-  // Any egg, at random
+  // Self-portrait
   const EGG_TRIGGER = '[data-egg-trigger]';
-  const SPIRA_SHARE = 1 / 3;          // the chance that the photo opens Spira ...
-  const MURMUR_SHARE = 1 / 3;         // ... or Murmuration; otherwise the next lens
   const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
   const html = document.documentElement;
@@ -123,7 +123,7 @@
     loadCore().then(lenses => lenses.next({ pointerType, trigger: element }), () => dropAudio('__lensesAudioContext'));
   }
 
-  // The trigger under a double-click or double-tap: a lens trigger, or the photo (either egg).
+  // The trigger under a double-click or double-tap: a lens trigger, or the photo (Self-portrait).
   const triggerOf = target => {
     const el = target instanceof Element ? target : target && target.parentElement;
     const trigger = el && el.closest(`${TRIGGER}, ${EGG_TRIGGER}`);
@@ -273,31 +273,44 @@
     }).finally(() => { murmurLoading = null; });
   }
 
-  /* Any egg, at random ----------------------------------------------------------- */
-  // A double-click or double-tap: on the photo, Spira, Murmuration or the next lens at random;
-  // elsewhere the next lens. A lens chosen from the photo behaves as a double-click on the
-  // page's name: the core places its caption by its trigger, and the photo holds no text to
-  // sit beside. Under reduced motion the photo never picks Murmuration (the odds stay even
-  // between the other two).
-  let spiraBound = false;
-  function activate(trigger, pointerType) {
-    if (!trigger.matches(EGG_TRIGGER)) { triggerLens(trigger, pointerType); return; }
-    if (spiraBound) {
-      const roll = Math.random();
-      const murmur = murmurSupported();
-      const spiraShare = murmur ? SPIRA_SHARE : SPIRA_SHARE / (1 - MURMUR_SHARE);
-      if (roll < spiraShare) { openSpira(); return; }
-      if (murmur && roll < SPIRA_SHARE + MURMUR_SHARE) { openMurmur(); return; }
+  /* Self-portrait (the fourth egg) -------------------------------------------- */
+  let portraitLoading = null;
+  function openPortrait(photo) {
+    // As for Spira: an active lens returns to normal first, without animation, and is forgotten.
+    const lenses = window.SiteLenses;
+    const lensesSettled = lenses && (lenses.current || lenses.busy) ? lenses.reset({ instant: true }) : null;
+    if (!lensesSettled) {
+      storage(store => { store.removeItem(STORE_KEY); store.removeItem(GROUND_KEY); });
+      unmark();
     }
-    const scope = trigger.closest('main') || document;
-    triggerLens(scope.querySelector(TRIGGER) || document.querySelector(TRIGGER) || trigger, pointerType);
+    if (window.SitePortrait) {
+      if (lensesSettled) lensesSettled.then(() => window.SitePortrait.open({ photo }));
+      else window.SitePortrait.open({ photo });
+      return;
+    }
+    if (portraitLoading) return;
+    const assets = [script(new URL(`easter/portrait/portrait.js?v=${PORTRAIT_VERSION}`, ROOT).href),
+      stylesheet(new URL(`easter/portrait/portrait.css?v=${PORTRAIT_VERSION}`, ROOT).href)];
+    portraitLoading = Promise.all([loadAll(assets)].concat(lensesSettled || [])).then(() => {
+      if (!window.SitePortrait) throw new Error('Self-portrait did not initialize.');
+      return window.SitePortrait.open({ photo });
+    }).catch(error => {
+      // Leave nothing behind, so the next trigger tries again.
+      assets.forEach(asset => asset.remove());
+      console.warn('The self-portrait could not load.', error);
+    }).finally(() => { portraitLoading = null; });
+  }
+
+  // A double-click or double-tap: on the photo, Self-portrait; elsewhere the next lens.
+  function activate(trigger, pointerType) {
+    if (trigger.matches(EGG_TRIGGER)) openPortrait(trigger);
+    else triggerLens(trigger, pointerType);
   }
 
   // The footer is injected by the site shell, possibly after this runs: one delegated click
   // listener, and the passwords' listener (both eggs'), once the page shows it has the site
   // shell's footer.
   function bindSpira() {
-    spiraBound = true;
     document.addEventListener('click', event => {
       const target = event.target instanceof Element ? event.target : null;
       if (target && target.closest(FOOTNOTE)) openSpira();
@@ -323,5 +336,6 @@
   }
   whenReady().then(() => { if (document.querySelector(SITE_FOOTER)) bindSpira(); });
 
-  window.SiteLensesBoot = { version: VERSION, spiraVersion: SPIRA_VERSION, murmurVersion: MURMUR_VERSION, root: ROOT, loadCore, openSpira, openMurmur };
+  window.SiteLensesBoot = { version: VERSION, spiraVersion: SPIRA_VERSION, murmurVersion: MURMUR_VERSION,
+    portraitVersion: PORTRAIT_VERSION, root: ROOT, loadCore, openSpira, openMurmur, openPortrait };
 })();

@@ -1,6 +1,6 @@
 # Easter eggs
 
-The site has three hidden features. All live in this directory, load only when a visitor asks
+The site has four hidden features. All live in this directory, load only when a visitor asks
 for them, and leave the page exactly as it was when they end.
 
 | Egg | Trigger | What it does |
@@ -8,7 +8,7 @@ for them, and leave the page exactly as it was when they end.
 | Spira (first) | the footer's `*`, or typing `yxjgogogo` outside a text field | A full-screen canvas: the page's words wind into a logarithmic spiral, then a spiral of the research unwinds. |
 | Lenses (second) | double-click or double-tap a name or a page title | The page is redrawn in place through one lens after another; Esc returns to normal. The active lens follows the reader to every page. |
 | Murmuration (third) | typing `aiai` outside a text field | The page's letters loosen from their lines and fly as a flock on the page's own paper; as the noise cools the flock orders; Esc (or Return) sends the letters home, where words, lines and the page grow back. |
-| Any, at random | double-click or double-tap the homepage photo | Spira, Murmuration, or the next lens (as a double-click on the name would), with even odds. A single click does nothing. |
+| Self-portrait (fourth) | double-click or double-tap the homepage photo | The photo flies into a figure, where a small program paints it from nothing, square by square, and rewrites itself as it goes (its improver too); when the portrait is done it paints its own program, until the picture is the program that paints it. A single click does nothing. |
 
 While a lens is active, the keys `1` to `9` jump to that place in the cycle and `0` returns to
 normal (not in text fields, not inside a paper's demo, not with a modifier). The last key
@@ -18,7 +18,12 @@ While the flock is out, the wheel and the arrow keys cool (down) or warm (up) th
 and `Home` set it to 0 and 1, and Esc or the Return button starts the flight home. A readout
 of the noise and the order (bottom right, with Return) shows only on intent: the pointer in
 that corner, a tap on the flock, or a key. The pointer scatters the letters near it. Under
-reduced motion the flock never opens (the password does nothing, the photo never picks it).
+reduced motion the flock never opens (the password does nothing).
+
+While the self-portrait is out, Space pauses, the right arrow shows the rest of the test on
+screen at once, and Esc or the Return button (bottom right, shown on intent as for the flock)
+sends the photo home. Under reduced motion it opens without the flight and stays still:
+Next test (beside Return, always shown) or the right arrow advances one test at a time.
 
 ## Where the site touches the eggs
 
@@ -35,14 +40,16 @@ The rest of the site knows only three things.
    brings the reader's lens to the page. Both Spira triggers (the footer's `*` and the typed
    password) and Murmuration's password live in it; Murmuration is bound where Spira is (pages
    with the site shell's footer), loads `easter/murmur/murmur.{js,css}` on its first opening,
-   and a failed load is retried by the next trigger. If it fails to load, the page shows as it is (the arrival mark and
+   and a failed load is retried by the next trigger. Self-portrait is bound wherever a
+   `[data-egg-trigger]` is (the homepage photo) and loads `easter/portrait/portrait.{js,css}` on
+   its first opening, retried the same way. If the boot fails to load, the page shows as it is (the arrival mark and
    the ground are removed), the password does nothing, and only the footer's `*` retries: it
    says "Could not load. Click to try again." and loads the boot again on the next click
    (then opens Spira, and the password works again). A click on `*` before the boot has
    loaded opens Spira once it is there.
 3. **Markup.** `[data-lens-trigger]` on the names and titles (`site-shell.js`, `index.html`,
    the page `h1`s, the paper template), `[data-egg-trigger]` on the homepage photo (a double-click
-   opens Spira or the next lens at random; where Spira is not bound, the next lens), the footer's `.easter-egg-footnote` button
+   opens Self-portrait, which paints that image), the footer's `.easter-egg-footnote` button
    (`site-shell.js`), and the bio's key sentence, an unstyled `<span data-spira-key>` in
    `index.html`. Spira is bound only on pages with the site shell's footer (`#site-footer`), so
    paper pages have no Spira.
@@ -117,16 +124,65 @@ gather first, then lines), blending into the place itself, with an exact ease on
 in the last 0.7 s; the swap (glyphs back, dialog gone) is one paint. A hidden tab pauses the
 loop; a resize, `pagehide` or a change to reduced motion finishes at once. Stored: nothing.
 
+## How Self-portrait works
+
+`portrait/portrait.js` holds a program of ten lines, each one of a few values, shown as a
+listing beside the painting:
+
+| Part | Line | Values |
+| --- | --- | --- |
+| `paint` | `size` | the square's side in cells of the 160 x 160 canvas: 40, 28, 20, 14, 10, 7, 5, 4, 3, 2 |
+| | `where` | anywhere; where the error is largest (a cell of a 16 x 16 error map, by its error); on the sitter's edges (a Sobel CDF); near the last square |
+| | `colour` | random; the sitter at the square's centre; the sitter's mean under it (an integral image); the best fit, `(mean t - (1 - a) mean p) / a` |
+| | `alpha` | 0.9, 0.7, 0.5, 0.35, 0.2, 0.1 |
+| | `tries` | the best of 1, 2, 4, 8 or 16 proposals, drawn only if it lowers the error |
+| `improve` | `every` | a test of paint every 200, 400, 800 or 1600 proposals (one window) |
+| | `step` | an edit moves a line one notch, or to any value |
+| | `pick` | any line, or the line edited longest ago |
+| | `keep` | if no worse, or always |
+| | `self` | a test of improve every 3, 6 or 12 tests of paint; this line is one of improve's |
+
+A **test** forks the canvas: the current program and the edited one each paint one window
+from the same canvas with the same random numbers, and the edit is kept if the edited copy's
+squared error is no larger (or always, if `keep` says so). An edit to `improve` is judged the
+same way over the next four windows of tests of paint. A change to how often improve edits
+itself cannot show its effect inside its own test, so it is kept as no worse. The winning copy
+goes on, so the display replays only the timeline that won; each verdict shows when its window
+has been shown. The first program is crude (size 40, anywhere, the colour at the centre,
+alpha 0.9). In a prototype of the same model outside the browser (mean of 20 seeds), the PSNR
+after 48,000 proposals was 31.0 dB with edits to paint only and 34.6 dB with improve editing
+itself as well.
+
+The **finale** begins at 34 dB or after 60,000 proposals. The sitter becomes the program's own
+text (`textOf`, drawn in bold 11 px monospace), and each copy in a test is judged against the
+text of its own program, so an edit also changes the picture it must match. Once the painting
+is close, edits cost more than they repay; after ten tests in a row that leave the program as
+it was, with the painting at 19.5 dB or more against its text, it has **settled** (a fixed point: the picture is
+the program that paints it). After 64,000 proposals without settling it stops, **unsettled**.
+The caption says which. In 16 seeded runs all settled, at 19.5 to 24.5 dB, the finale
+beginning between 28,000 and 62,000 proposals and ending by 114,000.
+
+The simulation is a generator sliced by work (about 12,000 cells visited per slice) and kept
+up to 16,000 proposals ahead of the display. The display draws each square as a `fillRect` on a
+canvas of 160 x n device pixels (whole pixels per cell), shows 320 rising to 960 proposals a
+second, and gives a test of paint at least 1.25 s on screen, falling to 0.65 s from 40,000
+proposals on. The dialog covers the page with its paper; the photo's copy flies between the
+page's photo and the frame (a transform, both ways). Closing restores the page exactly. A
+hidden tab pauses it, `pagehide` closes it at once, and a resize only redraws the charts.
+Stored: nothing.
+
 ## Files
 
 ```
 easter/
   README.md            this map
-  boot.js              entry point on every page: both eggs' triggers, the lens arrival
+  boot.js              entry point on every page: every egg's triggers, the lens arrival
   spira/spira.js       Spira (window.SiteEasterEgg), loaded on the first opening
   spira/spira.css
   murmur/murmur.js     Murmuration (window.SiteMurmuration), loaded on the first opening
   murmur/murmur.css
+  portrait/portrait.js Self-portrait (window.SitePortrait), loaded on its first opening
+  portrait/portrait.css
   lenses/core.js       the lenses core (window.SiteLenses): cycle, contract, caption, bell,
                        one animation loop, exact restoration; its header is the lens contract
   lenses/core.css      hidden glyphs, layers, caption, the arrival's fade
@@ -256,12 +312,13 @@ Asset URLs carry a cache key. When any file under `lenses/` changes, or `boot.js
 bump `lenses-vN` in `lenses/core.js`, `boot.js`, the `site-shell.js?v=` query of every
 hand-written page, the boot URL in `site-shell.js` and `LENSES_BOOT` in
 `scripts/build_papers.py`, then run `python3 scripts/build_papers.py`. When Spira changes, bump
-`SPIRA_VERSION` (`spira-vN`) in `boot.js`, and when Murmuration changes, `MURMUR_VERSION`
-(`murmur-vN`); either is a change to `boot.js`, so bump `lenses-vN`
+`SPIRA_VERSION` (`spira-vN`) in `boot.js`, when Murmuration changes, `MURMUR_VERSION`
+(`murmur-vN`), and when Self-portrait changes, `PORTRAIT_VERSION` (`portrait-vN`); each is a
+change to `boot.js`, so bump `lenses-vN`
 as well, or returning visitors keep a cached `boot.js` that asks for the old egg (GitHub
 Pages lets browsers cache files for 10 minutes). `tests/test_lenses_prepaint.py` checks that
 the lenses versions agree; the browser suites read the versions from `window.SiteLensesBoot`
-(`version`, `spiraVersion`, `murmurVersion`), so no test names a version.
+(`version`, `spiraVersion`, `murmurVersion`, `portraitVersion`), so no test names a version.
 
 ## Tests
 
@@ -274,7 +331,7 @@ tests/run_easter_suites.sh lenses_media                    # one suite
 ```
 
 `run_easter_suites.sh` runs `browser_lenses.js`, `browser_lenses_pages.js`,
-`browser_lenses_media.js`, `browser_tokens.js`, `browser_murmur.js`, every `browser_lens_*.js`
+`browser_lenses_media.js`, `browser_tokens.js`, `browser_murmur.js`, `browser_portrait.js`, every `browser_lens_*.js`
 and `browser_easter_egg.js`, each in its own agent-browser session, and prints one line per
 suite.
 Its header lists the environment variables (server URL, session prefix, time limit, results

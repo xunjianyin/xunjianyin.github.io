@@ -1,0 +1,140 @@
+/* Self-portrait (the homepage photo's egg): a program paints the photo and rewrites itself.
+   easter/README.md is the map. One figure on the page's own paper, set like a figure in a
+   paper: the painting, the program beside it, two small charts, a caption. Flat and square. */
+
+#portrait {
+  --frame: 320px;
+  --pt-ink: #1a1a1a;
+  --pt-text: #374151;
+  --pt-muted: #6b7280;
+  --pt-faint: #9ca3af;
+  --pt-rule: #e5e7eb;
+  --pt-accent: var(--secondary-color, #004A8C);
+  position: fixed; inset: 0; box-sizing: border-box;
+  width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0; border-radius: 0; outline: none;
+  overflow: hidden auto; overscroll-behavior: contain;
+  background: transparent; color: var(--pt-ink);
+  font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.5;
+  -webkit-text-fill-color: currentColor;
+}
+#portrait.is-dark {
+  --pt-ink: #d4d4d4;
+  --pt-text: #c4c4c4;
+  --pt-muted: #9ca3af;
+  --pt-faint: #7b8494;
+  --pt-rule: #374151;
+  --pt-accent: var(--secondary-color, #A9CBFA);
+}
+#portrait[open] { display: block; }
+#portrait::backdrop { background: transparent; }
+#portrait *, #portrait *::before, #portrait *::after { box-sizing: border-box; }
+
+/* The page's paper, laid over the page while the figure is out. */
+#portrait .portrait-ground { position: fixed; inset: 0; background: var(--bg-color, #fff); opacity: 0; }
+
+#portrait .portrait-figure {
+  position: relative; z-index: 1;
+  min-height: 100%; margin: 0; padding: 48px 32px;
+  display: grid; justify-content: center; align-content: center;
+  grid-template-columns: var(--frame) minmax(0, 540px);
+  grid-template-areas: "frame code" "curve test" "caption caption";
+  column-gap: 48px; row-gap: 22px;
+}
+
+/* The painting, with the photo above it at the start and at the end. */
+#portrait .portrait-frame {
+  grid-area: frame; position: relative;
+  width: var(--frame); height: var(--frame);
+  outline: 1px solid var(--pt-rule);
+  transform-origin: 0 0;
+}
+#portrait .portrait-paint, #portrait .portrait-photo {
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%;
+}
+#portrait .portrait-photo { object-fit: cover; }
+
+/* The program. Values in ink, the rest of each sentence muted, the value under test in the
+   accent, the verdict in its own column so a line never reflows. */
+#portrait .portrait-code {
+  grid-area: code; align-self: center;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 12px; line-height: 1.9;
+  color: var(--pt-ink);
+}
+#portrait .pl-fn { font-weight: 600; }
+#portrait .pl-fn + .pl { margin-top: 1px; }
+#portrait .pl + .pl-fn { margin-top: 10px; }
+#portrait .pl {
+  display: grid; grid-template-columns: 7ch minmax(0, 1fr) 16ch; column-gap: 1ch;
+  padding-left: 2ch;
+}
+#portrait .pl-key { color: var(--pt-muted); transition: color 240ms linear; }
+#portrait .pl-val { transition: color 600ms linear; }
+#portrait .pl-rest { color: var(--pt-muted); }
+#portrait .pl-new { color: var(--pt-accent); }
+#portrait .pl-verdict {
+  font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11.5px;
+  color: var(--pt-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#portrait .pl.is-testing .pl-key, #portrait .pl.is-testing-improve .pl-key { color: var(--pt-accent); }
+#portrait .pl.is-testing .pl-rest, #portrait .pl.is-testing-improve .pl-rest,
+#portrait .pl.was-reverted .pl-rest { display: none; }
+#portrait .pl.was-kept .pl-val, #portrait .pl.was-kept .pl-verdict { color: var(--pt-accent); }
+#portrait .pl.was-reverted .pl-new { color: var(--pt-faint); text-decoration: line-through; }
+
+/* Two small charts: the PSNR over the whole life, and the test on screen. */
+#portrait .portrait-chart { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+#portrait .portrait-curve { grid-area: curve; }
+#portrait .portrait-test { grid-area: test; }
+#portrait .portrait-chart canvas { display: block; width: 100%; height: 84px; }
+#portrait .portrait-chart-label { margin: 0; font-size: 11px; color: var(--pt-muted); letter-spacing: 0.02em; }
+
+#portrait .portrait-caption {
+  grid-area: caption; max-width: calc(var(--frame) + 48px + 540px);
+  font-size: 13.5px; line-height: 1.65; color: var(--pt-text);
+}
+#portrait .portrait-caption p { margin: 0; }
+#portrait .portrait-story b { color: var(--pt-ink); font-weight: 700; }
+#portrait .portrait-story code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.9em; color: var(--pt-ink); }
+#portrait .portrait-status { margin-top: 8px; font-size: 12px; color: var(--pt-muted); font-variant-numeric: tabular-nums; }
+#portrait .portrait-note { margin-top: 4px; font-size: 11.5px; color: var(--pt-faint); }
+#portrait .portrait-note a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+#portrait .portrait-note a:hover { color: var(--pt-accent); }
+
+/* Return (and, under reduced motion, Next test), hidden until intent. */
+#portrait .portrait-chrome {
+  position: fixed; right: 20px; bottom: 18px; z-index: 2;
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0; visibility: hidden; transition: opacity 180ms linear, visibility 0s linear 180ms;
+}
+#portrait .portrait-chrome.is-shown { opacity: 1; visibility: visible; transition: opacity 180ms linear; }
+#portrait .portrait-button {
+  appearance: none; margin: 0; padding: 4px 10px; border: 1px solid currentColor; border-radius: 0;
+  background: var(--bg-color, #fff); color: var(--pt-ink); font: inherit; font-size: 12px; letter-spacing: 0.02em;
+  cursor: pointer;
+}
+#portrait .portrait-button:hover { color: var(--pt-accent); }
+#portrait .portrait-button:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+#portrait:not(.is-still) .portrait-step { display: none; }
+#portrait .portrait-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* A phone, or a narrow window: one column. */
+@media (max-width: 860px) {
+  #portrait { --frame: min(320px, calc(100vw - 32px)); }
+  #portrait .portrait-figure {
+    padding: 28px 16px 40px; justify-content: center; align-content: start;
+    grid-template-columns: minmax(0, var(--frame));
+    grid-template-areas: "frame" "code" "curve" "test" "caption";
+    row-gap: 18px;
+  }
+  #portrait .portrait-code { font-size: 11px; line-height: 1.75; align-self: start; }
+  #portrait .pl { grid-template-columns: 6ch minmax(0, 1fr) 13ch; padding-left: 1ch; }
+  #portrait .pl-verdict { font-size: 10px; }
+  #portrait .portrait-caption { font-size: 13px; }
+  #portrait .portrait-chrome { right: 14px; bottom: 14px; }
+}
+@media (max-width: 860px) and (min-width: 600px) {
+  #portrait { --frame: 320px; }
+  #portrait .portrait-figure { grid-template-columns: minmax(0, 540px); }
+  #portrait .portrait-frame { justify-self: center; }
+}
