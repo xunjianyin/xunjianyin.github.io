@@ -2,12 +2,12 @@
  * Tests Print Gallery, the fifth egg (easter/gallery/): the photo's trigger (a single click does
  * nothing, a double-click or a double-tap opens it) and lazy loading, the levels (each label is
  * its print's date and commit message, the first version last), the live page under the camera
- * (the body's transform at the start and inside the first version's photo, the canvas's hole),
- * a whole journey that comes out on the live page with the page restored byte for byte, every
- * close path (Return's rush home, a second close, pagehide), the wheel and the keys, a hidden
- * tab, reduced motion (one print at a time), the sound (offline renders, M and the button), an
- * active lens reset first, the dark theme, a resize, a page without the photo, frame timing
- * and errors. Resolves with assertions, failures, notes and frame timing.
+ * (the body's transform on the way in and inside the first version's photo, the canvas's hole),
+ * the endless fall (the cycle comes round and the gallery stays open), every close path
+ * (Return's rush home, which restores the page byte for byte; a second close; pagehide), the
+ * wheel and the keys, a hidden tab, reduced motion (one level at a time), the sound (offline
+ * renders of the Shepard chord, no clicks, M and the button), an active lens reset first, the
+ * dark theme, a resize, a page without the photo, frame timing and errors. Resolves with assertions, failures, notes and frame timing.
  */
 (async () => {
   const failures = [];
@@ -140,20 +140,23 @@
     h = hook();
     const ctx = egg().querySelector('canvas').getContext('2d');
     const alphaAt = (x, y) => ctx.getImageData(Math.round(x * egg().querySelector('canvas').width), Math.round(y * egg().querySelector('canvas').height), 1, 1).data[3];
-    h.setDepth(0.02); await settle();
-    check(h.live === 'page' && alphaAt(0.1, 0.5) === 0, `Near the start the canvas is clear over the live page (${h.live}, alpha ${alphaAt(0.1, 0.5)})`);
+    h.setDepth(h.start + 0.02); await settle();
+    check(h.live === 'page' && alphaAt(0.1, 0.5) === 0, `On the way in the canvas is clear over the live page (${h.live}, alpha ${alphaAt(0.1, 0.5)})`);
+    check(h.start < 0, `The way in starts above level 0 (${h.start.toFixed(3)})`);
     for (const j of [1, 2, Math.floor(N / 2), N]) {
       h.setDepth(j); await settle();
       const p = manifest.prints[j - 1];
       const label = h.label();
       check(label.message === p.message && label.date.startsWith(p.date), `Level ${j}: the label is its print's (${label.date} · ${label.message})`);
-      check(h.live === null && alphaAt(0.5, 0.5) === 255, `Level ${j}: the canvas is opaque and the live page is away (${h.live})`);
+      // The first version's photo holds the live page; any other level's tunnel is too short to reach it.
+      check(h.live === (j === N ? 'inside' : null) && alphaAt(0.1, 0.1) === 255, `Level ${j}: the canvas is opaque and the live page is ${j === N ? 'in its photo' : 'away'} (${h.live})`);
     }
     check(/the first version/.test(h.label().date), `The deepest print is the first version (${h.label().date})`);
     h.setDepth(N + 0.6); await settle();
-    const scale = /scale\(([\d.e-]+)\)/.exec(doc.body.style.transform);
-    check(h.live === 'loop' && scale && +scale[1] < 1, `Inside the first version's photo the live page shows again, smaller (${h.live}, ${doc.body.style.transform})`);
-    check(h.label().date === 'Today', `The loop's label (${h.label().date})`);
+    check(h.live === 'inside' && /scale\(/.test(doc.body.style.transform), `Inside the first version's photo the live page shows again (${h.live}, ${doc.body.style.transform})`);
+    check(h.label().date === 'Today', `The cycle's label (${h.label().date})`);
+    h.setDepth(N + 1.2); await settle();
+    check(h.loops === 1 && h.depth < 1 && h.live === 'page', `Past the cycle the depth wraps and the fall goes on (${h.loops}, ${h.depth.toFixed(2)}, ${h.live})`);
     h.setDepth(3.5); await settle();
     check(h.live === null, 'Between prints the live page is away');
     // The images: every small print arrives; large ones around the camera.
@@ -162,17 +165,18 @@
     closeNow();
     restored('Levels', before);
 
-    /* 3. A whole journey at a fixed speed comes out on the live page, restored. */
+    /* 3. The endless fall: at a fixed speed the cycle comes round and the gallery stays open;
+       Return then brings it home with the page restored. */
     before = snapshot();
     await openWith({ speed: 10 });
     h = hook();
-    let deepest = 0;
     const began = performance.now();
-    while (egg() && performance.now() - began < 30000) { deepest = Math.max(deepest, h.depth); await delay(30); }
-    check(!egg(), 'The journey ends by itself');
-    check(deepest > N, `It passed through every level into the loop (deepest ${deepest.toFixed(2)} of ${N + 1})`);
-    restored('Journey', before);
-    notes.push(`journey at 10 levels/s: ${((performance.now() - began) / 1000).toFixed(1)} s for ${N} prints`);
+    await until(() => h.loops >= 1, 'the fall to come round the cycle', 30000);
+    check(!!egg() && h.depth < N, `The fall goes on past the first version (loops ${h.loops}, depth ${h.depth.toFixed(2)})`);
+    notes.push(`a cycle at 10 levels/s: ${((performance.now() - began) / 1000).toFixed(1)} s for ${N} prints and the live page`);
+    h.close();
+    await until(() => !egg(), 'Return to bring it home', 8000);
+    restored('Endless fall', before);
 
     /* 4. Close paths. Return (Escape): a rush home to the present, then out. */
     before = snapshot();
@@ -258,6 +262,7 @@
     await openWith({});
     h = hook();
     check(h.still && h.depth === 1 && h.label().message === manifest.prints[0].message, `Reduced motion: the newest print, still (${h.depth}, ${h.label().message})`);
+    check(alphaAt(0.5, 0.5) === 255, 'Reduced motion: the still level is drawn');
     check(!/scale\(/.test(doc.body.style.transform) || h.live === null, 'Reduced motion: the live page is not zoomed');
     const steps = egg().querySelectorAll('.gallery-step');
     check([...steps].every(b => win.getComputedStyle(b).display !== 'none') && egg().querySelector('.gallery-chrome').classList.contains('is-shown'), 'Reduced motion: Newer, Older and Return are shown');
@@ -281,17 +286,29 @@
       return { peak: +peak.toFixed(4), scheduled };
     };
     const renders = {
-      click: await render(0.5, a => a.click(0.05)),
-      whoosh: await render(1.6, a => a.whoosh(0.05)),
-      chord: await render(3, a => a.chord(0.05)),
-      drone: await render(3, a => a.drone(1, 50))
+      fall: await render(2.5, a => a.fall(0)),
+      chord: await render(3, a => a.chord(0.05))
     };
     for (const [name, result] of Object.entries(renders)) {
       audioPeaks[name] = result.peak;
       check(result.peak > 0.005 && result.peak < 0.9, `Offline ${name}: audible and unclipped (peak ${result.peak})`);
     }
-    const silent = await render(0.5, a => { a.setEnabled(false); a.click(0.05); a.chord(0.1); });
+    const silent = await render(0.5, a => { a.setEnabled(false); a.chord(0.1); });
     check(silent.scheduled === 0, 'With the sound off nothing is scheduled');
+    // The chord falls without clicks: no second difference far above its local level.
+    {
+      const rate = 48000; const seconds = 6; const context = new win.OfflineAudioContext(1, rate * seconds, rate);
+      const audio = win.SiteGallery.createAudio(context, { fadeIn: false });
+      for (let i = 0; i <= seconds * 60; i++) { const t = i / 60; context.suspend(t).then(() => { audio.fall(t * 0.84, 1, t); context.resume(); }).catch(() => {}); }
+      const data = (await context.startRendering()).getChannelData(0);
+      let worst = 0; const W = 480;
+      for (let i = W + 1; i < data.length - W - 1; i += W) {
+        let sum = 0; for (let j = i - W; j < i; j++) { const dd = data[j + 1] - 2 * data[j] + data[j - 1]; sum += dd * dd; }
+        const level = Math.sqrt(sum / W) + 1e-6;
+        for (let j = i; j < i + W; j++) worst = Math.max(worst, Math.abs(data[j + 1] - 2 * data[j] + data[j - 1]) / level);
+      }
+      check(worst < 8, `The falling chord has no clicks (worst second difference ${worst.toFixed(2)} x its local level)`);
+    }
     await openWith({ auto: false });
     const soundButton = egg().querySelector('.gallery-sound');
     check(hook().sound && /Sound on/.test(soundButton.textContent), `The sound starts on (${soundButton.textContent})`);
@@ -313,8 +330,6 @@
     await until(() => !egg(), 'the gallery to close');
 
     /* 9. The dark theme: a dark wall and label. */
-    // A taller window than the prints' 16:10, so the wall shows above and below a print.
-    frame.style.height = '900px';
     await load('/');
     doc.documentElement.setAttribute('data-theme', 'dark');
     await delay(800);
@@ -323,13 +338,12 @@
     await opened('the gallery to open in the dark theme');
     check(egg().classList.contains('is-dark'), 'The dark theme: the gallery is dark');
     hook().setDepth(1); await settle();
-    const wallCanvas = egg().querySelector('canvas');
-    const wall = wallCanvas.getContext('2d').getImageData(Math.round(wallCanvas.width / 2), 2, 1, 1).data;
-    check(wall[0] < 80 && wall[1] < 80 && wall[2] < 80, `The dark theme: the wall is the page's dark paper (${[...wall].slice(0, 3)})`);
+    const card = win.getComputedStyle(egg().querySelector('.gallery-label')).backgroundColor;
+    const rgb = card.match(/\d+/g).map(Number);
+    check(rgb[0] < 80 && rgb[1] < 80 && rgb[2] < 80, `The dark theme: the label is dark (${card})`);
     closeNow();
     restored('Dark theme', before);
     doc.documentElement.removeAttribute('data-theme');
-    frame.style.height = '800px';
 
     /* 10. A page without the photo. */
     await load('/publications.html', () => shellReady() && doc.readyState === 'complete');

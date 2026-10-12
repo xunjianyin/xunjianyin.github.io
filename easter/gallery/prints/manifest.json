@@ -1,8 +1,5 @@
 {
- "viewport": [
-  1280,
-  800
- ],
+ "crop": 3.6,
  "prints": [
   {
    "file": "01-cbc30f7",
@@ -10,12 +7,13 @@
    "date": "2026-10-06",
    "message": "Fix site-wide visual bugs and unify the accent colour",
    "portal": [
-    0.675,
-    0.095,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "02-d540dd4",
@@ -23,12 +21,13 @@
    "date": "2026-10-05",
    "message": "Move Atomic to Composite to publications as an ICLR 2026 workshop paper",
    "portal": [
-    0.675,
-    0.09199,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "03-8b1bdc7",
@@ -36,12 +35,13 @@
    "date": "2026-10-05",
    "message": "Add BreakingWeb (NeurIPS 2026) to publications, news, and CV",
    "portal": [
-    0.675,
-    0.09199,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "04-e03cbb9",
@@ -49,12 +49,13 @@
    "date": "2026-09-11",
    "message": "Keep DeepMind news entry concise",
    "portal": [
-    0.675,
-    0.09199,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "05-4577302",
@@ -62,12 +63,13 @@
    "date": "2026-09-11",
    "message": "Keep DeepMind homepage biography concise",
    "portal": [
-    0.675,
-    0.09199,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "06-d307a93",
@@ -75,12 +77,13 @@
    "date": "2026-09-11",
    "message": "Update CV and synchronize DeepMind experience across the website",
    "portal": [
-    0.675,
-    0.09199,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "07-c6c5348",
@@ -88,12 +91,13 @@
    "date": "2026-07-02",
    "message": "add Amazon AGI SF Lab experience and update bio with DeepMind and Amazon",
    "portal": [
-    0.675,
-    0.09199,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "08-89246f1",
@@ -101,12 +105,13 @@
    "date": "2026-04-03",
    "message": "update",
    "portal": [
-    0.675,
-    0.09199,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "09-1e51a7e",
@@ -114,12 +119,13 @@
    "date": "2026-03-27",
    "message": "add info",
    "portal": [
-    0.675,
-    0.09199,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "10-645adfc",
@@ -127,12 +133,13 @@
    "date": "2026-03-27",
    "message": "change style",
    "portal": [
-    0.675,
-    0.09,
-    0.12656,
-    0.2025
+    0.362826,
+    0.362826,
+    0.274348,
+    0.274348
    ],
-   "round": false
+   "round": false,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "11-3dfea2d",
@@ -140,12 +147,13 @@
    "date": "2026-01-25",
    "message": "feat: better ui",
    "portal": [
-    0.65703,
-    0.18188,
-    0.15937,
-    0.255
+    0.363834,
+    0.363834,
+    0.272331,
+    0.272331
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "12-ba87c58",
@@ -153,12 +161,13 @@
    "date": "2025-12-16",
    "message": "fix: info",
    "portal": [
-    0.65703,
-    0.28187,
-    0.15937,
-    0.255
+    0.363834,
+    0.363834,
+    0.272331,
+    0.272331
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "13-9c35fb0",
@@ -166,12 +175,13 @@
    "date": "2025-11-22",
    "message": "add button",
    "portal": [
-    0.65703,
-    0.28187,
-    0.15937,
-    0.255
+    0.363834,
+    0.363834,
+    0.272331,
+    0.272331
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "14-8e32656",
@@ -179,12 +189,13 @@
    "date": "2025-09-10",
    "message": "agent",
    "portal": [
-    0.66875,
-    0.29475,
-    0.15937,
-    0.255
+    0.363834,
+    0.363834,
+    0.272331,
+    0.272331
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "15-eb67980",
@@ -192,12 +203,13 @@
    "date": "2025-08-24",
    "message": "nothing",
    "portal": [
-    0.66875,
-    0.29475,
-    0.15937,
-    0.255
+    0.363834,
+    0.363834,
+    0.272331,
+    0.272331
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "16-52a6810",
@@ -205,12 +217,13 @@
    "date": "2025-08-02",
    "message": "info",
    "portal": [
-    0.66875,
-    0.29475,
-    0.15937,
-    0.255
+    0.363834,
+    0.363834,
+    0.272331,
+    0.272331
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "17-ba8b9f0",
@@ -218,12 +231,13 @@
    "date": "2025-08-01",
    "message": "acl",
    "portal": [
-    0.66875,
-    0.29475,
-    0.15937,
-    0.255
+    0.363834,
+    0.363834,
+    0.272331,
+    0.272331
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "18-94788c1",
@@ -231,12 +245,13 @@
    "date": "2025-06-15",
    "message": "fix: section align",
    "portal": [
-    0.66875,
-    0.29475,
-    0.15937,
-    0.255
+    0.363834,
+    0.363834,
+    0.272331,
+    0.272331
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "19-8435ca1",
@@ -244,12 +259,13 @@
    "date": "2025-06-15",
    "message": "fix: centered index",
    "portal": [
-    0.66875,
-    0.29475,
-    0.15937,
-    0.255
+    0.363834,
+    0.363834,
+    0.272331,
+    0.272331
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "20-e095504",
@@ -257,12 +273,13 @@
    "date": "2025-06-15",
    "message": "fix: centered",
    "portal": [
-    0.67183,
-    0.37486,
-    0.14302,
-    0.255
+    0.364146,
+    0.348261,
+    0.271708,
+    0.303479
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "21-5ddebe0",
@@ -270,12 +287,13 @@
    "date": "2025-06-14",
    "message": "feat: distance between title and item and item",
    "portal": [
-    0.7983,
-    0.32889,
-    0.16967,
-    0.255
+    0.363669,
+    0.372093,
+    0.272662,
+    0.255814
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "22-7224730",
@@ -283,12 +301,13 @@
    "date": "2025-06-14",
    "message": "aug: add some code link",
    "portal": [
-    0.7983,
-    0.29881,
-    0.1681,
-    0.2525
+    0.362402,
+    0.370904,
+    0.275196,
+    0.258192
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "23-3cf7396",
@@ -296,12 +315,13 @@
    "date": "2025-06-14",
    "message": "add info",
    "portal": [
-    0.7983,
-    0.28281,
-    0.1681,
-    0.2525
+    0.362402,
+    0.370904,
+    0.275196,
+    0.258192
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "24-e05a4f5",
@@ -309,12 +329,13 @@
    "date": "2025-04-19",
    "message": "outline",
    "portal": [
-    0.7983,
-    0.28281,
-    0.1681,
-    0.2525
+    0.362402,
+    0.370904,
+    0.275196,
+    0.258192
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "25-ca212ec",
@@ -322,12 +343,13 @@
    "date": "2025-04-19",
    "message": "add blogs and so on",
    "portal": [
-    0.7983,
-    0.10924,
-    0.1681,
-    0.2525
+    0.362402,
+    0.370904,
+    0.275196,
+    0.258192
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "26-5fa7610",
@@ -335,12 +357,13 @@
    "date": "2025-04-19",
    "message": "better",
    "portal": [
-    0.7983,
-    0.20482,
-    0.1681,
-    0.2525
+    0.362402,
+    0.370904,
+    0.275196,
+    0.258192
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "27-13eabd4",
@@ -348,12 +371,13 @@
    "date": "2025-04-18",
    "message": "data seperate and outline",
    "portal": [
-    0.7983,
-    0.15176,
-    0.1681,
-    0.26896
+    0.362402,
+    0.362402,
+    0.275196,
+    0.275196
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "28-fbdeaa4",
@@ -361,12 +385,13 @@
    "date": "2025-04-10",
    "message": "add 1st project",
    "portal": [
-    0.70455,
-    0.15176,
-    0.1681,
-    0.26896
+    0.362402,
+    0.362402,
+    0.275196,
+    0.275196
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "29-fbd0460",
@@ -374,12 +399,13 @@
    "date": "2024-12-17",
    "message": "interest",
    "portal": [
-    0.70455,
-    0.15363,
-    0.1681,
-    0.26896
+    0.362402,
+    0.362402,
+    0.275196,
+    0.275196
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   },
   {
    "file": "30-95ae503",
@@ -387,12 +413,13 @@
    "date": "2024-12-17",
    "message": "first",
    "portal": [
-    0.70455,
-    0.13176,
-    0.1681,
-    0.26896
+    0.362402,
+    0.362402,
+    0.275196,
+    0.275196
    ],
-   "round": true
+   "round": true,
+   "background": "rgb(255, 255, 255)"
   }
  ]
 }
