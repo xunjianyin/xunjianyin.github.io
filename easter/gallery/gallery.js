@@ -1,25 +1,27 @@
 /**
- * Print Gallery. The homepage photo holds the page as it was before, mounted like a print;
- * that page's photo holds the page before it; and so on, back through every version of the
- * site that looked different, to the first, whose photo holds the page you are on, whose
- * photo holds ... After Escher's Print Gallery (1956) and the Droste effect.
+ * Print Gallery. Look into the eye in the homepage photo: in its pupil is the page as it was
+ * one version before; in the eye of that page's photo, the version before it; and so on, back
+ * through every version of the site that looked different, to the first, whose eye holds the
+ * page you are on. After Escher's Print Gallery (1956) and the Droste effect.
  *
- * Every photo always shows the version before it, so the tunnel is on screen at once: the
- * page, the print in its photo, the print in that one's photo, down to a pixel. The camera
- * rests at each version (its wall label: date, how far back, the commit's own words), then
- * dives into its photo until the print there fills the screen, and rests again; round the
- * cycle without end, until Return.
+ * At each version the camera rests on the page as it was, the photo as it was (its wall label:
+ * date, how far back, the commit's own words). Then it turns to the face and dives into the
+ * viewer's left eye: past the photo's own sharpness the picture goes out of focus and dark, as
+ * a lens would, the pupil opens as an eye's does in the dark, and the earlier page brightens in
+ * it until it fills the screen. Round the cycle without end, until Return.
  *
- * Depth d: 0 is the live page, 1..N the prints (1 the newest), and at N + 1 the live page
- * again (it sits in the first version's photo); the depth wraps there. At an integer the level
- * fits the viewport; between k and k + 1 the camera zooms exponentially about the one point
- * the two framings share, eased so it starts and stops at rest (no turn is ever seen moving).
- * Where a level does not cover the viewport, the level around it is drawn, as it really is.
+ * Depth d: 0 is the live page, 1..N the prints (1 the newest), at N + 1 the live page again
+ * (in the first version's eye); the depth wraps there. At an integer the level fits the
+ * viewport. Between k and k + 1 (u, sine-eased, so each dive starts and ends at rest) the scale
+ * grows exponentially to the one that fits the next level, and the eye glides to the centre
+ * over the first 60 %.
  *
- * The live page is the real DOM: where it is drawn (at the start, and inside the first
- * version's photo) the body carries the CSS transform that puts it there, and the canvas
- * leaves a hole; the dialog is in the top layer, so the transform never moves it. Closing
- * restores the body's style exactly; the page DOM is never mutated otherwise.
+ * Each portrait is drawn from its full-resolution file over the photo's box (the page's own
+ * pixels stop being enough at once); defocus is a blend of smaller copies (mip levels), so it is
+ * cheap and smooth. The live page is the real DOM: the body carries the CSS transform that
+ * puts it where the camera wants it (until its photo covers the screen), and inside the first
+ * version's eye the canvas leaves a hole for it; the dialog is in the top layer, so the
+ * transform never moves it. Closing restores the body's style exactly.
  *
  * Sound, only on arrival: a music-box note per version, stepping down D major pentatonic as
  * the camera goes back in time (an octave lower beneath it when the year changes), and a
@@ -34,23 +36,24 @@
    * Tunable constants. Times are seconds unless named _MS.
    * ------------------------------------------------------------------------- */
   const PRINT_ASPECT = 1.6;            // the prints are 1280 x 800 captures
-  const MOUNT = 0.9;                   // a print fills this share of a square photo's width ...
-  const MOUNT_ROUND = 0.92;            // ... or of the largest rectangle inside a round one
-  const OPEN_TIME = 0.8;               // s: the photo opens into the gallery
-  const FIRST_REST = 1.4;              // s: the camera rests on the live page first
-  const TRAVEL = 2.1;                  // s: one dive, version to version
-  const REST = 1.0;                    // s: the rest at each version
-  const IDLE = 1.4;                    // s after the reader's last push, the camera's own dive resumes
-  const WHEEL_GAIN = 0.004;            // levels per second per wheel pixel
+  const FIRST_REST = 1.6;              // s: the camera rests on the live page first
+  const TRAVEL = 4.0;                  // s: one dive, version to version
+  const REST = 1.2;                    // s: the rest at each version
+  const PAN_END = 0.6;                 // the eye reaches the centre at this share of a dive
+  const PUPIL = [0.42, 0.92];          // the pupil's radius, in iris radii, at rest and opened
+  const DILATE = [0.45, 0.9];          // the pupil opens over this part of a dive ...
+  const LIGHT = [0.35, 0.85];          // ... and the earlier page brightens in it over this part
+  const DEFOCUS_FROM = 2.0;            // a picture blurs once magnified past this x its file's pixels ...
+  const DARK = [4, 24, 0.92];          // ... and darkens from 4x to 24x, to 92 %
+  const PUPIL_COLOUR = 'rgb(10, 10, 12)';
+  const IDLE = 1.4;                    // s after the reader's last push, the camera's own dives resume
+  const WHEEL_GAIN = 0.003;            // levels per second per wheel pixel
   const DECAY = 0.45;                  // s: a push from the wheel or a drag dies away
-  const MAX_SPEED = 6;                 // levels per second
-  const DRAG_LEVELS = 1.1;             // levels per viewport height dragged
-  const STEP_TIME = 1.3;               // s: the arrows move one version
-  const HOME_TIME = [1.0, 0.07];       // s: Return rushes home in a + b per level
-  const MIN_PORTAL_PX = 2;             // nesting stops below this size on screen
-  const LARGE_FROM = 1.1;              // a print drawn wider than this x its small file uses the large one
-  const SMALL_WIDTH = 512;
-  const CAPTION_FADE = [0.06, 0.2];    // a level's label fades as the camera leaves it
+  const MAX_SPEED = 5;                 // levels per second
+  const DRAG_LEVELS = 0.8;             // levels per viewport height dragged
+  const STEP_TIME = 2.0;               // s: the arrows move one version
+  const HOME_TIME = [1.2, 0.08];       // s: Return rushes home in a + b per level
+  const CAPTION_FADE = [0.04, 0.16];   // a level's label fades as the camera leaves it
   const CHROME_REGION = [260, 120];
   const CHROME_HIDE_MS = 1800;
   const CHROME_TAP_MS = 3500;
@@ -69,16 +72,28 @@
   const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
   const smooth = (a, b, x) => { const u = clamp((x - a) / (b - a), 0, 1); return u * u * (3 - 2 * u); };
   const easeInOut = u => { u = clamp(u, 0, 1); return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; };
+  // A dive's pace: at rest at both ends, never more than pi / 2 times its mean speed.
+  const easeSine = u => (1 - Math.cos(Math.PI * clamp(u, 0, 1))) / 2;
   const midiHz = m => 440 * Math.pow(2, (m - 69) / 12);
-  function parseColour(text) {
-    const m = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+)(%?))?/.exec(text || '');
-    if (!m) return null;
-    return [+m[1], +m[2], +m[3], m[4] === undefined ? 1 : parseFloat(m[4]) / (m[5] ? 100 : 1)];
-  }
   // A similarity x -> a x + b (a scalar scale, b a point).
   const sim = (a, bx, by) => ({ a, bx, by });
   const compose = (S, M) => sim(S.a * M.a, S.a * M.bx + S.bx, S.a * M.by + S.by);   // S after M
-  const unmount = (S, M) => sim(S.a / M.a, S.bx - (S.a * M.bx) / M.a, S.by - (S.a * M.by) / M.a);   // S after M^-1
+  const apply = (S, x, y) => [S.a * x + S.bx, S.a * y + S.by];
+
+  // Smaller and smaller copies of an image, for defocus: level n is 1 / 2^n of the first.
+  function mipsOf(image, smallest = 16) {
+    const levels = [image];
+    let w = image.naturalWidth || image.width; let h = image.naturalHeight || image.height;
+    let source = image;
+    while (Math.min(w, h) / 2 >= smallest) {
+      w = Math.max(1, Math.round(w / 2)); h = Math.max(1, Math.round(h / 2));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const g = c.getContext('2d'); g.imageSmoothingQuality = 'high';
+      g.drawImage(source, 0, 0, w, h);
+      levels.push(c); source = c;
+    }
+    return levels;
+  }
 
   let manifestPromise = null;
   function loadManifest() {
@@ -96,7 +111,7 @@
   let active = false;
 
   /**
-   * Opens the gallery. Options: photo (the live page's portal; default the homepage photo),
+   * Opens the gallery. Options: photo (the live page's photo; default the homepage photo),
    * and test hooks: auto (false: the camera does not move of its own), speed (levels per
    * second, fixed, no rests). Resolves true when it opened.
    */
@@ -108,7 +123,7 @@
     active = true;
     try {
       const manifest = await loadManifest();
-      if (!manifest.prints || !manifest.prints.length) throw new Error('No prints.');
+      if (!manifest.prints || !manifest.prints.length || !manifest.portraits) throw new Error('No prints.');
       return start(options, photo, manifest);
     } catch (error) {
       active = false;
@@ -135,16 +150,16 @@
     const prints = manifest.prints;
     const N = prints.length;
     const M = N + 1;                       // the cycle: the live page and the prints
-    const pageStyle = getComputedStyle(body);
-    const wallRGB = (() => { const c = parseColour(pageStyle.backgroundColor); return c && c[3] > 0.5 ? c : parseColour(getComputedStyle(html).backgroundColor) || [255, 255, 255, 1]; })();
-    const wall = `rgb(${wallRGB.slice(0, 3).join(',')})`;
-    const dark = (0.299 * wallRGB[0] + 0.587 * wallRGB[1] + 0.114 * wallRGB[2]) < 128;
+    const dark = (() => {
+      const c = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/.exec(getComputedStyle(body).backgroundColor) || [0, 255, 255, 255];
+      return (0.299 * c[1] + 0.587 * c[2] + 0.114 * c[3]) < 128;
+    })();
 
     /* ---- Geometry ---------------------------------------------------------- */
     // A print's units: width 1, height 1 / PRINT_ASPECT. The live page's: CSS px of the viewport.
     let vw = innerWidth; let vh = innerHeight;
     const bodyOrigin = (() => { const b = body.getBoundingClientRect(); return { x: b.left, y: b.top }; })();
-    const livePortal = (() => {
+    const liveBox = (() => {
       const b = photo.getBoundingClientRect();
       const border = parseFloat(getComputedStyle(photo).borderTopWidth) || 0;
       return { x: b.left + border, y: b.top + border, w: b.width - 2 * border, h: b.height - 2 * border, round: false };
@@ -153,49 +168,50 @@
     const isLive = j => j === 0;
     const widthOf = j => (isLive(j) ? vw : 1);
     const heightOf = j => (isLive(j) ? vh : 1 / PRINT_ASPECT);
-    const portalOf = j => {
-      if (isLive(j)) return livePortal;
+    const boxOf = j => {
+      if (isLive(j)) return liveBox;
       const p = prints[j - 1].portal; const h = 1 / PRINT_ASPECT;
       return { x: p[0], y: p[1] * h, w: p[2], h: p[3] * h, round: prints[j - 1].round };
     };
-    // Where level j + 1 sits in level j's photo, mounted: a similarity from its units to j's.
-    function mountOf(j) {
-      const P = portalOf(j); const next = index(j + 1);
+    const portraitKey = j => (isLive(j) ? manifest.live.portrait : prints[j - 1].portrait);
+    // The eye, in the level's units: its centre and the iris's radius.
+    const eyeOf = j => {
+      const box = boxOf(j); const p = manifest.portraits[portraitKey(j)];
+      return { x: box.x + p.eye[0] * box.w, y: box.y + p.eye[1] * box.h, r: p.iris * box.w };
+    };
+    // Where the next level sits in level j's pupil, opened to `open` iris radii: inscribed in the
+    // pupil's circle; a similarity from its units to j's.
+    function placeIn(j, open) {
+      const e = eyeOf(j); const next = index(j + 1);
       const a = widthOf(next) / heightOf(next);
-      let w;
-      if (P.round) { const D = Math.min(P.w, P.h); w = MOUNT_ROUND * D / Math.sqrt(1 + 1 / (a * a)); }
-      else w = MOUNT * Math.min(P.w, P.h * a);
-      const h = w / a;
-      return { rect: { x: P.x + (P.w - w) / 2, y: P.y + (P.h - h) / 2, w, h }, M: sim(w / widthOf(next), P.x + (P.w - w) / 2, P.y + (P.h - h) / 2) };
+      const R = open * e.r;
+      const w = 2 * R / Math.sqrt(1 + 1 / (a * a)); const h = w / a;
+      return sim(w / widthOf(next), e.x - w / 2, e.y - h / 2);
     }
-    let mounts = [];
-    const remount = () => { mounts = Array.from({ length: M }, (_, j) => mountOf(j)); };
-    remount();
-    // Level j fitted into the viewport (the live page as it is).
     function fitOf(j) {
       if (isLive(j)) return sim(1, 0, 0);
       const a = Math.min(vw, vh * PRINT_ASPECT);
       return sim(a, (vw - a) / 2, (vh - a / PRINT_ASPECT) / 2);
     }
-    // The camera at depth d: level k = floor(d) and its similarity, between its own framing and
-    // the next level's, zooming about the point they share; u is the eased progress.
+    // The camera at depth d: level k, its similarity, and the dive's eased progress u.
     function camera(d) {
       const k = Math.floor(d); const j = index(k);
-      const u = easeInOut(d - k);
-      const S0 = fitOf(j); const { M: m } = mounts[j];
-      const F1 = fitOf(index(k + 1));
+      const u = easeSine(d - k);
+      const S0 = fitOf(j);
+      const F1 = fitOf(index(k + 1)); const m = placeIn(j, PUPIL[1]);
       const a1 = F1.a / m.a;
-      const S1 = sim(a1, F1.bx - a1 * m.bx, F1.by - a1 * m.by);
-      if (Math.abs(a1 - S0.a) < 1e-12) return { k, S: S0 };
-      const zx = (S0.bx - S1.bx) / (a1 - S0.a); const zy = (S0.by - S1.by) / (a1 - S0.a);
+      const e = eyeOf(j);
+      const [ex, ey] = apply(S0, e.x, e.y);
       const a = S0.a * Math.pow(a1 / S0.a, u);
-      const fx = S0.a * zx + S0.bx; const fy = S0.a * zy + S0.by;
-      return { k, S: sim(a, fx - a * zx, fy - a * zy) };
+      const g = smooth(0, PAN_END, u);
+      // The end framing puts the eye exactly where the fitted next level's centre is.
+      const [cx, cy] = apply(F1, widthOf(index(k + 1)) / 2, heightOf(index(k + 1)) / 2);
+      const px = ex + (cx - ex) * g; const py = ey + (cy - ey) * g;
+      return { k, u, S: sim(a, px - a * e.x, py - a * e.y) };
     }
-    const covers = (j, S) => S.bx <= 0.5 && S.by <= 0.5 && S.bx + S.a * widthOf(j) >= vw - 0.5 && S.by + S.a * heightOf(j) >= vh - 0.5;
 
     /* ---- Images ------------------------------------------------------------ */
-    const images = prints.map(p => ({ small: null, large: null, smallLoading: false, largeLoading: false, file: p.file }));
+    const images = prints.map(p => ({ small: null, large: null, mips: null, smallLoading: false, largeLoading: false, file: p.file }));
     function loadImage(j, size) {
       const record = images[j - 1];
       const key = size === 'large' ? 'largeLoading' : 'smallLoading';
@@ -203,25 +219,35 @@
       record[key] = true;
       const img = new Image();
       img.decoding = 'async';
-      img.onload = () => { const done = () => { record[size] = img; record[key] = false; }; if (img.decode) img.decode().then(done, done); else done(); };
+      img.onload = () => {
+        const done = () => { record[size] = img; record[key] = false; record[size === 'small' ? 'smallMips' : 'largeMips'] = mipsOf(img, 32); };
+        if (img.decode) img.decode().then(done, done); else done();
+      };
       img.onerror = () => { record[key] = false; };
       img.src = new URL(`${record.file}-${size === 'large' ? 'l' : 's'}.webp`, BASE).href;
     }
     for (let j = 1; j <= N; j++) loadImage(j, 'small');
-    // Large files around the camera (the level before, this one, the two after); others let go.
     function feedImages(d) {
       const k = Math.floor(d);
       const near = new Set([-1, 0, 1, 2].map(n => index(k + n)));
-      images.forEach((record, i) => { if (near.has(i + 1)) loadImage(i + 1, 'large'); else if (record.large) record.large = null; });
+      images.forEach((record, i) => { if (near.has(i + 1)) loadImage(i + 1, 'large'); else if (record.large) { record.large = null; record.largeMips = null; } });
     }
-    const ready = j => isLive(j) || !!images[j - 1].small;
+    const portraits = {};
+    for (const key of Object.keys(manifest.portraits)) {
+      portraits[key] = { mips: null };
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => { const done = () => { portraits[key].mips = mipsOf(img); }; if (img.decode) img.decode().then(done, done); else done(); };
+      img.src = new URL(`portrait-${key}.webp`, BASE).href;
+    }
+    const ready = j => (isLive(j) || !!images[j - 1].small) && !!portraits[portraitKey(j)].mips;
 
     /* ---- DOM ------------------------------------------------------------- */
     const dialog = document.createElement('dialog');
     dialog.id = 'gallery';
     dialog.tabIndex = -1;
     dialog.autofocus = true;
-    dialog.setAttribute('aria-label', 'Print Gallery: every earlier version of this page, each inside the photo of the next');
+    dialog.setAttribute('aria-label', 'Print Gallery: every earlier version of this page, each in the eye of the next');
     if (dark) dialog.classList.add('is-dark');
     if (still) dialog.classList.add('is-still');
     const canvas = document.createElement('canvas');
@@ -262,13 +288,12 @@
     let lastPush = -1e9;
     let paused = false; let held = false;
     let seek = null;                       // { from, to, start, duration }: a timed move
-    let restUntil = still ? Infinity : FIRST_REST;   // the camera rests until this clock time
+    let restUntil = still ? Infinity : FIRST_REST;
     let raf = 0; let lastNow = 0; let clock = 0;
     let closed = false; let leaving = false; let movedIn = false;
     let phase = 'falling';
     let drag = null;
-    let liveShown = 'page';                // where the DOM is drawn: 'page' (outermost), 'inside' (in a photo) or null
-    let opening = still ? 1 : 0;           // 0..1: the photo opens into the gallery
+    let liveShown = 'page';                // where the DOM is drawn: 'page' (the outer level), 'inside' (in an eye) or null
     const fixedSpeed = Number.isFinite(options.speed) ? options.speed : null;
     const auto = options.auto !== false;
     const stats = { frames: 0, avgMs: 0, maxMs: 0 };
@@ -280,70 +305,95 @@
     }
 
     /* ---- Drawing ----------------------------------------------------------- */
-    function portalPath(P, S) {
-      const x = S.a * P.x + S.bx; const y = S.a * P.y + S.by; const w = S.a * P.w; const h = S.a * P.h;
-      ctx.beginPath();
-      if (P.round) ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
-      else ctx.rect(x, y, w, h);
-      return w;
-    }
-    function visible(j, S) {
-      return S.bx < vw && S.by < vh && S.bx + S.a * widthOf(j) > 0 && S.by + S.a * heightOf(j) > 0;
-    }
-    // Level i (an absolute depth) at S, and the levels inside its photo. Returns where the live
-    // page is drawn, when it is.
-    function drawLevel(i, S, alpha, outer) {
-      const j = index(i);
-      let liveAt = null;
-      if (isLive(j)) {
-        liveAt = S;
-        if (!outer) {
-          // The live page shows through a hole in the mount.
-          ctx.globalCompositeOperation = 'destination-out';
-          ctx.globalAlpha = alpha; ctx.fillStyle = '#000';
-          ctx.fillRect(S.bx, S.by, S.a * vw, S.a * vh);
-          ctx.globalCompositeOperation = 'source-over';
-        }
-      } else if (visible(j, S)) {
-        const record = images[j - 1];
-        const w = S.a;
-        const img = record.large && w * dpr > SMALL_WIDTH * LARGE_FROM ? record.large : record.small || record.large;
-        ctx.globalAlpha = alpha;
-        if (img) ctx.drawImage(img, S.bx, S.by, w, w / PRINT_ASPECT);
-        else { ctx.fillStyle = '#f4f4f2'; ctx.fillRect(S.bx, S.by, w, w / PRINT_ASPECT); }
-      }
-      const P = portalOf(j);
-      const next = index(i + 1);
-      if (S.a * P.w < MIN_PORTAL_PX || !ready(next)) { ctx.globalAlpha = 1; return liveAt; }
-      // The photo: a white mount, and the version before it, with a hairline.
-      const fade = isLive(j) && outer ? alpha * opening : alpha;
-      if (fade > 0.001) {
-        ctx.save();
-        portalPath(P, S);
-        ctx.clip();
-        ctx.globalAlpha = fade;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(S.a * P.x + S.bx, S.a * P.y + S.by, S.a * P.w, S.a * P.h);
-        const { rect, M: m } = mounts[j];
-        const inner = drawLevel(i + 1, compose(S, m), fade, false);
-        ctx.globalAlpha = fade * 0.5; ctx.lineWidth = 1 / dpr; ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-        ctx.strokeRect(S.a * rect.x + S.bx, S.a * rect.y + S.by, S.a * rect.w, S.a * rect.h);
-        ctx.restore();
-        liveAt = liveAt || inner;
-      }
+    // An image (its mip levels) into a rect on screen, out of focus past its own sharpness.
+    function drawMips(mips, x, y, w, h, alpha = 1) {
+      if (!mips || w < 0.5 || x > vw || y > vh || x + w < 0 || y + h < 0) return;
+      const full = mips[0].naturalWidth || mips[0].width;
+      const level = clamp(Math.log2((w * dpr) / full / DEFOCUS_FROM), 0, mips.length - 1);
+      const lo = Math.floor(level); const hi = Math.min(mips.length - 1, lo + 1); const f = level - lo;
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(mips[lo], x, y, w, h);
+      if (f > 0.01 && hi !== lo) { ctx.globalAlpha = alpha * f; ctx.drawImage(mips[hi], x, y, w, h); }
       ctx.globalAlpha = 1;
-      return liveAt;
     }
+    // A print's page: the large file when sharp enough, its smaller copies when out of focus.
+    function drawPage(j, S, alpha = 1) {
+      const record = images[j - 1];
+      const w = S.a; const h = w / PRINT_ASPECT;
+      if (S.bx > vw || S.by > vh || S.bx + w < 0 || S.by + h < 0) return;
+      if (record.large && w * dpr <= record.large.naturalWidth * DEFOCUS_FROM) {
+        ctx.globalAlpha = alpha; ctx.drawImage(record.large, S.bx, S.by, w, h); ctx.globalAlpha = 1;
+      } else if (record.largeMips) {
+        drawMips(record.largeMips, S.bx, S.by, w, h, alpha);
+      } else if (record.small) {
+        drawMips(record.smallMips || [record.small], S.bx, S.by, w, h, alpha);
+      }
+    }
+    // The portrait over the photo's box (round if the photo was).
+    function drawPortrait(j, S) {
+      const box = boxOf(j); const p = portraits[portraitKey(j)];
+      if (!p.mips) return;
+      const [x, y] = apply(S, box.x, box.y); const w = S.a * box.w; const h = S.a * box.h;
+      if (x > vw || y > vh || x + w < 0 || y + h < 0) return;
+      ctx.save();
+      ctx.beginPath();
+      if (box.round) ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2); else ctx.rect(x, y, w, h);
+      ctx.clip();
+      drawMips(p.mips, x, y, w, h);
+      ctx.restore();
+    }
+    // How much the camera has magnified level j's portrait: screen px per pixel of its file.
+    const magnification = (j, S) => {
+      const p = portraits[portraitKey(j)];
+      const full = p.mips ? (p.mips[0].naturalWidth || p.mips[0].width) : 1000;
+      return (S.a * boxOf(j).w * dpr) / full;
+    };
     function draw(d) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
-      let { k, S } = camera(d);
-      // Where this level leaves the viewport uncovered, draw the level around it (twice at most).
-      for (let up = 0; up < 2 && !covers(index(k), S); up++) { S = unmount(S, mounts[index(k - 1)].M); k -= 1; }
-      const j = index(k);
-      if (isLive(j)) ctx.clearRect(0, 0, vw, vh);
-      else { ctx.fillStyle = wall; ctx.fillRect(0, 0, vw, vh); }
-      const liveAt = drawLevel(k, S, 1, true);
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      const { k, u, S } = camera(d);
+      const j = index(k); const next = index(k + 1);
+      let liveAt = null;
+      // The level: the live page (the DOM, until its photo covers the screen) or a print.
+      if (isLive(j)) {
+        ctx.clearRect(0, 0, vw, vh);
+        const [bx, by] = apply(S, liveBox.x, liveBox.y);
+        const covered = bx <= 0 && by <= 0 && bx + S.a * liveBox.w >= vw && by + S.a * liveBox.h >= vh;
+        if (!covered) liveAt = S;
+      } else {
+        ctx.fillStyle = PUPIL_COLOUR; ctx.fillRect(0, 0, vw, vh);
+        drawPage(j, S);
+      }
+      drawPortrait(j, S);
+      // Past the photo's own sharpness, the dark of the eye closes in.
+      const darkness = DARK[2] * smooth(DARK[0], DARK[1], magnification(j, S));
+      if (darkness > 0.002) { ctx.globalAlpha = darkness; ctx.fillStyle = PUPIL_COLOUR; ctx.fillRect(0, 0, vw, vh); ctx.globalAlpha = 1; }
+      // The pupil, opening, and the earlier version in it, brightening.
+      const open = PUPIL[0] + (PUPIL[1] - PUPIL[0]) * smooth(DILATE[0], DILATE[1], u);
+      const e = eyeOf(j);
+      const [ex, ey] = apply(S, e.x, e.y); const R = S.a * open * e.r;
+      if (R > 0.6 && ready(next)) {
+        ctx.save();
+        ctx.beginPath(); ctx.arc(ex, ey, R, 0, Math.PI * 2); ctx.clip();
+        ctx.fillStyle = PUPIL_COLOUR; ctx.fillRect(ex - R, ey - R, 2 * R, 2 * R);
+        const C = compose(S, placeIn(j, open));
+        const cw = C.a * widthOf(next); const ch = C.a * heightOf(next);
+        if (cw > 2) {
+          const light = smooth(LIGHT[0], LIGHT[1], u);
+          if (isLive(next)) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = '#000'; ctx.fillRect(C.bx, C.by, cw, ch);
+            ctx.globalCompositeOperation = 'source-over';
+            liveAt = C;
+          } else {
+            drawPage(next, C);
+            drawPortrait(next, C);
+          }
+          if (light < 0.999) { ctx.globalAlpha = 1 - light; ctx.fillStyle = PUPIL_COLOUR; ctx.fillRect(C.bx, C.by, cw, ch); ctx.globalAlpha = 1; }
+        }
+        ctx.restore();
+      }
       const where = !liveAt ? null : isLive(j) ? 'page' : 'inside';
       if (where || where !== liveShown) placeBody(liveAt);
       liveShown = where;
@@ -364,10 +414,10 @@
         label.classList.toggle('is-title', isLive(j));
         if (isLive(j) && !again) {
           labelDate.textContent = 'Print Gallery';
-          labelText.textContent = 'Inside its photo, this page keeps every page it used to be.';
+          labelText.textContent = 'Look into the eye: every page this one used to be.';
         } else if (isLive(j)) {
           labelDate.textContent = 'Today';
-          labelText.textContent = 'The first version held this one.';
+          labelText.textContent = 'The first version was looking at this one.';
         } else {
           const p = prints[j - 1];
           labelDate.textContent = `${p.date} · ${j === N ? 'the first version' : ago(j)}`;
@@ -387,7 +437,6 @@
       const before = depth;
       if (seek) {
         const u = clamp((clock - seek.start) / seek.duration, 0, 1);
-        // The eased camera is inside camera(); a seek runs straight in depth.
         depth = seek.from + (seek.to - seek.from) * u;
         if (u >= 1) { depth = seek.to; seek = null; restUntil = clock + REST; }
       } else if (drag) {
@@ -398,9 +447,8 @@
         speed *= Math.exp(-dt / DECAY);
         depth += speed * dt;
       } else if (auto && !paused && clock >= restUntil) {
-        // The camera's own dive: to the next version, from wherever it is.
         const from = depth; const to = Math.floor(depth + 1e-6) + 1;
-        seek = { from, to, start: clock, duration: TRAVEL * (to - from) };
+        if (ready(index(to - 1)) && ready(index(to))) seek = { from, to, start: clock, duration: TRAVEL * (to - from) };
       }
       if (depth < 0 && !leaving) { depth = 0; speed = 0; }
       arrive(before, depth);           // before the wrap, so today at the end of a cycle sounds
@@ -409,8 +457,7 @@
     // Crossing an integer (either way) is an arrival: its note.
     function arrive(before, after) {
       if (before === after) return;
-      const a = Math.floor(before + 1e-9); const b = Math.floor(after + 1e-9);
-      if (after > before && b > a) note(index(b), b);
+      if (after > before && Math.floor(after + 1e-9) > Math.floor(before + 1e-9)) note(index(Math.floor(after + 1e-9)), Math.floor(after + 1e-9));
       else if (after < before && Math.ceil(after - 1e-9) < Math.ceil(before - 1e-9)) note(index(Math.ceil(after - 1e-9)), Math.ceil(after - 1e-9));
     }
     function frame(now) {
@@ -419,7 +466,6 @@
       const began = performance.now();
       const dt = lastNow ? Math.min(0.1, (now - lastNow) / 1000) : 1 / 60;
       lastNow = now; clock += dt;
-      if (!still) opening = smooth(0.1, OPEN_TIME, clock);
       if (!still) step(dt);
       feedImages(depth);
       draw(depth);
@@ -545,7 +591,7 @@
     on(window, 'resize', () => {
       // The live page reflows: its photo is not where it was. Out at once while it shows.
       if (liveShown) { cleanup(); return; }
-      vw = innerWidth; vh = innerHeight; sizeCanvas(); remount(); schedule();
+      vw = innerWidth; vh = innerHeight; sizeCanvas(); schedule();
     });
     on(document, 'visibilitychange', () => {
       if (document.hidden) { held = true; if (raf) cancelAnimationFrame(raf); raf = 0; if (audio) audio.suspend(); }
@@ -613,6 +659,7 @@
       get sound() { return soundOn; },
       get frameStats() { return stats; },
       get loaded() { return images.map(r => (r.large ? 'l' : r.small ? 's' : '-')).join(''); },
+      get portraitsReady() { return Object.values(portraits).every(p => !!p.mips); },
       notes: () => notes.slice(),
       label: () => ({ date: labelDate.textContent, message: labelText.textContent }),
       setDepth(value) { seek = null; speed = 0; lastPush = clock; depth = Math.max(0, value); if (depth >= M) { depth -= M; loops++; } movedIn = true; restUntil = clock + REST; schedule(); },

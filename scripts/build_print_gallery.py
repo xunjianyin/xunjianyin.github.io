@@ -13,16 +13,25 @@ through).
 2. The kept versions are captured again at device pixel ratio 3, for sharpness when a print
    fills the screen.
 
+3. Each version's portrait is taken from the repository at that commit, at full resolution
+   (figures/me-320.jpg is figures/me.png made small, so me.png stands in for it), and the
+   gallery dives into its eye: EYES gives, per portrait file (the first 8 hex digits of its git
+   blob), the centre of the viewer's left eye and the iris's radius, as fractions of the image
+   (read by hand and refined to the darkest disc). A new portrait needs a new entry.
+
 Writes, under easter/gallery/prints/: NN-<hash>-l.webp (2048 x 1280), NN-<hash>-s.webp
-(512 x 320) and manifest.json (newest first: date, commit subject, the photo's inner box
-(inside its border) as fractions of the page, round or not). Raw captures are cached in
-GALLERY_CACHE, so a rebuild needs no browser.
+(512 x 320), portrait-<blob>.webp (at most 1400 px) and manifest.json (newest first: date,
+commit subject, the photo's inner box (inside its border) as fractions of the page, round or
+not, its portrait; then the portraits' eyes, and the live page's portrait). Raw captures are
+cached in GALLERY_CACHE, so a rebuild needs no browser.
 """
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -40,6 +49,16 @@ SESSION = 'print-gallery-build'
 VIEWPORT = (1280, 800)
 LARGE = (2048, 1280)
 SMALL = (512, 320)
+PORTRAIT_MAX = 1400      # px: a portrait's longer side
+# The viewer's left eye, per portrait (blob prefix): centre (x, y) and iris radius, as fractions
+# of the image's width and height (the radius of its width).
+EYES = {
+    'e613dbb4': {'eye': [0.4532, 0.3973], 'iris': 0.0064},    # figures/me.png (and me-320.jpg), from 2026-01
+    'acf51dca': {'eye': [0.48428, 0.4192], 'iris': 0.0047},   # figures/me.jpg, by the lake
+    'bfc9eb8a': {'eye': [0.38392, 0.43587], 'iris': 0.0118},  # figures/me.jpg, the city
+    '77587269': {'eye': [0.4496, 0.4597], 'iris': 0.0064},    # figures/me.jpg, the first versions
+}
+STANDS_IN = {'figures/me-320.jpg': 'figures/me.png'}
 DIFF_KEEP = 2.2          # mean absolute difference (0-255, grey, 320 x 200) that counts as a new look
 SETTLE_MS = 1800         # after load: fonts, images, the lists main.js fills
 
@@ -163,6 +182,25 @@ def photo_missing(record: dict) -> bool:
     return grey_.mean[0] > 215 and hsv.mean[1] < 20
 
 
+def portrait_of(commit: str) -> tuple[str, str]:
+    """The homepage photo's file at a commit (its full-resolution stand-in) and its blob."""
+    html = run(['git', '-C', str(ROOT), 'show', f'{commit}:index.html']).stdout
+    path = re.search(r'<img[^>]*src="(figures/[^"]+)"', html).group(1)
+    path = STANDS_IN.get(path, path)
+    blob = run(['git', '-C', str(ROOT), 'rev-parse', f'{commit}:{path}']).stdout.strip()
+    return path, blob
+
+
+def write_portrait(blob: str) -> None:
+    out = OUT / f'portrait-{blob[:8]}.webp'
+    if out.exists():
+        return
+    data = subprocess.run(['git', '-C', str(ROOT), 'cat-file', 'blob', blob], check=True, capture_output=True).stdout
+    image = Image.open(io.BytesIO(data)).convert('RGB')
+    image.thumbnail((PORTRAIT_MAX, PORTRAIT_MAX), Image.LANCZOS)
+    image.save(out, 'WEBP', quality=86, method=6)
+
+
 def inner_box(record: dict) -> list[float]:
     """The photo's box inside its border, as fractions of the 1280 x 800 page."""
     p = record['portal']
@@ -230,6 +268,17 @@ def main() -> None:
         shutil.rmtree(OUT)
     OUT.mkdir(parents=True)
     manifest = []
+    eyes: dict[str, dict] = {}
+
+    def eye_of(commit: str) -> str:
+        path, blob = portrait_of(commit)
+        key = blob[:8]
+        if key not in EYES:
+            sys.exit(f'{commit[:7]}: no EYES entry for {path} (blob {key}); add its eye to EYES.')
+        write_portrait(blob)
+        eyes[key] = EYES[key]
+        return key
+
     for n, record in enumerate(kept, start=1):
         sharp = json.loads((CACHE / f'{record["hash"]}@{dpr}.json').read_text())
         image = Image.open(CACHE / f'{record["hash"]}@{dpr}.png').convert('RGB')
@@ -237,8 +286,9 @@ def main() -> None:
         image.resize(LARGE, Image.LANCZOS).save(OUT / f'{base}-l.webp', 'WEBP', quality=74, method=6)
         image.resize(SMALL, Image.LANCZOS).save(OUT / f'{base}-s.webp', 'WEBP', quality=80, method=6)
         manifest.append({'file': base, 'hash': record['hash'][:7], 'date': record['date'], 'message': record['message'],
-                         'portal': inner_box(sharp), 'round': bool(sharp['portal'].get('round'))})
-    (OUT / 'manifest.json').write_text(json.dumps({'viewport': list(VIEWPORT), 'prints': manifest}, indent=1) + '\n')
+                         'portal': inner_box(sharp), 'round': bool(sharp['portal'].get('round')), 'portrait': eye_of(record['hash'])})
+    live = eye_of(history[-1][0])
+    (OUT / 'manifest.json').write_text(json.dumps({'viewport': list(VIEWPORT), 'prints': manifest, 'live': {'portrait': live}, 'portraits': eyes}, indent=1) + '\n')
     total = sum(f.stat().st_size for f in OUT.iterdir())
     print(f'{len(manifest)} prints from {len(records)} captures ({len(history)} commits); {total / 1e6:.2f} MB')
 

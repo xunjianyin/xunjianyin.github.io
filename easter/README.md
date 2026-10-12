@@ -9,7 +9,7 @@ for them, and leave the page exactly as it was when they end.
 | Lenses (second) | double-click or double-tap a name or a page title | The page is redrawn in place through one lens after another; Esc returns to normal. The active lens follows the reader to every page. |
 | Murmuration (third) | typing `aiai` outside a text field | The page's letters loosen from their lines and fly as a flock on the page's own paper; as the noise cools the flock orders; Esc (or Return) sends the letters home, where words, lines and the page grow back. |
 | Self-portrait (fourth) | typing `selfie` outside a text field, on the homepage | The photo flies into a figure, where a small program paints it from nothing, square by square, and rewrites itself as it goes (its improver too); when the portrait is done it paints its own program, until the picture is the program that paints it. The sound follows the process. |
-| Print Gallery (fifth) | double-click or double-tap the homepage photo | The homepage photo holds the page as it was one version before, mounted like a print; that page's photo holds the one before; and on, through every version that looked different, to the first, whose photo holds the page you are on. The camera rests at each version, then dives into its photo, round the cycle until Return. A single click does nothing. |
+| Print Gallery (fifth) | double-click or double-tap the homepage photo | The camera rests on the page, then dives into the eye in its photo: in the pupil is the page as it was one version before, with its own photo; into that eye, the version before; and on, through every version that looked different, to the first, whose eye holds the page you are on, round until Return. A single click does nothing. |
 
 While a lens is active, the keys `1` to `9` jump to that place in the cycle and `0` returns to
 normal (not in text fields, not inside a paper's demo, not with a modifier). The last key
@@ -27,11 +27,11 @@ screen at once, M (or the Sound button) switches the sound, and Esc or the Retur
 Next test (beside Return, always shown) or the right arrow advances one test at a time.
 
 In the gallery the camera rests at each version (its wall label: date, how far back, the
-commit's own words) and dives into the next, round the cycle until Return. The wheel (or a
-vertical drag) dives faster or rises, the arrows and Page Up/Down move one version, Space stops
-the camera's own dives, M (or the Sound button) switches the sound, and Esc, Home or Return
-rush back up to the page as it is; a second Esc closes at once. Under reduced motion nothing
-moves: one version at a time (its photo still holds the one before), Newer and Older (beside
+commit's own words), then dives into the eye in its photo to the version before, round the
+cycle until Return. The wheel (or a vertical drag) dives faster or rises, the arrows and Page
+Up/Down move one version, Space stops the camera's own dives, M (or the Sound button) switches
+the sound, and Esc, Home or Return rush back up to the page as it is; a second Esc closes at
+once. Under reduced motion nothing moves: one version at a time, Newer and Older (beside
 Return, always shown) or the arrows.
 
 ## Where the site touches the eggs
@@ -217,35 +217,40 @@ and `--reuse` rebuilds from them):
 uv run --with pillow python scripts/build_print_gallery.py
 ```
 
-**The tunnel.** Every photo always holds the version before it, on a white mount (the print
-fills 90 % of a square photo's width, 92 % of the largest 16:10 rectangle in a round one, with
-a hairline), so the page, the print in its photo and the prints in theirs are on screen at once,
-down to 2 px. Depth `d`: 0 the live page, 1 to N the prints, N + 1 the live page again (it
-sits in the first version's photo), where the depth wraps. At an integer the level fits the
-viewport; between k and k + 1 the camera zooms exponentially about the one point the two
-framings share, eased in and out, so every dive starts and ends at rest and a turn is never
-seen moving. Where a level does not cover the viewport (a window that is not 16:10), the level
-around it is drawn, as it really is.
+**Portraits and eyes.** Each version's photo is drawn from its own file at full resolution
+(`portrait-<blob>.webp`; `figures/me-320.jpg` is `figures/me.png` made small, so me.png stands
+in), over the photo's box. `EYES` in the build script gives, per portrait, the centre of the
+viewer's left eye and the iris's radius (read by hand, refined to the darkest disc); a new
+portrait needs an entry there, or the build stops and says so.
 
-**The camera.** It rests 1.4 s on the live page while the photo opens (0.8 s), then dives 2.1 s
-into each version and rests 1 s there, about 3 s a version. The wheel and a drag push it (the
-push dies away over 0.45 s; the camera's own dives resume 1.4 s later from where it is). The
-arrows seek one version in 1.3 s; Return seeks the live page in 1 s plus 0.07 s a version and
-closes there. Rising back to the live page also closes.
+**The dive.** Depth `d`: 0 the live page, 1 to N the prints, N + 1 the live page again (in the
+first version's eye), where the depth wraps. At an integer the level fits the viewport (bands
+around it are the dark of the eye). Between k and k + 1, with u the sine-eased progress (at rest
+at both ends), the scale grows exponentially to the one that fits the next level, and the eye
+glides to the centre over the first 60 %. The pupil, at rest 0.42 of the iris's radius, opens
+to 0.92 over u 0.45 to 0.9, and the earlier version sits in it, inscribed in its circle,
+brightening from the dark over u 0.35 to 0.85. Past twice a picture's own pixels it goes out of
+focus (a blend of its halved copies), and from 4x to 24x the dark of the eye closes in, to
+92 %: the photo's sharpness runs out where the eye takes over.
 
-**The live page** is the real DOM. While it is drawn (as the outer level, or inside the first
-version's photo) the body carries a CSS transform (origin 0 0) that puts it where the camera
-wants it, and the canvas leaves a hole there; the dialog is in the top layer, so the transform
+**The camera.** It rests 1.6 s on the live page, then dives 4 s into each version's eye and
+rests 1.2 s there, about 5 s a version. The wheel and a drag push it (the push dies away over
+0.45 s; the camera's own dives resume 1.4 s later from where it is). The arrows seek one
+version in 2 s; Return seeks the live page in 1.2 s plus 0.08 s a version and closes there.
+Rising back to the live page also closes.
+
+**The live page** is the real DOM. While it is drawn (as the outer level until its photo covers
+the screen, or in the first version's eye) the body carries a CSS transform (origin 0 0) that
+puts it where the camera wants it, and the canvas leaves a hole there; the dialog is in the top layer, so the transform
 never moves it. Elsewhere the body is moved off screen under the opaque canvas. The body's
 `overflow`, `transform`, `transform-origin` and `will-change` and the root's
 `scrollbar-gutter` are restored byte for byte. A resize while the live page shows closes at
 once (the page reflows); otherwise it refits. A hidden tab stops the frames; `pagehide` closes
 at once.
 
-**Loading.** The manifest and every small print at the opening; the large prints for the level
-before the camera, its own and the two after (the others are let go). A print is drawn from its
-large file once it is wider than 1.1 x 512 device px. The camera never dives into a version
-whose print has not arrived.
+**Loading.** The manifest, every small print and the four portraits at the opening; the large
+prints for the level before the camera, its own and the two after (the others are let go). The
+camera never dives into a version whose print or portrait has not arrived.
 
 **Sound** (the site's preference, M or the Sound button), only on arrival: a music-box note
 (a sine and three soft overtones, the high ones dying first, in a small room) for each version,

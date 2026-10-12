@@ -138,6 +138,8 @@
     before = snapshot();
     await openWith({ auto: false });
     h = hook();
+    await until(() => h.portraitsReady, 'the portraits to load', 15000);
+    check(true, 'Every portrait loads');
     const ctx = egg().querySelector('canvas').getContext('2d');
     const alphaAt = (x, y) => ctx.getImageData(Math.round(x * egg().querySelector('canvas').width), Math.round(y * egg().querySelector('canvas').height), 1, 1).data[3];
     h.setDepth(0.02); await settle();
@@ -147,12 +149,11 @@
       const p = manifest.prints[j - 1];
       const label = h.label();
       check(label.message === p.message && label.date.startsWith(p.date), `Level ${j}: the label is its print's (${label.date} · ${label.message})`);
-      // The first version's photo holds the live page; any other level's tunnel is too short to reach it.
-      check(h.live === (j === N ? 'inside' : null) && alphaAt(0.1, 0.1) === 255, `Level ${j}: the canvas is opaque and the live page is ${j === N ? 'in its photo' : 'away'} (${h.live})`);
+      check(h.live === null && alphaAt(0.1, 0.1) === 255, `Level ${j}: the canvas is opaque and the live page is away (${h.live})`);
     }
     check(/the first version/.test(h.label().date), `The deepest print is the first version (${h.label().date})`);
     h.setDepth(N + 0.6); await settle();
-    check(h.live === 'inside' && /scale\(/.test(doc.body.style.transform), `Inside the first version's photo the live page shows again (${h.live}, ${doc.body.style.transform})`);
+    check(h.live === 'inside' && /scale\(/.test(doc.body.style.transform), `In the first version's eye the live page shows again (${h.live}, ${doc.body.style.transform})`);
     check(h.label().date === 'Today', `The cycle's label (${h.label().date})`);
     h.setDepth(N + 1.2); await settle();
     check(h.loops === 1 && h.depth < 1 && h.live === 'page', `Past the cycle the depth wraps and the fall goes on (${h.loops}, ${h.depth.toFixed(2)}, ${h.live})`);
