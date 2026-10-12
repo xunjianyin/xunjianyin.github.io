@@ -1,6 +1,6 @@
 /* Run with agent-browser eval --stdin against a local static preview of the site.
- * Tests Self-portrait, the fourth egg (easter/portrait/): the photo's trigger (a single click
- * does nothing, a double-click or a double-tap opens it) and lazy loading, no DOM mutation
+ * Tests Self-portrait, the fourth egg (easter/portrait/): its password (selfie, outside a text
+ * field; the photo's double-click opens the gallery instead) and lazy loading, no DOM mutation
  * while it is open and exact restoration after it, the model (tests and verdicts, the listing
  * following the kept edits, PSNR rising, the same verdicts for the same seed), the finale and
  * its ending (the painted program is the program), every close path (Escape, a second close,
@@ -99,7 +99,9 @@
   };
   const mouse = (type, detail) => photo().dispatchEvent(new win.MouseEvent(type, { bubbles: true, cancelable: true, detail }));
   const doubleClick = () => { mouse('mousedown', 1); mouse('mouseup', 1); mouse('click', 1); mouse('mousedown', 2); mouse('mouseup', 2); mouse('click', 2); mouse('dblclick', 2); };
-  const tap = (x, y) => { for (const type of ['pointerdown', 'pointerup']) photo().dispatchEvent(new win.PointerEvent(type, { pointerId: 31, pointerType: 'touch', isPrimary: true, bubbles: true, cancelable: true, clientX: x, clientY: y })); };
+  const type = (text = 'selfie', target = doc.body) => {
+    for (const key of text) target.dispatchEvent(new win.KeyboardEvent('keydown', { key, code: `Key${key.toUpperCase()}`, bubbles: true, cancelable: true }));
+  };
   // Opens through the test hook (the module loaded first through the boot, if need be).
   const openWith = async options => {
     if (!win.SitePortrait) {
@@ -116,22 +118,24 @@
   const key = (k, target = egg()) => target.dispatchEvent(new win.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
 
   try {
-    /* 1. The trigger and lazy loading: a single click does nothing and loads nothing; a real
-       double-click (two clicks, then dblclick) opens it once and loads it once. */
+    /* 1. The password and lazy loading: nothing before it; typed into a text field it does
+       nothing; outside one it opens the portrait once and loads it once. The photo's
+       double-click opens the gallery, not the portrait. */
     await load('/');
-    check(!!photo() && win.getComputedStyle(photo()).touchAction === 'manipulation', 'The homepage photo is the trigger, and a double-tap on it does not zoom');
     check(typeof win.SiteLensesBoot.openPortrait === 'function' && /^portrait-v\d+$/.test(win.SiteLensesBoot.portraitVersion),
       `The boot exposes openPortrait and portraitVersion (${win.SiteLensesBoot.portraitVersion})`);
-    check(assets().length === 0 && !win.SitePortrait, 'Nothing of the portrait is loaded before the trigger');
-    mouse('click', 1);
+    check(assets().length === 0 && !win.SitePortrait, 'Nothing of the portrait is loaded before the password');
+    const field = doc.createElement('input'); doc.body.append(field);
+    type('selfie', field);
     await delay(400);
-    check(!egg() && assets().length === 0, 'A single click on the photo opens and loads nothing');
+    check(!egg() && assets().length === 0, 'The password typed in a text field opens and loads nothing');
+    field.remove();
     let before = snapshot();
-    doubleClick();
-    await opened('a double-click to open the portrait');
-    check(assets().length === 2, `The double-click loads portrait.js and portrait.css once (${assets().length})`);
-    check(!doc.querySelector('#spira') && !doc.querySelector('#murmur') && !(win.SiteLenses && win.SiteLenses.current),
-      'The photo opens the portrait, not Spira, Murmuration or a lens');
+    type();
+    await opened('the password to open the portrait');
+    check(assets().length === 2, `The password loads portrait.js and portrait.css once (${assets().length})`);
+    check(!doc.querySelector('#spira') && !doc.querySelector('#murmur') && !doc.querySelector('#gallery') && !(win.SiteLenses && win.SiteLenses.current),
+      'The password opens the portrait, not another egg or a lens');
     check(doc.activeElement === egg() && egg().scrollTop === 0, `The dialog takes the focus and opens at its top (${doc.activeElement && doc.activeElement.tagName}, ${egg().scrollTop})`);
     // The flight: the frame starts over the page's photo.
     const lifting = egg().querySelector('.portrait-frame').getAnimations();
@@ -142,20 +146,13 @@
     await delay(1500);
     check(hook().cursor > 0, `Proposals are shown (${Math.round(hook().cursor)})`);
     closeNow();
-    restored('Double-click', before);
+    restored('Password', before);
     check(assets().length === 2, 'Closing keeps the loaded assets for the next opening');
-
-    /* 1b. A double-tap opens it too; two taps far apart do not. */
-    const box = photo().getBoundingClientRect(); const px = box.left + box.width / 2; const py = box.top + box.height / 2;
-    tap(px, py); await delay(500); tap(px, py);
-    await delay(300);
-    check(!egg(), 'Two taps 500 ms apart open nothing');
-    before = snapshot();
-    tap(px, py); await delay(120); tap(px + 3, py + 2);
-    await opened('a double-tap to open the portrait');
-    check(!!egg(), 'A double-tap opens the portrait');
-    closeNow();
-    restored('Double-tap', before);
+    doubleClick();
+    await until(() => doc.querySelector('#gallery')?.open, 'the photo to open the gallery');
+    check(!egg(), 'A double-click on the photo opens the gallery, not the portrait');
+    doc.querySelector('#gallery').gallery.close(); doc.querySelector('#gallery')?.gallery.close();
+    await until(() => !doc.querySelector('#gallery'), 'the gallery to close');
 
     /* 2. The model, at a high fixed rate: tests and verdicts, the listing follows the kept
        edits, the PSNR rises. */
@@ -374,8 +371,8 @@
     const lenses = await win.SiteLensesBoot.loadCore();
     await lenses.next({ pointerType: 'mouse', trigger: doc.querySelector('[data-lens-trigger]') });
     await until(() => !lenses.busy, 'the lens to settle', 15000);
-    check(!!lenses.current, `A lens is active before the double-click (${lenses.current})`);
-    doubleClick();
+    check(!!lenses.current, `A lens is active before the password (${lenses.current})`);
+    type();
     await opened('the portrait to open over a lens', 15000);
     check(lenses.current === null && sessionStorage.getItem('lenses-active') === null,
       `The lens is reset and forgotten first (${lenses.current}, ${sessionStorage.getItem('lenses-active')})`);
@@ -388,7 +385,7 @@
     doc.documentElement.setAttribute('data-theme', 'dark');
     await delay(800);   // past the theme's colour transition
     before = snapshot();
-    doubleClick();
+    type();
     await opened('the portrait to open in the dark theme');
     check(egg().classList.contains('is-dark'), 'The dark theme: the figure is dark');
     const paint8 = egg().querySelector('.portrait-paint');

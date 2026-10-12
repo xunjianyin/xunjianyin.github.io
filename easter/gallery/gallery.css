@@ -1,0 +1,75 @@
+/* Print Gallery (the homepage photo's egg): every earlier version of the page, each inside
+   the photo of the next. easter/README.md is the map. The canvas is the gallery; the one
+   piece of type is a wall label, square and flat, bottom left. */
+
+#gallery {
+  --gl-ink: #1a1a1a;
+  --gl-muted: #6b7280;
+  --gl-rule: #d9dbe0;
+  --gl-card: #ffffff;
+  --gl-accent: var(--secondary-color, #004A8C);
+  position: fixed; inset: 0; box-sizing: border-box;
+  width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0; border-radius: 0; outline: none;
+  overflow: hidden; overscroll-behavior: contain;
+  background: transparent; color: var(--gl-ink);
+  font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.5;
+  -webkit-text-fill-color: currentColor;
+}
+#gallery.is-dark {
+  --gl-ink: #d4d4d4;
+  --gl-muted: #9ca3af;
+  --gl-rule: #3a3d44;
+  --gl-card: #1f1f1f;
+  --gl-accent: var(--secondary-color, #A9CBFA);
+}
+#gallery[open] { display: block; }
+#gallery::backdrop { background: transparent; }
+#gallery *, #gallery *::before, #gallery *::after { box-sizing: border-box; }
+#gallery .gallery-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; touch-action: none; }
+
+/* The wall label: the date and how far back, the commit's own words, and where the camera is
+   between today and the first version. */
+#gallery .gallery-label {
+  position: absolute; left: 24px; bottom: 22px; z-index: 1;
+  width: max-content; max-width: min(440px, calc(100vw - 48px)); margin: 0;
+  padding: 10px 14px 12px;
+  background: var(--gl-card); border: 1px solid var(--gl-rule);
+  pointer-events: none;
+}
+#gallery .gallery-date {
+  margin: 0; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gl-muted); font-variant-numeric: tabular-nums;
+}
+#gallery .gallery-message { margin: 4px 0 0; font-size: 14px; line-height: 1.45; color: var(--gl-ink); }
+#gallery .gallery-label.is-title .gallery-date { color: var(--gl-ink); font-weight: 700; letter-spacing: 0.06em; }
+#gallery .gallery-track { position: relative; height: 1px; min-width: 180px; margin-top: 10px; background: var(--gl-rule); }
+#gallery .gallery-marker { position: absolute; top: -2px; left: 0; width: 5px; height: 5px; margin-left: -2.5px; background: var(--gl-ink); }
+
+/* Return and Sound (and, under reduced motion, Newer and Older), hidden until intent. */
+#gallery .gallery-chrome {
+  position: absolute; right: 20px; bottom: 18px; z-index: 2;
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0; visibility: hidden; transition: opacity 180ms linear, visibility 0s linear 180ms;
+}
+#gallery .gallery-chrome.is-shown { opacity: 1; visibility: visible; transition: opacity 180ms linear; }
+#gallery .gallery-button {
+  appearance: none; margin: 0; padding: 4px 10px; border: 1px solid currentColor; border-radius: 0;
+  background: var(--gl-card); color: var(--gl-ink); font: inherit; font-size: 12px; letter-spacing: 0.02em;
+  cursor: pointer;
+}
+#gallery .gallery-button:hover { color: var(--gl-accent); }
+#gallery .gallery-button:disabled { opacity: 0.4; cursor: default; }
+#gallery .gallery-button:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+#gallery .gallery-key {
+  display: inline-block; min-width: 1.4em; margin-left: 2px; padding: 0 3px;
+  border: 1px solid var(--gl-rule); color: var(--gl-muted); font-size: 10.5px; line-height: 1.35; text-align: center;
+}
+#gallery:not(.is-still) .gallery-step { display: none; }
+#gallery .gallery-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 600px) {
+  #gallery .gallery-label { left: 14px; right: 14px; bottom: 14px; width: auto; }
+  #gallery .gallery-message { font-size: 13px; }
+  #gallery .gallery-chrome { right: 14px; bottom: auto; top: 14px; }
+}

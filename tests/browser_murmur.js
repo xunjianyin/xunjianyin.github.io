@@ -3,7 +3,7 @@
  * mutation while it is open and exact restoration after it, the model (letters per unit, order
  * at low noise, disorder at high noise, the cooling schedule), every close path (Escape, a
  * second close, pagehide, resize, Return), the last frame of the flight home on the glyphs,
- * the homepage photo (it opens Self-portrait, not the flock), reduced motion, an active lens reset first, other pages (the
+ * the homepage photo (it opens the gallery, not the flock), reduced motion, an active lens reset first, other pages (the
  * publications, the blogs, a paper page without the egg), frame timing and errors.
  * Resolves with assertions, failures, notes and frame timing.
  */
@@ -248,13 +248,13 @@
     await until(() => !egg(), 'Return to finish', 5000);
     restored('Return', before);
 
-    /* 6. The photo opens Self-portrait, never the flock. */
+    /* 6. The photo opens the gallery, never the flock. */
     check(!!doc.querySelector('.profile-photo[data-egg-trigger]'), 'The homepage photo is an egg trigger');
     doubleClick();
-    await until(() => doc.querySelector('#portrait')?.open, 'the photo to open Self-portrait');
-    check(!egg(), 'The photo opens Self-portrait, not the flock');
-    doc.querySelector('#portrait').portrait.close(); doc.querySelector('#portrait')?.portrait.close();
-    await until(() => !doc.querySelector('#portrait'), 'Self-portrait to close');
+    await until(() => doc.querySelector('#gallery')?.open, 'the photo to open the gallery');
+    check(!egg(), 'The photo opens the gallery, not the flock');
+    doc.querySelector('#gallery').gallery.close(); doc.querySelector('#gallery')?.gallery.close();
+    await until(() => !doc.querySelector('#gallery'), 'the gallery to close');
 
     /* 8. An active lens is reset (and forgotten) before the flock opens. */
     const lenses = await win.SiteLensesBoot.loadCore();

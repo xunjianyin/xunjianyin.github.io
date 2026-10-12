@@ -1,6 +1,6 @@
 # Easter eggs
 
-The site has four hidden features. All live in this directory, load only when a visitor asks
+The site has five hidden features. All live in this directory, load only when a visitor asks
 for them, and leave the page exactly as it was when they end.
 
 | Egg | Trigger | What it does |
@@ -8,7 +8,8 @@ for them, and leave the page exactly as it was when they end.
 | Spira (first) | the footer's `*`, or typing `yxjgogogo` outside a text field | A full-screen canvas: the page's words wind into a logarithmic spiral, then a spiral of the research unwinds. |
 | Lenses (second) | double-click or double-tap a name or a page title | The page is redrawn in place through one lens after another; Esc returns to normal. The active lens follows the reader to every page. |
 | Murmuration (third) | typing `aiai` outside a text field | The page's letters loosen from their lines and fly as a flock on the page's own paper; as the noise cools the flock orders; Esc (or Return) sends the letters home, where words, lines and the page grow back. |
-| Self-portrait (fourth) | double-click or double-tap the homepage photo | The photo flies into a figure, where a small program paints it from nothing, square by square, and rewrites itself as it goes (its improver too); when the portrait is done it paints its own program, until the picture is the program that paints it. The sound follows the process. A single click does nothing. |
+| Self-portrait (fourth) | typing `selfie` outside a text field, on the homepage | The photo flies into a figure, where a small program paints it from nothing, square by square, and rewrites itself as it goes (its improver too); when the portrait is done it paints its own program, until the picture is the program that paints it. The sound follows the process. |
+| Print Gallery (fifth) | double-click or double-tap the homepage photo | The camera dives into the photo, where the page is as it was one version before; into that page's photo, and on, through every version of the site that looked different, to the first, whose photo holds the page you started on. A single click does nothing. |
 
 While a lens is active, the keys `1` to `9` jump to that place in the cycle and `0` returns to
 normal (not in text fields, not inside a paper's demo, not with a modifier). The last key
@@ -25,6 +26,13 @@ screen at once, M (or the Sound button) switches the sound, and Esc or the Retur
 (bottom right with Sound, shown on intent as for the flock) sends the photo home. Under reduced motion it opens without the flight and stays still:
 Next test (beside Return, always shown) or the right arrow advances one test at a time.
 
+In the gallery the camera dives by itself, slowing at each version so its wall label can be
+read. The wheel (or a vertical drag) dives faster or rises, the arrows and Page Up/Down move
+one version, Space pauses the camera's own dive, End dives to the end of the loop, M (or the
+Sound button) switches the sound, and Esc, Home or Return rush back up to the present; a
+second Esc closes at once. Under reduced motion there is no zoom: one print at a time, Newer
+and Older (beside Return, always shown) or the arrows.
+
 ## Where the site touches the eggs
 
 The rest of the site knows only three things.
@@ -40,16 +48,17 @@ The rest of the site knows only three things.
    brings the reader's lens to the page. Both Spira triggers (the footer's `*` and the typed
    password) and Murmuration's password live in it; Murmuration is bound where Spira is (pages
    with the site shell's footer), loads `easter/murmur/murmur.{js,css}` on its first opening,
-   and a failed load is retried by the next trigger. Self-portrait is bound wherever a
-   `[data-egg-trigger]` is (the homepage photo) and loads `easter/portrait/portrait.{js,css}` on
-   its first opening, retried the same way. If the boot fails to load, the page shows as it is (the arrival mark and
+   and a failed load is retried by the next trigger. Print Gallery is bound wherever a
+   `[data-egg-trigger]` is (the homepage photo) and loads `easter/gallery/gallery.{js,css}` on its
+   first opening, retried the same way; Self-portrait's password is bound where Spira's is and
+   needs the photo too (it loads `easter/portrait/portrait.{js,css}`). If the boot fails to load, the page shows as it is (the arrival mark and
    the ground are removed), the password does nothing, and only the footer's `*` retries: it
    says "Could not load. Click to try again." and loads the boot again on the next click
    (then opens Spira, and the password works again). A click on `*` before the boot has
    loaded opens Spira once it is there.
 3. **Markup.** `[data-lens-trigger]` on the names and titles (`site-shell.js`, `index.html`,
    the page `h1`s, the paper template), `[data-egg-trigger]` on the homepage photo (a double-click
-   opens Self-portrait, which paints that image), the footer's `.easter-egg-footnote` button
+   opens Print Gallery, which dives through it; Self-portrait paints it), the footer's `.easter-egg-footnote` button
    (`site-shell.js`), and the bio's key sentence, an unstyled `<span data-spira-key>` in
    `index.html`. Spira is bound only on pages with the site shell's footer (`#site-footer`), so
    paper pages have no Spira.
@@ -188,6 +197,54 @@ gesture); without one, the first pointer or key inside the figure starts it. Mea
 (peaks): a kept bell 0.08, an edit to improve 0.12, the endings 0.15, the flight 0.03, a mixed
 scene 0.17, as loud as Spira's cues (its melody 0.14).
 
+## How Print Gallery works
+
+**Prints.** `scripts/build_print_gallery.py` checks out every commit of the repository into a
+temporary worktree, serves it on a port of its own (so nothing is cached across versions) and
+captures the homepage in agent-browser at 1280 x 800 CSS px, device pixel ratio 2, with empty
+storage and the light theme. It records the photo (the largest roughly square image near the
+top) and whether it is drawn round. A version becomes a print when it looks different from
+the last print (mean grey difference above 2.2 at 320 x 200) and from HEAD (the live page is
+the newest level), and when its photo loaded. The prints go to `gallery/prints/` as
+`NN-<hash>-l.webp` (1920 x 1200) and `-s.webp` (480 x 300) with `manifest.json`, newest first:
+date, commit subject, the portal as fractions of the print, round or not. Rebuild after the
+homepage changes (about 13 minutes; the captures are cached in `GALLERY_CACHE`, and `--reuse`
+rebuilds from them):
+
+```
+uv run --with pillow python scripts/build_print_gallery.py
+```
+
+**The camera.** Depth `d` is continuous: 0 the live page, 1 to N the prints, N + 1 the live page
+again. At an integer the level fits the viewport. Inside a level's portal sits the next level,
+on a white mount (86 % of a square portal's width, 90 % of the largest 16:10 rectangle in a
+round one), with a hairline. Between k and k + 1 the camera zooms exponentially about the one
+point the two framings share, so a dive is a straight fall whatever the portal's place. A
+portal shows the level's own portrait until the camera starts into it (d > k + 0.05), then
+dissolves into the mount over 0.3 of a segment; over the last 0.38, all outside the next level
+fades to the wall (the page's own background), so a level is framed alike arriving or leaving.
+The camera's own dive runs at 1.15 x (0.08 + sin^2(pi frac d)) levels per second, about 3 s a
+version, slowest at each version; it waits before a portal whose print has not arrived.
+
+**The live page.** While it is on screen (the first segment, and inside the first version's
+photo at the end) the body carries a CSS transform (origin 0 0) that puts it where the camera
+wants it, and the canvas leaves a hole there; the dialog is in the top layer, so the transform
+never moves it. Between, the body is moved off screen under the opaque canvas. Reaching N + 1
+(or 0 on the way back) the transform is the identity and the dialog goes: the journey ends on
+the page it began on. The body's `overflow`, `transform`, `transform-origin` and `will-change`
+and the root's `scrollbar-gutter` are restored byte for byte. A resize while the live page is
+under the camera closes at once (the page reflows); between prints it only refits. A hidden
+tab stops the frames; `pagehide` closes at once.
+
+**Loading.** The manifest and the first four small prints at the opening, the other small ones
+three at a time, the large ones for the level under the camera and the next two. A print is
+drawn from its large file once it is wider on screen than 1.15 x the small one.
+
+**Sound** (the site's preference, M or the Sound button): a sine drone that falls an octave,
+G3 to G2, from today to the first version; a soft shutter (two filtered noise clicks) at each
+version; a falling whoosh for the rush home; a G major arpeggio when the loop closes. Stored:
+nothing of its own.
+
 ## Files
 
 ```
@@ -200,6 +257,9 @@ easter/
   murmur/murmur.css
   portrait/portrait.js Self-portrait (window.SitePortrait), loaded on its first opening
   portrait/portrait.css
+  gallery/gallery.js   Print Gallery (window.SiteGallery), loaded on its first opening
+  gallery/gallery.css
+  gallery/prints/      the prints and manifest.json (built by scripts/build_print_gallery.py)
   lenses/core.js       the lenses core (window.SiteLenses): cycle, contract, caption, bell,
                        one animation loop, exact restoration; its header is the lens contract
   lenses/core.css      hidden glyphs, layers, caption, the arrival's fade
@@ -330,12 +390,14 @@ bump `lenses-vN` in `lenses/core.js`, `boot.js`, the `site-shell.js?v=` query of
 hand-written page, the boot URL in `site-shell.js` and `LENSES_BOOT` in
 `scripts/build_papers.py`, then run `python3 scripts/build_papers.py`. When Spira changes, bump
 `SPIRA_VERSION` (`spira-vN`) in `boot.js`, when Murmuration changes, `MURMUR_VERSION`
-(`murmur-vN`), and when Self-portrait changes, `PORTRAIT_VERSION` (`portrait-vN`); each is a
+(`murmur-vN`), when Self-portrait changes, `PORTRAIT_VERSION` (`portrait-vN`), and when Print
+Gallery's code changes, `GALLERY_VERSION` (`gallery-vN`; new prints need no bump, the manifest
+is fetched fresh); each is a
 change to `boot.js`, so bump `lenses-vN`
 as well, or returning visitors keep a cached `boot.js` that asks for the old egg (GitHub
 Pages lets browsers cache files for 10 minutes). `tests/test_lenses_prepaint.py` checks that
 the lenses versions agree; the browser suites read the versions from `window.SiteLensesBoot`
-(`version`, `spiraVersion`, `murmurVersion`, `portraitVersion`), so no test names a version.
+(`version`, `spiraVersion`, `murmurVersion`, `portraitVersion`, `galleryVersion`), so no test names a version.
 
 ## Tests
 
@@ -348,7 +410,7 @@ tests/run_easter_suites.sh lenses_media                    # one suite
 ```
 
 `run_easter_suites.sh` runs `browser_lenses.js`, `browser_lenses_pages.js`,
-`browser_lenses_media.js`, `browser_tokens.js`, `browser_murmur.js`, `browser_portrait.js`, every `browser_lens_*.js`
+`browser_lenses_media.js`, `browser_tokens.js`, `browser_murmur.js`, `browser_portrait.js`, `browser_gallery.js`, every `browser_lens_*.js`
 and `browser_easter_egg.js`, each in its own agent-browser session, and prints one line per
 suite.
 Its header lists the environment variables (server URL, session prefix, time limit, results

@@ -779,8 +779,8 @@
     await until(() => !egg(), 'the opening close button');
     check(!doc.body.style.overflow && !doc.documentElement.classList.contains('spira-hide-text'), 'The opening Close restores an absent overflow style and the glyphs');
 
-    /* 10b. The homepage photo is Self-portrait's trigger (tests/browser_portrait.js): a single
-       click does nothing, and a double-click opens Self-portrait, never Spira or a lens. */
+    /* 10b. The homepage photo is the gallery's trigger (tests/browser_gallery.js): a single
+       click does nothing, and a double-click opens the gallery, never Spira or a lens. */
     await load('/');
     const photo = doc.querySelector('.profile-photo[data-egg-trigger]');
     check(!!photo && win.getComputedStyle(photo).touchAction === 'manipulation', 'The homepage photo is an egg trigger, and a double-tap on it does not zoom');
@@ -788,13 +788,13 @@
     const photoMain = doc.querySelector('#main-content').innerHTML;
     mouse('click', 1);
     await delay(400);
-    check(!egg() && !doc.querySelector('#portrait') && !(win.SiteLenses && win.SiteLenses.current) && assets().length === 0, 'A single click on the photo opens nothing (and loads nothing)');
+    check(!egg() && !doc.querySelector('#gallery') && !(win.SiteLenses && win.SiteLenses.current) && assets().length === 0, 'A single click on the photo opens nothing (and loads nothing)');
     mouse('mousedown', 1); mouse('mouseup', 1); mouse('click', 1); mouse('mousedown', 2); mouse('mouseup', 2); mouse('click', 2); mouse('dblclick', 2);
-    await until(() => doc.querySelector('#portrait')?.open, 'the photo to open Self-portrait');
-    check(!egg() && !(win.SiteLenses && win.SiteLenses.current) && assets().length === 0, 'A double-click on the photo opens Self-portrait, not Spira or a lens');
-    doc.querySelector('#portrait').portrait.close(); doc.querySelector('#portrait')?.portrait.close();
-    await until(() => !doc.querySelector('#portrait'), 'Self-portrait to close');
-    check(doc.querySelector('#main-content').innerHTML === photoMain, 'After Self-portrait the homepage markup is restored');
+    await until(() => doc.querySelector('#gallery')?.open, 'the photo to open the gallery');
+    check(!egg() && !(win.SiteLenses && win.SiteLenses.current) && assets().length === 0, 'A double-click on the photo opens the gallery, not Spira or a lens');
+    doc.querySelector('#gallery').gallery.close(); doc.querySelector('#gallery')?.gallery.close();
+    await until(() => !doc.querySelector('#gallery'), 'the gallery to close');
+    check(doc.querySelector('#main-content').innerHTML === photoMain, 'After the gallery the homepage markup is restored');
   } catch (error) { failures.push(error.stack || String(error)); }
   finally {
     frame.remove();

@@ -24,21 +24,28 @@
  *   the first opening, and an active lens is reset at once (and forgotten) first. Under
  *   reduced motion it does not open (the password does nothing).
  *
- * Self-portrait (the fourth egg, easter/portrait/), wherever a [data-egg-trigger] is (the
+ * Print Gallery (the fifth egg, easter/gallery/), wherever a [data-egg-trigger] is (the
  * homepage photo):
- * - A double-click or a double-tap on the photo opens it; easter/portrait/portrait.{js,css}
- *   load on the first opening, and an active lens is reset at once (and forgotten) first. A
- *   single click does nothing: the photo gives nothing away. Under reduced motion it opens
- *   still, one test at a time. Its AudioContext is primed inside the gesture.
+ * - A double-click or a double-tap on the photo opens it; easter/gallery/gallery.{js,css}
+ *   load on the first opening (the prints and their manifest as it needs them), and an active
+ *   lens is reset at once (and forgotten) first. A single click does nothing: the photo gives
+ *   nothing away. Under reduced motion it opens still, one print at a time. Its AudioContext
+ *   is primed inside the gesture.
+ *
+ * Self-portrait (the fourth egg, easter/portrait/), on pages with the photo and the site
+ * shell's footer:
+ * - Typing its password outside a text field opens it (it paints that photo); assets and lens
+ *   as for the gallery. Under reduced motion it opens still, one test at a time.
  */
 (() => {
   'use strict';
   if (window.SiteLensesBoot) return;
 
-  const VERSION = 'lenses-v14';       // the ?v= of the lenses core (easter/lenses/core.*)
+  const VERSION = 'lenses-v15';       // the ?v= of the lenses core (easter/lenses/core.*)
   const SPIRA_VERSION = 'spira-v12';  // the ?v= of easter/spira/spira.*
   const MURMUR_VERSION = 'murmur-v2'; // the ?v= of easter/murmur/murmur.*
   const PORTRAIT_VERSION = 'portrait-v2'; // the ?v= of easter/portrait/portrait.*
+  const GALLERY_VERSION = 'gallery-v1'; // the ?v= of easter/gallery/gallery.*
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
   const ROOT = new URL('../', SCRIPT_SRC).href;                 // easter/boot.js → the site root
   const STORE_KEY = 'lenses-active';
@@ -57,10 +64,10 @@
   // Spira
   const SITE_FOOTER = '#site-footer';
   const FOOTNOTE = '.easter-egg-footnote';
-  const PASSWORDS = { yxjgogogo: () => openSpira(), aiai: () => openMurmur() };
+  const PASSWORDS = { yxjgogogo: () => openSpira(), aiai: () => openMurmur(), selfie: () => openPortrait() };
   const PASSWORD_GAP_MS = 1800;       // a longer pause between keys starts the password over
   const TYPING = 'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], dialog[open]';
-  // Self-portrait
+  // The photo (Print Gallery; Self-portrait paints it)
   const EGG_TRIGGER = '[data-egg-trigger]';
   const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
@@ -123,7 +130,7 @@
     loadCore().then(lenses => lenses.next({ pointerType, trigger: element }), () => dropAudio('__lensesAudioContext'));
   }
 
-  // The trigger under a double-click or double-tap: a lens trigger, or the photo (Self-portrait).
+  // The trigger under a double-click or double-tap: a lens trigger, or the photo (Print Gallery).
   const triggerOf = target => {
     const el = target instanceof Element ? target : target && target.parentElement;
     const trigger = el && el.closest(`${TRIGGER}, ${EGG_TRIGGER}`);
@@ -275,7 +282,8 @@
 
   /* Self-portrait (the fourth egg) -------------------------------------------- */
   let portraitLoading = null;
-  function openPortrait(photo) {
+  function openPortrait(photo = document.querySelector(EGG_TRIGGER)) {
+    if (!photo) return;
     // As for Spira: an active lens returns to normal first, without animation, and is forgotten.
     const lenses = window.SiteLenses;
     const lensesSettled = lenses && (lenses.current || lenses.busy) ? lenses.reset({ instant: true }) : null;
@@ -304,9 +312,40 @@
     }).finally(() => { portraitLoading = null; });
   }
 
-  // A double-click or double-tap: on the photo, Self-portrait; elsewhere the next lens.
+  /* Print Gallery (the fifth egg) --------------------------------------------- */
+  let galleryLoading = null;
+  function openGallery(photo = document.querySelector(EGG_TRIGGER)) {
+    if (!photo) return;
+    // As for Spira: an active lens returns to normal first, without animation, and is forgotten.
+    const lenses = window.SiteLenses;
+    const lensesSettled = lenses && (lenses.current || lenses.busy) ? lenses.reset({ instant: true }) : null;
+    if (!lensesSettled) {
+      storage(store => { store.removeItem(STORE_KEY); store.removeItem(GROUND_KEY); });
+      unmark();
+    }
+    primeAudio('__galleryAudioContext');
+    if (window.SiteGallery) {
+      if (lensesSettled) lensesSettled.then(() => window.SiteGallery.open({ photo }));
+      else window.SiteGallery.open({ photo });
+      return;
+    }
+    if (galleryLoading) return;
+    const assets = [script(new URL(`easter/gallery/gallery.js?v=${GALLERY_VERSION}`, ROOT).href),
+      stylesheet(new URL(`easter/gallery/gallery.css?v=${GALLERY_VERSION}`, ROOT).href)];
+    galleryLoading = Promise.all([loadAll(assets)].concat(lensesSettled || [])).then(() => {
+      if (!window.SiteGallery) throw new Error('Print Gallery did not initialize.');
+      return window.SiteGallery.open({ photo });
+    }).catch(error => {
+      // Leave nothing behind, so the next trigger tries again.
+      assets.forEach(asset => asset.remove());
+      dropAudio('__galleryAudioContext');
+      console.warn('The gallery could not load.', error);
+    }).finally(() => { galleryLoading = null; });
+  }
+
+  // A double-click or double-tap: on the photo, Print Gallery; elsewhere the next lens.
   function activate(trigger, pointerType) {
-    if (trigger.matches(EGG_TRIGGER)) openPortrait(trigger);
+    if (trigger.matches(EGG_TRIGGER)) openGallery(trigger);
     else triggerLens(trigger, pointerType);
   }
 
@@ -340,5 +379,5 @@
   whenReady().then(() => { if (document.querySelector(SITE_FOOTER)) bindSpira(); });
 
   window.SiteLensesBoot = { version: VERSION, spiraVersion: SPIRA_VERSION, murmurVersion: MURMUR_VERSION,
-    portraitVersion: PORTRAIT_VERSION, root: ROOT, loadCore, openSpira, openMurmur, openPortrait };
+    portraitVersion: PORTRAIT_VERSION, galleryVersion: GALLERY_VERSION, root: ROOT, loadCore, openSpira, openMurmur, openPortrait, openGallery };
 })();
