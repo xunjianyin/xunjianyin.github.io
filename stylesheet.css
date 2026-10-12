@@ -376,6 +376,84 @@ a:focus, button:focus {
   }
 }
 
+/* Tupper's self-referential formula below the homepage's end (tupper.js): hidden until a hard
+   scroll past the end pulls it out; on a click its plot, which is the formula again. */
+.tupper {
+  box-sizing: border-box;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.tupper-formula {
+  display: inline-block;
+  max-width: 100%;
+  margin: 0;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font-size: 17px;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.tupper-formula:hover,
+.tupper-formula[aria-expanded="true"] { opacity: 0.85; }
+.tupper-formula:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+
+.tupper-formula math {
+  margin: 0;
+  font-family: 'STIX Two Math', 'Latin Modern Math', 'Cambria Math', math;
+}
+
+.tupper-plot { margin: 18px 0 0; }
+
+.tupper-grid {
+  display: block;
+  margin: 0 auto;
+  color: var(--text-color);
+}
+
+.tupper-lines {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.45;
+}
+
+.tupper-grid.is-fine .tupper-lines { display: none; }
+.tupper-cells { fill: currentColor; opacity: 0.85; shape-rendering: crispEdges; }
+.tupper-scan { fill: var(--primary-color); opacity: 0.35; }
+
+.tupper-plot figcaption {
+  max-width: 636px;
+  margin: 10px auto 0;
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.6;
+}
+
+.tupper-plot figcaption p { margin: 0; }
+.tupper-counter { font-variant-numeric: tabular-nums; }
+
+.tupper-k {
+  margin-top: 6px !important;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 10.5px;
+  word-break: break-all;
+}
+
+@media screen and (max-width: 600px) {
+  .tupper { padding: 0 16px 32px; }
+  .tupper-formula { font-size: 12px; padding: 4px 0; }
+}
+
 /* Print styles */
 @media print {
   a {

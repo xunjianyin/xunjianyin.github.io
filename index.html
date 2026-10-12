@@ -331,10 +331,51 @@
 
   <div id="site-footer"></div>
 
+  <!-- Tupper's self-referential formula, below the page's end: a hard scroll past the end pulls it
+       out, and a click plots it; the plot is the formula (tupper.js). -->
+  <aside class="tupper" aria-label="Tupper's self-referential formula" hidden>
+    <button type="button" class="tupper-formula" aria-expanded="false" aria-controls="tupper-plot" title="Plot it">
+      <math display="block">
+        <mfrac><mn>1</mn><mn>2</mn></mfrac>
+        <mo>&lt;</mo>
+        <mrow>
+          <mo>&#x230A;</mo>
+          <mi>mod</mi>
+          <mrow>
+            <mo>(</mo>
+            <mrow><mo>&#x230A;</mo><mfrac><mi>y</mi><mn>17</mn></mfrac><mo>&#x230B;</mo></mrow>
+            <msup>
+              <mn>2</mn>
+              <mrow>
+                <mo>&#x2212;</mo><mn>17</mn><mrow><mo>&#x230A;</mo><mi>x</mi><mo>&#x230B;</mo></mrow>
+                <mo>&#x2212;</mo><mi>mod</mi><mrow><mo>(</mo><mrow><mo>&#x230A;</mo><mi>y</mi><mo>&#x230B;</mo></mrow><mo>,</mo><mn>17</mn><mo>)</mo></mrow>
+              </mrow>
+            </msup>
+            <mo>,</mo>
+            <mn>2</mn>
+            <mo>)</mo>
+          </mrow>
+          <mo>&#x230B;</mo>
+        </mrow>
+      </math>
+    </button>
+    <figure id="tupper-plot" class="tupper-plot" hidden>
+      <figcaption>
+        <p class="tupper-counter" aria-hidden="true"></p>
+        <div class="tupper-note" hidden>
+          <p>Plotted over 0 &le; <i>x</i> &lt; 106 and <i>k</i> &le; <i>y</i> &lt; <i>k</i> + 17, axes reversed, the
+            inequality draws itself (Jeff Tupper, 2001), where</p>
+          <p class="tupper-k"><i>k</i> = <span class="tupper-k-digits"></span></p>
+        </div>
+      </figcaption>
+    </figure>
+  </aside>
+
   <script src="site-shell.js?v=lenses-v19"></script>
   <script src="utils.js"></script>
   <script src="data.js"></script>
   <script src="main.js"></script>
+  <script src="tupper.js" defer></script>
 </body>
 
 </html>
