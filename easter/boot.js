@@ -41,11 +41,11 @@
   'use strict';
   if (window.SiteLensesBoot) return;
 
-  const VERSION = 'lenses-v16';       // the ?v= of the lenses core (easter/lenses/core.*)
+  const VERSION = 'lenses-v17';       // the ?v= of the lenses core (easter/lenses/core.*)
   const SPIRA_VERSION = 'spira-v12';  // the ?v= of easter/spira/spira.*
   const MURMUR_VERSION = 'murmur-v2'; // the ?v= of easter/murmur/murmur.*
   const PORTRAIT_VERSION = 'portrait-v2'; // the ?v= of easter/portrait/portrait.*
-  const GALLERY_VERSION = 'gallery-v2'; // the ?v= of easter/gallery/gallery.*
+  const GALLERY_VERSION = 'gallery-v3'; // the ?v= of easter/gallery/gallery.*
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
   const ROOT = new URL('../', SCRIPT_SRC).href;                 // easter/boot.js → the site root
   const STORE_KEY = 'lenses-active';

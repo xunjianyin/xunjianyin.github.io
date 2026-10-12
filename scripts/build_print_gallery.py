@@ -1,5 +1,6 @@
-"""Build the Print Gallery's prints: for every version of the site that looked different, a
-square of the homepage centred on its photo (the portal the gallery dives through).
+"""Build the Print Gallery's prints: for every version of the site that looked different, its
+homepage as it first appeared, with the place of its photo (the portal the gallery dives
+through).
 
     uv run --with pillow python scripts/build_print_gallery.py            # capture and build
     uv run --with pillow python scripts/build_print_gallery.py --reuse    # rebuild from the captures
@@ -9,16 +10,13 @@ square of the homepage centred on its photo (the portal the gallery dives throug
    1280 x 800 CSS px, device pixel ratio 2, light theme, empty storage. A version is kept when
    its capture differs visibly from the last kept one and from HEAD's (the live page is the
    gallery's own level, so HEAD's look is never a print), and when its photo loaded.
-2. The kept versions are captured again at device pixel ratio 3, and from each a square is
-   cut, centred on the photo, CROP times the photo's width on a side (padded with the page's
-   background where it runs past the page). Since every photo sits at the centre of its
-   square and fills the same share of it, each square nests in the next one's photo at the
-   same scale: the gallery's zoom is one steady fall.
+2. The kept versions are captured again at device pixel ratio 3, for sharpness when a print
+   fills the screen.
 
-Writes, under easter/gallery/prints/: NN-<hash>-l.webp (1600 px square), NN-<hash>-s.webp
-(400 px) and manifest.json (newest first: date, commit subject, the photo's inner box as
-fractions of the square, round or not). Raw captures are cached in GALLERY_CACHE, so a
-rebuild needs no browser.
+Writes, under easter/gallery/prints/: NN-<hash>-l.webp (2048 x 1280), NN-<hash>-s.webp
+(512 x 320) and manifest.json (newest first: date, commit subject, the photo's inner box
+(inside its border) as fractions of the page, round or not). Raw captures are cached in
+GALLERY_CACHE, so a rebuild needs no browser.
 """
 from __future__ import annotations
 
@@ -40,9 +38,8 @@ OUT = ROOT / 'easter' / 'gallery' / 'prints'
 CACHE = Path(os.environ.get('GALLERY_CACHE', Path(tempfile.gettempdir()) / 'print-gallery-cache'))
 SESSION = 'print-gallery-build'
 VIEWPORT = (1280, 800)
-CROP = 3.6               # a print's side, in widths of its photo (the gallery's zoom per version)
-LARGE = 1600             # px: a print's side
-SMALL = 400
+LARGE = (2048, 1280)
+SMALL = (512, 320)
 DIFF_KEEP = 2.2          # mean absolute difference (0-255, grey, 320 x 200) that counts as a new look
 SETTLE_MS = 1800         # after load: fonts, images, the lists main.js fills
 
@@ -166,28 +163,12 @@ def photo_missing(record: dict) -> bool:
     return grey_.mean[0] > 215 and hsv.mean[1] < 20
 
 
-def colour(text: str) -> tuple[int, int, int]:
-    parts = [float(v) for v in text[text.index('(') + 1:text.index(')')].split(',')[:3]]
-    return tuple(round(v) for v in parts)
-
-
-def square(record: dict, dpr: int) -> tuple[Image.Image, list[float]]:
-    """The print: a square centred on the photo, CROP photo widths a side, padded with the
-    page's background; and the photo's inner box (inside its border) as fractions of it."""
-    shot = Image.open(CACHE / f'{record["hash"]}@{dpr}.png').convert('RGB')
+def inner_box(record: dict) -> list[float]:
+    """The photo's box inside its border, as fractions of the 1280 x 800 page."""
     p = record['portal']
-    cx = p['x'] + p['w'] / 2
-    cy = p['y'] + p['h'] / 2
-    side = CROP * p['w']
-    left = cx - side / 2
-    top = cy - side / 2
-    canvas = Image.new('RGB', (round(side * dpr), round(side * dpr)), colour(record['background']))
-    box = (round(left * dpr), round(top * dpr), round((left + side) * dpr), round((top + side) * dpr))
-    region = shot.crop((max(0, box[0]), max(0, box[1]), min(shot.width, box[2]), min(shot.height, box[3])))
-    canvas.paste(region, (max(0, -box[0]), max(0, -box[1])))
     b = p.get('border', 0)
-    inner = [(p['x'] + b - left) / side, (p['y'] + b - top) / side, (p['w'] - 2 * b) / side, (p['h'] - 2 * b) / side]
-    return canvas, [round(v, 6) for v in inner]
+    w, h = VIEWPORT
+    return [round(v, 6) for v in ((p['x'] + b) / w, (p['y'] + b) / h, (p['w'] - 2 * b) / w, (p['h'] - 2 * b) / h)]
 
 
 def main() -> None:
@@ -213,6 +194,10 @@ def main() -> None:
         meta = CACHE / f'{hash_}.json'
         if meta.exists() and (CACHE / f'{hash_}.png').exists():
             records[hash_] = {**json.loads(meta.read_text()), 'date': date, 'message': subject}
+    # The live page's look: HEAD's capture, or (rebuilding from the cache after commits that did
+    # not touch the homepage) the newest capture there is.
+    newest = next((h for h, _, _ in reversed(history) if h in records), None)
+    head = head if head in records else newest or head
     head_grey = grey(CACHE / f'{head}.png') if head in records else None
     kept: list[dict] = []
     last = None
@@ -230,9 +215,10 @@ def main() -> None:
     kept = [r for r in kept if r['hash'] != head]
     kept.reverse()   # newest first
 
-    # 2. The kept versions at DPR 3, cut square around the photo.
+    # 2. The kept versions at DPR 3.
     dpr = 3
     missing = [r for r in kept if not (CACHE / f'{r["hash"]}@{dpr}.png').exists()]
+    # (The kept versions at DPR 3: sharp enough to fill a screen.)
     if missing and args.reuse:
         sys.exit(f'{len(missing)} versions have no DPR {dpr} capture; run without --reuse.')
     if missing:
@@ -246,13 +232,13 @@ def main() -> None:
     manifest = []
     for n, record in enumerate(kept, start=1):
         sharp = json.loads((CACHE / f'{record["hash"]}@{dpr}.json').read_text())
-        image, inner = square({**sharp, 'hash': record['hash']}, dpr)
+        image = Image.open(CACHE / f'{record["hash"]}@{dpr}.png').convert('RGB')
         base = f'{n:02d}-{record["hash"][:7]}'
-        image.resize((LARGE, LARGE), Image.LANCZOS).save(OUT / f'{base}-l.webp', 'WEBP', quality=76, method=6)
-        image.resize((SMALL, SMALL), Image.LANCZOS).save(OUT / f'{base}-s.webp', 'WEBP', quality=82, method=6)
+        image.resize(LARGE, Image.LANCZOS).save(OUT / f'{base}-l.webp', 'WEBP', quality=74, method=6)
+        image.resize(SMALL, Image.LANCZOS).save(OUT / f'{base}-s.webp', 'WEBP', quality=80, method=6)
         manifest.append({'file': base, 'hash': record['hash'][:7], 'date': record['date'], 'message': record['message'],
-                         'portal': inner, 'round': bool(sharp['portal'].get('round')), 'background': sharp['background']})
-    (OUT / 'manifest.json').write_text(json.dumps({'crop': CROP, 'prints': manifest}, indent=1) + '\n')
+                         'portal': inner_box(sharp), 'round': bool(sharp['portal'].get('round'))})
+    (OUT / 'manifest.json').write_text(json.dumps({'viewport': list(VIEWPORT), 'prints': manifest}, indent=1) + '\n')
     total = sum(f.stat().st_size for f in OUT.iterdir())
     print(f'{len(manifest)} prints from {len(records)} captures ({len(history)} commits); {total / 1e6:.2f} MB')
 

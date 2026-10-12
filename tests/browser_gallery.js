@@ -3,11 +3,11 @@
  * nothing, a double-click or a double-tap opens it) and lazy loading, the levels (each label is
  * its print's date and commit message, the first version last), the live page under the camera
  * (the body's transform on the way in and inside the first version's photo, the canvas's hole),
- * the endless fall (the cycle comes round and the gallery stays open), every close path
+ * the cycle (it comes round and the gallery stays open; each arrival sounds), every close path
  * (Return's rush home, which restores the page byte for byte; a second close; pagehide), the
- * wheel and the keys, a hidden tab, reduced motion (one level at a time), the sound (offline
- * renders of the Shepard chord, no clicks, M and the button), an active lens reset first, the
- * dark theme, a resize, a page without the photo, frame timing and errors. Resolves with assertions, failures, notes and frame timing.
+ * wheel and the keys, a hidden tab, reduced motion (one version at a time), the sound (offline
+ * renders of the music box, M and the button), an active lens reset first, the dark theme, a
+ * resize, a page without the photo, frame timing and errors. Resolves with assertions, failures, notes and frame timing.
  */
 (async () => {
   const failures = [];
@@ -140,9 +140,8 @@
     h = hook();
     const ctx = egg().querySelector('canvas').getContext('2d');
     const alphaAt = (x, y) => ctx.getImageData(Math.round(x * egg().querySelector('canvas').width), Math.round(y * egg().querySelector('canvas').height), 1, 1).data[3];
-    h.setDepth(h.start + 0.02); await settle();
-    check(h.live === 'page' && alphaAt(0.1, 0.5) === 0, `On the way in the canvas is clear over the live page (${h.live}, alpha ${alphaAt(0.1, 0.5)})`);
-    check(h.start < 0, `The way in starts above level 0 (${h.start.toFixed(3)})`);
+    h.setDepth(0.02); await settle();
+    check(h.live === 'page' && alphaAt(0.1, 0.5) === 0, `At the start the canvas is clear over the live page (${h.live}, alpha ${alphaAt(0.1, 0.5)})`);
     for (const j of [1, 2, Math.floor(N / 2), N]) {
       h.setDepth(j); await settle();
       const p = manifest.prints[j - 1];
@@ -173,6 +172,8 @@
     const began = performance.now();
     await until(() => h.loops >= 1, 'the fall to come round the cycle', 30000);
     check(!!egg() && h.depth < N, `The fall goes on past the first version (loops ${h.loops}, depth ${h.depth.toFixed(2)})`);
+    const heard = h.notes();
+    check(heard.includes('1') && heard.includes(String(N)) && heard.includes('today'), `An arrival sounds a note, today its arpeggio (${heard.slice(0, 5).join(' ')} ... ${heard.slice(-3).join(' ')})`);
     notes.push(`a cycle at 10 levels/s: ${((performance.now() - began) / 1000).toFixed(1)} s for ${N} prints and the live page`);
     h.close();
     await until(() => !egg(), 'Return to bring it home', 8000);
@@ -286,29 +287,16 @@
       return { peak: +peak.toFixed(4), scheduled };
     };
     const renders = {
-      fall: await render(2.5, a => a.fall(0)),
-      chord: await render(3, a => a.chord(0.05))
+      tine: await render(2.5, a => a.tine(81, 1, 0.05)),
+      yearDyad: await render(2.5, a => { a.tine(81, 1, 0.05); a.tine(69, 0.6, 0.05); }),
+      today: await render(3, a => a.arpeggio([62, 66, 69, 74], 0.05))
     };
     for (const [name, result] of Object.entries(renders)) {
       audioPeaks[name] = result.peak;
       check(result.peak > 0.005 && result.peak < 0.9, `Offline ${name}: audible and unclipped (peak ${result.peak})`);
     }
-    const silent = await render(0.5, a => { a.setEnabled(false); a.chord(0.1); });
+    const silent = await render(0.5, a => { a.setEnabled(false); a.tine(81, 1, 0.05); a.arpeggio([62, 66], 0.1); });
     check(silent.scheduled === 0, 'With the sound off nothing is scheduled');
-    // The chord falls without clicks: no second difference far above its local level.
-    {
-      const rate = 48000; const seconds = 6; const context = new win.OfflineAudioContext(1, rate * seconds, rate);
-      const audio = win.SiteGallery.createAudio(context, { fadeIn: false });
-      for (let i = 0; i <= seconds * 60; i++) { const t = i / 60; context.suspend(t).then(() => { audio.fall(t * 0.84, 1, t); context.resume(); }).catch(() => {}); }
-      const data = (await context.startRendering()).getChannelData(0);
-      let worst = 0; const W = 480;
-      for (let i = W + 1; i < data.length - W - 1; i += W) {
-        let sum = 0; for (let j = i - W; j < i; j++) { const dd = data[j + 1] - 2 * data[j] + data[j - 1]; sum += dd * dd; }
-        const level = Math.sqrt(sum / W) + 1e-6;
-        for (let j = i; j < i + W; j++) worst = Math.max(worst, Math.abs(data[j + 1] - 2 * data[j] + data[j - 1]) / level);
-      }
-      check(worst < 8, `The falling chord has no clicks (worst second difference ${worst.toFixed(2)} x its local level)`);
-    }
     await openWith({ auto: false });
     const soundButton = egg().querySelector('.gallery-sound');
     check(hook().sound && /Sound on/.test(soundButton.textContent), `The sound starts on (${soundButton.textContent})`);

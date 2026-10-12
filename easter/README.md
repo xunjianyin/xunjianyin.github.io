@@ -9,7 +9,7 @@ for them, and leave the page exactly as it was when they end.
 | Lenses (second) | double-click or double-tap a name or a page title | The page is redrawn in place through one lens after another; Esc returns to normal. The active lens follows the reader to every page. |
 | Murmuration (third) | typing `aiai` outside a text field | The page's letters loosen from their lines and fly as a flock on the page's own paper; as the noise cools the flock orders; Esc (or Return) sends the letters home, where words, lines and the page grow back. |
 | Self-portrait (fourth) | typing `selfie` outside a text field, on the homepage | The photo flies into a figure, where a small program paints it from nothing, square by square, and rewrites itself as it goes (its improver too); when the portrait is done it paints its own program, until the picture is the program that paints it. The sound follows the process. |
-| Print Gallery (fifth) | double-click or double-tap the homepage photo | The photo opens into a tunnel: inside it, the page as it was one version before; inside that page's photo, the one before; and on, through every version that looked different, to the first, whose photo holds the page you are on, and round again. The camera falls through it without end. A single click does nothing. |
+| Print Gallery (fifth) | double-click or double-tap the homepage photo | The homepage photo holds the page as it was one version before, mounted like a print; that page's photo holds the one before; and on, through every version that looked different, to the first, whose photo holds the page you are on. The camera rests at each version, then dives into its photo, round the cycle until Return. A single click does nothing. |
 
 While a lens is active, the keys `1` to `9` jump to that place in the cycle and `0` returns to
 normal (not in text fields, not inside a paper's demo, not with a modifier). The last key
@@ -26,12 +26,13 @@ screen at once, M (or the Sound button) switches the sound, and Esc or the Retur
 (bottom right with Sound, shown on intent as for the flock) sends the photo home. Under reduced motion it opens without the flight and stays still:
 Next test (beside Return, always shown) or the right arrow advances one test at a time.
 
-In the gallery the camera falls by itself at one steady rate, through the cycle and round
-again. The wheel (or a vertical drag) speeds the fall or reverses it, the arrows and Page
-Up/Down move one version, Space stops the camera's own fall, M (or the Sound button) switches
-the sound, and Esc, Home or Return rush back up to the page as it is; a second Esc closes at
-once. Under reduced motion nothing moves: one level at a time (its tunnel still drawn), Newer
-and Older (beside Return, always shown) or the arrows.
+In the gallery the camera rests at each version (its wall label: date, how far back, the
+commit's own words) and dives into the next, round the cycle until Return. The wheel (or a
+vertical drag) dives faster or rises, the arrows and Page Up/Down move one version, Space stops
+the camera's own dives, M (or the Sound button) switches the sound, and Esc, Home or Return
+rush back up to the page as it is; a second Esc closes at once. Under reduced motion nothing
+moves: one version at a time (its photo still holds the one before), Newer and Older (beside
+Return, always shown) or the arrows.
 
 ## Where the site touches the eggs
 
@@ -204,54 +205,54 @@ temporary worktree, serves it on a port of its own (so nothing is cached across 
 captures the homepage in agent-browser at 1280 x 800 CSS px, device pixel ratio 2, with empty
 storage and the light theme. It records the photo (the largest roughly square image near the
 top), its border and whether it is drawn round. A version becomes a print when it looks
-different from the last print (mean grey difference above 2.2 at 320 x 200) and from HEAD (the
-live page is the gallery's own level), and when its photo loaded. Each kept version is captured
-again at device pixel ratio 3, and a square is cut around its photo, the photo at the centre,
-3.6 photo widths a side, padded with the page's background past the page's edge. The prints go
-to `gallery/prints/` as `NN-<hash>-l.webp` (1600 px) and `-s.webp` (400 px) with
-`manifest.json`, newest first: date, commit subject, the photo's inner box (inside its border)
-as fractions of the square, round or not. Rebuild after the homepage changes (about 13
-minutes; captures are cached in `GALLERY_CACHE`, and `--reuse` rebuilds from them):
+different from the last print (mean grey difference above 2.2 at 320 x 200) and from the live
+page's look (HEAD's capture, or the newest cached one), and when its photo loaded. The kept
+versions are captured again at device pixel ratio 3 and written to `gallery/prints/` as
+`NN-<hash>-l.webp` (2048 x 1280) and `-s.webp` (512 x 320), with `manifest.json`, newest first:
+date, commit subject, the photo's box inside its border as fractions of the page, round or not.
+Rebuild after the homepage changes (about 13 minutes; captures are cached in `GALLERY_CACHE`,
+and `--reuse` rebuilds from them):
 
 ```
 uv run --with pillow python scripts/build_print_gallery.py
 ```
 
-**The tunnel.** Every level is a unit square whose photo sits at its centre and fills 0.27 of
-its side, so each level nests in the photo of the one before, 3.6 times smaller, about one
-centre: a Droste tunnel, five or six levels deep on screen. Depth `d` is continuous: 0 the live
-page, 1 to N the prints, then the live page again (it sits in the first version's photo), the
-depth wrapping by N + 1. At an integer the level's square covers the screen; between k and
-k + 1 the camera zooms exponentially about the point the two framings share (the centre), so
-the fall is one straight line at one rate: 0.42 levels a second, eased in over 1.6 s after the
-photo has opened (0.7 s). A level's wall label shows near its integer and fades between.
+**The tunnel.** Every photo always holds the version before it, on a white mount (the print
+fills 90 % of a square photo's width, 92 % of the largest 16:10 rectangle in a round one, with
+a hairline), so the page, the print in its photo and the prints in theirs are on screen at once,
+down to 2 px. Depth `d`: 0 the live page, 1 to N the prints, N + 1 the live page again (it
+sits in the first version's photo), where the depth wraps. At an integer the level fits the
+viewport; between k and k + 1 the camera zooms exponentially about the one point the two
+framings share, eased in and out, so every dive starts and ends at rest and a turn is never
+seen moving. Where a level does not cover the viewport (a window that is not 16:10), the level
+around it is drawn, as it really is.
 
-**The way in.** Depth below 0 runs from the page as it is (the identity, about -0.6 for a
-1280 px window) to the live page's square covering the screen at 0, at the fall's own zoom
-rate, the photo gliding to the centre. Return seeks back there (1 s plus 0.06 s a level) and
-closes: the journey ends on the page it began on.
+**The camera.** It rests 1.4 s on the live page while the photo opens (0.8 s), then dives 2.1 s
+into each version and rests 1 s there, about 3 s a version. The wheel and a drag push it (the
+push dies away over 0.45 s; the camera's own dives resume 1.4 s later from where it is). The
+arrows seek one version in 1.3 s; Return seeks the live page in 1 s plus 0.07 s a version and
+closes there. Rising back to the live page also closes.
 
-**The live page** is the real DOM. While it is drawn (on the way in, at the live level, and
-inside the first version's photo) the body carries a CSS transform (origin 0 0) that puts its
-square where the camera wants it, and the canvas leaves a hole there; the dialog is in the top
-layer, so the transform never moves it. Elsewhere the body is moved off screen under the
-opaque canvas. The body's `overflow`, `transform`, `transform-origin` and `will-change` and the
-root's `scrollbar-gutter` are restored byte for byte. A resize while the live page shows
-closes at once (the page reflows); otherwise it only refits. A hidden tab stops the frames;
-`pagehide` closes at once.
+**The live page** is the real DOM. While it is drawn (as the outer level, or inside the first
+version's photo) the body carries a CSS transform (origin 0 0) that puts it where the camera
+wants it, and the canvas leaves a hole there; the dialog is in the top layer, so the transform
+never moves it. Elsewhere the body is moved off screen under the opaque canvas. The body's
+`overflow`, `transform`, `transform-origin` and `will-change` and the root's
+`scrollbar-gutter` are restored byte for byte. A resize while the live page shows closes at
+once (the page reflows); otherwise it refits. A hidden tab stops the frames; `pagehide` closes
+at once.
 
 **Loading.** The manifest and every small print at the opening; the large prints for the level
-under the camera and the three after it (the others are let go). A print is drawn from its
-large file once it is wider than 360 device px. The camera never falls into a level whose
-print has not arrived.
+before the camera, its own and the two after (the others are let go). A print is drawn from its
+large file once it is wider than 1.1 x 512 device px. The camera never dives into a version
+whose print has not arrived.
 
-**Sound** (the site's preference, M or the Sound button) is a Shepard chord (Shepard 1964;
-Risset's endless glissando): a root, its fifth and its major third, each nine sines an octave
-apart under one bell-shaped envelope in log frequency (centre 235 Hz, one octave wide), every
-partial sweeping the whole range and coming round only at its silent ends. It falls half an
-octave a level, following the unwrapped depth, so it falls for as long as the camera falls and
-rises when it rises; a soft G major arpeggio marks each pass through today. Measured offline:
-peak 0.09, no clicks. Stored: nothing of its own.
+**Sound** (the site's preference, M or the Sound button), only on arrival: a music-box note
+(a sine and three soft overtones, the high ones dying first, in a small room) for each version,
+stepping down D major pentatonic from D6 as the camera goes back in time (an octave lower
+beneath it when the year changes), and a rising D major arpeggio at today. Arrivals while
+scrolling fast are at least 90 ms apart. Measured offline: a note's peak 0.07, the arpeggio
+0.14. Stored: nothing of its own.
 
 ## Files
 
