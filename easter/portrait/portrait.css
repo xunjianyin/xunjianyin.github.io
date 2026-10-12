@@ -114,6 +114,10 @@
   cursor: pointer;
 }
 #portrait .portrait-button:hover { color: var(--pt-accent); }
+#portrait .portrait-key {
+  display: inline-block; min-width: 1.4em; margin-left: 2px; padding: 0 3px;
+  border: 1px solid var(--pt-rule); color: var(--pt-muted); font-size: 10.5px; line-height: 1.35; text-align: center;
+}
 #portrait .portrait-button:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
 #portrait:not(.is-still) .portrait-step { display: none; }
 #portrait .portrait-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

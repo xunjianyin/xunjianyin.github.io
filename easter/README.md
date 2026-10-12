@@ -8,7 +8,7 @@ for them, and leave the page exactly as it was when they end.
 | Spira (first) | the footer's `*`, or typing `yxjgogogo` outside a text field | A full-screen canvas: the page's words wind into a logarithmic spiral, then a spiral of the research unwinds. |
 | Lenses (second) | double-click or double-tap a name or a page title | The page is redrawn in place through one lens after another; Esc returns to normal. The active lens follows the reader to every page. |
 | Murmuration (third) | typing `aiai` outside a text field | The page's letters loosen from their lines and fly as a flock on the page's own paper; as the noise cools the flock orders; Esc (or Return) sends the letters home, where words, lines and the page grow back. |
-| Self-portrait (fourth) | double-click or double-tap the homepage photo | The photo flies into a figure, where a small program paints it from nothing, square by square, and rewrites itself as it goes (its improver too); when the portrait is done it paints its own program, until the picture is the program that paints it. A single click does nothing. |
+| Self-portrait (fourth) | double-click or double-tap the homepage photo | The photo flies into a figure, where a small program paints it from nothing, square by square, and rewrites itself as it goes (its improver too); when the portrait is done it paints its own program, until the picture is the program that paints it. The sound follows the process. A single click does nothing. |
 
 While a lens is active, the keys `1` to `9` jump to that place in the cycle and `0` returns to
 normal (not in text fields, not inside a paper's demo, not with a modifier). The last key
@@ -21,8 +21,8 @@ that corner, a tap on the flock, or a key. The pointer scatters the letters near
 reduced motion the flock never opens (the password does nothing).
 
 While the self-portrait is out, Space pauses, the right arrow shows the rest of the test on
-screen at once, and Esc or the Return button (bottom right, shown on intent as for the flock)
-sends the photo home. Under reduced motion it opens without the flight and stays still:
+screen at once, M (or the Sound button) switches the sound, and Esc or the Return button
+(bottom right with Sound, shown on intent as for the flock) sends the photo home. Under reduced motion it opens without the flight and stays still:
 Next test (beside Return, always shown) or the right arrow advances one test at a time.
 
 ## Where the site touches the eggs
@@ -169,7 +169,24 @@ second, and gives a test of paint at least 1.25 s on screen, falling to 0.65 s f
 proposals on. The dialog covers the page with its paper; the photo's copy flies between the
 page's photo and the frame (a transform, both ways). Closing restores the page exactly. A
 hidden tab pauses it, `pagehide` closes it at once, and a resize only redraws the charts.
-Stored: nothing.
+Stored: nothing of its own; the sound follows the site's preference (`localStorage`,
+`spira-sound`, which Spira and the lenses read too), and M or the Sound button sets it.
+
+**Sound** (Web Audio, synthesized; D major pentatonic, as Spira and the lenses) is a
+sonification of the process, not an accompaniment:
+
+| Sound | What it follows |
+| --- | --- |
+| the brush | band-passed noise, as loud as the paint laid each second (cells x alpha, to the power 0.35) and pitched by the squares' mean side: 280 Hz for side 40 up to about 2 kHz for side 2 |
+| the beat | two sines on D3 (and A3 beneath); one is detuned by 2.4 Hz x the distance to the goal: `(34 - PSNR) / 16` against the photo, `(25 - PSNR) / 12` against its own text, so the beating slows as it nears. At a settled end it stops: the detuned sine fades and the other takes its share, so the still tone has one level whatever phase they met at |
+| a verdict | kept: a bell on the line's degree (paint D5 to B5 in the order size, where, colour, alpha, tries; improve a dyad from D3); not kept: a damped pluck an octave lower; the `self` rule rewriting itself: its motif, then again twice, each time twice as fast and an octave higher |
+| the finale, the end | a swell (D F# A E) as the sitter changes; a rising D add9 arpeggio when it settles, an open A6sus chord when it does not; five seconds later everything fades out over six, and the context is suspended |
+| the flight | a band-passed noise sweep, up as the photo flies in, down as it flies home |
+
+The boot creates the AudioContext inside the double-click (browsers start sound only in a
+gesture); without one, the first pointer or key inside the figure starts it. Measured offline
+(peaks): a kept bell 0.08, an edit to improve 0.12, the endings 0.15, the flight 0.03, a mixed
+scene 0.17, as loud as Spira's cues (its melody 0.14).
 
 ## Files
 

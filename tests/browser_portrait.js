@@ -5,8 +5,9 @@
  * following the kept edits, PSNR rising, the same verdicts for the same seed), the finale and
  * its ending (the painted program is the program), every close path (Escape, a second close,
  * Return, pagehide), a hidden tab, Space and the right arrow, reduced motion (still, one test
- * at a time), an active lens reset first, the dark theme, a resize, a page without the photo,
- * frame timing and errors.
+ * at a time), the sound (offline renders of every cue, the beat standing still at full
+ * strength, the cue log, M and the Sound button, the site's preference), an active lens reset
+ * first, the dark theme, a resize, a page without the photo, frame timing and errors.
  * Resolves with assertions, failures, notes and frame timing.
  */
 (async () => {
@@ -24,6 +25,9 @@
   document.body.append(frame);
   const storedLens = sessionStorage.getItem('lenses-active'); const storedGround = sessionStorage.getItem('lenses-ground');
   const storedTheme = localStorage.getItem('theme');
+  const storedSound = localStorage.getItem('spira-sound');
+  localStorage.removeItem('spira-sound');
+  const audioPeaks = {};
   sessionStorage.removeItem('lenses-active'); sessionStorage.removeItem('lenses-ground');
   const notes = [];
   const errors = [];
@@ -208,6 +212,9 @@
     check(h.shownText() === h.text(), 'At the end the listing shows the program itself');
     check(h.ending.settled ? /fixed point/.test(story()) : /not settled/.test(story()), `The caption names the ending (${story().slice(0, 90)})`);
     if (h.ending.settled) check(h.psnr >= 19.5, `A settled self-portrait matches its text (${h.psnr.toFixed(2)} dB)`);
+    const cues = h.audioCues();
+    check(cues.filter(c => c.startsWith('verdict ')).length === Math.min(h.counts.tests, 800 - 3), `Every verdict has a sound cue (${cues.filter(c => c.startsWith('verdict ')).length} of ${h.counts.tests})`);
+    check(cues.includes('finale') && cues.at(-1) === `ending ${h.ending.settled ? 'settled' : 'unsettled'}`, `The finale and the ending have their cues (${cues.slice(-2).join(', ')})`);
     notes.push(`finale: seed 33 ended ${h.ending.settled ? 'settled' : 'unsettled'} at ${h.ending.at} proposals, ${h.psnr.toFixed(1)} dB; ${h.text().replace(/\n/g, ' / ')}`);
     await delay(300);
     check(pending.size === 0, 'At rest after the ending (no animation frame pending)');
@@ -282,6 +289,64 @@
     await delay(200);
     closeNow();
 
+    /* 5b. Sound. Offline: the same synthesizer on an OfflineAudioContext, measured. */
+    const render = async (seconds, play, channels = 2) => {
+      const rate = 48000; const context = new win.OfflineAudioContext(channels, Math.round(rate * seconds), rate);
+      const audio = win.SitePortrait.createAudio(context, { fadeIn: false });
+      await play(audio, context);
+      const scheduled = audio.scheduled; const buffer = await context.startRendering();
+      let peak = 0;
+      for (let c = 0; c < buffer.numberOfChannels; c++) { const data = buffer.getChannelData(c); for (let i = 0; i < data.length; i++) { const v = Math.abs(data[i]); if (v > peak) peak = v; } }
+      return { peak: +peak.toFixed(4), scheduled, buffer };
+    };
+    const renders = {
+      keptPaint: await render(2.5, a => a.cue.verdict(0.05, 1, 2, true)),
+      notKept: await render(0.6, a => a.cue.verdict(0.05, 1, 2, false)),
+      keptImprove: await render(3, a => a.cue.verdict(0.05, 2, 1, true)),
+      itself: await render(3.5, a => a.cue.verdict(0.05, 2, 4, true, true)),
+      finale: await render(6, a => a.cue.finale(0.05)),
+      settled: await render(7, a => a.cue.ending(0.05, true)),
+      unsettled: await render(6, a => a.cue.ending(0.05, false)),
+      whoosh: await render(1, a => a.cue.whoosh(0.05, true, 0.65)),
+      brush: await render(2, a => a.brush(5000, 40, 0)),
+      beat: await render(3, a => a.beat(1, 2, 0)),
+      mix: await render(14, a => { a.beat(1, 1.5, 0); a.brush(2000, 10, 0); for (let i = 0; i < 9; i++) a.cue.verdict(0.5 + i * 1.3, i % 6 === 5 ? 2 : 1, i % 5, i % 3 === 0); a.cue.finale(12); })
+    };
+    for (const [name, result] of Object.entries(renders)) {
+      audioPeaks[name] = result.peak;
+      check(result.peak > 0.01 && result.peak < 0.9, `Offline ${name}: audible and unclipped (peak ${result.peak})`);
+    }
+    check(renders.itself.scheduled === 3 * renders.keptImprove.scheduled, `The rule that rewrote itself plays its motif three times (${renders.itself.scheduled} voices, ${renders.keptImprove.scheduled} for one)`);
+    const silent = await render(0.5, a => { a.setEnabled(false); a.cue.verdict(0.05, 1, 0, true); a.cue.finale(0.1); });
+    check(silent.scheduled === 0 && silent.peak === 0, 'With the sound off the synthesizer schedules nothing and is silent');
+    // The beat stops at full strength whatever phase the roots meet at.
+    const stilled = [];
+    for (const stopAt of [2.37, 2.61, 2.85]) {
+      const result = await render(7, (a, context) => {
+        a.beat(1, 2, 0);
+        context.suspend(stopAt).then(() => { a.beat(1, 0, stopAt); context.resume(); });
+      }, 1);
+      const data = result.buffer.getChannelData(0); let sum = 0;
+      for (let i = 5 * 48000; i < 7 * 48000; i++) sum += data[i] * data[i];
+      stilled.push(Math.sqrt(sum / (2 * 48000)));
+    }
+    check(Math.max(...stilled) - Math.min(...stilled) < 0.002 && Math.min(...stilled) > 0.02, `The stilled beat has one level whenever it stops (${stilled.map(v => v.toFixed(4)).join(', ')})`);
+
+    /* 5c. Sound live: the opening's cue, M and the Sound button, the site's preference. */
+    await openWith({ seed: 4, rate: 3000 });
+    h = hook();
+    const soundButton = egg().querySelector('.portrait-sound');
+    check(h.sound && soundButton.getAttribute('aria-pressed') === 'true' && /Sound on/.test(soundButton.textContent), `The sound starts on, its button says so (${soundButton.textContent})`);
+    check(h.audioCues()[0] === 'whoosh up', `The flight has its cue (${h.audioCues()[0]})`);
+    key('m');
+    check(!h.sound && localStorage.getItem('spira-sound') === 'off' && /Sound off/.test(soundButton.textContent), 'M switches the sound off and stores it');
+    closeNow();
+    await openWith({ seed: 4 });
+    check(!hook().sound && hook().audioState === null && hook().audioCues().length === 0, 'With the sound off a re-open makes no context and logs no cue');
+    egg().querySelector('.portrait-sound').click();
+    check(hook().sound && localStorage.getItem('spira-sound') === 'on' && hook().audioState !== null, `The Sound button turns it back on and makes a context (${hook().audioState})`);
+    closeNow();
+
     /* 6. Reduced motion: no flight, the paper at once, Next test shown, one test per step;
        Escape closes at once. */
     setReduced(true);
@@ -343,6 +408,7 @@
     if (storedLens === null) sessionStorage.removeItem('lenses-active'); else sessionStorage.setItem('lenses-active', storedLens);
     if (storedGround === null) sessionStorage.removeItem('lenses-ground'); else sessionStorage.setItem('lenses-ground', storedGround);
     if (storedTheme === null) localStorage.removeItem('theme'); else localStorage.setItem('theme', storedTheme);
+    if (storedSound === null) localStorage.removeItem('spira-sound'); else localStorage.setItem('spira-sound', storedSound);
   }
   /* 10. Frame timing over every dialog. */
   mergeStats();
@@ -350,5 +416,5 @@
   /* 11. No uncaught errors or console.error calls. */
   assertions++;
   if (errors.length) failures.push(`Errors: ${errors.join(' | ')}`);
-  return { assertions, failures, notes, frameStats, errors };
+  return { assertions, failures, notes, frameStats, audioPeaks, errors };
 })();

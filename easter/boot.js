@@ -29,16 +29,16 @@
  * - A double-click or a double-tap on the photo opens it; easter/portrait/portrait.{js,css}
  *   load on the first opening, and an active lens is reset at once (and forgotten) first. A
  *   single click does nothing: the photo gives nothing away. Under reduced motion it opens
- *   still, one test at a time.
+ *   still, one test at a time. Its AudioContext is primed inside the gesture.
  */
 (() => {
   'use strict';
   if (window.SiteLensesBoot) return;
 
-  const VERSION = 'lenses-v13';       // the ?v= of the lenses core (easter/lenses/core.*)
+  const VERSION = 'lenses-v14';       // the ?v= of the lenses core (easter/lenses/core.*)
   const SPIRA_VERSION = 'spira-v12';  // the ?v= of easter/spira/spira.*
   const MURMUR_VERSION = 'murmur-v2'; // the ?v= of easter/murmur/murmur.*
-  const PORTRAIT_VERSION = 'portrait-v1'; // the ?v= of easter/portrait/portrait.*
+  const PORTRAIT_VERSION = 'portrait-v2'; // the ?v= of easter/portrait/portrait.*
   const SCRIPT_SRC = (document.currentScript && document.currentScript.src) || location.href;
   const ROOT = new URL('../', SCRIPT_SRC).href;                 // easter/boot.js → the site root
   const STORE_KEY = 'lenses-active';
@@ -283,6 +283,8 @@
       storage(store => { store.removeItem(STORE_KEY); store.removeItem(GROUND_KEY); });
       unmark();
     }
+    // Its sound needs an AudioContext created inside the gesture; the portrait adopts it.
+    primeAudio('__portraitAudioContext');
     if (window.SitePortrait) {
       if (lensesSettled) lensesSettled.then(() => window.SitePortrait.open({ photo }));
       else window.SitePortrait.open({ photo });
@@ -297,6 +299,7 @@
     }).catch(error => {
       // Leave nothing behind, so the next trigger tries again.
       assets.forEach(asset => asset.remove());
+      dropAudio('__portraitAudioContext');
       console.warn('The self-portrait could not load.', error);
     }).finally(() => { portraitLoading = null; });
   }

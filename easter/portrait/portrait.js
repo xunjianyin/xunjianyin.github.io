@@ -433,6 +433,283 @@
   }
 
   /* ---------------------------------------------------------------------------
+   * Sound (Web Audio, synthesized): a sonification of the process, on D major pentatonic as
+   * Spira and the lenses are.
+   *   the brush   band-passed noise, as loud as the paint laid each second (cells x alpha) and
+   *               as high as the squares are small: broad low strokes at first, a fine hiss later
+   *   the beat    two sines on D3, one detuned by the distance to the goal (the portrait's
+   *               FINALE_PSNR, then the program's own text), so they beat slower as it nears;
+   *               at the fixed point the beat stops and the tone stands still
+   *   a verdict   kept: a bell on the line's degree (paint in octave 5, improve a dyad in
+   *               octave 4); not kept: a damped pluck an octave lower; the rule that rewrote
+   *               itself plays its motif, then the motif again twice, each time twice as fast
+   *               and an octave higher
+   *   the finale  a swell as the sitter changes; the end a rising arpeggio when it settles, an
+   *               open suspended chord when it does not, then silence
+   * The site's sound preference holds (localStorage SOUND_KEY, shared with Spira and the
+   * lenses); M or the Sound button switches it. The synthesizer runs on any BaseAudioContext,
+   * so an OfflineAudioContext renders exactly the cues the egg plays (the tests measure them).
+   *   voice -> panner -> dry -------------------------> master -> compressor -> out
+   *                   \-> reverb send -> convolver --/
+   * ------------------------------------------------------------------------- */
+  const SOUND_KEY = 'spira-sound';
+  const AUDIO_MASTER = 0.8;
+  const AUDIO_FADE_IN = 1.5;            // s
+  const AUDIO_TOGGLE = 0.25;            // s: the ramp when the sound is switched or held
+  const AUDIO_COMPRESSOR = { threshold: -18, ratio: 4, knee: 12 };
+  const AUDIO_VOICES = 48;              // one-shot voices beyond this are dropped
+  const REVERB = { seconds: 2.6, predelay: 0.02, send: 0.3 };
+  const PENTATONIC = [0, 2, 4, 7, 9];   // semitones above D
+  const BEAT = { root: 50, fifth: 57, gain: 0.035, fifthGain: 0.015, max: 2.4, glide: 0.6, cutoff: 900, attack: 2.5 };
+  const BEAT_GOAL_FINALE = 25;          // dB: the beat's goal against the program's own text (it stops at the fixed point)
+  const BRUSH = { gain: 0.09, low: 280, high: 2400, q: 1.1, glide: 0.18, full: 5000, curve: 0.35 };
+  const NOTE = { kept: 0.07, not: 0.05, improve: 0.055, motif: 0.24, gapMs: 70 };
+  const BELL_RATIOS = [1, 2, 2.76, 4.07];
+  const BELL_GAINS = [1, 0.35, 0.22, 0.08];
+  const BELL_DECAYS = [2.2, 1.3, 1.0, 0.6];   // s to near silence
+  const SWELL = { attack: 1.4, hold: 0.6, release: 3, gain: 0.022, cutoff: 1400, detune: 6 };
+  const FINALE_CHORD = [62, 66, 69, 76];      // D4 F#4 A4 E5
+  const SETTLED_CHORD = [50, 62, 66, 69, 76]; // D add9, arpeggiated: resolved
+  const UNSETTLED_CHORD = [45, 52, 54, 59, 62]; // A6sus, left open
+  const WHOOSH = { gain: 0.075, low: 300, high: 1800, q: 0.8 };
+  const REST = { after: 5, fade: 6 };         // s: after the ending, the sound fades to silence
+  const midiHz = m => 440 * Math.pow(2, (m - 69) / 12);
+  // A line's degree: its place in its part (paint: size D ... tries B; improve: every D ... self B).
+  const degreeOf = id => (LINE[id].fn === 'paint' ? PAINT : IMPROVE).indexOf(id);
+
+  function createPortraitAudio(context, options = {}) {
+    const offline = typeof OfflineAudioContext !== 'undefined' && context instanceof OfflineAudioContext;
+    const rate = context.sampleRate;
+    let enabled = true; let closed = false; let held = false;
+    const audio = { context, offline, scheduled: 0, alive: 0 };
+    let seed = 0x5eed;
+    const random = () => { seed = (seed + 0x6D2B79F5) >>> 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+
+    const compressor = context.createDynamicsCompressor();
+    compressor.threshold.value = AUDIO_COMPRESSOR.threshold; compressor.ratio.value = AUDIO_COMPRESSOR.ratio; compressor.knee.value = AUDIO_COMPRESSOR.knee;
+    compressor.connect(context.destination);
+    const master = context.createGain(); master.connect(compressor);
+    const start0 = context.currentTime;
+    if (options.fadeIn === false) master.gain.value = AUDIO_MASTER;
+    else { master.gain.setValueAtTime(0, start0); master.gain.linearRampToValueAtTime(AUDIO_MASTER, start0 + AUDIO_FADE_IN); }
+    const dry = context.createGain(); dry.connect(master);
+    const convolver = context.createConvolver(); convolver.connect(master);
+    const send = context.createGain(); send.gain.value = REVERB.send; send.connect(convolver);
+    const noise = context.createBuffer(1, Math.round(2 * rate), rate);
+    { const data = noise.getChannelData(0); for (let i = 0; i < data.length; i++) data[i] = random() * 2 - 1; }
+    // Reverb: stereo noise decaying to -60 dB in REVERB.seconds, a lowpass closing along the tail.
+    function buildImpulse() {
+      if (closed) return;
+      const pre = Math.round(REVERB.predelay * rate); const length = pre + Math.round(REVERB.seconds * rate);
+      const ir = context.createBuffer(2, length, rate); const tau = REVERB.seconds / 6.91;
+      for (let ch = 0; ch < 2; ch++) {
+        const data = ir.getChannelData(ch); let low = 0;
+        for (let i = pre; i < length; i++) {
+          const t = (i - pre) / rate;
+          low += (0.75 - 0.6 * Math.min(1, t / REVERB.seconds)) * ((random() * 2 - 1) - low);
+          data[i] = low * Math.exp(-t / tau);
+        }
+      }
+      try { convolver.buffer = ir; } catch (error) { /* a closed context */ }
+    }
+    if (offline) buildImpulse(); else setTimeout(buildImpulse, 40);
+
+    const ready = () => enabled && !closed && !held && (offline || context.state === 'running');
+    const roomFor = () => audio.alive < AUDIO_VOICES;
+    const at = t => Math.max(t, context.currentTime);
+    function panned(node, pan, wet = true) {
+      const panner = context.createStereoPanner(); panner.pan.value = clamp(pan || 0, -1, 1);
+      node.connect(panner); panner.connect(dry);
+      if (wet) panner.connect(send);
+      return panner;
+    }
+    function voice(source, t, end) {
+      audio.scheduled++; audio.alive++;
+      source.onended = () => { audio.alive--; };
+      source.start(t); source.stop(end);
+    }
+    function noiseSource() {
+      const source = context.createBufferSource(); source.buffer = noise; source.loop = true;
+      return source;
+    }
+
+    /* Continuous voices: the beat and the brush (silent until set) ------------- */
+    const beatOut = context.createGain(); beatOut.gain.value = 0;
+    const beatTone = context.createBiquadFilter(); beatTone.type = 'lowpass'; beatTone.frequency.value = BEAT.cutoff;
+    beatOut.connect(beatTone); panned(beatTone, 0, true);
+    const beatVoices = [[BEAT.root, BEAT.gain / 2], [BEAT.root, BEAT.gain / 2], [BEAT.fifth, BEAT.fifthGain]].map(([m, g]) => {
+      const o = context.createOscillator(); o.type = 'sine'; o.frequency.value = midiHz(m);
+      const amp = context.createGain(); amp.gain.value = g;
+      o.connect(amp); amp.connect(beatOut); o.start(start0);
+      return { o, amp };
+    });
+    let beatStill = false;
+    const brushSource = noiseSource();
+    const brushBand = context.createBiquadFilter(); brushBand.type = 'bandpass'; brushBand.frequency.value = BRUSH.low; brushBand.Q.value = BRUSH.q;
+    const brushOut = context.createGain(); brushOut.gain.value = 0;
+    brushSource.connect(brushBand); brushBand.connect(brushOut); panned(brushOut, -0.15, false);
+    brushSource.start(start0);
+
+    /* One-shot voices ---------------------------------------------------------- */
+    // A bell: four sine partials, a 4 ms attack, exponential decays (as Spira's).
+    function bell(m, t, g, pan = 0, stretch = 1) {
+      if (!ready() || !roomFor() || !(g > 0)) return;
+      t = at(t);
+      const sum = context.createGain(); const out = panned(sum, pan);
+      const f = midiHz(m);
+      for (let k = 0; k < BELL_RATIOS.length; k++) {
+        const fk = f * BELL_RATIOS[k]; if (fk > rate * 0.45) continue;
+        const amp = context.createGain(); amp.connect(out);
+        const peak = g * BELL_GAINS[k]; const decay = BELL_DECAYS[k] * stretch;
+        amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(peak, t + 0.004);
+        amp.gain.exponentialRampToValueAtTime(peak * 1e-3, t + 0.004 + decay);
+        const o = context.createOscillator(); o.type = 'sine'; o.frequency.value = fk; o.connect(amp);
+        voice(o, t, t + 0.05 + decay);
+      }
+    }
+    // A damped pluck: a triangle through a lowpass, gone in a fifth of a second.
+    function pluck(m, t, g, pan = 0) {
+      if (!ready() || !roomFor()) return;
+      t = at(t);
+      const lowpass = context.createBiquadFilter(); lowpass.type = 'lowpass'; lowpass.frequency.value = 900; lowpass.Q.value = 0.5;
+      const amp = context.createGain(); amp.connect(lowpass); panned(lowpass, pan, false);
+      amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(g, t + 0.003);
+      amp.gain.exponentialRampToValueAtTime(g * 1e-3, t + 0.2);
+      const o = context.createOscillator(); o.type = 'triangle'; o.frequency.value = midiHz(m); o.connect(amp);
+      voice(o, t, t + 0.25);
+    }
+    // A swell: a soft chord of detuned triangle pairs through a lowpass.
+    function swell(chord, t, g = SWELL.gain) {
+      if (!ready()) return;
+      t = at(t);
+      const end = t + SWELL.attack + SWELL.hold + SWELL.release;
+      const lowpass = context.createBiquadFilter(); lowpass.type = 'lowpass'; lowpass.frequency.value = SWELL.cutoff; lowpass.Q.value = 0.3;
+      const amp = context.createGain(); amp.connect(lowpass); panned(lowpass, 0);
+      amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(g, t + SWELL.attack);
+      amp.gain.setValueAtTime(g, t + SWELL.attack + SWELL.hold); amp.gain.linearRampToValueAtTime(0, end);
+      for (const m of chord) {
+        for (const cents of [-SWELL.detune, SWELL.detune]) {
+          if (!roomFor()) return;
+          const o = context.createOscillator(); o.type = 'triangle'; o.frequency.value = midiHz(m); o.detune.value = cents; o.connect(amp);
+          voice(o, t, end + 0.05);
+        }
+      }
+    }
+    function whoosh(t, up, duration) {
+      if (!ready() || !roomFor()) return;
+      t = at(t);
+      const source = noiseSource();
+      const band = context.createBiquadFilter(); band.type = 'bandpass'; band.Q.value = WHOOSH.q;
+      const [from, to] = up ? [WHOOSH.low, WHOOSH.high] : [WHOOSH.high, WHOOSH.low];
+      band.frequency.setValueAtTime(from, t); band.frequency.exponentialRampToValueAtTime(to, t + duration);
+      const amp = context.createGain();
+      amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(WHOOSH.gain, t + duration * 0.45);
+      amp.gain.linearRampToValueAtTime(0, t + duration);
+      source.connect(band); band.connect(amp); panned(amp, 0);
+      voice(source, t, t + duration + 0.05);
+    }
+
+    function rampMaster(value, t, seconds) {
+      const p = master.gain; p.cancelScheduledValues(t); p.setValueAtTime(p.value, t); p.linearRampToValueAtTime(value, t + seconds);
+    }
+    let lastNote = -1e9;
+    Object.assign(audio, {
+      get ready() { return ready(); },
+      get enabled() { return enabled; },
+      get state() { return offline ? 'offline' : context.state; },
+      now: () => context.currentTime,
+      // The beat: its presence (0..1) and its rate in Hz, gliding. At a rate of zero the two
+      // roots would meet at whatever phase the glide left them (even cancelling), so the
+      // detuned one fades and the other takes its share: the tone stands still at full strength.
+      beat(level, hz, t = context.currentTime) {
+        if (closed) return;
+        t = at(t);
+        beatOut.gain.setTargetAtTime(clamp(level, 0, 1), t, level > beatOut.gain.value ? BEAT.attack / 3 : 0.4);
+        const still = hz <= 0.001;
+        if (still !== beatStill) {
+          beatStill = still;
+          beatVoices[0].amp.gain.setTargetAtTime(still ? BEAT.gain : BEAT.gain / 2, t, BEAT.glide);
+          beatVoices[1].amp.gain.setTargetAtTime(still ? 0 : BEAT.gain / 2, t, BEAT.glide);
+        }
+        beatVoices[1].o.frequency.setTargetAtTime(midiHz(BEAT.root) + clamp(hz, 0, BEAT.max), t, BEAT.glide);
+      },
+      // The brush: paint laid per second (cells x alpha) and the mean side of its squares.
+      brush(perSecond, side, t = context.currentTime) {
+        if (closed) return;
+        t = at(t);
+        const level = perSecond > 0 ? BRUSH.gain * Math.pow(clamp(perSecond / BRUSH.full, 0, 1), BRUSH.curve) : 0;
+        const f = clamp(BRUSH.low * Math.pow(40 / Math.max(1, side || 40), 0.65), BRUSH.low, BRUSH.high);
+        brushOut.gain.setTargetAtTime(level, t, BRUSH.glide);
+        if (perSecond > 0) brushBand.frequency.setTargetAtTime(f, t, BRUSH.glide);
+      },
+      cue: {
+        // A verdict: level 1 or 2, the line's degree, kept or not, the rule rewriting itself.
+        verdict(t, level, degree, kept, itself = false) {
+          const now = context.currentTime;
+          if (now - lastNote < NOTE.gapMs / 1000 && !itself) return;
+          lastNote = now;
+          const pan = level === 2 ? 0.25 : -0.05;
+          const m = (level === 2 ? 50 : 74) + PENTATONIC[degree];
+          if (!kept) { pluck(m - 12, t, NOTE.not, pan); return; }
+          if (level === 1) { bell(m, t, NOTE.kept, pan); return; }
+          if (!itself) { bell(m, t, NOTE.improve, pan, 1.3); bell(m + 7, t + 0.09, NOTE.improve * 0.7, pan, 1.3); return; }
+          // The motif, then itself again: twice as fast and an octave higher, twice.
+          let start = t; let step = NOTE.motif; let g = NOTE.improve;
+          for (let k = 0; k < 3; k++) {
+            bell(m + 12 * k, start, g, pan, 1.1); bell(m + 12 * k + 7, start + step, g * 0.7, pan, 1.1);
+            start += 2 * step; step /= 2; g *= 0.6;
+          }
+        },
+        finale(t) { swell(FINALE_CHORD, t); bell(62, t, NOTE.improve * 0.8, 0, 1.4); },
+        ending(t, settled) {
+          if (settled) {
+            SETTLED_CHORD.forEach((m, i) => bell(m, t + i * 0.24, NOTE.kept * (1 - i * 0.1), (i - 2) * 0.15, 1.4));
+            swell(SETTLED_CHORD.slice(0, 3), t, SWELL.gain * 0.8);
+          } else {
+            swell(UNSETTLED_CHORD, t, SWELL.gain);
+          }
+        },
+        whoosh(t, up, duration) { whoosh(t, up, duration); }
+      },
+      // Everything fades to silence (after the end); a live context is then suspended.
+      rest(t = context.currentTime, seconds = REST.fade) {
+        if (closed) return;
+        rampMaster(0, at(t), seconds);
+        if (!offline) setTimeout(() => { if (!closed && context.state === 'running') context.suspend().catch(() => {}); }, (at(t) - context.currentTime + seconds) * 1000 + 100);
+      },
+      // Held (Space, a hidden tab): the master drops; released, it returns.
+      hold(value) {
+        if (closed || held === value) return;
+        held = value;
+        if (!enabled) return;
+        rampMaster(held ? 0 : AUDIO_MASTER, context.currentTime, AUDIO_TOGGLE);
+      },
+      setEnabled(value) {
+        if (closed || enabled === value) return;
+        enabled = value;
+        const t = context.currentTime;
+        if (enabled) {
+          if (!offline && context.state === 'suspended') context.resume().catch(() => {});
+          if (!held) rampMaster(AUDIO_MASTER, t, AUDIO_TOGGLE);
+        } else {
+          rampMaster(0, t, AUDIO_TOGGLE);
+          if (!offline) setTimeout(() => { if (!enabled && !closed && context.state === 'running') context.suspend().catch(() => {}); }, AUDIO_TOGGLE * 1000 + 80);
+        }
+      },
+      // Fade (unless fast) and close the context.
+      close(fast) {
+        if (closed) return;
+        const t = context.currentTime;
+        if (!fast && !offline && context.state === 'running') rampMaster(0, t, 0.3);
+        closed = true;
+        if (offline) return;
+        setTimeout(() => { try { context.close().catch(() => {}); } catch (error) { /* already closed */ } }, fast ? 0 : 360);
+      }
+    });
+    return audio;
+  }
+
+  /* ---------------------------------------------------------------------------
    * The egg
    * ------------------------------------------------------------------------- */
   let active = false;
@@ -583,7 +860,12 @@
     stepButton.type = 'button'; stepButton.className = 'portrait-button portrait-step'; stepButton.textContent = 'Next test';
     const returnButton = document.createElement('button');
     returnButton.type = 'button'; returnButton.className = 'portrait-button'; returnButton.textContent = 'Return';
-    chrome.append(stepButton, returnButton);
+    const soundButton = document.createElement('button');
+    soundButton.type = 'button'; soundButton.className = 'portrait-button portrait-sound';
+    const soundLabel = document.createElement('span');
+    const soundKey = document.createElement('span'); soundKey.className = 'portrait-key'; soundKey.setAttribute('aria-hidden', 'true'); soundKey.textContent = 'm';
+    soundButton.append(soundLabel, ' ', soundKey);
+    chrome.append(stepButton, soundButton, returnButton);
     const live = document.createElement('p');
     live.className = 'portrait-live'; live.setAttribute('aria-live', 'polite');
     dialog.append(ground, figure, chrome, live);
@@ -619,6 +901,13 @@
     let held = false;                    // the visitor paused (Space)
     let rateFixed = Number.isFinite(options.rate) && options.rate > 0 ? options.rate : 0;
     const stats = { frames: 0, avgMs: 0, maxMs: 0, simMs: 0, sliceMs: 0 };
+    // Sound: the synthesizer (adopted from the boot's gesture, or created on one), the site's
+    // preference, a cue log for the tests, and the paint laid since the brush last listened.
+    let audio = null; let audioBroken = false; let audioRested = false;
+    let soundOn = true;
+    try { soundOn = localStorage.getItem(SOUND_KEY) !== 'off'; } catch (error) { soundOn = true; }
+    const audioCues = [];
+    let laid = 0; let laidSides = 0; let listenedAt = performance.now();
     const simMs = Number.isFinite(options.simMs) && options.simMs > 0 ? options.simMs : SIM_MS;
 
     function paintPaper() {
@@ -647,6 +936,9 @@
     // A test ends: the verdict, then the line settles.
     function endTest(e) {
       const r = rows[e.line];
+      const itself = e.level === 2 && e.line === 'self' && e.keep;
+      cue(`verdict ${e.level} ${e.line} ${e.keep ? 'kept' : 'not'}${itself ? ' itself' : ''}`,
+        a => a.cue.verdict(a.now(), e.level, degreeOf(e.line), e.keep, itself));
       counts.tests++;
       verdicts.push(`${e.level} ${e.line} ${e.from}>${e.to} ${e.keep ? 'kept' : 'not'}`);
       r.row.classList.remove('is-testing', 'is-testing-improve');
@@ -672,6 +964,8 @@
       if (e.level === 1) test1 = null; else test2 = null;
     }
     function stroke(e) {
+      const paint = e.z * e.z * e.a;
+      laid += paint; laidSides += e.z * paint;
       ctx.fillStyle = `rgba(${e.r},${e.g},${e.b},${e.a})`;
       ctx.fillRect(e.x * scale, e.y * scale, e.z * scale, e.z * scale);
     }
@@ -688,13 +982,20 @@
         if (e.k === 's') stroke(e);
         else if (e.k === 'p') { curve.push(e.at, e.v); psnrShown = e.v; }
         else if (e.k === 't') beginTest(e);
-        else if (e.k === 'f') { finaleShownAt = e.at; finaleIndex = curve.length; story.innerHTML = STORIES.finale; announce('The portrait is done. Now it paints its own program.'); }
+        else if (e.k === 'f') {
+          finaleShownAt = e.at; finaleIndex = curve.length; story.innerHTML = STORIES.finale;
+          announce('The portrait is done. Now it paints its own program.');
+          cue('finale', a => a.cue.finale(a.now()));
+        }
         else if (e.k === 'e') ending = e;
       }
       if (test1 && to >= test1.end) endTest(test1);
       if (test2 && !test1 && to >= test2.end) endTest(test2);
       if (ending && to >= ending.at && phase === 'painting' && !test1 && !test2) {
         phase = 'ended';
+        cue(`ending ${ending.settled ? 'settled' : 'unsettled'}`, a => a.cue.ending(a.now(), ending.settled));
+        listen(true);
+        restTimer = setTimeout(() => { audioRested = true; if (audio) audio.rest(); }, REST.after * 1000);
         story.innerHTML = ending.settled ? STORIES.settled : STORIES.unsettled;
         announce(ending.settled ? 'It has stopped changing itself: the picture is the program that paints it.' : 'It has not settled.');
       }
@@ -848,6 +1149,7 @@
         advance(cursor);
       }
       drawCurve(); drawTest(); describe();
+      listen();
       const took = performance.now() - began;
       stats.frames++; stats.avgMs += (took - stats.avgMs) / stats.frames; stats.maxMs = Math.max(stats.maxMs, took);
       // At rest once the end has been shown and nothing remains to compute.
@@ -857,6 +1159,7 @@
     function schedule() { if (!raf && !closed && !paused && !held) raf = requestAnimationFrame(frameLoop); }
     function hold(value) {
       held = value;
+      if (audio) audio.hold(held);
       if (held) { if (raf) cancelAnimationFrame(raf); raf = 0; } else { lastNow = 0; schedule(); }
     }
     // One test at a time: show up to the end of the test of paint after the cursor (reduced
@@ -876,6 +1179,80 @@
       schedule();
     }
 
+    /* ---- Sound ------------------------------------------------------------- */
+    let restTimer = 0; let lastListen = 0;
+    function audioFailed(error) {
+      if (!audioBroken) console.warn('The self-portrait\'s sound is unavailable.', error);
+      audioBroken = true;
+      const failed = audio; audio = null;
+      if (failed) { try { failed.close(true); } catch (closing) { /* already closed */ } }
+    }
+    // The boot primes a context inside the double-click; without one (or with the sound off
+    // then) a context is created on the next gesture inside the dialog.
+    function adoptAudio() {
+      if (audio || closed || audioBroken) return;
+      const primed = window.__portraitAudioContext;
+      if (primed !== undefined) { try { delete window.__portraitAudioContext; } catch (error) { window.__portraitAudioContext = undefined; } }
+      if (!soundOn) { if (primed && primed.state !== 'closed') primed.close().catch(() => {}); return; }
+      try {
+        let context = primed && primed.state !== 'closed' ? primed : null;
+        if (!context) {
+          const Context = window.AudioContext || window.webkitAudioContext;
+          if (!Context) return;
+          context = new Context();
+        }
+        if (context.state === 'suspended' && !document.hidden) context.resume().catch(() => {});
+        audio = createPortraitAudio(context);
+        if (held) audio.hold(true);
+        if (audioRested) audio.rest(audio.now(), 0.01);
+      } catch (error) { audioFailed(error); }
+    }
+    function unlockAudio() {
+      if (!soundOn || closed || closing) return;
+      if (!audio) { adoptAudio(); return; }
+      if (audio.state === 'suspended' && !document.hidden && !audioRested) audio.context.resume().catch(() => {});
+    }
+    // A cue: logged (test hook) whenever the sound is on; played when the context runs.
+    function cue(name, play) {
+      if (!soundOn) return;
+      if (audioCues.length < 800) audioCues.push(name);
+      if (!audio || !audio.ready) return;
+      try { play(audio); } catch (error) { audioFailed(error); }
+    }
+    // The beat's rate: the distance to the goal (the portrait's PSNR, then its own text's);
+    // none at a settled end.
+    function beatHz() {
+      if (ending && phase === 'ended' && ending.settled) return 0;
+      const u = finaleShownAt >= 0 ? (BEAT_GOAL_FINALE - psnrShown) / 12 : (FINALE_PSNR - psnrShown) / 16;
+      return BEAT.max * clamp(u, 0, 1);
+    }
+    // Every 120 ms (or now): the brush hears the paint laid since, the beat the distance.
+    function listen(now = false) {
+      const t = performance.now();
+      if (!now && t - lastListen < 120) return;
+      const seconds = Math.max(0.016, (t - listenedAt) / 1000);
+      const perSecond = laid / seconds; const side = laid > 0 ? laidSides / laid : 0;
+      laid = 0; laidSides = 0; listenedAt = t; lastListen = t;
+      if (!audio || audioBroken) return;
+      const sounding = phase === 'painting' || phase === 'ended';
+      try {
+        audio.brush(phase === 'painting' ? perSecond : 0, side);
+        audio.beat(sounding ? 1 : 0, beatHz());
+      } catch (error) { audioFailed(error); }
+    }
+    function labelSound() {
+      soundButton.setAttribute('aria-pressed', String(soundOn));
+      soundLabel.textContent = soundOn ? 'Sound on' : 'Sound off';
+    }
+    // The visitor switches the sound (the Sound button or M); the choice is the site's.
+    function setSound(value) {
+      soundOn = value;
+      try { localStorage.setItem(SOUND_KEY, soundOn ? 'on' : 'off'); } catch (error) { /* private mode */ }
+      labelSound();
+      if (soundOn) { if (!audio) adoptAudio(); if (audio) { audio.setEnabled(true); listen(true); } }
+      else if (audio) audio.setEnabled(false);
+    }
+
     /* ---- Open, close, restore ---------------------------------------------- */
     function cleanup() {
       if (closed) return;
@@ -885,6 +1262,9 @@
       events.abort();
       clearTimeout(chromeTimer); clearTimeout(liveTimer);
       Object.values(rows).forEach(r => clearTimeout(r.timer));
+      clearTimeout(restTimer);
+      if (audio) { try { audio.close(!closing); } catch (error) { /* already closed */ } audio = null; }
+      else if (window.__portraitAudioContext) { try { window.__portraitAudioContext.close().catch(() => {}); } catch (error) { /* closed */ } window.__portraitAudioContext = undefined; }
       try { if (dialog.open) dialog.close(); } catch (error) { /* already closed */ }
       dialog.remove();
       if (overflow) body.style.setProperty('overflow', overflow, overflowPriority);
@@ -915,6 +1295,9 @@
       if (closed) return;
       if (closing || document.hidden || still) { cleanup(); return; }
       closing = true; phase = 'closing';
+      if (audio) {
+        try { audio.brush(0, 0); audio.beat(0, 0); audio.cue.whoosh(audio.now() + 0.2, false, T_RETURN / 1000); } catch (error) { audioFailed(error); }
+      }
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
       hideChrome();
@@ -949,6 +1332,12 @@
     on(window, 'pagehide', cleanup);
     on(window, 'resize', () => { measureCharts(); drawCurve(); drawTest(); });
     on(document, 'visibilitychange', () => {
+      if (audio && !audioBroken) {
+        try {
+          if (document.hidden) { if (audio.state === 'running') audio.context.suspend().catch(() => {}); }
+          else if (soundOn && audio.enabled && !audioRested && audio.state === 'suspended') audio.context.resume().catch(() => {});
+        } catch (error) { audioFailed(error); }
+      }
       if (document.hidden) { paused = true; if (raf) cancelAnimationFrame(raf); raf = 0; }
       else { paused = false; lastNow = 0; schedule(); }
     });
@@ -958,7 +1347,8 @@
       if (inCorner) { chromeHover = true; showChrome(0); }
       else if (chromeHover) { chromeHover = false; showChrome(CHROME_HIDE_MS); }
     });
-    on(dialog, 'pointerdown', event => { if (!chrome.contains(event.target)) showChrome(CHROME_TAP_MS); });
+    on(dialog, 'pointerdown', event => { unlockAudio(); if (!chrome.contains(event.target)) showChrome(CHROME_TAP_MS); });
+    on(soundButton, 'click', () => setSound(!soundOn));
     // Keys: Esc returns (the dialog's cancel); Space pauses; the right arrow shows the next test.
     on(dialog, 'keydown', event => {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
@@ -966,6 +1356,8 @@
         event.preventDefault();
         if (still) skip(); else hold(!held);
       } else if (event.key === 'ArrowRight') { event.preventDefault(); skip(); }
+      else if ((event.key === 'm' || event.key === 'M') && !event.repeat) { event.preventDefault(); setSound(!soundOn); }
+      if (event.key !== 'm' && event.key !== 'M') unlockAudio();
       showChrome(CHROME_TAP_MS);
     });
 
@@ -989,6 +1381,9 @@
       verdicts: () => verdicts.slice(),
       listing: () => [...code.querySelectorAll('.pl')].map(row => row.querySelector('.pl-val').textContent),
       setRate(value) { rateFixed = value > 0 ? value : 0; },
+      get sound() { return soundOn; },
+      get audioState() { return audio ? audio.state : null; },
+      audioCues: () => audioCues.slice(),
       get held() { return held; },
       pause() { hold(true); },
       resume() { hold(false); },
@@ -1012,6 +1407,8 @@
       announce('A program is painting the photograph and rewriting itself as it goes. Escape returns.');
       dialog.focus({ preventScroll: true });
       const parts = [code, curveBox, testBox, caption];
+      labelSound();
+      adoptAudio();
       const begin = () => {
         if (closed || closing) return;
         phase = 'painting';
@@ -1027,6 +1424,7 @@
         const path = flight();
         parts.forEach(el => { el.style.opacity = '0'; });
         fade(ground, 0, 1, T_GROUND);
+        if (path) cue('whoosh up', a => a.cue.whoosh(a.now(), true, T_LIFT / 1000));
         const lift = path ? frame.animate([{ transform: path }, { transform: 'none' }], { duration: T_LIFT, easing: EASE, fill: 'none' })
           : fade(frame, 0, 1, T_LIFT);
         lift.finished.then(() => {
@@ -1044,5 +1442,5 @@
     return true;
   }
 
-  window.SitePortrait = { open, get active() { return active; } };
+  window.SitePortrait = { open, get active() { return active; }, createAudio: (context, options) => createPortraitAudio(context, options) };
 })();
