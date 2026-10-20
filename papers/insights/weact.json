@@ -1,0 +1,33 @@
+{
+  "story": {
+    "title": "Different stages need different capabilities",
+    "paragraphs": [
+      "A deep-research agent plans its investigation, searches for evidence, checks what it found and writes an answer. These stages need different capabilities, yet conventional fine-tuning updates shared parameters and deploys a single configuration throughout the task. Learning or refreshing one capability can therefore change parameters that another capability relies on.",
+      "Independent LoRA adapters separate those updates, but merging the adapters into one fixed model can still change how each specialist behaves. WeAct keeps the adapters separate during execution as well: the agent selects the weights appropriate to the current stage through its existing tool-calling interface. The research question is whether this separation supports both effective composition and local updates to individual capabilities."
+    ]
+  },
+  "mechanism": {
+    "title": "Weight selection becomes an internal action",
+    "paragraphs": [
+      "Training produces three adapters over frozen Qwen3-32B: Plan, Search and Writing, with ranks 32, 64 and 32. Each training example retains preceding interactions so the adapter learns to continue work already in progress. Its loss covers only the current stage’s assistant tokens and terminal exit call; earlier turns, the loading exchange and tool observations remain context without becoming prediction targets.",
+      "At inference, load_lora and offload_lora activate and release one adapter through the model’s native tool interface. The selected adapter controls subsequent reasoning and external tool calls until it releases control. Moving from one adapter to another requires offloading the first, and failed or invalid calls leave the active weights unchanged. All calls and results extend the same interaction history. The implementation retains the initial task and latest five user/tool messages, replacing older observation bodies with placeholders.",
+      "The two policies use the same mechanism. WeAct-hard normally enforces Plan → Search → Writing. WeAct-soft lets the base model choose a capability and the active adapter hand control back, with coverage, repetition and termination constraints enforced by the harness. Adapters stay resident on the GPU, but switching weights requires rebuilding the KV cache from the retained history. This is a change in the policy generating subsequent tokens, not simply an instruction to adopt another role."
+    ]
+  },
+  "evidence": {
+    "title": "Composition improves accuracy; local updates extend the library",
+    "paragraphs": [
+      "Across eight benchmarks, WeAct-hard has the highest mean accuracy at 45.47% and leads on six benchmarks. WeAct-soft averages 43.21% and leads on GAIA and MuSiQue. Full SFT averages 42.80%, Single LoRA 38.73%, and the strongest static merge, TIES-Merging, 35.66%. The headline 6.2% and 27.5% are relative improvements in the mean score; the corresponding absolute gains are 2.67 and 9.81 percentage points. The prescribed hard policy is strongest overall, so the result does not imply that flexible scheduling is always better.",
+      "Controlled diagnostics distinguish two failure modes. In sequential training, a shared rank-96 adapter still loses an average 1.67 points of teacher-forced content-token accuracy across capabilities; random partitioning loses 1.12 points. Capability-aligned adapters preserve their parameters through later stages. Separately, every tested static fusion increases mean target-token negative log-likelihood relative to the corresponding individual specialist, including full additive merging without rank compression. These are diagnostic measurements that support capability separation, rather than additional end-to-end benchmark scores.",
+      "The library can also change locally. Adding a Code adapter raises MegaScience accuracy from 26.5% to 29.0%, SciBench from 40.0% to 40.5%, and DS-1000 from 14.0% to 16.0%, with a 1.0-point gain on GAIA (Table 2). Refreshing only Writing improves ResearchQA and DeepResearch Bench under both routing policies (Table 3). The backbone and other adapters stay fixed, and neither update replays their historical training data. These studies demonstrate one capability insertion and one local refinement; they do not test a long sequence of continual updates.",
+      "Efficiency depends on the reference. WeAct uses 142.8 nominal EFLOPs for training, less than Full SFT but 1.96 times Single LoRA’s compute. In a controlled WebWalkerQA timing evaluation with 50 runs per method, soft and hard reduce mean answer-ready latency by 33.4% and 20.3% relative to Full SFT. These latency results include adapter switching and cache handling, and apply to that controlled evaluation rather than every task or deployment."
+    ]
+  },
+  "sources": [
+    {"label": "Capability learning and weight actions · Section 2", "url": "https://arxiv.org/html/2610.26847v1#S2"},
+    {"label": "Retention and static-fusion diagnostics · Section 3", "url": "https://arxiv.org/html/2610.26847v1#S3"},
+    {"label": "Main results and efficiency · Section 4", "url": "https://arxiv.org/html/2610.26847v1#S4"},
+    {"label": "Original paper · PDF", "url": "https://arxiv.org/pdf/2610.26847"}
+  ],
+  "reading_notes": "Read arXiv 2610.26847v1 on 2026-10-20: PDF, HTML and extracted TeX. Verified the five authors, first three equal-contribution marks and affiliations against arxiv-authors.tex and PDF page 1. Read Sections 2–4, Discussion, Limitations, the main table, capability retention and fusion diagnostics, Code insertion and Writing refresh. Transcribed selected Table 1 rows and all eight benchmark scores; averages agree to the published precision. Recomputed relative improvements from the printed averages. Kept hard versus soft routing explicit, distinguished teacher-forced diagnostics from end-to-end accuracy, and qualified efficiency relative to both Full SFT and Single LoRA. Source Figure 2 includes schematic paths and percentages; its caption explicitly distinguishes these from measured results. The source exposes no public project-code link. Preserve the arXiv preprint status."
+}

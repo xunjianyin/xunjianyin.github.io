@@ -1,0 +1,83 @@
+{
+  "weact": {
+    "short_name": "WeAct",
+    "topic": "Modular agent learning",
+    "takeaway": "An agent can change the weights it uses as a task unfolds. WeAct trains separate capability adapters and lets the agent activate them through tool calls, continuing from a shared interaction history.",
+    "question": "How can a long-horizon agent learn, combine and update different capabilities without forcing every stage of a task through one fixed parameter configuration?",
+    "method": [
+      {
+        "title": "Learn capabilities independently",
+        "text": "Train Plan, Search and Writing LoRA adapters over a frozen backbone. Retain earlier interactions as context, but supervise only the current capability’s assistant outputs and exit call."
+      },
+      {
+        "title": "Make weights callable",
+        "text": "Expose load_lora and offload_lora as native tools. At most one adapter is active; its weights govern subsequent reasoning and external tool use."
+      },
+      {
+        "title": "Expand or refine the library",
+        "text": "Register a newly trained Code adapter or update the Writing adapter while keeping the backbone and the other adapters fixed."
+      }
+    ],
+    "findings": [
+      {
+        "value": "45.47%",
+        "label": "Mean accuracy across eight deep-research benchmarks",
+        "detail": "WeAct-hard improves on Full SFT’s 42.80% by 2.67 percentage points, a 6.2% relative gain. WeAct-soft averages 43.21%."
+      },
+      {
+        "value": "+27.5%",
+        "label": "Relative gain over the strongest static merge",
+        "detail": "WeAct-hard’s 45.47% versus TIES-Merging’s 35.66% is a 9.81-point difference. Both WeAct variants outperform every tested static merge on all eight benchmarks."
+      }
+    ],
+    "scope": "The main results use Qwen3-32B and a small library of three capability adapters. The paper’s uncertainty estimates are nominal task-based binomial standard errors, not variability across repeated training runs. Keeping other parameters unchanged prevents overwriting them, but does not establish retention within an updated adapter or stable routing through many successive updates. Scaling the library and defining capability boundaries for less structured tasks remain open questions.",
+    "diagram": {
+      "title": "Capability learning and tool-mediated weight switching",
+      "steps": [
+        {"label": "Train", "text": "Independent LoRAs over one frozen backbone"},
+        {"label": "Select", "text": "Internal tool calls choose the active weights"},
+        {"label": "Continue", "text": "Reason and act from the shared history"}
+      ],
+      "caption": "WeAct separates learning a capability from deciding when to invoke it."
+    },
+    "source_url": "https://arxiv.org/html/2610.26847v1",
+    "source_note": "Verified against arXiv 2610.26847v1, submitted 19 October 2026: PDF, HTML and TeX source. Author order, equal contributions and affiliations: arxiv-authors.tex and PDF page 1. Method: Sections/2-Method.tex. Headline results and the transposed comparison table: Table 1, Tables/3-main-results.tex. Relative improvements are computed from the displayed average scores: (45.47 - 42.80) / 42.80 = 6.24%; (45.47 - 35.66) / 35.66 = 27.51%. Figure 2: Figures/02-method/weact-main.pdf, rendered directly with Poppler at 2400 px wide. Code insertion and Writing refresh: Tables 2 and 3. Efficiency qualifications: Section 4.4. No public code URL was supplied in the paper, so the page links only to verified paper resources.",
+    "results_table": {
+      "caption": "Table 1, selected methods, transposed for comparison. Accuracy (%) on the same eight benchmarks; higher is better. The average is the unweighted mean across benchmarks. Original nominal standard-error estimates are available in the linked paper.",
+      "headings": ["Benchmark", "Full SFT", "Single LoRA", "TIES-Merging", "WeAct-hard", "WeAct-soft"],
+      "rows": [
+        ["GAIA", "41.75", "35.92", "34.95", "40.78", "46.60"],
+        ["2Wiki", "50.90", "49.70", "47.60", "56.30", "53.20"],
+        ["Bamboogle", "65.60", "54.40", "55.20", "69.60", "62.40"],
+        ["MuSiQue", "15.76", "15.35", "14.07", "17.21", "17.58"],
+        ["WebWalkerQA", "38.53", "35.15", "34.41", "40.00", "37.79"],
+        ["xbench-DS", "50.00", "51.00", "44.00", "54.00", "50.00"],
+        ["BrowseComp", "13.50", "12.50", "7.00", "17.50", "15.50"],
+        ["FRAMES", "66.38", "55.83", "48.06", "68.33", "62.62"],
+        ["Average", "42.80", "38.73", "35.66", "45.47", "43.21"]
+      ],
+      "highlight": [],
+      "highlight_columns": [4, 5],
+      "source_url": "https://arxiv.org/html/2610.26847v1#S3.T1"
+    },
+    "figure_local": "assets/weact-overview.png",
+    "figure_url": "https://arxiv.org/src/2610.26847v1 (Figures/02-method/weact-main.pdf; original Figure 2, rendered to PNG at 2400 px wide with Poppler)",
+    "figure_caption": "Original Figure 2. Capability-specific training builds an adapter library (top). Internal tool calls select the active weights, while external tools interact with the environment (bottom). WeAct-hard prescribes the stage order; WeAct-soft selects capabilities from the evolving history. The paths and percentages in this schematic illustrate execution, rather than benchmark measurements.",
+    "primary_figure": true,
+    "figure_scroll": true,
+    "affiliations": ["Carnegie Mellon University", "Duke University", "Meta MSL"],
+    "authors_detail": [
+      {"name": "Rui Shi", "affiliations": [1], "equal": true},
+      {"name": "Xunjian Yin", "affiliations": [2], "equal": true},
+      {"name": "Jiacheng Sang", "affiliations": [2], "equal": true},
+      {"name": "Zichuan Liu", "affiliations": [1]},
+      {"name": "Shuyan Zhou", "affiliations": [2, 3]}
+    ],
+    "glance": {
+      "result": "45.47% average accuracy across eight benchmarks, versus 42.80% for full fine-tuning.",
+      "prior": "Independently trained adapters become actions that change the agent’s active weights during a trajectory.",
+      "limitation": "Evaluated on one backbone with a small adapter library; sustained continual learning remains open."
+    },
+    "abstract_label": "Read the abstract"
+  }
+}

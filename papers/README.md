@@ -1,6 +1,6 @@
 # Research pages
 
-These 29 pages share a restrained, light academic design. They are generated as
+These 30 pages share a restrained, light academic design. They are generated as
 complete static HTML: no framework, external fonts, or client-side data fetching
 is required. Existing paper URLs remain unchanged.
 

@@ -2,6 +2,29 @@
 const publications = [
   // Preprints
   {
+    title: "WeAct: Dynamic Weight Switching as Agent Actions",
+    authors: "Rui Shi*, <b>Xunjian Yin</b>*, Jiacheng Sang*, Zichuan Liu, Shuyan Zhou",
+    venue: "arXiv preprint 2026",
+    links: [
+      { text: "Paper", url: "https://arxiv.org/abs/2610.26847" },
+      { text: "Page", url: "papers/weact.html" }
+    ],
+    abstract: "Long-horizon agents must learn heterogeneous capabilities from interleaved trajectories. Updating shared parameters to learn new capabilities can degrade previously acquired ones, resulting in catastrophic forgetting. As a trajectory unfolds, different stages may require different capabilities, yet conventional joint training and static adapter merging maintain a fixed parameter configuration throughout execution. We introduce WeAct (Weight-level Internal Actions), which trains independent capability-specific LoRA adapters over a frozen backbone and adds adapter selection to the agent's action space. These internal actions use the model's native tool-calling interface for on-demand capability composition in a shared context. Across eight deep-research benchmarks, Qwen3-32B with WeAct improves average accuracy by 6.2% relative to full fine-tuning counterparts despite using less compute, and by 27.5% relative to the strongest static LoRA-merging method. WeAct also supports modular continual adaptation, by adding a new code computation adapter to expand the agent's capabilities and updating the existing writing adapter to improve report quality. Both updates leave the backbone and other adapters unchanged, supporting modular continual adaptation in agents.",
+    citation: `<pre><code>@misc{shi2026weactdynamicweightswitching,
+      title={WeAct: Dynamic Weight Switching as Agent Actions},
+      author={Rui Shi and Xunjian Yin and Jiacheng Sang and Zichuan Liu and Shuyan Zhou},
+      year={2026},
+      eprint={2610.26847},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2610.26847},
+}</code></pre>`,
+    isNew: true,
+    topics: ["improvement", "reasoning"],
+    isPreprint: true,
+    isSelected: true
+  },
+  {
     title: "X-Tree: Tokenizing Reusable Experience for Efficient Agent Generalization",
     authors: "Sitao Cheng, <b>Xunjian Yin</b>, Zhiyuan Sun, Yuxuan Li, Ruiwen Zhou, Xiangru Jian, Victor Zhong",
     venue: "arXiv preprint 2026",

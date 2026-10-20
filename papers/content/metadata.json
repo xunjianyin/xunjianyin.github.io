@@ -837,5 +837,24 @@
     "citation": "@inproceedings{hu-etal-2024-themis,\n    title = \"Themis: A Reference-free {NLG} Evaluation Language Model with Flexibility and Interpretability\",\n    author = \"Hu, Xinyu and Lin, Li and Gao, Mingqi and Yin, Xunjian and Wan, Xiaojun\",\n    booktitle = \"Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing\",\n    year = \"2024\",\n    url = \"https://aclanthology.org/2024.emnlp-main.891/\",\n    pages = \"15924--15951\"\n}",
     "figures": [],
     "original_words": 736
+  },
+  "weact": {
+    "title": "WeAct: Dynamic Weight Switching as Agent Actions",
+    "authors": "Rui Shi*, Xunjian Yin*, Jiacheng Sang*, Zichuan Liu, Shuyan Zhou",
+    "venue": "arXiv preprint 2026",
+    "links": [
+      {
+        "label": "Paper",
+        "url": "https://arxiv.org/abs/2610.26847"
+      },
+      {
+        "label": "PDF",
+        "url": "https://arxiv.org/pdf/2610.26847"
+      }
+    ],
+    "abstract": "Long-horizon agents must learn heterogeneous capabilities from interleaved trajectories. Updating shared parameters to learn new capabilities can degrade previously acquired ones, resulting in catastrophic forgetting. As a trajectory unfolds, different stages may require different capabilities, yet conventional joint training and static adapter merging maintain a fixed parameter configuration throughout execution. We introduce WeAct (Weight-level Internal Actions), which trains independent capability-specific LoRA adapters over a frozen backbone and adds adapter selection to the agent's action space. These internal actions use the model's native tool-calling interface for on-demand capability composition in a shared context. Across eight deep-research benchmarks, Qwen3-32B with WeAct improves average accuracy by 6.2% relative to full fine-tuning counterparts despite using less compute, and by 27.5% relative to the strongest static LoRA-merging method. WeAct also supports modular continual adaptation, by adding a new code computation adapter to expand the agent's capabilities and updating the existing writing adapter to improve report quality. Both updates leave the backbone and other adapters unchanged, supporting modular continual adaptation in agents.",
+    "citation": "@misc{shi2026weactdynamicweightswitching,\n      title={WeAct: Dynamic Weight Switching as Agent Actions},\n      author={Rui Shi and Xunjian Yin and Jiacheng Sang and Zichuan Liu and Shuyan Zhou},\n      year={2026},\n      eprint={2610.26847},\n      archivePrefix={arXiv},\n      primaryClass={cs.LG},\n      url={https://arxiv.org/abs/2610.26847},\n}",
+    "figures": [],
+    "original_words": 0
   }
 }

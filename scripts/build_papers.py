@@ -29,7 +29,7 @@ AUTHOR_FIELDS = {"name", "affiliations", "equal"}
 # neighbours in a thread are the most closely related papers.
 RESEARCH_THREADS: dict[str, list[str]] = {
     "Agents, self-improvement, and reasoning": [
-        "godel-agent", "derl", "chemagent", "coding-agents-long-context", "epistemic-context-learning",
+        "godel-agent", "weact", "derl", "chemagent", "coding-agents-long-context", "epistemic-context-learning",
         "contrasolver", "atomic-to-composite", "geometry-of-reasoning"],
     "Language modeling and decoding": ["reverse-lm", "coral"],
     "Knowledge in language models": [
