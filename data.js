@@ -1318,7 +1318,7 @@ const researchExperience = [
   {
     period: "May 2026 - Sep. 2026",
     institution: "Google DeepMind",
-    mentor: "Dr. Jingmeng Rao",
+    mentor: "Dr. Jinmeng Rao",
     description: "Working memory management for long horizon agentic tasks. We designed a method that enables internal agents to autonomously and dynamically manage their context and retrieve necessary information from their history without loss."
   },
   {
