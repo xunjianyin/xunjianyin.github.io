@@ -1394,7 +1394,7 @@ const talks = [
   },
   {
     title: "Speech at the Graduation Ceremony",
-    venue: "Peking University",
+    venue: "Academy for Advanced Interdisciplinary Studies, Peking University",
     date: "Jun 26, 2025",
     attachments: [
       { text: "News", url: "https://mp.weixin.qq.com/s/fzxzfwheU-5rATVypjenwg" },
@@ -1412,11 +1412,12 @@ const talks = [
     ]
   },
   {
-    title: "Talk at the Founder Product Launch Event",
+    title: "Talk at the Founder Product Launch Event: Error-Robust Retrieval for Chinese Spelling Check",
     venue: "Founder",
     date: "Jan 25, 2024",
     attachments: [
-      { text: "News", url: "https://mp.weixin.qq.com/s/1LBHCS1GypM62GQWZ2VX9w" }
+      { text: "News", url: "https://mp.weixin.qq.com/s/1LBHCS1GypM62GQWZ2VX9w" },
+      { text: "Paper", url: "https://aclanthology.org/2024.lrec-main.553/" }
     ]
   }
 
